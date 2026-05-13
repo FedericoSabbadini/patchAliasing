@@ -1,0 +1,25 @@
+\begin{thebibliography}{1}\setlength{\itemsep}{-1ex}\small
+
+\bibitem{nauman2011using}
+M.~Nauman, T.~Ali, and A.~Rauf.
+\newblock Using trusted computing for privacy preserving keystroke-based
+  authentication in smartphones.
+\newblock {\em Telecommunication Systems}, pages 1--13, 2011.
+
+\bibitem{se-cs-collab:nauman10}
+M.~Nauman and M.~Uzair.
+\newblock Se and cs collaboration: Training students for engineering large,
+  complex systems.
+\newblock In {\em Proceedings of the 20th Conference on Software Engineering
+  Education \& Training}, pages 167--174, Washington, DC, USA, 2007. IEEE
+  Computer Society.
+
+\bibitem{seo2011user}
+H.~Seo and H.~Kim.
+\newblock User input pattern-based authentication method to prevent mobile
+  e-financial incidents.
+\newblock In {\em Parallel and Distributed Processing with Applications
+  Workshops (ISPAW), 2011 Ninth IEEE International Symposium on}, pages
+  382--387. IEEE, 2011.
+
+\end{thebibliography}
