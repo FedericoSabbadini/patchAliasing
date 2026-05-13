@@ -1,0 +1,66 @@
+\section{Point 1 — Patch-Based Tokenisation as an Operator; Conditions for Identical Patches}
+
+
+\subsection{Setup and Formal Definition}
+
+Let $x[n]$ be a discrete-time signal with $n \in \mathbb{Z}$, sampled at frequency $f_s$.
+Patch-based tokenisation extracts a sequence of tokens by sliding a window of size $P$
+samples with stride $S$:
+\begin{equation}
+    \mathbf{p}_k
+    = \bigl(x[kS],\; x[kS+1],\; \ldots,\; x[kS+P-1]\bigr)
+    \in \mathbb{R}^P,
+    \qquad k = 0, 1, 2, \ldots
+\end{equation}
+
+\begin{definition}[Patch Tokenisation Operator]
+    The map $\mathcal{T}: \ell^\infty(\mathbb{Z}) \to (\mathbb{R}^P)^{\mathbb{N}}$ defined
+    by~(1) is called the \emph{patch tokenisation operator}.  It is linear: collecting $K$
+    patches yields
+    \begin{equation}
+        \mathbf{P} = \mathcal{T}\{x\} = \mathbf{W} \cdot \mathbf{x},
+    \end{equation}
+    where $\mathbf{W} \in \{0,1\}^{KP \times N}$ is a binary selection matrix whose $k$-th
+    block of $P$ rows picks the $P$ consecutive samples starting at index $kS$.
+\end{definition}
+
+\subsection{Condition for Two Consecutive Patches to Be Identical}
+
+\begin{proposition}
+    Patches $\mathbf{p}_k$ and $\mathbf{p}_{k+1}$ are identical if and only if
+    \begin{equation}
+        x[n] = x[n + S] \quad \forall\, n \in \{kS,\, kS+1,\, \ldots,\, kS+P-1\}.
+    \end{equation}
+    Globally, if the signal is periodic with period $T_0$ (in samples), identical
+    consecutive patches occur whenever
+    \begin{equation}
+        \boxed{S = m \cdot T_0, \qquad m \in \mathbb{Z}^+.}
+    \end{equation}
+    Equivalently, in terms of signal frequency $f$ and sampling frequency $f_s$:
+    \begin{equation}
+        f = m \cdot \frac{f_s}{S}, \qquad m \in \mathbb{Z}^+.
+    \end{equation}
+\end{proposition}
+
+\begin{proof}
+    $\mathbf{p}_k = \mathbf{p}_{k+1}$ component-wise requires
+    $x[kS + j] = x[(k+1)S + j]$ for all $j \in \{0,\ldots,P-1\}$,
+    i.e.\ $x[n] = x[n+S]$ on that window.
+    For a periodic signal with $T_0 = f_s/f$ samples, this holds whenever $S$ is an
+    integer multiple of $T_0$, giving~(4).
+\end{proof}
+
+\subsection{Loss of Observability}
+
+When $\mathbf{p}_k = \mathbf{p}_{k+1}$ for all $k$, the token sequence is constant — the
+model sees the same vector repeated.  The \emph{rank} of the token matrix $\mathbf{P}$
+collapses to 1.  Consequently:
+
+\begin{itemize}
+    \item Temporal variation is invisible to the model.
+    \item Any two signals differing only by a phase shift of $S$ samples produce the same
+          token sequence: they are \textbf{observationally equivalent}.
+    \item Even when patches are not fully identical but merely highly correlated
+          ($S \approx mT_0$), the effective information in the token sequence is reduced
+          (\emph{soft} loss of observability).
+\end{itemize}
