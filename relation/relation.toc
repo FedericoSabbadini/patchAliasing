@@ -1,0 +1,13 @@
+\contentsline {section}{\numberline {1}Point 1 — Patch-Based Tokenisation as an Operator; Conditions for Identical Patches}{3}{section.1}%
+\contentsline {subsection}{\numberline {1.1}Setup and Formal Definition}{3}{subsection.1.1}%
+\contentsline {subsection}{\numberline {1.2}Condition for Two Consecutive Patches to Be Identical}{3}{subsection.1.2}%
+\contentsline {subsection}{\numberline {1.3}Loss of Observability}{3}{subsection.1.3}%
+\contentsline {section}{\numberline {2}Point 2 — Relationship Between $f_s$, $P$, $S$, $f$; Phase-Locking and Degeneracies}{4}{section.2}%
+\contentsline {subsection}{\numberline {2.1}The Patch-Induced Frequency}{4}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}Phase-Locking Condition}{4}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}Effect of Patch Size $P$}{4}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.4}Token-Space Degeneracies}{4}{subsection.2.4}%
+\contentsline {paragraph}{At $f = m\,f_s/S$ (harmonics of $f_{\mathrm {patch}}$).}{4}{section*.2}%
+\contentsline {paragraph}{At $f = k\,f_s/P$ (but not harmonics of $f_{\mathrm {patch}}$).}{5}{section*.3}%
+\contentsline {subsection}{\numberline {2.5}Overlap, Stride, and Blind-Spot Frequencies}{5}{subsection.2.5}%
+\contentsline {subsection}{\numberline {2.6}Summary}{5}{subsection.2.6}%

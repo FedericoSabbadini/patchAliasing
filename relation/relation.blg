@@ -1,0 +1,49 @@
+This is BibTeX, Version 0.99e (TeX Live 2026)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: relation.aux
+The style file: plain.bst
+Database file #1: patchAliasing.bib
+Warning--entry type for "paganiPreliminaryInsightsChronos2026b" isn't style-file defined
+--line 1 of file patchAliasing.bib
+You've used 1 entry,
+            2118 wiz_defined-function locations,
+            501 strings with 4446 characters,
+and the built_in function-call counts, 621 in all, are:
+= -- 43
+> -- 73
+< -- 0
++ -- 29
+- -- 28
+* -- 60
+:= -- 118
+add.period$ -- 2
+call.type$ -- 1
+change.case$ -- 17
+chr.to.int$ -- 0
+cite$ -- 1
+duplicate$ -- 7
+empty$ -- 23
+format.name$ -- 28
+if$ -- 110
+int.to.chr$ -- 0
+int.to.str$ -- 1
+missing$ -- 0
+newline$ -- 7
+num.names$ -- 2
+pop$ -- 21
+preamble$ -- 1
+purify$ -- 16
+quote$ -- 0
+skip$ -- 10
+stack$ -- 0
+substring$ -- 5
+swap$ -- 1
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 4
+warning$ -- 0
+while$ -- 2
+width$ -- 2
+write$ -- 9
+(There was 1 warning)
