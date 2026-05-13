@@ -1,17 +1,9 @@
-@online{paganiPreliminaryInsightsChronos2026b,
-  title = {Preliminary {{Insights}} in {{Chronos Frequency Data Understanding}} and {{Reconstruction}}},
-  author = {Pagani, Alessandro and Cominelli, Marco and Han, Liying and Dong, Gaofeng and Benini, Sergio and Gringoli, Francesco and Savardi, Mattia and Srivastava, Mani B. and Bihl, Trevor and Blasch, Erik P. and Brigham, Daniel O. and Combs, Kara and Kaplan, Lance M. and Cerutti, Federico},
-  date = {2026-05-07},
-  eprint = {2605.06361},
-  eprinttype = {arXiv},
-  eprintclass = {cs.LG},
-  doi = {10.48550/arXiv.2605.06361},
-  url = {http://arxiv.org/abs/2605.06361},
+@online{FastAccurateZeroshot2024,
+  title = {Fast and Accurate Zero-Shot Forecasting with {{Chronos-Bolt}} and {{AutoGluon}} | {{Artificial Intelligence}}},
+  date = {2024-12-02T10:20:13-08:00},
+  url = {https://aws.amazon.com/blogs/machine-learning/fast-and-accurate-zero-shot-forecasting-with-chronos-bolt-and-autogluon/},
   urldate = {2026-05-13},
-  abstract = {This paper presents a preliminary analysis of the ability of Chronos foundation model to process and internally represent frequency domain information. Foundation models that process time-series data offer practitioners a unified architecture capable of learning generic temporal representations across diverse tasks and domains, reducing the need for taskspecific feature engineering and enabling transfer across signal modalities. Despite their growing adoption, the extent to which such models encode fundamental signal properties remains insufficiently characterised. We address this gap by analysing Chronos under controlled conditions, starting from the simplest class of signals: discrete sinusoids generated at fixed frequencies. Using lightweight online minimum description length probes applied to the decoder architecture, we test for the presence and separability of frequency information in the model’s internal representations. The results provide insight into how frequential content is captured across the frequency spectrum and highlight regimes in which representation quality may degrade or require particular care. These findings offer practical guidance for users of Chronos in signal processing and information fusion contexts, and contribute to ongoing efforts to improve the interpretability and evaluation of foundation models for temporal data.},
-  pubstate = {prepublished},
-  keywords = {Computer Science - Machine Learning},
-  file = {/Users/federicosabbadini/Zotero/storage/RESRAGAF/Pagani et al. - 2026 - Preliminary Insights in Chronos Frequency Data Understanding and Reconstruction.pdf}
+  file = {/Users/gianlucabrignoli/Zotero/storage/IXC76RPM/fast-and-accurate-zero-shot-forecasting-with-chronos-bolt-and-autogluon.html}
 }
 
 @article{belroseLEACEPerfectLinear2023,
@@ -26,4 +18,21 @@
   urldate = {2026-05-13},
   langid = {english},
   file = {/Users/gianlucabrignoli/Zotero/storage/RYHDGA5V/Belrose et al. - 2023 - LEACE Perfect linear concept erasure in closed form.pdf}
+}
+
+@inproceedings{voitaInformationTheoreticProbingMinimum2020,
+  title = {Information-{{Theoretic Probing}} with {{Minimum Description Length}}},
+  booktitle = {Proceedings of the 2020 {{Conference}} on {{Empirical Methods}} in {{Natural Language Processing}} ({{EMNLP}})},
+  author = {Voita, Elena and Titov, Ivan},
+  editor = {Webber, Bonnie and Cohn, Trevor and He, Yulan and Liu, Yang},
+  date = {2020-11},
+  pages = {183--196},
+  publisher = {Association for Computational Linguistics},
+  location = {Online},
+  doi = {10.18653/v1/2020.emnlp-main.14},
+  url = {https://aclanthology.org/2020.emnlp-main.14/},
+  urldate = {2026-05-13},
+  abstract = {To measure how well pretrained representations encode some linguistic property, it is common to use accuracy of a probe, i.e. a classifier trained to predict the property from the representations. Despite widespread adoption of probes, differences in their accuracy fail to adequately reflect differences in representations. For example, they do not substantially favour pretrained representations over randomly initialized ones. Analogously, their accuracy can be similar when probing for genuine linguistic labels and probing for random synthetic tasks. To see reasonable differences in accuracy with respect to these random baselines, previous work had to constrain either the amount of probe training data or its model size. Instead, we propose an alternative to the standard probes, information-theoretic probing with minimum description length (MDL). With MDL probing, training a probe to predict labels is recast as teaching it to effectively transmit the data. Therefore, the measure of interest changes from probe accuracy to the description length of labels given representations. In addition to probe quality, the description length evaluates “the amount of effort” needed to achieve the quality. This amount of effort characterizes either (i) size of a probing model, or (ii) the amount of data needed to achieve the high quality. We consider two methods for estimating MDL which can be easily implemented on top of the standard probing pipelines: variational coding and online coding. We show that these methods agree in results and are more informative and stable than the standard probes.},
+  eventtitle = {{{EMNLP}} 2020},
+  file = {/Users/gianlucabrignoli/Zotero/storage/2HEIYU9B/Voita e Titov - 2020 - Information-Theoretic Probing with Minimum Description Length.pdf}
 }

@@ -227,3 +227,5 @@ __marimo__/
 *.fdb_latexmk
 *.synctex.gz
 *.toc
+*.bcf
+*.run.xml
