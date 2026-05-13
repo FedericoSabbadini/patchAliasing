@@ -216,3 +216,14 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# PDF artifacts
+*.out
+*.log
+*.fls
+*.blg
+*.bbl
+*.aux
+*.fdb_latexmk
+*.synctex.gz
+*.toc
