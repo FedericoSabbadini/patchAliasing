@@ -36,3 +36,87 @@
   eventtitle = {{{EMNLP}} 2020},
   file = {/Users/gianlucabrignoli/Zotero/storage/2HEIYU9B/Voita e Titov - 2020 - Information-Theoretic Probing with Minimum Description Length.pdf}
 }
+
+@article{wangDeepTimeSeries2026,
+  title = {Deep {{Time Series Models}}: {{A Comprehensive Survey}} and {{Benchmark}}},
+  shorttitle = {Deep {{Time Series Models}}},
+  author = {Wang, Yuxuan and Wu, Haixu and Dong, Jiaxiang and Liu, Yong and Wang, Chen and Long, Mingsheng and Wang, Jianmin},
+  date = {2026},
+  journaltitle = {IEEE Transactions on Pattern Analysis and Machine Intelligence},
+  pages = {1--20},
+  issn = {1939-3539},
+  doi = {10.1109/TPAMI.2026.3690845},
+  url = {https://ieeexplore.ieee.org/abstract/document/11509648},
+  urldate = {2026-05-15},
+  abstract = {Time series, characterized by a sequence of data points organized in a discrete-time order, are ubiquitous in real-world scenarios. Unlike other data modalities, time series present unique challenges in learning and modeling due to their intricate and dynamic nature, including the entanglement of nonlinear patterns and time-variant trends. Recent years have witnessed remarkable breakthroughs in time series analysis, with techniques shifting from traditional statistical methods to contemporary deep learning models. In this paper, we delve into the design of deep time series models across various analysis tasks and review the existing literature from two perspectives: basic modules and model architectures. Further, we develop and release Time Series Library (TSLib) as a fair benchmark of deep time series models for diverse analysis tasks. TSLib implements 41 prominent models, including both small- and large-scale time series models, covers 30 datasets from different domains, and supports 5 prevalent analysis tasks. Based on TSLib, we evaluate 16 popular deep time series models and 6 advanced time series foundation models. Empirical findings indicate that models with specific structures are apt only at distinct analytical tasks, providing insights for research and adoption of deep time series models. Code and datasets are available at https://github.com/thuml/Time-Series-Library.},
+  keywords = {Benchmark,Cutoff frequency,Deep time series models,Feeds,Filtering,Filters,Information filtering,Integrated circuits,Low-pass filters,Motion pictures,Protocols,Recommender systems,Survey,Time series analysis,Time series foundation models},
+  file = {/Users/gianlucabrignoli/Zotero/storage/4BQGKWIG/Wang et al. - 2026 - Deep Time Series Models A Comprehensive Survey and Benchmark.pdf}
+}
+
+@online{ansariChronosLearningLanguage2024,
+  title = {Chronos: {{Learning}} the {{Language}} of {{Time Series}}},
+  shorttitle = {Chronos},
+  author = {Ansari, Abdul Fatir and Stella, Lorenzo and Turkmen, Caner and Zhang, Xiyuan and Mercado, Pedro and Shen, Huibin and Shchur, Oleksandr and Rangapuram, Syama Sundar and Arango, Sebastian Pineda and Kapoor, Shubham and Zschiegner, Jasper and Maddix, Danielle C. and Wang, Hao and Mahoney, Michael W. and Torkkola, Kari and Wilson, Andrew Gordon and Bohlke-Schneider, Michael and Wang, Yuyang},
+  date = {2024-11-04},
+  eprint = {2403.07815},
+  eprinttype = {arXiv},
+  eprintclass = {cs.LG},
+  doi = {10.48550/arXiv.2403.07815},
+  url = {http://arxiv.org/abs/2403.07815},
+  urldate = {2026-05-13},
+  abstract = {We introduce Chronos, a simple yet effective framework for pretrained probabilistic time series models. Chronos tokenizes time series values using scaling and quantization into a fixed vocabulary and trains existing transformer-based language model architectures on these tokenized time series via the cross-entropy loss. We pretrained Chronos models based on the T5 family (ranging from 20M to 710M parameters) on a large collection of publicly available datasets, complemented by a synthetic dataset that we generated via Gaussian processes to improve generalization. In a comprehensive benchmark consisting of 42 datasets, and comprising both classical local models and deep learning methods, we show that Chronos models: (a) significantly outperform other methods on datasets that were part of the training corpus; and (b) have comparable and occasionally superior zero-shot performance on new datasets, relative to methods that were trained specifically on them. Our results demonstrate that Chronos models can leverage time series data from diverse domains to improve zero-shot accuracy on unseen forecasting tasks, positioning pretrained models as a viable tool to greatly simplify forecasting pipelines.},
+  pubstate = {prepublished},
+  keywords = {Computer Science - Artificial Intelligence,Computer Science - Machine Learning},
+  file = {/Users/gianlucabrignoli/Zotero/storage/45QCGFYH/Ansari et al. - 2024 - Chronos Learning the Language of Time Series.pdf}
+}
+
+@online{ansariChronos2UnivariateUniversal2025,
+  title = {Chronos-2: {{From Univariate}} to {{Universal Forecasting}}},
+  shorttitle = {Chronos-2},
+  author = {Ansari, Abdul Fatir and Shchur, Oleksandr and Küken, Jaris and Auer, Andreas and Han, Boran and Mercado, Pedro and Rangapuram, Syama Sundar and Shen, Huibin and Stella, Lorenzo and Zhang, Xiyuan and Goswami, Mononito and Kapoor, Shubham and Maddix, Danielle C. and Guerron, Pablo and Hu, Tony and Yin, Junming and Erickson, Nick and Desai, Prateek Mutalik and Wang, Hao and Rangwala, Huzefa and Karypis, George and Wang, Yuyang and Bohlke-Schneider, Michael},
+  date = {2025-10-17},
+  eprint = {2510.15821},
+  eprinttype = {arXiv},
+  eprintclass = {cs.LG},
+  doi = {10.48550/arXiv.2510.15821},
+  url = {http://arxiv.org/abs/2510.15821},
+  urldate = {2026-05-13},
+  abstract = {Pretrained time series models have enabled inference-only forecasting systems that produce accurate predictions without task-specific training. However, existing approaches largely focus on univariate forecasting, limiting their applicability in real-world scenarios where multivariate data and covariates play a crucial role. We present Chronos-2, a pretrained model capable of handling univariate, multivariate, and covariate-informed forecasting tasks in a zero-shot manner. Chronos-2 employs a group attention mechanism that facilitates in-context learning (ICL) through efficient information sharing across multiple time series within a group, which may represent sets of related series, variates of a multivariate series, or targets and covariates in a forecasting task. These general capabilities are achieved through training on synthetic datasets that impose diverse multivariate structures on univariate series. Chronos-2 delivers state-of-the-art performance across three comprehensive benchmarks: fev-bench, GIFT-Eval, and Chronos Benchmark II. On fev-bench, which emphasizes multivariate and covariate-informed forecasting, Chronos-2's universal ICL capabilities lead to substantial improvements over existing models. On tasks involving covariates, it consistently outperforms baselines by a wide margin. Case studies in the energy and retail domains further highlight its practical advantages. The in-context learning capabilities of Chronos-2 establish it as a general-purpose forecasting model that can be used "as is" in real-world forecasting pipelines.},
+  pubstate = {prepublished},
+  keywords = {Computer Science - Artificial Intelligence,Computer Science - Machine Learning,Statistics - Machine Learning},
+  file = {/Users/gianlucabrignoli/Zotero/storage/9BKLVV4J/Ansari et al. - 2025 - Chronos-2 From Univariate to Universal Forecasting.pdf;/Users/gianlucabrignoli/Zotero/storage/QT62C6NH/2510.html}
+}
+
+@online{FastAccurateZeroshot2024a,
+  title = {Fast and Accurate Zero-Shot Forecasting with {{Chronos-Bolt}} and {{AutoGluon}} | {{Artificial Intelligence}}},
+  date = {2024-12-02T10:20:13-08:00},
+  url = {https://aws.amazon.com/blogs/machine-learning/fast-and-accurate-zero-shot-forecasting-with-chronos-bolt-and-autogluon/},
+  urldate = {2026-05-13},
+  file = {/Users/gianlucabrignoli/Zotero/storage/T2EIEKSP/fast-and-accurate-zero-shot-forecasting-with-chronos-bolt-and-autogluon.html}
+}
+
+@online{ChronosBoltPipelineAmazonscienceChronosforecastinga,
+  title = {{{ChronosBoltPipeline}} | Amazon-Science/Chronos-Forecasting},
+  url = {https://deepwiki.com/amazon-science/chronos-forecasting/2.4-chronosboltpipeline},
+  urldate = {2026-05-13},
+  abstract = {The `ChronosBoltPipeline` provides a high-performance forecasting interface for Chronos-Bolt models, a patch-based variant of the original Chronos architecture. Chronos-Bolt achieves up to 250x faster},
+  langid = {english},
+  organization = {DeepWiki},
+  file = {/Users/gianlucabrignoli/Zotero/storage/Y3CVBUDY/2.html}
+}
+
+@online{paganiPreliminaryInsightsChronos2026,
+  title = {Preliminary {{Insights}} in {{Chronos Frequency Data Understanding}} and {{Reconstruction}}},
+  author = {Pagani, Alessandro and Cominelli, Marco and Han, Liying and Dong, Gaofeng and Benini, Sergio and Gringoli, Francesco and Savardi, Mattia and Srivastava, Mani B. and Bihl, Trevor and Blasch, Erik P. and Brigham, Daniel O. and Combs, Kara and Kaplan, Lance M. and Cerutti, Federico},
+  date = {2026-05-07},
+  eprint = {2605.06361},
+  eprinttype = {arXiv},
+  eprintclass = {cs.LG},
+  doi = {10.48550/arXiv.2605.06361},
+  url = {http://arxiv.org/abs/2605.06361},
+  urldate = {2026-05-13},
+  abstract = {This paper presents a preliminary analysis of the ability of Chronos foundation model to process and internally represent frequency domain information. Foundation models that process time-series data offer practitioners a unified architecture capable of learning generic temporal representations across diverse tasks and domains, reducing the need for task-specific feature engineering and enabling transfer across signal modalities. Despite their growing adoption, the extent to which such models encode fundamental signal properties remains insufficiently characterised. We address this gap by analysing Chronos under controlled conditions, starting from the simplest class of signals: discrete sinusoids generated at fixed frequencies. Using lightweight online minimum description length probes applied to the decoder architecture, we test for the presence and separability of frequency information in the model's internal representations. The results provide insight into how frequential content is captured across the frequency spectrum and highlight regimes in which representation quality may degrade or require particular care. These findings offer practical guidance for users of Chronos in signal processing and information fusion contexts, and contribute to ongoing efforts to improve the interpretability and evaluation of foundation models for temporal data.},
+  pubstate = {prepublished},
+  keywords = {Computer Science - Machine Learning},
+  file = {/Users/gianlucabrignoli/Zotero/storage/FCVSZP6E/Pagani et al. - 2026 - Preliminary Insights in Chronos Frequency Data Understanding and Reconstruction.pdf;/Users/gianlucabrignoli/Zotero/storage/ML5UPVNR/2605.html}
+}
