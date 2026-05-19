@@ -1,0 +1,25 @@
+Classical frequentist analyses — reporting $p$-values from null-hypothesis significance tests — are ill-suited to the questions posed by this work.
+We are not merely asking whether an effect exists, but rather: \emph{how large} is it, \emph{how uncertain} are we about its magnitude, and \emph{which competing model of the phenomenon} is better supported by the data?
+Bayesian inference provides the natural framework for all three questions, and it is adopted exclusively in this section for the quantitative analysis of results.
+
+\subsection{Prior Specification}
+
+Priors are chosen to be weakly informative, reflecting the theoretical constraints derived in Sections~\ref{sec:one}–\ref{sec:two} without unduly constraining the posterior.
+For the effect of frequency on MAE, we place a Gaussian process prior over the error–frequency curve, with a length-scale informed by the spacing between blind-spot harmonics ($f_s / S$).
+For the phase-sensitivity effect ($H_2$), we use a von Mises prior over the phase-error relationship, consistent with the circular symmetry of the problem.
+Patch parameter effects ($H_3$) are modelled through a hierarchical prior that shares information across $(P, S)$ configurations while allowing configuration-specific deviations.
+
+\subsection{Posterior Inference and Uncertainty Quantification}
+
+Posterior distributions over effect sizes are estimated via Markov chain Monte Carlo (MCMC) using a No-U-Turn Sampler (NUTS), implemented in a probabilistic programming framework.
+For each hypothesis, we report the posterior mean, the 95\% highest density interval (HDI), and the posterior probability that the effect exceeds a domain-relevant threshold $\delta$ chosen a priori.
+
+\subsection{Hypothesis Comparison via Bayes Factors}
+
+Model comparison between competing hypotheses (e.g.\ whether the error increase at harmonic frequencies is better described by a sharp spike or a smooth Gaussian envelope) is carried out using Bayes factors computed via bridge sampling.
+A Bayes factor $\mathrm{BF}_{10} > 10$ is treated as strong evidence in favour of the alternative model.
+
+\subsection{Results}
+
+\noindent\textbf{[To be completed.]}
+This subsection will present the posterior distributions, HDIs, and Bayes factors for each hypothesis, accompanied by annotated error–frequency curves showing the credible intervals of the fitted model.

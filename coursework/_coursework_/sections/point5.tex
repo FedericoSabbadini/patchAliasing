@@ -1,0 +1,23 @@
+Testing the hypotheses of Section~\ref{sec:point4} demands experimental conditions in which the frequency content and phase of the input can be controlled with precision, and in which architectural effects are cleanly separable from the confounds of real-world data (noise, non-stationarity, irregular sampling).
+For these reasons, the primary experimental stimuli are \emph{synthetic signals}: pure sinusoids, linear superpositions, and their phase-shifted variants, generated at known frequencies and evaluated under systematic parameter sweeps.
+
+\subsection{Signal Generation Protocol}
+
+Input signals take the form $x[n] = A \cos(2\pi f n / f_s + \phi) + \varepsilon[n]$, where $A$ is amplitude, $f$ is the target frequency, $\phi$ is the initial phase, and $\varepsilon[n] \sim \mathcal{N}(0, \sigma^2)$ is optional additive noise.
+Frequencies are drawn from a grid that includes: (i) exact harmonics of $f_{\mathrm{patch}}$, (ii) off-harmonic control frequencies equidistant between harmonics, and (iii) near-harmonic frequencies within $\pm 5\%$ of each blind spot to characterise the degradation envelope.
+
+\subsection{Experimental Factors}
+
+The experiment is structured as a full factorial design over the following factors:
+
+\begin{itemize}
+    \item \textbf{Signal frequency} $f$: spanning the range $[1\,\text{Hz},\, f_s/2]$ at a resolution fine enough to resolve individual blind spots.
+    \item \textbf{Initial phase} $\phi$: sampled uniformly from $[0, 2\pi)$ in steps of $\pi/8$ to test $H_2$.
+    \item \textbf{Patch length} $P$ and \textbf{stride} $S$: varied across a predefined grid of $(P, S)$ pairs, including overlapping ($S < P$), non-overlapping ($S = P$), and gapped ($S > P$) configurations, to test $H_3$.
+    \item \textbf{Noise level} $\sigma$: included as a nuisance factor to confirm that effects are not noise-induced.
+\end{itemize}
+
+\subsection{Isolation of Architectural Effects}
+
+\noindent\textbf{[To be completed.]}
+This subsection will detail the control conditions used to ensure that observed accuracy drops are attributable to structural aliasing rather than to classical Nyquist undersampling, encoder non-linearity, or training distribution mismatch.

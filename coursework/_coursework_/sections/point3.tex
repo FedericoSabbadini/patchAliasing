@@ -1,0 +1,17 @@
+The first two sections established that structural aliasing operates at the level of raw signal samples and token vectors.
+However, in practical deployment settings, time-series models are not evaluated on abstract sinusoids: they are tasked with recognising \emph{domain concepts} — states, events, anomalies, and transitions that carry operational meaning.
+A model with frequency-dependent blind spots may therefore fail not merely in terms of spectral reconstruction accuracy, but in terms of its ability to correctly identify the concepts that downstream decisions depend upon.
+
+This section makes that connection explicit by introducing a formal semantic layer.
+We adopt an ontology-based representation~\cite{voitaInformationTheoreticProbingMinimum2020} that articulates the relevant concepts, their properties, and the relations among them in the chosen application domain.
+The ontology is constructed in three stages: (i) identification of the core domain concepts (e.g.\ operating regime, fault condition, periodic load cycle) and their characteristic frequency signatures; (ii) formalisation of the relationships between these concepts and the signal-level observability conditions derived in Sections~\ref{sec:one} and~\ref{sec:two}; and (iii) analysis of which concept classes are structurally at risk given the patch parameters of Chronos-Bolt.
+
+\subsection{Ontological Representation}
+
+\noindent\textbf{[To be completed.]}
+The ontology will be formally specified here, with class definitions, property axioms, and a mapping from concept identifiers to their expected frequency ranges and temporal granularities.
+
+\subsection{Impact of Structural Aliasing on Semantic Observability}
+
+\noindent\textbf{[To be completed.]}
+This subsection will trace how aliasing at blind-spot frequencies propagates upward to distort the recognition of specific ontology classes, providing concrete examples from the chosen domain.

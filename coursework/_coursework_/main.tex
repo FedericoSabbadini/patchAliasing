@@ -21,136 +21,194 @@
 %----------------------------------------------------------------------------------------
 
 \documentclass[
-letterpaper, % Paper size, use either a4paper or letterpaper
-10pt, % Default font size, can also use 11pt or 12pt, although this is not recommended
-twoside, % Two side traditional mode where headers and footers change between odd and even pages, comment this option to make them fixed
-]{LTJournalArticle}  
+a4paper,
+10pt,
+twoside,
+]{LTJournalArticle}
 
-\addbibresource{patchAliasing.bib} % BibLaTeX bibliography file
+\addbibresource{patchAliasing.bib}
 
-% \footertext{\textit{Journal of ...}} % Text to appear in the footer, leave this command empty for no footer text
+\setcounter{page}{1}
 
-\setcounter{page}{1} % The page number of the first page, set this to a higher number if the article is to be part of an issue or larger work
-
-
+%--- Typography & Math ---
+% mathdesign/charter (mdbch) already provides amssymb/amsfonts symbols; do NOT reload them
 \usepackage[charter]{mathdesign}
 \usepackage{amsmath}
-\newtheorem{example}{Example}
+
+%--- Layout & Spacing ---
 \usepackage{booktabs}
 \usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{microtype}
 
-% Paragraph spacing
-\setlength{\parskip}{7pt}
+%--- Color ---
+\usepackage[dvipsnames]{xcolor}
+\definecolor{accentblue}{RGB}{30, 80, 160}
+\definecolor{lightgray}{RGB}{245, 245, 248}
+\definecolor{rulegray}{RGB}{180, 180, 190}
+
+%--- Framed boxes ---
+\usepackage{mdframed}
+\mdfdefinestyle{theoremstyle}{
+	linecolor=accentblue,
+	linewidth=1.2pt,
+	backgroundcolor=lightgray,
+	innertopmargin=6pt,
+	innerbottommargin=6pt,
+	innerleftmargin=8pt,
+	innerrightmargin=8pt,
+	skipabove=8pt,
+	skipbelow=4pt,
+}
+
+%--- Theorem environments ---
+\usepackage{amsthm}
+\theoremstyle{definition}
+\newtheorem{example}{Example}[section]
+
+
+%--- Paragraph & equation spacing ---
+\setlength{\parskip}{6pt}
 \setlength{\parindent}{0pt}
+\setlength{\emergencystretch}{1.5em}  % absorbs minor overfull \hbox
+\setlength{\abovedisplayskip}{9pt}
+\setlength{\belowdisplayskip}{9pt}
+\setlength{\abovedisplayshortskip}{4pt}
+\setlength{\belowdisplayshortskip}{4pt}
 
-% Equation spacing
-\setlength{\abovedisplayskip}{10pt}
-\setlength{\belowdisplayskip}{10pt}
-\setlength{\abovedisplayshortskip}{5pt}
-\setlength{\belowdisplayshortskip}{5pt}
+%--- Section styling ---
+\titleformat{\section}
+{\large\bfseries\color{accentblue}}
+{\thesection}{1em}{}[{\color{rulegray}\titlerule[0.5pt]}]
 
-% Section spacing
-\titlespacing*{\subsection}
-{0pt}{0.5cm}{0pt}
+\titleformat{\subsection}
+{\normalsize\bfseries\color{accentblue!80!black}}
+{\thesubsection}{1em}{}
 
+\titlespacing*{\section}{0pt}{18pt}{6pt}
+\titlespacing*{\subsection}{0pt}{12pt}{4pt}
+
+%--- Hyperlinks: class already loads hyperref, so configure via hypersetup ---
+\hypersetup{colorlinks=true, linkcolor=accentblue, citecolor=accentblue, urlcolor=accentblue}
 
 %----------------------------------------------------------------------------------------
 %	TITLE SECTION
 %----------------------------------------------------------------------------------------
 
-\title{Deliverable 1\\Structural Aliasing Analysis in Time Series Forecasting using Chronos} % Article title, use manual lines breaks (\\) to beautify the layout
+\title{Structural Aliasing in Patch-Based\\Time-Series Foundation Models}
 
-% Authors are listed in a comma-separated list with superscript numbers indicating affiliations
-% \thanks{} is used for any text that should be placed in a footnote on the first page, such as the corresponding author's email, journal acceptance dates, a copyright/license notice, keywords, etc
 \author{
-	Matteo Boniotti, Gianluca Brignoli and Federico Sabbadini \thanks{This work is licensed under the Creative Commons Attribution 4.0 International License. \newline Copyright for any third-party material included in this work remains with its respective owners and must be respected accordingly. \newline \newline During the preparation of this work, the authors used AI-based tools, including GPT-5.5, GPT-5.4, Gemini 3.1 Pro, and Sonnet 4.6, to support language refinement and improve clarity. All generated or suggested content was carefully reviewed, revised where necessary, and validated by the authors, who assume full responsibility for the final content of this work.}
+	Matteo Boniotti, Gianluca Brignoli, and Federico Sabbadini
+	\thanks{%
+		This work is submitted as Deliverable~1 for the joint CS/DT coursework 2026,
+		co-supervised by Prof.\ Benini.\newline
+		Licensed under CC BY 4.0.
+		Copyright for third-party material remains with its respective owners.\newline
+		AI-based tools (GPT-5.5, GPT-5.4, Gemini 3.1 Pro, Claude Sonnet 4.6) were used
+		for language refinement only; all technical content was produced and validated
+		by the authors, who bear full responsibility for the final work.
+	}
 }
 
-% Affiliations are output in the \date{} command
-% \date{\footnotesize\textsuperscript{\textbf{1}}School of Chemistry, The University of Michigan\\ \textsuperscript{\textbf{2}}Physics Department, The University of Wisconsin\\ \textsuperscript{\textbf{3}}Biological Sciences Department, The University of Minnesota}
-
-
-
-
-%-------------------------------------------------------------------------------------------------
+%----------------------------------------------------------------------------------------
 \begin{document}
 	
-	\title{Structural Aliasing Analysis in Time Series Forecasting using Chronos} % Article title, use manual lines breaks (\\) to beautify the layout
-	\author{
-		Matteo Boniotti, Gianluca Brignoli and Federico Sabbadini \thanks{This work is licensed under the Creative Commons Attribution 4.0 International License. \newline Copyright for any third-party material included in this work remains with its respective owners and must be respected accordingly. \newline \newline During the preparation of this work, the authors used AI-based tools, including GPT-5.5, GPT-5.4, Gemini 3.1 Pro, and Sonnet 4.6, to support language refinement and improve clarity. All generated or suggested content was carefully reviewed, revised where necessary, and validated by the authors, who assume full responsibility for the final content of this work.}
-	}
 	\maketitle
 	
-	%----------------------------------------ABSTRACT-------------------------------------------
-	\begin{abstract}
-	\noindent Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent porttitor arcu luctus, imperdiet urna iaculis, mattis eros. Pellentesque iaculis odio vel nisl ullamcorper, nec faucibus ipsum molestie. Sed dictum nisl non aliquet porttitor. Etiam vulputate arcu dignissim, finibus sem et, viverra nisl. Aenean luctus congue massa, ut laoreet metus ornare in. Nunc fermentum nisi imperdiet lectus tincidunt vestibulum at ac elit. Nulla mattis nisl eu malesuada suscipit. Aliquam arcu turpis, ultrices sed luctus ac, vehicula id metus. Morbi eu feugiat velit, et tempus augue. Proin ac mattis tortor. Donec tincidunt, ante rhoncus luctus semper, arcu lorem lobortis justo, nec convallis ante quam quis lectus. Aenean tincidunt sodales massa, et hendrerit tellus mattis ac. Sed non pretium nibh. Donec cursus maximus luctus. Vivamus lobortis eros et massa porta porttitor.
-	\end{abstract}
-	%----------------------------------------INTRO------------------------------------------------
+	%--- Decorative rule below title ---
+	{\color{rulegray}\noindent\rule{\linewidth}{1pt}}
+	\vspace{4pt}
+	
+	%---------------------------------------- ABSTRACT -------------------------------------------
+	\begin{mdframed}[style=theoremstyle, linecolor=rulegray]
+		\noindent\textbf{Abstract.}\quad
+		Patch-based tokenisation is a cornerstone of modern time-series foundation models, enabling
+		transformers to process long sequences efficiently by grouping consecutive samples into
+		fixed-length patches.
+		This work investigates a representational failure mode that we term \emph{structural aliasing}:
+		when the stride of the patch grid is commensurate with the period of an input signal,
+		consecutive tokens become identical, collapsing the token sequence to a low-rank representation
+		and rendering the model blind to that frequency component.
+		We formalise patch tokenisation as a linear operator, derive the set of blind-spot frequencies
+		as harmonics of the patch frequency $f_{\mathrm{patch}} = f_s/S$, and show that this failure
+		is orthogonal to classical Nyquist–Shannon undersampling.
+		We further connect signal-level observability loss to domain-level concept distortions through
+		an ontological semantic layer, validate three falsifiable hypotheses via controlled synthetic
+		experiments, quantify uncertainty using Bayesian inference, and investigate a candidate
+		mitigation strategy.
+		Finally, we discuss how the findings can inform the design of agentic AI systems that monitor,
+		explain, and act upon structural aliasing risks in real-time deployments.
+	\end{mdframed}
+	
+	%---------------------------------------- INTRO -----------------------------------------------
 	\newpage
 	\section*{Introduction}
-		\input{sections/introduction.tex}
+	\addcontentsline{toc}{section}{Introduction}
+	\input{sections/introduction.tex}
 	
-	%----------------------------------------POINT1------------------------------------------------
+	%---------------------------------------- POINT 1 ---------------------------------------------
 	\newpage
-	\section{Formal Definition of Patch-Based tokenization} \label{sec:one}
-		 \input{sections/point1.tex}
+	\section{Formal Model of Patch-Based Tokenisation}
+	\label{sec:one}
+	\input{sections/point1.tex}
 	
-	%----------------------------------------POINT2------------------------------------------------
+	%---------------------------------------- POINT 2 ---------------------------------------------
 	\newpage
-	\section{Phase-locking and Degeneration Analysis} \label{sec:two}
-		 \input{sections/point2.tex}
-
-%----------------------------------------POINT3------------------------------------------------
+	\section{Phase-Locking, Degeneracy, and Blind-Spot Frequencies}
+	\label{sec:two}
+	\input{sections/point2.tex}
+	
+	%---------------------------------------- POINT 3 ---------------------------------------------
 	\newpage
-	\section{Point 3}
-		\label{sec:point3}
-		\input{sections/point3.tex}
-
-%----------------------------------------POINT4------------------------------------------------
+	\section{Semantic Layer: Ontological Representation of Domain Concepts}
+	\label{sec:point3}
+	\input{sections/point3.tex}
+	
+	%---------------------------------------- POINT 4 ---------------------------------------------
 	\newpage
-	\section{Point 4}
-		\label{sec:point4}
-		\input{sections/point4.tex}
-
-%----------------------------------------POINT5------------------------------------------------
+	\section{Falsifiable Hypotheses}
+	\label{sec:point4}
+	\input{sections/point4.tex}
+	
+	%---------------------------------------- POINT 5 ---------------------------------------------
 	\newpage
-	\section{Point 5}
-		\label{sec:point5}
-		\input{sections/point5.tex}
-
-%----------------------------------------POINT6------------------------------------------------
+	\section{Controlled Experimental Design}
+	\label{sec:point5}
+	\input{sections/point5.tex}
+	
+	%---------------------------------------- POINT 6 ---------------------------------------------
 	\newpage
-	\section{Point 6}
-		\label{sec:point6}
-		\input{sections/point6.tex}
-
-%----------------------------------------POINT7------------------------------------------------
+	\section{Behavioural and Representational Evaluation}
+	\label{sec:point6}
+	\input{sections/point6.tex}
+	
+	%---------------------------------------- POINT 7 ---------------------------------------------
 	\newpage
-	\section{Point 7}
-		\label{sec:point7}
-		\input{sections/point7.tex}
-
-%----------------------------------------POINT8------------------------------------------------
+	\section{Bayesian Statistical Analysis}
+	\label{sec:point7}
+	\input{sections/point7.tex}
+	
+	%---------------------------------------- POINT 8 ---------------------------------------------
 	\newpage
-	\section{Point 8}
-		\label{sec:point8}
-		\input{sections/point8.tex}
-
-%----------------------------------------POINT9------------------------------------------------
+	\section{Mitigation Strategy}
+	\label{sec:point8}
+	\input{sections/point8.tex}
+	
+	%---------------------------------------- POINT 9 ---------------------------------------------
 	\newpage
-	\section{Point 9}
-		\label{sec:point9}
-		\input{sections/point9.tex}
-
-%----------------------------------------CONCLUSIONS------------------------------------------
+	\section{Agentic AI Integration}
+	\label{sec:point9}
+	\input{sections/point9.tex}
+	
+	%---------------------------------------- CONCLUSIONS -----------------------------------------
 	\newpage
 	\section{Conclusions}
-		\label{sec:conclusions}
-		\input{sections/conclusions.tex}
-
-	%----------------------------------------REFERENCES-------------------------------------------
+	\label{sec:conclusions}
+	\input{sections/conclusions.tex}
+	
+	%---------------------------------------- REFERENCES ------------------------------------------
 	\newpage
 	\nocite{*}
-	\printbibliography % Output the bibliography
-
+	\printbibliography
+	
 \end{document}

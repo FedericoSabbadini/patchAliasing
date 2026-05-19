@@ -1,0 +1,20 @@
+Structural aliasing can manifest at two distinct levels of the model pipeline, and a complete evaluation must address both.
+At the \emph{behavioural level}, aliasing is visible as degraded forecasting accuracy at specific frequencies — a measurable consequence that affects end-users directly.
+At the \emph{representational level}, aliasing is visible as a collapse of internal activation diversity — a mechanistic signature that explains \emph{why} the behavioural failure occurs and confirms that the root cause is architectural rather than incidental.
+
+\subsection{Behavioural Evaluation}
+
+Forecasting accuracy is assessed using standard time-series metrics — mean absolute error (MAE), mean squared error (MSE), and continuous ranked probability score (CRPS) for probabilistic outputs — computed over the held-out forecast horizon for each combination of experimental factors defined in Section~\ref{sec:point5}.
+The primary diagnostic plot is the \emph{error–frequency curve}: a profile of MAE (or CRPS) as a function of $f$, with blind-spot frequencies marked.
+A sharp, reproducible increase in error at harmonics of $f_{\mathrm{patch}}$, consistent across random seeds and noise levels, constitutes behavioural evidence for $H_1$.
+
+\subsection{Representational Evaluation}
+
+To probe internal representations, we apply linear probing~\cite{voitaInformationTheoreticProbingMinimum2020} and, where applicable, concept erasure via LEACE~\cite{belroseLEACEPerfectLinear2023} to the token embeddings produced by the encoder at each layer.
+Specifically, we train a lightweight linear classifier to predict the input frequency class from the token sequence, and measure how classification accuracy varies across frequency bins.
+A drop in probing accuracy at blind-spot frequencies — even when the input signal is fully representable — provides representational evidence for rank collapse in token space.
+
+\subsection{Metrics and Evaluation Protocol}
+
+\noindent\textbf{[To be completed.]}
+This subsection will specify the train/test split strategy, the number of repetitions per experimental cell, and the aggregation procedure used to produce the frequency profiles analysed in Section~\ref{sec:point7}.

@@ -1,0 +1,25 @@
+This work set out to develop a formal and falsifiable account of structural aliasing in patch-based time-series foundation models, using Chronos-Bolt as the primary architecture under study.
+Across the preceding sections, we have moved from a purely theoretical characterisation to empirical validation and, finally, to implications for agentic deployment.
+
+From a signal-theoretic standpoint, the central result is clear: patch-based tokenisation introduces a set of \emph{architectural blind spots} at frequencies that are integer multiples of the patch frequency $f_{\mathrm{patch}} = f_s / S$.
+At these frequencies, the token sequence collapses in rank, the model's temporal observability is lost, and forecasting accuracy degrades sharply.
+This failure is independent of classical undersampling: the affected signals are fully Nyquist-representable and would be faithfully processed by a sample-by-sample architecture.
+The degeneracy is instead a consequence of the geometric commensurability between signal periodicity and the fixed stride grid.
+
+The semantic layer introduced in Section~\ref{sec:point3} revealed that this signal-level failure does not remain confined to the token representation.
+Domain concepts whose characteristic frequency signatures overlap with the blind-spot set are at elevated risk of misclassification or non-detection, with consequences that are application-specific but potentially serious in monitoring and anomaly-detection contexts.
+
+The Bayesian analysis in Section~\ref{sec:point7} provided principled uncertainty quantification for the three core hypotheses.
+The evidence in support of $H_1$ (frequency-dependent blind spots) and $H_3$ (patch parameter dependence) was strong across experimental conditions.
+The evidence for $H_2$ (phase sensitivity) was more nuanced: while phase shifts partially mitigate near-harmonic degradation, the theoretical result of Section~\ref{sec:point8} confirms that exact harmonic degeneracy is phase-invariant and cannot be resolved by offset perturbation alone.
+
+The investigation of mitigation strategies (Section~\ref{sec:point8}) underscored the importance of grounding remedies in the underlying theoretical mechanism.
+Strategies that do not alter the commensurability between signal period and stride — such as uniform phase offsets or simple data augmentation — address the symptom rather than the cause.
+Multi-resolution tokenisation and learnable stride configurations, by contrast, are theoretically motivated and warrant further investigation.
+
+Finally, the agentic framing of Section~\ref{sec:point9} demonstrated that the analysis developed in this work is not merely academic.
+A deployed agentic system can leverage the derived blind-spot set, the ontological concept map, and the Bayesian posterior over effect sizes to maintain a real-time spectral risk model, generate structured explanations for human operators, and trigger principled corrective actions when reliability thresholds are breached.
+
+\paragraph{Limitations and future work.}
+The experimental programme of this report relied on synthetic stimuli, providing controlled conditions at the cost of ecological validity.
+Future work should evaluate structural aliasing on real-world multivariate time-series benchmarks, investigate the interaction between aliasing and the model's learned token embeddings, and develop architecture-level solutions — such as frequency-aware positional encodings or adaptive patch boundaries — whose effectiveness can be verified against the theoretical predictions derived here.

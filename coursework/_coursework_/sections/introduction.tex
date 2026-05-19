@@ -1,14 +1,21 @@
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent porttitor arcu luctus, imperdiet urna iaculis, mattis eros. Pellentesque iaculis odio vel nisl ullamcorper, nec faucibus ipsum molestie. Sed dictum nisl non aliquet porttitor. Etiam vulputate arcu dignissim, finibus sem et, viverra nisl. Aenean luctus congue massa, ut laoreet metus ornare in. Nunc fermentum nisi imperdiet lectus tincidunt vestibulum at ac elit. Nulla mattis nisl eu malesuada suscipit.
+Time-series foundation models have emerged as a powerful paradigm for zero-shot and few-shot temporal forecasting, with architectures such as Chronos~\cite{FastAccurateZeroshot2024} achieving remarkable generalisation across diverse domains.
+A key enabler of this scalability is \emph{patch-based tokenisation}: rather than feeding individual scalar observations to a transformer, contiguous windows of samples are grouped into fixed-length patches, dramatically shortening the effective sequence length and reducing the quadratic cost of self-attention.
+Despite its computational appeal, this design choice introduces a subtle but consequential inductive bias that has received little formal scrutiny.
 
-Aliquam arcu turpis, ultrices sed luctus ac, vehicula id metus. Morbi eu feugiat velit, et tempus augue. Proin ac mattis tortor. Donec tincidunt, ante rhoncus luctus semper, arcu lorem lobortis justo, nec convallis ante quam quis lectus. Aenean tincidunt sodales massa, et hendrerit tellus mattis ac. Sed non pretium nibh. Donec cursus maximus luctus. Vivamus lobortis eros et massa porta porttitor. Donec laoreet nisl vel risus lacinia elementum non nec lacus. Nullam luctus, nulla volutpat ultricies ultrices, quam massa placerat augue, ut fringilla urna lectus nec nibh. Vestibulum efficitur condimentum orci a semper. Pellentesque ut metus pretium lacus maximus semper~\cite{FastAccurateZeroshot2024}.
+The central concern of this work is what we term \emph{structural aliasing}: a representational failure that arises not from undersampling in the classical Nyquist–Shannon sense, but from the geometric interaction between the periodicity of an input signal and the fixed stride of the patch grid.
+When the stride $S$ is commensurate with the signal period $T_0$, consecutive patches become identical or near-identical, collapsing the token sequence to a constant or low-diversity representation.
+The model then suffers a loss of temporal observability that is invisible to standard sampling-theoretic guarantees — the signal is fully representable, yet the architecture cannot perceive it.
 
-Fusce varius orci ac magna dapibus porttitor. In tempor leo a neque bibendum sollicitudin. Nulla pretium fermentum nisi, eget sodales magna facilisis eu. Praesent aliquet nulla ut bibendum lacinia. Donec vel mauris vulputate, commodo ligula ut, egestas orci. Suspendisse commodo odio sed hendrerit lobortis. Donec finibus eros erat, vel ornare enim mattis et. Donec finibus dolor quis dolor tempus consequat. Mauris fringilla dui id libero egestas, ut mattis neque ornare. Ut condimentum urna pharetra ipsum consequat, eu interdum elit cursus. Vivamus scelerisque tortor et nunc ultricies, id tincidunt libero pharetra. Aliquam eu imperdiet leo. Morbi a massa volutpat velit condimentum convallis et facilisis dolor~\cite{belroseLEACEPerfectLinear2023}.
+Beyond the signal-theoretic dimension, structural aliasing carries semantic consequences.
+In real-world deployment scenarios, time-series signals encode domain concepts such as operational states, anomalies, control conditions, and recurring events.
+A model that is blind to certain frequencies may therefore misclassify or entirely miss semantically meaningful patterns.
+To make this connection explicit, we introduce an ontological layer that maps signal-level observability failures to domain-level concept distortions, and we evaluate the phenomenon through both behavioural metrics and internal representational probing.
 
-\begin{equation}
-	\cos^3 \theta =\frac{1}{4}\cos\theta+\frac{3}{4}\cos 3\theta
-	\label{eq:example}
-\end{equation}
-
-Automatically referencing an equation number using its label: Equation \ref{eq:example}.
-
-In hac habitasse platea dictumst. Curabitur mattis elit sit amet justo luctus vestibulum. In hac habitasse platea dictumst. Pellentesque lobortis justo enim, a condimentum massa tempor eu. Ut quis nulla a quam pretium eleifend nec eu nisl. Nam cursus porttitor eros, sed luctus ligula convallis quis. Nam convallis, ligula in auctor euismod, ligula mauris fringilla tellus, et egestas mauris odio eget diam. Praesent sodales in ipsum eu dictum. Aenean vel enim ipsum. Fusce ut felis at eros sagittis bibendum mollis lobortis libero~\cite{voitaInformationTheoreticProbingMinimum2020}.
+This report is structured as follows.
+Section~\ref{sec:one} formalises patch-based tokenisation as a linear operator and derives the conditions under which token identity — and hence observability loss — occurs.
+Section~\ref{sec:two} characterises the resulting blind-spot frequencies as harmonics of the patch frequency $f_{\mathrm{patch}} = f_s / S$, and analyses the role of patch size, stride, and overlap.
+Section~\ref{sec:point3} introduces the semantic layer through a formal ontology of the chosen application domain.
+Section~\ref{sec:point4} enumerates the falsifiable hypotheses that drive our experimental programme.
+Sections~\ref{sec:point5} and~\ref{sec:point6} describe the controlled synthetic experiments and the evaluation methodology at both the behavioural and representational levels.
+Section~\ref{sec:point7} presents the Bayesian statistical analysis used to quantify uncertainty and compare competing hypotheses.
+Section~\ref{sec:point8} investigates a principled mitigation strategy, and Section~\ref{sec:point9} situates the findings within an agentic AI setting, discussing how an autonomous agent could monitor, explain, and act upon structural aliasing risks.

@@ -70,7 +70,7 @@ qualitatively different behaviours, summarised below.
 \end{example}
 
 % -----------------------------------------------------------------
-\subsection{Effect of Patch Size $P$}
+\subsection{Effect of Patch Size \texorpdfstring{$P$}{P}}
 
 A single patch of $P$ samples spans a duration $P/f_s$ seconds and covers
 $P \cdot f / f_s$ cycles of the signal.
@@ -170,8 +170,8 @@ phase-locking.
 For $S \geq P$ (no overlap or gaps), the aliasing is maximal; the
 \textbf{blind-spot frequencies} are:
 \begin{equation}
-	\boxed{f_{\mathrm{blind}} = m \cdot \frac{f_s}{S},
-		\qquad m = 1, 2, 3, \ldots, \left\lfloor \frac{S}{2} \right\rfloor.}
+	\boxed{f_{\mathrm{blind}} = m \cdot \frac{f_s}{S}, \quad
+		m = 1, 2, \ldots, \left\lfloor \tfrac{S}{2} \right\rfloor.}
 \end{equation}
 The upper limit follows from the Nyquist criterion applied to the token sequence, whose
 effective sample rate is $f_s/S$.
@@ -202,7 +202,6 @@ These consequences follow directly from what is expressed in
 \end{example}
 
 % -----------------------------------------------------------------
-\newpage
 \subsection{Summary}
 
 \begin{table}[h]
