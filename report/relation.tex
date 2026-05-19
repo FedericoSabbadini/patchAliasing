@@ -1,0 +1,43 @@
+\documentclass[12pt,a4paper]{article}
+
+% ── Packages ───────────────────────────────────────────────────────────────
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{microtype}
+\usepackage{parskip}
+
+\geometry{margin=2.5cm}
+
+% ── Theorem environments ───────────────────────────────────────────────────
+\newtheorem{definition}{Definition}
+\newtheorem{proposition}{Proposition}
+\newtheorem{remark}{Remark}
+
+% ── Document ───────────────────────────────────────────────────────────────
+\title{\textbf{Patch-Based Tokenisation of Discrete-Time Signals}\\
+	Coursework — Points 1 \& 2}
+\date{}
+
+\begin{document}
+	 
+	\maketitle
+	\tableofcontents
+	\newpage
+	
+	\setcounter{section}{0}
+	\setcounter{page}{3}
+	\section{Point 1} \label{sec:point1}
+	\input{sections/point1.tex}
+	\newpage
+	\section{Point 2} \label{sec:point2}
+	\input{sections/point2.tex}
+	
+	% -------------------------------------------------------------------
+	\newpage
+	% add bibliography-related commands here 
+	\bibliographystyle{plain}
+	\bibliography{patchAliasing}   
+	
+\end{document}
