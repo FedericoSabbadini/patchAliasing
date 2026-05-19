@@ -1,0 +1,72 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Main Document
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[
+letterpaper,
+10pt,
+unnumberedsections,
+twoside
+]{LTJournalArticle}
+
+%------------------------------------------------
+% BIBLIOGRAPHY
+%------------------------------------------------
+\addbibresource{patchAliasing.bib}
+
+%------------------------------------------------
+% MATH / THEOREMS
+%------------------------------------------------
+\usepackage{amsmath}
+
+% Safe theorem definitions (no amsthm dependency)
+\newtheorem{example}{Example}
+
+%------------------------------------------------
+% HEADER
+%------------------------------------------------
+\runninghead{Structural Aliasing in Time-Series Forecasting}
+
+\setcounter{page}{1}
+
+%------------------------------------------------
+% TITLE
+%------------------------------------------------
+\title{Structural Aliasing Analysis in Chronos-Based Time-Series Forecasting}
+
+\author{
+	Matteo Boniotti, Gianluca Brignoli, Federico Sabbadini
+	\thanks{
+		CC BY 4.0 License.
+	}
+}
+
+%------------------------------------------------
+\begin{document}
+	
+	\maketitle
+	
+	%------------------------------------------------
+	% MAIN CONTENT
+	%------------------------------------------------
+	\input{sections/deliverable1}
+	
+	%------------------------------------------------
+	% OPTIONAL SECTIONS
+	%------------------------------------------------
+	\newpage
+	\section{Title 1}
+	\label{sec:one}
+	\input{sections/point1}
+	
+	\newpage
+	\section{Title 2}
+	\label{sec:two}
+	\input{sections/point2}
+	
+	%------------------------------------------------
+	% BIBLIOGRAPHY
+	%------------------------------------------------
+	\printbibliography
+	
+\end{document}

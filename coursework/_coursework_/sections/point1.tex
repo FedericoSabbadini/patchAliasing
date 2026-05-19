@@ -1,0 +1,208 @@
+\subsection{Setup and Formal Definition of the Tokenisation Operator}
+
+
+To rigorously understand the failure modes of patch-based architectures like Chronos-Bolt,
+we must first formally define the tokenisation process.
+Let $x[n]$ represent a discrete-time, univariate signal where the index $n \in \mathbb{Z}$
+is sampled at a continuous frequency of $f_s$.
+
+Unlike classical autoregressive models that process temporal data one scalar time-step at a
+time, modern foundation models employ \emph{patch-based tokenisation}.
+This technique groups contiguous samples to radically reduce the effective sequence length
+and improve the computational efficiency of the transformer's attention mechanisms.
+This is achieved by sliding a window of fixed size $P$ (the \emph{patch length}) across the
+signal, moving forward by a step size of $S$ (the \emph{stride}).
+
+We can extract this sequence of tokens as follows:
+\begin{equation}
+	\mathbf{p}_k
+	= \bigl(x[kS],\; x[kS+1],\; \ldots,\; x[kS+P-1]\bigr)
+	\in \mathbb{R}^P,
+	\qquad k \in \mathbb{N}.
+\end{equation}
+
+\begin{example}[Constructing patches by hand]
+	Let $x = [x_0, x_1, x_2, x_3, x_4, x_5, x_6, x_7]$ with $P = 4$ and $S = 2$.
+	The first three patches are:
+	\[
+	\mathbf{p}_0 = [x_0,x_1,x_2,x_3], \qquad
+	\mathbf{p}_1 = [x_2,x_3,x_4,x_5], \qquad
+	\mathbf{p}_2 = [x_4,x_5,x_6,x_7].
+	\]
+	Because $S < P$, consecutive patches overlap by $P - S = 2$ samples
+	(e.g.\ $\mathbf{p}_0$ and $\mathbf{p}_1$ share $x_2$ and $x_3$).
+	With $S = P = 4$ (no overlap), the patches would instead be
+	$\mathbf{p}_0{=}[x_0,\ldots,x_3]$, $\mathbf{p}_1{=}[x_4,\ldots,x_7]$,
+	with no shared samples at all.
+\end{example}
+
+\begin{definition}[Patch Tokenisation Operator]
+	We can formalise this extraction as a linear map acting on the bounded signal space.
+	The map $\mathcal{T}: \ell^\infty(\mathbb{Z}) \to (\mathbb{R}^P)^{\mathbb{N}}$,
+	as defined above, is referred to as the \emph{patch tokenisation operator}.
+	When collecting an arbitrary number of $K$ patches from a signal vector $\mathbf{x}$,
+	the operation can be represented as a matrix multiplication:
+	\begin{equation}
+		\mathbf{P} = \mathcal{T}\{x\} = \mathbf{W} \cdot \mathbf{x}.
+	\end{equation}
+	Here, $\mathbf{W} \in \{0,1\}^{KP \times N}$ is a \emph{block-binary selection matrix}.
+	Its $k$-th block consists of $P$ rows that act as a mask, picking out exactly $P$
+	consecutive signal samples starting at the temporal index $kS$.
+\end{definition}
+
+\begin{example}[Explicit matrix form]
+	Take $N = 6$, $P = 3$, $S = 3$ (non-overlapping), giving $K = 2$ patches.
+	The selection matrix and the resulting patch matrix are:
+	\[
+	\mathbf{W}
+	= \begin{pmatrix}
+		1 & 0 & 0 & 0 & 0 & 0 \\
+		0 & 1 & 0 & 0 & 0 & 0 \\
+		0 & 0 & 1 & 0 & 0 & 0 \\
+		0 & 0 & 0 & 1 & 0 & 0 \\
+		0 & 0 & 0 & 0 & 1 & 0 \\
+		0 & 0 & 0 & 0 & 0 & 1 \\
+	\end{pmatrix},
+	\qquad
+	\mathbf{P}
+	= \mathbf{W}\mathbf{x}
+	= \begin{pmatrix} x_0 \\ x_1 \\ x_2 \\ x_3 \\ x_4 \\ x_5 \end{pmatrix},
+	\]
+	which, when reshaped into $K \times P = 2 \times 3$ block form, gives
+	$\mathbf{p}_0 = [x_0,x_1,x_2]$ and $\mathbf{p}_1 = [x_3,x_4,x_5]$.
+	Each row of $\mathbf{W}$ contains exactly one non-zero entry (a 1) at the position of
+	the corresponding signal sample, confirming the pure selection nature of the operator.
+\end{example}
+
+\noindent The operator $\mathcal{T}$ is \emph{linear} because:
+\begin{enumerate}
+	\item $\mathcal{T}\{ax\} = a\,\mathcal{T}\{x\}$ for any scalar $a$ — scaling the
+	signal scales every patch proportionally.
+	\item $\mathcal{T}\{x+y\} = \mathcal{T}\{x\} + \mathcal{T}\{y\}$ — the patch of a
+	sum equals the sum of the patches.
+\end{enumerate}
+Linearity is the key property that makes the rank-collapse analysis in
+Section~\ref{sec:one} tractable.
+
+% -----------------------------------------------------------------
+\subsection{The Mechanics of Phase-Locking and Degeneracy}
+
+The fundamental vulnerability of the patch tokenisation operator emerges when the periodic
+structure of the input signal aligns perfectly with the model's fixed stride grid.
+We refer to this specific synchronisation as \emph{phase-locking}.
+
+\begin{proposition}[Condition for Token Identity]
+	Two consecutive patches, $\mathbf{p}_k$ and $\mathbf{p}_{k+1}$, will be
+	mathematically identical if and only if the signal amplitude remains constant across
+	the stride shift for every element within the observation window:
+	\begin{equation}
+		x[n] = x[n + S] \quad \forall\, n \in \{kS,\, kS+1,\, \ldots,\, kS+P-1\}.
+	\end{equation}
+	Globally, if the underlying continuous signal is a pure sinusoid (or any periodic
+	signal) with a fundamental period of $T_0$ samples, this exact alignment occurs
+	whenever the stride $S$ spans an integer multiple of the signal's period:
+	\begin{equation}
+		\boxed{S = m \cdot T_0, \quad m \in \mathbb{Z}^+.}
+	\end{equation}
+	Substituting $T_0 = f_s / f$, we can express this condition directly in terms of the
+	signal's continuous frequency $f$ and the sampling frequency $f_s$:
+	\begin{equation}
+		f = m \cdot \frac{f_s}{S}, \qquad m \in \mathbb{Z}^+.
+	\end{equation}
+\end{proposition}
+
+\begin{proof}
+	To satisfy $\mathbf{p}_k = \mathbf{p}_{k+1}$ strictly component-wise, it is required
+	that $x[kS + j] = x[(k+1)S + j]$ for every internal patch index
+	$j \in \{0,\ldots,P-1\}$.
+	For a periodic signal with $T_0 = f_s/f$, this strict equality holds whenever the
+	stride shift $S$ represents a traversal of exactly $m$ full wave cycles.
+	In such instances, the sliding window captures the geometrically identical segment of
+	the waveform at every step, and the proposition follows.
+\end{proof}
+
+\begin{example}[Phase-locking with a discrete sinusoid]
+	Let $f_s = 8\,\text{Hz}$, $f = 2\,\text{Hz}$, so $T_0 = f_s/f = 4$ samples.
+	Choose $S = 4$ ($= 1 \cdot T_0$) and $P = 4$.  The signal values are:
+	\begin{center}
+		\begin{tabular}{c|cccccccc}
+			$n$    & 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 \\\hline
+			$x[n]$ & $0$ & $1$ & $0$ & $-1$ & $0$ & $1$ & $0$ & $-1$
+		\end{tabular}
+	\end{center}
+	Then $\mathbf{p}_0 = [0,1,0,-1]$ and $\mathbf{p}_1 = [0,1,0,-1]$:
+	the two patches are \textbf{identical}.
+	If instead we set $S = 8 = 2T_0$, every patch still starts at phase $0$, and the
+	result is the same.
+	Conversely, with $S = 3$ (not a multiple of $T_0 = 4$), we obtain
+	$\mathbf{p}_0 = [0,1,0,-1]$ and $\mathbf{p}_1 = [-1,0,1,0]$, which are distinct —
+	no phase-locking occurs.
+\end{example}
+
+% -----------------------------------------------------------------
+\subsection{The Consequence: Loss of Observability}
+
+When the phase-locking condition $f = m \cdot (f_s/S)$ is met, we achieve a state where
+$\mathbf{p}_k = \mathbf{p}_{k+1}$ for all $k$.
+The token matrix $\mathbf{P}$ undergoes a mathematical \emph{rank collapse}, reducing its
+rank to exactly 1.
+
+This creates a \emph{degenerate token sequence}, which induces severe representational
+failures within the network:
+
+\begin{itemize}
+	\item \textbf{Complete Temporal Blindness.}
+	Because the transformer processes a sequence of completely identical vectors, the
+	temporal variation of the actual underlying signal becomes entirely invisible to
+	the model's self-attention mechanisms.
+	The model cannot perceive that a wave is oscillating; it simply perceives a
+	constant, flat embedding.
+	
+	\item \textbf{Observational Equivalence and Aliasing.}
+	Any two distinct signals that differ only by a phase shift of $S$ samples produce
+	the exact same sequence of tokens.
+	They become observationally indistinguishable to the decoder, making it
+	impossible for the model to correctly reconstruct or forecast the true phase of
+	the original signal.
+	
+	\smallskip
+	\begin{example}[Two signals, one token sequence]
+		With $f_s = 8\,\text{Hz}$, $f = 2\,\text{Hz}$, $S = 4$, consider two
+		phase-shifted signals:
+		\[
+		x_1[n] = \cos\!\left(\tfrac{2\pi \cdot 2\,n}{8}\right),
+		\qquad
+		x_2[n] = \cos\!\left(\tfrac{2\pi \cdot 2\,n}{8} + \tfrac{\pi}{2}\right).
+		\]
+		$x_1$ has values $[1, 0, -1, 0, 1, 0, -1, 0, \ldots]$ and $x_2$ has values
+		$[0, -1, 0, 1, 0, -1, 0, 1, \ldots]$.
+		Their patch sequences with $P = 4$:
+		\begin{align*}
+			x_1 &: \mathbf{p}_0{=}[1,0,-1,0],\quad
+			\mathbf{p}_1{=}[1,0,-1,0],\quad \ldots \\
+			x_2 &: \mathbf{p}_0{=}[0,-1,0,1],\quad
+			\mathbf{p}_1{=}[0,-1,0,1],\quad \ldots
+		\end{align*}
+		Each signal individually produces a \emph{constant} token sequence.
+		Although the two constant sequences differ from each other here, the decoder
+		cannot infer the phase trajectory over time from either one —
+		both look as if the signal is not evolving.
+	\end{example}
+	
+	\item \textbf{Soft Degradation at Boundary Frequencies.}
+	This failure is not isolated to exact integer multiples.
+	Even when patches are not perfectly identical but merely highly correlated
+	(i.e.\ when $S \approx m T_0$), the sequence suffers a \emph{soft} loss of
+	observability.
+	The effective information bandwidth is severely restricted, explaining why
+	predictive accuracy degrades smoothly around these critical frequency boundaries
+	before fully collapsing at the exact harmonic frequencies.
+\end{itemize}
+
+\noindent For example, in the specific architecture of Chronos-Bolt, the sampling frequency
+is $f_s = 512\,\text{Hz}$ and the stride is $S = 16$.
+According to our derived condition $f = m \cdot (512/16)$, the fundamental patch frequency
+is precisely $32\,\text{Hz}$.
+Consequently, any input signal at $32\,\text{Hz}$, $64\,\text{Hz}$, $96\,\text{Hz}$, or
+other integer harmonics will trigger this structural aliasing, resulting in an immediate
+and sharp collapse in the model's predictive accuracy.
