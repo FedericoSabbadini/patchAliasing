@@ -1,0 +1,34 @@
+[
+    {
+        "generator": "tsmixup",
+        "params": {
+            "K": 3,
+            "alpha": 0.2,
+            "l_min": 128,
+            "l_max": 2048,
+            "data_mode": "synthetic",
+            "t_lengths": [500, 600, 700, 400, 550],
+            "data_dir": "./input_datasets"
+        }
+    },
+    {
+        "generator": "tsmixup",
+        "params": {
+            "K": 3,
+            "alpha": 1.5,
+            "l_min": 128,
+            "l_max": 2048,
+            "data_mode": "synthetic",
+            "t_lengths": [500, 600, 700, 400, 550],
+            "data_dir": "./input_datasets"
+        }
+    },
+    {
+        "generator": "kernelsynth",
+        "params": {
+            "J": 3,
+            "l_syn": 512,
+            "jitter": 0.1
+        }
+    }
+]
