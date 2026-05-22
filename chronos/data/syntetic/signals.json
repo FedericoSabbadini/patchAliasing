@@ -8,7 +8,8 @@
             "l_max": 2048,
             "data_mode": "synthetic",
             "t_lengths": [500, 600, 700, 400, 550],
-            "data_dir": "./input_datasets"
+            "data_dir": "./input_datasets", 
+            "fs": 512
         }
     },
     {
@@ -20,7 +21,8 @@
             "l_max": 2048,
             "data_mode": "synthetic",
             "t_lengths": [500, 600, 700, 400, 550],
-            "data_dir": "./input_datasets"
+            "data_dir": "./input_datasets",
+            "fs": 512
         }
     },
     {
@@ -28,7 +30,8 @@
         "params": {
             "J": 3,
             "l_syn": 512,
-            "jitter": 0.1
+            "jitter": 0.1,
+            "fs": 512
         }
     }
 ]

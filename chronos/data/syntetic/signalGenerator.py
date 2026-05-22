@@ -14,9 +14,10 @@ def runTSMixup(**parameters):
         parameters["K"], parameters["alpha"],
         parameters["l_min"], parameters["l_max"],
         parameters["data_mode"], parameters["t_lengths"],
-        parameters["data_dir"], seed=SEED, output_dir=OUTPUT_DIR,
+        parameters["data_dir"], parameters["fs"], seed=SEED, output_dir=OUTPUT_DIR,
+
     )
-    sig = gen.generate()
+    sig, t = gen.generate()
     path = gen.save(sig)
     print(f"\n\nTSMixup     -> {path}  shape={sig.shape} mean={sig.mean():.4f} std={sig.std():.4f}")
 
@@ -24,9 +25,9 @@ def runTSMixup(**parameters):
 def runKernelSynth(**parameters):
     gen = KernelSynthGenerator(
         parameters["J"], parameters["l_syn"],
-        parameters["jitter"], seed=SEED, output_dir=OUTPUT_DIR,
+        parameters["jitter"], parameters["fs"], seed=SEED, output_dir=OUTPUT_DIR,
     )
-    sig = gen.generate()
+    sig, t = gen.generate()
     path = gen.save(sig)
     print(f"\n\nKernelSynth -> {path}  shape={sig.shape} mean={sig.mean():.4f} std={sig.std():.4f}")
 
