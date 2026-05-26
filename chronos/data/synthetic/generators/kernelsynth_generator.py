@@ -211,6 +211,16 @@ class KernelSynthGenerator:
     
 
     # ---------------- I/O ----------------
+    def getParameters(self) -> dict:
+        return {
+            "generator": "KernelSynth",
+            "J": self.J,
+            "l_syn": self.l_syn,
+            "fs": self.fs,
+            "jitter": self.jitter,
+            "inject": self.inject
+        }
+    
     def save(self, signal):
         path = self.path().with_suffix(".npy")
         self.output_dir.mkdir(parents=True, exist_ok=True)

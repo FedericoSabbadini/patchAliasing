@@ -172,6 +172,20 @@ class TSMixupGenerator:
         return "__" + "_".join(parts) if parts else ""
 
     # ---------------- IO ----------------
+    def getParameters(self):
+        return {
+            "K": self.K,
+            "alpha": self.alpha,
+            "l_min": self.l_min,
+            "l_max": self.l_max,
+            "data_mode": self.data_mode,
+            "t_lengths": self.t_lengths,
+            "inject": self.inject,
+            "P": self.P,
+            "fs": self.fs
+        }
+    
+    
     def save(self, signal):
         path = self.path().with_suffix(".npy")
         self.output_dir.mkdir(parents=True, exist_ok=True)
@@ -205,7 +219,6 @@ def retrieveDataFromPath(name:str) -> dict:
     alpha = float(parameters[2][5:]) # 1.5
     l_min = int(parameters[3][4:]) # 512
     l_max = int(parameters[4][4:]) # 512
-    fs = float(parameters[5][2:]) # 256
     t_lengths = [int(t) for t in parameters[6][2:].split(",")] # [256, 384, 512]
 
     inject = {}
@@ -227,7 +240,6 @@ def retrieveDataFromPath(name:str) -> dict:
         "alpha": alpha,
         "l_min": l_min,
         "l_max": l_max,
-        "fs": fs,
         "t_lengths": t_lengths,
         "inject": inject
     }
