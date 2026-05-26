@@ -30,6 +30,8 @@ class TSMixupGenerator:
                  inject=None, 
                  P=16,
                  fs=1.0,
+
+                 name=None,
                  ):
 
         self.K = K # K is the maximum number of subsequences to mix, randomly chosen between 1 and K for each signal. 
@@ -53,6 +55,7 @@ class TSMixupGenerator:
         self.P = P # P is the patch size, needed for cpp-mode injection to define the frequency of the injected component in terms of cycles per patch.
         # It is relevant for the cpp injection mode, where the frequency of the injected sinusoidal component is defined in terms of how many cycles fit into a patch of length P.
         self.fs = fs
+        self.name = name
 
 
     def _build_datasets(self) -> List[np.ndarray]:
@@ -101,43 +104,9 @@ class TSMixupGenerator:
         lambdas = self.rng.dirichlet([self.alpha] * k) # Sample mixing weights from a Dirichlet distribution, which ensures that they sum to 1 and controls the variability of the weights based on alpha.
         signal = sum(lam * s for lam, s in zip(lambdas, scaled)) # Mix the scaled subsequences using the sampled weights to create the final synthetic signal.
 
-        signal, self._inject_tag = self._apply_injection(signal, t)
+        signal = self._apply_injection(signal, t)
         return signal
 
-
-    def save(self, signal):
-        """Save the generated signal as a .npy file."""
-        self.output_dir.mkdir(parents=True, exist_ok=True)
-        np.save((self.__str__() + ".npy"), signal)
-
-
-    def plot(self, signal):
-        """Plot the generated signal and save the figure."""
-        plt.figure(figsize=(12, 4))
-        plt.plot(signal)
-        plt.title("Generated TSMixup Signal")
-        plt.xlabel("Samples")
-        plt.ylabel("Value")
-        plt.grid()
-        plt.tight_layout()
-        plt.savefig((self.__str__() + ".png"))
-        plt.close()
-
-
-    def __str__(self) -> str:
-        tag = getattr(self, "_inject_tag", "")
-
-        t_lenghts = ",".join(str(t) for t in self.t_lengths)
-        path = self.output_dir / (
-            f"TSMixup_K{self.K}_alpha{self.alpha}"
-            f"_lmin{self.l_min}_lmax{self.l_max}_fs{self.fs}"
-            f"_tlenght{t_lenghts}_{tag}"
-        )
-        if phase := (self.inject or {}).get("phase", 0.0):
-            path = path.with_name(path.stem + f"_ph{phase:g}" + path.suffix)
-        if amplitude := (self.inject or {}).get("amplitude", 1.0):
-            path = path.with_name(path.stem + f"_amp{amplitude:g}" + path.suffix)
-        return str(path)
     
 
     # ---------------- controlled injection ----------------
@@ -149,7 +118,7 @@ class TSMixupGenerator:
         t is needed for hz-mode injection to compute the sinusoid in seconds (t = np.arange(len(signal)) / fs).
         """
         if not self.inject:
-            return signal, "" # If no injection is specified, return the original signal and an empty tag.
+            return signal # If no injection is specified, return the original signal.
         
         # inject has the format {"mode": "cpp" or "hz", "value": float, "amplitude": float, "phase": float}
         spec = self.inject
@@ -165,12 +134,58 @@ class TSMixupGenerator:
             cpp = float(spec["value"])
             period_samples = self.P / cpp
             comp = amp * np.sin(2 * np.pi * n / period_samples + phase) # Compute the sinusoidal component based on the specified cpp, amplitude, and phase.
-            tag = f"_cpp{cpp:g}"
         elif spec["mode"] == "hz": # hz = cycles per second, which defines the frequency of the sinusoidal component in terms of hertz, independent of the signal length, and is relevant for testing sampling effects.
             # use hz when you want to inject a component at a specific frequency regardless of the signal length
             f_hz = float(spec["value"])
             comp = amp * np.sin(2 * np.pi * f_hz * t + phase) # Compute the sinusoidal component based on the specified frequency in hertz, amplitude, and phase. Note that t is in seconds, so this is fs-dependent.
-            tag = f"_hz{f_hz:g}"
         else:
             raise ValueError(f"Unknown inject mode: {spec['mode']}")
-        return signal + comp, tag
+        return signal + comp
+    
+
+
+    # ---------------- deterministic naming ----------------
+    def _base_path(self) -> Path:
+        t_lengths = ",".join(str(t) for t in self.t_lengths)
+        return self.output_dir / (
+            f"TSMixup_K{self.K}_alpha{self.alpha}"
+            f"_lmin{self.l_min}_lmax{self.l_max}"
+            f"_fs{self.fs}"
+            f"_tl{t_lengths}"
+            f"{self._build_tag()}.txt"
+        )
+
+    def _build_tag(self):
+        if not self.inject:
+            return ""
+        spec = self.inject
+        parts = []
+        if "value" in spec:
+            parts.append(f"cpp{spec.get('value', 0.0)}")
+        if "amplitude" in spec:
+            parts.append(f"amp{spec.get('amplitude', 1.0)}")
+        if "phase" in spec:
+            parts.append(f"ph{spec.get('phase', 0.0)}")
+        return "__" + "_".join(parts) if parts else ""
+
+    # ---------------- IO ----------------
+    def save(self, signal):
+        path = self.path().with_suffix(".npy")
+        self.output_dir.mkdir(parents=True, exist_ok=True)
+        np.save(path, signal)
+
+    def plot(self, signal):
+        path = self.path().with_suffix(".png")
+        plt.figure(figsize=(12, 4))
+        plt.plot(signal, linewidth=0.8)
+        plt.title("Generated TSMixup Signal")
+        plt.grid()
+        plt.tight_layout()
+        plt.savefig(path)
+        plt.close()
+
+    def path(self) -> str:
+        if self.name:
+            return self.output_dir / f"{self.name}"
+        else: 
+            return self._base_path()

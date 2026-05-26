@@ -1,1082 +1,1077 @@
 [
-  {
-    "_comment": "=== A. ON-GRID integer harmonics cpp=1..8 (8 = Nyquist). Predicted BLIND SPOTS. ===",
+    {
+        "_comment": "=== A. ON-GRID integer harmonics cpp=1..8 (8 = Nyquist). Predicted BLIND SPOTS. ===",
+        "generator": "kernelsynth",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "J": 5,
+        "l_syn": 512,
+        "fs": 256,
+        "jitter": 1e-06,
+        "P": 16,
+        "inject": {
+            "mode": "cpp",
+            "value": 1.0,
+            "amplitude": 1.0
+        }
+        }
+    },
+    {
+        "generator": "kernelsynth",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "J": 5,
+        "l_syn": 512,
+        "fs": 256,
+        "jitter": 1e-06,
+        "P": 16,
+        "inject": {
+            "mode": "cpp",
+            "value": 2.0,
+            "amplitude": 1.0
+        }
+        }
+    },
+    {
+        "generator": "kernelsynth",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "J": 5,
+        "l_syn": 512,
+        "fs": 256,
+        "jitter": 1e-06,
+        "P": 16,
+        "inject": {
+            "mode": "cpp",
+            "value": 3.0,
+            "amplitude": 1.0
+        }
+        }
+    },
+    {
+        "generator": "kernelsynth",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "J": 5,
+        "l_syn": 512,
+        "fs": 256,
+        "jitter": 1e-06,
+        "P": 16,
+        "inject": {
+            "mode": "cpp",
+            "value": 4.0,
+            "amplitude": 1.0
+        }
+        }
+    },
+    {
+        "generator": "kernelsynth",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "J": 5,
+        "l_syn": 512,
+        "fs": 256,
+        "jitter": 1e-06,
+        "P": 16,
+        "inject": {
+            "mode": "cpp",
+            "value": 5.0,
+            "amplitude": 1.0
+        }
+        }
+    },
+    {
+        "generator": "kernelsynth",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "J": 5,
+        "l_syn": 512,
+        "fs": 256,
+        "jitter": 1e-06,
+        "P": 16,
+        "inject": {
+            "mode": "cpp",
+            "value": 6.0,
+            "amplitude": 1.0
+        }
+        }
+    },
+    {
+        "generator": "kernelsynth",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "J": 5,
+        "l_syn": 512,
+        "fs": 256,
+        "jitter": 1e-06,
+        "P": 16,
+        "inject": {
+            "mode": "cpp",
+            "value": 7.0,
+            "amplitude": 1.0
+        }
+        }
+    },
+    {
+        "generator": "kernelsynth",
+        "default_name": "KernelSynth_J5_l_sin512_fs256_jitter1e-06__cpp8_amp1.0",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "J": 5,
+        "l_syn": 512,
+        "fs": 256,
+        "jitter": 1e-06,
+        "P": 16,
+        "inject": {
+            "mode": "cpp",
+            "value": 8.0,
+            "amplitude": 1.0
+        }
+        }
+    },
+    {
+        "_comment": "=== B. OFF-GRID half-integer controls cpp=0.5..7.5 (should remain observable). ===",
+        "generator": "kernelsynth",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "J": 5,
+        "l_syn": 512,
+        "fs": 256,
+        "jitter": 1e-06,
+        "P": 16,
+        "inject": {
+            "mode": "cpp",
+            "value": 0.5,
+            "amplitude": 1.0
+        }
+        }
+    },
+    {
+        "generator": "kernelsynth",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "J": 5,
+        "l_syn": 512,
+        "fs": 256,
+        "jitter": 1e-06,
+        "P": 16,
+        "inject": {
+            "mode": "cpp",
+            "value": 1.5,
+            "amplitude": 1.0
+        }
+        }
+    },
+    {
+        "generator": "kernelsynth",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "J": 5,
+        "l_syn": 512,
+        "fs": 256,
+        "jitter": 1e-06,
+        "P": 16,
+        "inject": {
+            "mode": "cpp",
+            "value": 2.5,
+            "amplitude": 1.0
+        }
+        }
+    },
+    {
+        "generator": "kernelsynth",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "J": 5,
+        "l_syn": 512,
+        "fs": 256,
+        "jitter": 1e-06,
+        "P": 16,
+        "inject": {
+            "mode": "cpp",
+            "value": 3.5,
+            "amplitude": 1.0
+        }
+        }
+    },
+    {
+        "generator": "kernelsynth",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "J": 5,
+        "l_syn": 512,
+        "fs": 256,
+        "jitter": 1e-06,
+        "P": 16,
+        "inject": {
+            "mode": "cpp",
+            "value": 4.5,
+            "amplitude": 1.0
+        }
+        }
+    },
+    {
+        "generator": "kernelsynth",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "J": 5,
+        "l_syn": 512,
+        "fs": 256,
+        "jitter": 1e-06,
+        "P": 16,
+        "inject": {
+            "mode": "cpp",
+            "value": 5.5,
+            "amplitude": 1.0
+        }
+        }
+    },
+    {
+        "generator": "kernelsynth",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "J": 5,
+        "l_syn": 512,
+        "fs": 256,
+        "jitter": 1e-06,
+        "P": 16,
+        "inject": {
+            "mode": "cpp",
+            "value": 6.5,
+            "amplitude": 1.0
+        }
+        }
+    },
+    {
+        "generator": "kernelsynth",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "J": 5,
+        "l_syn": 512,
+        "fs": 256,
+        "jitter": 1e-06,
+        "P": 16,
+        "inject": {
+            "mode": "cpp",
+            "value": 7.5,
+            "amplitude": 1.0
+        }
+        }
+    },
+    {
+        "_comment": "=== C. FINE SWEEP around the fundamental cpp 0.90..1.10 (degradation boundary). ===",
+        "generator": "kernelsynth",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "J": 5,
+        "l_syn": 512,
+        "fs": 256,
+        "jitter": 1e-06,
+        "P": 16,
+        "inject": {
+            "mode": "cpp",
+            "value": 0.9,
+            "amplitude": 1.0
+        }
+        }
+    },
+    {
+        "generator": "kernelsynth",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "J": 5,
+        "l_syn": 512,
+        "fs": 256,
+        "jitter": 1e-06,
+        "P": 16,
+        "inject": {
+            "mode": "cpp",
+            "value": 0.95,
+            "amplitude": 1.0
+        }
+        }
+    },
+    {
+        "generator": "kernelsynth",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "J": 5,
+        "l_syn": 512,
+        "fs": 256,
+        "jitter": 1e-06,
+        "P": 16,
+        "inject": {
+            "mode": "cpp",
+            "value": 0.98,
+            "amplitude": 1.0
+        }
+        }
+    },
+    {
+        "generator": "kernelsynth",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "J": 5,
+        "l_syn": 512,
+        "fs": 256,
+        "jitter": 1e-06,
+        "P": 16,
+        "inject": {
+            "mode": "cpp",
+            "value": 1.02,
+            "amplitude": 1.0
+        }
+        }
+    },
+    {
+        "generator": "kernelsynth",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "J": 5,
+        "l_syn": 512,
+        "fs": 256,
+        "jitter": 1e-06,
+        "P": 16,
+        "inject": {
+            "mode": "cpp",
+            "value": 1.05,
+            "amplitude": 1.0
+        }
+        }
+    },
+    {
+        "generator": "kernelsynth",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "J": 5,
+        "l_syn": 512,
+        "fs": 256,
+        "jitter": 1e-06,
+        "P": 16,
+        "inject": {
+            "mode": "cpp",
+            "value": 1.1,
+            "amplitude": 1.0
+        }
+        }
+    },
+    {
+        "_comment": "=== D. PHASE at on-grid cpp=1 (invariance predicted: all equally degenerate). ===",
+        "generator": "kernelsynth",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "J": 5,
+        "l_syn": 512,
+        "fs": 256,
+        "jitter": 1e-06,
+        "P": 16,
+        "inject": {
+            "mode": "cpp",
+            "value": 1.0,
+            "amplitude": 1.0,
+            "phase": 0.0
+        }
+        }
+    },
+    {
+        "generator": "kernelsynth",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "J": 5,
+        "l_syn": 512,
+        "fs": 256,
+        "jitter": 1e-06,
+        "P": 16,
+        "inject": {
+            "mode": "cpp",
+            "value": 1.0,
+            "amplitude": 1.0,
+            "phase": 0.7853982
+        }
+        }
+    },
+    {
+        "generator": "kernelsynth",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "J": 5,
+        "l_syn": 512,
+        "fs": 256,
+        "jitter": 1e-06,
+        "P": 16,
+        "inject": {
+            "mode": "cpp",
+            "value": 1.0,
+            "amplitude": 1.0,
+            "phase": 1.5707963
+        }
+        }
+    },
+    {
+        "generator": "kernelsynth",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "J": 5,
+        "l_syn": 512,
+        "fs": 256,
+        "jitter": 1e-06,
+        "P": 16,
+        "inject": {
+            "mode": "cpp",
+            "value": 1.0,
+            "amplitude": 1.0,
+            "phase": 3.1415927
+        }
+        }
+    },
+    {
+        "_comment": "--- phase at on-grid cpp=2 ---",
+        "generator": "kernelsynth",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "J": 5,
+        "l_syn": 512,
+        "fs": 256,
+        "jitter": 1e-06,
+        "P": 16,
+        "inject": {
+            "mode": "cpp",
+            "value": 2.0,
+            "amplitude": 1.0,
+            "phase": 1.5707963
+        }
+        }
+    },
+    {
+        "generator": "kernelsynth",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "J": 5,
+        "l_syn": 512,
+        "fs": 256,
+        "jitter": 1e-06,
+        "P": 16,
+        "inject": {
+            "mode": "cpp",
+            "value": 2.0,
+            "amplitude": 1.0,
+            "phase": 3.1415927
+        }
+        }
+    },
+    {
+        "_comment": "--- phase at OFF-grid cpp=1.5 (phase should matter: control) ---",
+        "generator": "kernelsynth",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "J": 5,
+        "l_syn": 512,
+        "fs": 256,
+        "jitter": 1e-06,
+        "P": 16,
+        "inject": {
+            "mode": "cpp",
+            "value": 1.5,
+            "amplitude": 1.0,
+            "phase": 0.0
+        }
+        }
+    },
+    {
+        "generator": "kernelsynth",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "J": 5,
+        "l_syn": 512,
+        "fs": 256,
+        "jitter": 1e-06,
+        "P": 16,
+        "inject": {
+            "mode": "cpp",
+            "value": 1.5,
+            "amplitude": 1.0,
+            "phase": 1.5707963
+        }
+        }
+    },
+    {
+        "generator": "kernelsynth",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "J": 5,
+        "l_syn": 512,
+        "fs": 256,
+        "jitter": 1e-06,
+        "P": 16,
+        "inject": {
+            "mode": "cpp",
+            "value": 1.5,
+            "amplitude": 1.0,
+            "phase": 3.1415927
+        }
+        }
+    },
+    {
+        "_comment": "=== E. Hz/fs separation: f=16Hz @ fs=256 => cpp=1.0 (ON-grid). ===",
+        "generator": "kernelsynth",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "J": 5,
+        "l_syn": 512,
+        "fs": 256,
+        "jitter": 1e-06,
+        "P": 16,
+        "inject": {
+            "mode": "hz",
+            "value": 16.0,
+            "amplitude": 1.0
+        }
+        }
+    },
+    {
+        "_comment": "f=16Hz @ fs=512 => cpp=0.5 (OFF-grid): same freq, no longer a blind spot.",
+        "generator": "kernelsynth",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "J": 5,
+        "l_syn": 512,
+        "fs": 512,
+        "jitter": 1e-06,
+        "P": 16,
+        "inject": {
+            "mode": "hz",
+            "value": 16.0,
+            "amplitude": 1.0
+        }
+        }
+    },
+    {
+        "_comment": "f=32Hz @ fs=256 => cpp=2.0 (ON-grid).",
+        "generator": "kernelsynth",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "J": 5,
+        "l_syn": 512,
+        "fs": 256,
+        "jitter": 1e-06,
+        "P": 16,
+        "inject": {
+            "mode": "hz",
+            "value": 32.0,
+            "amplitude": 1.0
+        }
+        }
+    },
+    {
+        "_comment": "f=32Hz @ fs=512 => cpp=1.0 (ON-grid).",
+        "generator": "kernelsynth",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "J": 5,
+        "l_syn": 512,
+        "fs": 512,
+        "jitter": 1e-06,
+        "P": 16,
+        "inject": {
+            "mode": "hz",
+            "value": 32.0,
+            "amplitude": 1.0
+        }
+        }
+    },
+    {
+        "_comment": "=== F. Patch-size sweep at cpp=1: P=8 (period 8 smp). ===",
+        "generator": "kernelsynth",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "J": 5,
+        "l_syn": 512,
+        "fs": 256,
+        "jitter": 1e-06,
+        "P": 8,
+        "inject": {
+            "mode": "cpp",
+            "value": 1.0,
+            "amplitude": 1.0
+        }
+        }
+    },
+    {
+        "_comment": "P=16 (period 16 smp, the model's native patch).",
+        "generator": "kernelsynth",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "J": 5,
+        "l_syn": 512,
+        "fs": 256,
+        "jitter": 1e-06,
+        "P": 16,
+        "inject": {
+            "mode": "cpp",
+            "value": 1.0,
+            "amplitude": 1.0
+        }
+        }
+    },
+    {
+        "_comment": "P=32 (period 32 smp).",
+        "generator": "kernelsynth",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "J": 5,
+        "l_syn": 512,
+        "fs": 256,
+        "jitter": 1e-06,
+        "P": 32,
+        "inject": {
+            "mode": "cpp",
+            "value": 1.0,
+            "amplitude": 1.0
+        }
+        }
+    },
+    {
+        "_comment": "--- same sweep at cpp=2 --- P=8",
+        "generator": "kernelsynth",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "J": 5,
+        "l_syn": 512,
+        "fs": 256,
+        "jitter": 1e-06,
+        "P": 8,
+        "inject": {
+            "mode": "cpp",
+            "value": 2.0,
+            "amplitude": 1.0
+        }
+        }
+    },
+    {
+        "_comment": "P=32",
+        "generator": "kernelsynth",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "J": 5,
+        "l_syn": 512,
+        "fs": 256,
+        "jitter": 1e-06,
+        "P": 32,
+        "inject": {
+            "mode": "cpp",
+            "value": 2.0,
+            "amplitude": 1.0
+        }
+        }
+    },
+    {
+        "_comment": "=== G. SNR sweep at on-grid cpp=1: does the blind spot survive weak/strong tones? ===",
+        "generator": "kernelsynth",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "J": 5,
+        "l_syn": 512,
+        "fs": 256,
+        "jitter": 1e-06,
+        "P": 16,
+        "inject": {
+            "mode": "cpp",
+            "value": 1.0,
+            "amplitude": 0.25
+        }
+        }
+    },
+    {
+        "generator": "kernelsynth",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "J": 5,
+        "l_syn": 512,
+        "fs": 256,
+        "jitter": 1e-06,
+        "P": 16,
+        "inject": {
+            "mode": "cpp",
+            "value": 1.0,
+            "amplitude": 0.5
+        }
+        }
+    },
+    {
+        "generator": "kernelsynth",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "J": 5,
+        "l_syn": 512,
+        "fs": 256,
+        "jitter": 1e-06,
+        "P": 16,
+        "inject": {
+            "mode": "cpp",
+            "value": 1.0,
+            "amplitude": 1.0
+        }
+        }
+    },
+    {
+        "generator": "kernelsynth",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "J": 5,
+        "l_syn": 512,
+        "fs": 256,
+        "jitter": 1e-06,
+        "P": 16,
+        "inject": {
+            "mode": "cpp",
+            "value": 1.0,
+            "amplitude": 2.0
+        }
+        }
+    },
+    {
+        "generator": "kernelsynth",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "J": 5,
+        "l_syn": 512,
+        "fs": 256,
+        "jitter": 1e-06,
+        "P": 16,
+        "inject": {
+            "mode": "cpp",
+            "value": 1.0,
+            "amplitude": 4.0
+        }
+        }
+    },
+    {
+        "_comment": "=== H. Extremes: near-DC cpp=0.1 (period 160 smp). ===",
+        "generator": "kernelsynth",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "J": 5,
+        "l_syn": 512,
+        "fs": 256,
+        "jitter": 1e-06,
+        "P": 16,
+        "inject": {
+            "mode": "cpp",
+            "value": 0.1,
+            "amplitude": 1.0
+        }
+        }
+    },
+    {
+        "_comment": "Nyquist edge cpp=8.0 (f=fs/2=128Hz).",
+        "generator": "kernelsynth",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "J": 5,
+        "l_syn": 512,
+        "fs": 256,
+        "jitter": 1e-06,
+        "P": 16,
+        "inject": {
+            "mode": "cpp",
+            "value": 8.0,
+            "amplitude": 1.0
+        }
+        }
+    },
+    {
+        "_comment": "Just below Nyquist cpp=7.9 (observable).",
+        "generator": "kernelsynth",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "J": 5,
+        "l_syn": 512,
+        "fs": 256,
+        "jitter": 1e-06,
+        "P": 16,
+        "inject": {
+            "mode": "cpp",
+            "value": 7.9,
+            "amplitude": 1.0
+        }
+        }
+    },
+    {
+        "_comment": "=== I. TSMixup on-grid harmonics cpp=1..4. ===",
+        "generator": "tsmixup",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "K": 3,
+        "alpha": 1.5,
+        "l_min": 512,
+        "l_max": 512,
+        "fs": 256,
+        "P": 16,
+        "t_lengths": [
+            256,
+            384,
+            512
+        ],
+        "inject": {
+            "mode": "cpp",
+            "value": 1.0,
+            "amplitude": 1.0
+        }
+        }
+    },
+    {
+        "generator": "tsmixup",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "K": 3,
+        "alpha": 1.5,
+        "l_min": 512,
+        "l_max": 512,
+        "fs": 256,
+        "P": 16,
+        "t_lengths": [
+            256,
+            384,
+            512
+        ],
+        "inject": {
+            "mode": "cpp",
+            "value": 2.0,
+            "amplitude": 1.0
+        }
+        }
+    },
+    {
+        "generator": "tsmixup",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "K": 3,
+        "alpha": 1.5,
+        "l_min": 512,
+        "l_max": 512,
+        "fs": 256,
+        "P": 16,
+        "t_lengths": [
+            256,
+            384,
+            512
+        ],
+        "inject": {
+            "mode": "cpp",
+            "value": 3.0,
+            "amplitude": 1.0
+        }
+        }
+    },
+    {
+        "generator": "tsmixup",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "K": 3,
+        "alpha": 1.5,
+        "l_min": 512,
+        "l_max": 512,
+        "fs": 256,
+        "P": 16,
+        "t_lengths": [
+            256,
+            384,
+            512
+        ],
+        "inject": {
+            "mode": "cpp",
+            "value": 4.0,
+            "amplitude": 1.0
+        }
+        }
+    },
+    {
+        "_comment": "--- TSMixup off-grid controls ---",
+        "generator": "tsmixup",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "K": 3,
+        "alpha": 1.5,
+        "l_min": 512,
+        "l_max": 512,
+        "fs": 256,
+        "P": 16,
+        "t_lengths": [
+            256,
+            384,
+            512
+        ],
+        "inject": {
+            "mode": "cpp",
+            "value": 0.5,
+            "amplitude": 1.0
+        }
+        }
+    },
+    {
+        "generator": "tsmixup",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "K": 3,
+        "alpha": 1.5,
+        "l_min": 512,
+        "l_max": 512,
+        "fs": 256,
+        "P": 16,
+        "t_lengths": [
+            256,
+            384,
+            512
+        ],
+        "inject": {
+            "mode": "cpp",
+            "value": 1.5,
+            "amplitude": 1.0
+        }
+        }
+    },
+    {
+        "generator": "tsmixup",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "K": 3,
+        "alpha": 1.5,
+        "l_min": 512,
+        "l_max": 512,
+        "fs": 256,
+        "P": 16,
+        "t_lengths": [
+            256,
+            384,
+            512
+        ],
+        "inject": {
+            "mode": "cpp",
+            "value": 2.5,
+            "amplitude": 1.0
+        }
+        }
+    },
+    {
+        "_comment": "--- TSMixup phase triplet at on-grid cpp=1 ---",
+        "generator": "tsmixup",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "K": 3,
+        "alpha": 1.5,
+        "l_min": 512,
+        "l_max": 512,
+        "fs": 256,
+        "P": 16,
+        "t_lengths": [
+            256,
+            384,
+            512
+        ],
+        "inject": {
+            "mode": "cpp",
+            "value": 1.0,
+            "amplitude": 1.0,
+            "phase": 0.0
+        }
+        }
+    },
+    {
+        "generator": "tsmixup",
+        "n_realizations": 5,
+        "seed": 3,
+        "params": {
+        "K": 3,
+        "alpha": 1.5,
+        "l_min": 512,
+        "l_max": 512,
+        "fs": 256,
+        "P": 16,
+        "t_lengths": [
+            256,
+            384,
+            512
+        ],
+        "inject": {
+            "mode": "cpp",
+            "value": 1.0,
+            "amplitude": 1.0,
+            "phase": 1.5707963
+        }
+        }
+    },
+    {
     "generator": "kernelsynth",
     "n_realizations": 5,
-    "seed": 3,
+    "seed": 10,
     "params": {
-      "J": 5,
-      "l_syn": 512,
-      "fs": 256,
-      "jitter": 1e-06,
-      "P": 16,
-      "inject": {
+        "J": 5,
+        "l_syn": 512,
+        "fs": 256,
+        "jitter": 1e-6,
+        "P": 16,
+        "inject": {
         "mode": "cpp",
-        "value": 1.0,
-        "amplitude": 1.0
-      }
-    }
-  },
-  {
-    "generator": "kernelsynth",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "J": 5,
-      "l_syn": 512,
-      "fs": 256,
-      "jitter": 1e-06,
-      "P": 16,
-      "inject": {
-        "mode": "cpp",
-        "value": 2.0,
-        "amplitude": 1.0
-      }
-    }
-  },
-  {
-    "generator": "kernelsynth",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "J": 5,
-      "l_syn": 512,
-      "fs": 256,
-      "jitter": 1e-06,
-      "P": 16,
-      "inject": {
-        "mode": "cpp",
-        "value": 3.0,
-        "amplitude": 1.0
-      }
-    }
-  },
-  {
-    "generator": "kernelsynth",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "J": 5,
-      "l_syn": 512,
-      "fs": 256,
-      "jitter": 1e-06,
-      "P": 16,
-      "inject": {
-        "mode": "cpp",
-        "value": 4.0,
-        "amplitude": 1.0
-      }
-    }
-  },
-  {
-    "generator": "kernelsynth",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "J": 5,
-      "l_syn": 512,
-      "fs": 256,
-      "jitter": 1e-06,
-      "P": 16,
-      "inject": {
-        "mode": "cpp",
-        "value": 5.0,
-        "amplitude": 1.0
-      }
-    }
-  },
-  {
-    "generator": "kernelsynth",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "J": 5,
-      "l_syn": 512,
-      "fs": 256,
-      "jitter": 1e-06,
-      "P": 16,
-      "inject": {
-        "mode": "cpp",
-        "value": 6.0,
-        "amplitude": 1.0
-      }
-    }
-  },
-  {
-    "generator": "kernelsynth",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "J": 5,
-      "l_syn": 512,
-      "fs": 256,
-      "jitter": 1e-06,
-      "P": 16,
-      "inject": {
-        "mode": "cpp",
-        "value": 7.0,
-        "amplitude": 1.0
-      }
-    }
-  },
-  {
-    "generator": "kernelsynth",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "J": 5,
-      "l_syn": 512,
-      "fs": 256,
-      "jitter": 1e-06,
-      "P": 16,
-      "inject": {
-        "mode": "cpp",
-        "value": 8.0,
-        "amplitude": 1.0
-      }
-    }
-  },
-  {
-    "_comment": "=== B. OFF-GRID half-integer controls cpp=0.5..7.5 (should remain observable). ===",
-    "generator": "kernelsynth",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "J": 5,
-      "l_syn": 512,
-      "fs": 256,
-      "jitter": 1e-06,
-      "P": 16,
-      "inject": {
-        "mode": "cpp",
-        "value": 0.5,
-        "amplitude": 1.0
-      }
-    }
-  },
-  {
-    "generator": "kernelsynth",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "J": 5,
-      "l_syn": 512,
-      "fs": 256,
-      "jitter": 1e-06,
-      "P": 16,
-      "inject": {
-        "mode": "cpp",
-        "value": 1.5,
-        "amplitude": 1.0
-      }
-    }
-  },
-  {
-    "generator": "kernelsynth",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "J": 5,
-      "l_syn": 512,
-      "fs": 256,
-      "jitter": 1e-06,
-      "P": 16,
-      "inject": {
-        "mode": "cpp",
-        "value": 2.5,
-        "amplitude": 1.0
-      }
-    }
-  },
-  {
-    "generator": "kernelsynth",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "J": 5,
-      "l_syn": 512,
-      "fs": 256,
-      "jitter": 1e-06,
-      "P": 16,
-      "inject": {
-        "mode": "cpp",
-        "value": 3.5,
-        "amplitude": 1.0
-      }
-    }
-  },
-  {
-    "generator": "kernelsynth",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "J": 5,
-      "l_syn": 512,
-      "fs": 256,
-      "jitter": 1e-06,
-      "P": 16,
-      "inject": {
-        "mode": "cpp",
-        "value": 4.5,
-        "amplitude": 1.0
-      }
-    }
-  },
-  {
-    "generator": "kernelsynth",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "J": 5,
-      "l_syn": 512,
-      "fs": 256,
-      "jitter": 1e-06,
-      "P": 16,
-      "inject": {
-        "mode": "cpp",
-        "value": 5.5,
-        "amplitude": 1.0
-      }
-    }
-  },
-  {
-    "generator": "kernelsynth",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "J": 5,
-      "l_syn": 512,
-      "fs": 256,
-      "jitter": 1e-06,
-      "P": 16,
-      "inject": {
-        "mode": "cpp",
-        "value": 6.5,
-        "amplitude": 1.0
-      }
-    }
-  },
-  {
-    "generator": "kernelsynth",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "J": 5,
-      "l_syn": 512,
-      "fs": 256,
-      "jitter": 1e-06,
-      "P": 16,
-      "inject": {
-        "mode": "cpp",
-        "value": 7.5,
-        "amplitude": 1.0
-      }
-    }
-  },
-  {
-    "_comment": "=== C. FINE SWEEP around the fundamental cpp 0.90..1.10 (degradation boundary). ===",
-    "generator": "kernelsynth",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "J": 5,
-      "l_syn": 512,
-      "fs": 256,
-      "jitter": 1e-06,
-      "P": 16,
-      "inject": {
-        "mode": "cpp",
-        "value": 0.9,
-        "amplitude": 1.0
-      }
-    }
-  },
-  {
-    "generator": "kernelsynth",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "J": 5,
-      "l_syn": 512,
-      "fs": 256,
-      "jitter": 1e-06,
-      "P": 16,
-      "inject": {
-        "mode": "cpp",
-        "value": 0.95,
-        "amplitude": 1.0
-      }
-    }
-  },
-  {
-    "generator": "kernelsynth",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "J": 5,
-      "l_syn": 512,
-      "fs": 256,
-      "jitter": 1e-06,
-      "P": 16,
-      "inject": {
-        "mode": "cpp",
-        "value": 0.98,
-        "amplitude": 1.0
-      }
-    }
-  },
-  {
-    "generator": "kernelsynth",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "J": 5,
-      "l_syn": 512,
-      "fs": 256,
-      "jitter": 1e-06,
-      "P": 16,
-      "inject": {
-        "mode": "cpp",
-        "value": 1.02,
-        "amplitude": 1.0
-      }
-    }
-  },
-  {
-    "generator": "kernelsynth",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "J": 5,
-      "l_syn": 512,
-      "fs": 256,
-      "jitter": 1e-06,
-      "P": 16,
-      "inject": {
-        "mode": "cpp",
-        "value": 1.05,
-        "amplitude": 1.0
-      }
-    }
-  },
-  {
-    "generator": "kernelsynth",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "J": 5,
-      "l_syn": 512,
-      "fs": 256,
-      "jitter": 1e-06,
-      "P": 16,
-      "inject": {
-        "mode": "cpp",
-        "value": 1.1,
-        "amplitude": 1.0
-      }
-    }
-  },
-  {
-    "_comment": "=== D. PHASE at on-grid cpp=1 (invariance predicted: all equally degenerate). ===",
-    "generator": "kernelsynth",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "J": 5,
-      "l_syn": 512,
-      "fs": 256,
-      "jitter": 1e-06,
-      "P": 16,
-      "inject": {
-        "mode": "cpp",
-        "value": 1.0,
-        "amplitude": 1.0,
-        "phase": 0.0
-      }
-    }
-  },
-  {
-    "generator": "kernelsynth",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "J": 5,
-      "l_syn": 512,
-      "fs": 256,
-      "jitter": 1e-06,
-      "P": 16,
-      "inject": {
-        "mode": "cpp",
-        "value": 1.0,
-        "amplitude": 1.0,
-        "phase": 0.7853982
-      }
-    }
-  },
-  {
-    "generator": "kernelsynth",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "J": 5,
-      "l_syn": 512,
-      "fs": 256,
-      "jitter": 1e-06,
-      "P": 16,
-      "inject": {
-        "mode": "cpp",
-        "value": 1.0,
-        "amplitude": 1.0,
+        "value": 0.25,
+        "amplitude": 2.0,
         "phase": 1.5707963
-      }
+        }
     }
-  },
-  {
-    "generator": "kernelsynth",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "J": 5,
-      "l_syn": 512,
-      "fs": 256,
-      "jitter": 1e-06,
-      "P": 16,
-      "inject": {
-        "mode": "cpp",
-        "value": 1.0,
-        "amplitude": 1.0,
-        "phase": 3.1415927
-      }
     }
-  },
-  {
-    "_comment": "--- phase at on-grid cpp=2 ---",
-    "generator": "kernelsynth",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "J": 5,
-      "l_syn": 512,
-      "fs": 256,
-      "jitter": 1e-06,
-      "P": 16,
-      "inject": {
-        "mode": "cpp",
-        "value": 2.0,
-        "amplitude": 1.0,
-        "phase": 1.5707963
-      }
-    }
-  },
-  {
-    "generator": "kernelsynth",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "J": 5,
-      "l_syn": 512,
-      "fs": 256,
-      "jitter": 1e-06,
-      "P": 16,
-      "inject": {
-        "mode": "cpp",
-        "value": 2.0,
-        "amplitude": 1.0,
-        "phase": 3.1415927
-      }
-    }
-  },
-  {
-    "_comment": "--- phase at OFF-grid cpp=1.5 (phase should matter: control) ---",
-    "generator": "kernelsynth",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "J": 5,
-      "l_syn": 512,
-      "fs": 256,
-      "jitter": 1e-06,
-      "P": 16,
-      "inject": {
-        "mode": "cpp",
-        "value": 1.5,
-        "amplitude": 1.0,
-        "phase": 0.0
-      }
-    }
-  },
-  {
-    "generator": "kernelsynth",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "J": 5,
-      "l_syn": 512,
-      "fs": 256,
-      "jitter": 1e-06,
-      "P": 16,
-      "inject": {
-        "mode": "cpp",
-        "value": 1.5,
-        "amplitude": 1.0,
-        "phase": 1.5707963
-      }
-    }
-  },
-  {
-    "generator": "kernelsynth",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "J": 5,
-      "l_syn": 512,
-      "fs": 256,
-      "jitter": 1e-06,
-      "P": 16,
-      "inject": {
-        "mode": "cpp",
-        "value": 1.5,
-        "amplitude": 1.0,
-        "phase": 3.1415927
-      }
-    }
-  },
-  {
-    "_comment": "=== E. Hz/fs separation: f=16Hz @ fs=256 => cpp=1.0 (ON-grid). ===",
-    "generator": "kernelsynth",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "J": 5,
-      "l_syn": 512,
-      "fs": 256,
-      "jitter": 1e-06,
-      "P": 16,
-      "inject": {
-        "mode": "hz",
-        "value": 16.0,
-        "amplitude": 1.0
-      }
-    }
-  },
-  {
-    "_comment": "f=16Hz @ fs=512 => cpp=0.5 (OFF-grid): same freq, no longer a blind spot.",
-    "generator": "kernelsynth",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "J": 5,
-      "l_syn": 512,
-      "fs": 512,
-      "jitter": 1e-06,
-      "P": 16,
-      "inject": {
-        "mode": "hz",
-        "value": 16.0,
-        "amplitude": 1.0
-      }
-    }
-  },
-  {
-    "_comment": "f=32Hz @ fs=256 => cpp=2.0 (ON-grid).",
-    "generator": "kernelsynth",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "J": 5,
-      "l_syn": 512,
-      "fs": 256,
-      "jitter": 1e-06,
-      "P": 16,
-      "inject": {
-        "mode": "hz",
-        "value": 32.0,
-        "amplitude": 1.0
-      }
-    }
-  },
-  {
-    "_comment": "f=32Hz @ fs=512 => cpp=1.0 (ON-grid).",
-    "generator": "kernelsynth",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "J": 5,
-      "l_syn": 512,
-      "fs": 512,
-      "jitter": 1e-06,
-      "P": 16,
-      "inject": {
-        "mode": "hz",
-        "value": 32.0,
-        "amplitude": 1.0
-      }
-    }
-  },
-  {
-    "_comment": "=== F. Patch-size sweep at cpp=1: P=8 (period 8 smp). ===",
-    "generator": "kernelsynth",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "J": 5,
-      "l_syn": 512,
-      "fs": 256,
-      "jitter": 1e-06,
-      "P": 8,
-      "inject": {
-        "mode": "cpp",
-        "value": 1.0,
-        "amplitude": 1.0
-      }
-    }
-  },
-  {
-    "_comment": "P=16 (period 16 smp, the model's native patch).",
-    "generator": "kernelsynth",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "J": 5,
-      "l_syn": 512,
-      "fs": 256,
-      "jitter": 1e-06,
-      "P": 16,
-      "inject": {
-        "mode": "cpp",
-        "value": 1.0,
-        "amplitude": 1.0
-      }
-    }
-  },
-  {
-    "_comment": "P=32 (period 32 smp).",
-    "generator": "kernelsynth",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "J": 5,
-      "l_syn": 512,
-      "fs": 256,
-      "jitter": 1e-06,
-      "P": 32,
-      "inject": {
-        "mode": "cpp",
-        "value": 1.0,
-        "amplitude": 1.0
-      }
-    }
-  },
-  {
-    "_comment": "--- same sweep at cpp=2 --- P=8",
-    "generator": "kernelsynth",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "J": 5,
-      "l_syn": 512,
-      "fs": 256,
-      "jitter": 1e-06,
-      "P": 8,
-      "inject": {
-        "mode": "cpp",
-        "value": 2.0,
-        "amplitude": 1.0
-      }
-    }
-  },
-  {
-    "_comment": "P=32",
-    "generator": "kernelsynth",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "J": 5,
-      "l_syn": 512,
-      "fs": 256,
-      "jitter": 1e-06,
-      "P": 32,
-      "inject": {
-        "mode": "cpp",
-        "value": 2.0,
-        "amplitude": 1.0
-      }
-    }
-  },
-  {
-    "_comment": "=== G. SNR sweep at on-grid cpp=1: does the blind spot survive weak/strong tones? ===",
-    "generator": "kernelsynth",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "J": 5,
-      "l_syn": 512,
-      "fs": 256,
-      "jitter": 1e-06,
-      "P": 16,
-      "inject": {
-        "mode": "cpp",
-        "value": 1.0,
-        "amplitude": 0.25
-      }
-    }
-  },
-  {
-    "generator": "kernelsynth",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "J": 5,
-      "l_syn": 512,
-      "fs": 256,
-      "jitter": 1e-06,
-      "P": 16,
-      "inject": {
-        "mode": "cpp",
-        "value": 1.0,
-        "amplitude": 0.5
-      }
-    }
-  },
-  {
-    "generator": "kernelsynth",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "J": 5,
-      "l_syn": 512,
-      "fs": 256,
-      "jitter": 1e-06,
-      "P": 16,
-      "inject": {
-        "mode": "cpp",
-        "value": 1.0,
-        "amplitude": 1.0
-      }
-    }
-  },
-  {
-    "generator": "kernelsynth",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "J": 5,
-      "l_syn": 512,
-      "fs": 256,
-      "jitter": 1e-06,
-      "P": 16,
-      "inject": {
-        "mode": "cpp",
-        "value": 1.0,
-        "amplitude": 2.0
-      }
-    }
-  },
-  {
-    "generator": "kernelsynth",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "J": 5,
-      "l_syn": 512,
-      "fs": 256,
-      "jitter": 1e-06,
-      "P": 16,
-      "inject": {
-        "mode": "cpp",
-        "value": 1.0,
-        "amplitude": 4.0
-      }
-    }
-  },
-  {
-    "_comment": "=== H. Extremes: near-DC cpp=0.1 (period 160 smp). ===",
-    "generator": "kernelsynth",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "J": 5,
-      "l_syn": 512,
-      "fs": 256,
-      "jitter": 1e-06,
-      "P": 16,
-      "inject": {
-        "mode": "cpp",
-        "value": 0.1,
-        "amplitude": 1.0
-      }
-    }
-  },
-  {
-    "_comment": "Nyquist edge cpp=8.0 (f=fs/2=128Hz).",
-    "generator": "kernelsynth",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "J": 5,
-      "l_syn": 512,
-      "fs": 256,
-      "jitter": 1e-06,
-      "P": 16,
-      "inject": {
-        "mode": "cpp",
-        "value": 8.0,
-        "amplitude": 1.0
-      }
-    }
-  },
-  {
-    "_comment": "Just below Nyquist cpp=7.9 (observable).",
-    "generator": "kernelsynth",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "J": 5,
-      "l_syn": 512,
-      "fs": 256,
-      "jitter": 1e-06,
-      "P": 16,
-      "inject": {
-        "mode": "cpp",
-        "value": 7.9,
-        "amplitude": 1.0
-      }
-    }
-  },
-  {
-    "_comment": "=== I. TSMixup on-grid harmonics cpp=1..4. ===",
-    "generator": "tsmixup",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "K": 3,
-      "alpha": 1.5,
-      "l_min": 512,
-      "l_max": 512,
-      "fs": 256,
-      "P": 16,
-      "t_lengths": [
-        256,
-        384,
-        512
-      ],
-      "inject": {
-        "mode": "cpp",
-        "value": 1.0,
-        "amplitude": 1.0
-      }
-    }
-  },
-  {
-    "generator": "tsmixup",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "K": 3,
-      "alpha": 1.5,
-      "l_min": 512,
-      "l_max": 512,
-      "fs": 256,
-      "P": 16,
-      "t_lengths": [
-        256,
-        384,
-        512
-      ],
-      "inject": {
-        "mode": "cpp",
-        "value": 2.0,
-        "amplitude": 1.0
-      }
-    }
-  },
-  {
-    "generator": "tsmixup",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "K": 3,
-      "alpha": 1.5,
-      "l_min": 512,
-      "l_max": 512,
-      "fs": 256,
-      "P": 16,
-      "t_lengths": [
-        256,
-        384,
-        512
-      ],
-      "inject": {
-        "mode": "cpp",
-        "value": 3.0,
-        "amplitude": 1.0
-      }
-    }
-  },
-  {
-    "generator": "tsmixup",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "K": 3,
-      "alpha": 1.5,
-      "l_min": 512,
-      "l_max": 512,
-      "fs": 256,
-      "P": 16,
-      "t_lengths": [
-        256,
-        384,
-        512
-      ],
-      "inject": {
-        "mode": "cpp",
-        "value": 4.0,
-        "amplitude": 1.0
-      }
-    }
-  },
-  {
-    "_comment": "--- TSMixup off-grid controls ---",
-    "generator": "tsmixup",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "K": 3,
-      "alpha": 1.5,
-      "l_min": 512,
-      "l_max": 512,
-      "fs": 256,
-      "P": 16,
-      "t_lengths": [
-        256,
-        384,
-        512
-      ],
-      "inject": {
-        "mode": "cpp",
-        "value": 0.5,
-        "amplitude": 1.0
-      }
-    }
-  },
-  {
-    "generator": "tsmixup",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "K": 3,
-      "alpha": 1.5,
-      "l_min": 512,
-      "l_max": 512,
-      "fs": 256,
-      "P": 16,
-      "t_lengths": [
-        256,
-        384,
-        512
-      ],
-      "inject": {
-        "mode": "cpp",
-        "value": 1.5,
-        "amplitude": 1.0
-      }
-    }
-  },
-  {
-    "generator": "tsmixup",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "K": 3,
-      "alpha": 1.5,
-      "l_min": 512,
-      "l_max": 512,
-      "fs": 256,
-      "P": 16,
-      "t_lengths": [
-        256,
-        384,
-        512
-      ],
-      "inject": {
-        "mode": "cpp",
-        "value": 2.5,
-        "amplitude": 1.0
-      }
-    }
-  },
-  {
-    "_comment": "--- TSMixup phase triplet at on-grid cpp=1 ---",
-    "generator": "tsmixup",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "K": 3,
-      "alpha": 1.5,
-      "l_min": 512,
-      "l_max": 512,
-      "fs": 256,
-      "P": 16,
-      "t_lengths": [
-        256,
-        384,
-        512
-      ],
-      "inject": {
-        "mode": "cpp",
-        "value": 1.0,
-        "amplitude": 1.0,
-        "phase": 0.0
-      }
-    }
-  },
-  {
-    "generator": "tsmixup",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "K": 3,
-      "alpha": 1.5,
-      "l_min": 512,
-      "l_max": 512,
-      "fs": 256,
-      "P": 16,
-      "t_lengths": [
-        256,
-        384,
-        512
-      ],
-      "inject": {
-        "mode": "cpp",
-        "value": 1.0,
-        "amplitude": 1.0,
-        "phase": 1.5707963
-      }
-    }
-  },
-  {
-    "generator": "tsmixup",
-    "n_realizations": 5,
-    "seed": 3,
-    "params": {
-      "K": 3,
-      "alpha": 1.5,
-      "l_min": 512,
-      "l_max": 512,
-      "fs": 256,
-      "P": 16,
-      "t_lengths": [
-        256,
-        384,
-        512
-      ],
-      "inject": {
-        "mode": "cpp",
-        "value": 1.0,
-        "amplitude": 1.0,
-        "phase": 3.1415927
-      }
-    }
-  }
 ]

@@ -70,7 +70,9 @@ class KernelSynthGenerator:
                  output_dir="./signals",
                  
                  inject=None, 
-                 P=16
+                 P=16,
+
+                name=None
                  ):
 
 
@@ -89,6 +91,8 @@ class KernelSynthGenerator:
 
         self.inject = inject # optional injection configuration (None or dict with mode, value, amplitude, phase)
         self.P = P # patch size, needed for cpp-mode injection (if inject is not None and inject.mode == "cpp")
+
+        self.name = name # optional name for the generated signal (if None, a deterministic name will be built based on the parameters and injection configuration)
 
     def _build_kernel_bank(self) -> list[tuple[str, Callable[[np.ndarray, np.ndarray], np.ndarray]]]:
         """Build a bank of base kernels with different parameters."""
@@ -148,36 +152,10 @@ class KernelSynthGenerator:
                 continue
 
             self.last_kernels = names # store the names of the kernels used to generate the signal for reference
-            signal, self._inject_tag = self._apply_injection(signal, t) # apply optional injection of a deterministic periodic component and get the corresponding tag for naming
+            signal = self._apply_injection(signal, t) # apply optional injection of a deterministic periodic component and get the corresponding tag for naming
             
             return signal
 
-
-    def save(self, signal):
-        self.output_dir.mkdir(parents=True, exist_ok=True)
-        np.save((self.__str__() + ".npy"), signal)
-
-    def plot(self, signal):
-        plt.figure(figsize=(12, 4))
-        plt.plot(signal, linewidth=0.8, color="crimson")
-        plt.title("Generated KernelSynth Signal")
-        plt.xlabel("Samples")
-        plt.ylabel("Value")
-        plt.grid()
-        plt.tight_layout()
-        plt.savefig((self.__str__() + ".png"))
-        plt.close()
-
-    def __str__(self) -> str:
-        tag = getattr(self, "_inject_tag", "")
-        path = self.output_dir / (
-            f"KernelSynth_J{self.J}_l_syn{self.l_syn}_fs{self.fs}_jitter{self.jitter}_{tag}"
-        )
-        if phase := (self.inject or {}).get("phase", 0.0):
-            path = path.with_name(path.stem + f"_ph{phase:g}" + path.suffix)
-        if amplitude := (self.inject or {}).get("amplitude", 1.0):
-            path = path.with_name(path.stem + f"_amp{amplitude:g}" + path.suffix)
-        return str(path)
     
 
     # ---------------- controlled injection ----------------
@@ -198,12 +176,57 @@ class KernelSynthGenerator:
             cpp = float(spec["value"])
             period_samples = self.P / cpp                  # cpp = P / period_samples
             comp = amp * np.sin(2 * np.pi * n / period_samples + phase)
-            tag = f"_cpp{cpp:g}"
         elif spec["mode"] == "hz":
             f_hz = float(spec["value"])
             comp = amp * np.sin(2 * np.pi * f_hz * t + phase)   # t in seconds → fs-dependent
-            tag = f"_hz{f_hz:g}"
         else:
-            raise ValueError(f"Unknown inject mode: {spec['mode']}")
+            raise ValueError(f"Unknown inject mode: {spec.get('mode')}")
 
-        return x + comp, tag
+        return x + comp
+
+
+
+    # ---------------- deterministic naming ----------------
+    def _build_tag(self) -> str:
+        if not self.inject:
+            return ""
+        spec = self.inject
+        parts = []
+        if "value" in spec:
+            parts.append(f"cpp{float(spec.get('value', 0.0)):.4f}".rstrip("0").rstrip("."))
+        if "amplitude" in spec:
+            parts.append(f"amp{float(spec.get('amplitude', 1.0)):.4f}".rstrip("0").rstrip("."))
+        if "phase" in spec:
+            parts.append(f"ph{float(spec.get('phase', 0.0)):.4f}".rstrip("0").rstrip("."))
+        return "__" + "_".join(parts) if parts else ""
+
+    def _base_path(self) -> Path:
+        return self.output_dir / (
+            f"KernelSynth_J{self.J}_l_syn{self.l_syn}_fs{self.fs}_jitter{self.jitter}"
+            f"{self._build_tag()}.txt"
+        )
+    
+
+    # ---------------- I/O ----------------
+    def save(self, signal):
+        path = self.path().with_suffix(".npy")
+        self.output_dir.mkdir(parents=True, exist_ok=True)
+        np.save(path, signal)
+
+    def plot(self, signal):
+
+        path = self.path().with_suffix(".png")
+        plt.figure(figsize=(12, 4))
+        plt.plot(signal, linewidth=0.8, color="crimson")
+        plt.title("Generated KernelSynth Signal")
+        plt.grid()
+        plt.tight_layout()
+        plt.savefig(path)
+        plt.close()
+
+
+    def path(self) -> Path:
+        if self.name:
+            return self.output_dir / f"{self.name}"
+        else:
+            return self._base_path()
