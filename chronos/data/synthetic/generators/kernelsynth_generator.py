@@ -233,3 +233,39 @@ class KernelSynthGenerator:
             return self.output_dir / f"{self.name}"
         else:
             return self._base_path()
+        
+    def retrieveDataFromPath(self) -> np.ndarray:
+        # return a json/dict of the parameters and injection configuration encoded in the filename, 
+        # for reference, from KernelSynth_J5_l_syn512_fs256_jitter0.0001__cpp7.9_amp0.03_ph1.5708
+
+        parameters = name.split("__")[0].split("_") # = ['KernelSynth', 'J5', 'l_syn512', 'fs256', 'jitter0.0001'], 
+        inject_spec = name.split("__")[1].split("_") if "__" in name else [] # = ['cpp7.9', 'amp0.03', 'ph1.5708']  
+
+        J = int(parameters[1][1:]) # 5
+        l_syn = int(parameters[2][5:]) # 512
+        fs = float(parameters[3][2:]) # 256.0
+        jitter = float(parameters[4][6:]) # 0.0001
+
+        inject = {}
+        for item in inject_spec:
+            if item.startswith("cpp"):
+                inject["mode"] = "cpp"
+                inject["value"] = float(item[3:]) # 7.9
+            elif item.startswith("hz"):
+                inject["mode"] = "hz"
+                inject["value"] = float(item[2:]) # 7.9
+            elif item.startswith("amp"):
+                inject["amplitude"] = float(item[3:]) # 0.03
+            elif item.startswith("ph"):
+                inject["phase"] = float(item[2:]) # 1.5708
+
+        return {
+            "generator": "KernelSynth",
+            "J": J,
+            "l_syn": l_syn,
+            "fs": fs,
+            "jitter": jitter,
+            "inject": inject
+        }
+        
+        

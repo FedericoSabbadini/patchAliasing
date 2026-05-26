@@ -192,3 +192,42 @@ class TSMixupGenerator:
             return self.output_dir / f"{self.name}"
         else: 
             return self._base_path()
+        
+
+def retrieveDataFromPath(name:str) -> dict:
+    # return a json/dict of the parameters and injection configuration encoded in the filename, 
+    # for reference, from #TSMixup_K3_alpha1.5_lmin512_lmax512_fs256_tl256,384,512__cpp6.5_amp0.3_ph1.5707963
+    
+    parameters = name.split("__")[0].split("_") # = ['TSMixup', 'K3', 'alpha1.5', 'lmin512', 'lmax512', 'fs256', 'tl256,384,512'], 
+    inject_spec = name.split("__")[1].split("_") if "__" in name else [] # = ['cpp6.5', 'amp0.3', 'ph1.5707963']
+    
+    K = int(parameters[1][1:]) # 3
+    alpha = float(parameters[2][5:]) # 1.5
+    l_min = int(parameters[3][4:]) # 512
+    l_max = int(parameters[4][4:]) # 512
+    fs = float(parameters[5][2:]) # 256
+    t_lengths = [int(t) for t in parameters[6][2:].split(",")] # [256, 384, 512]
+
+    inject = {}
+    for spec in inject_spec:
+        if spec.startswith("cpp"):
+            inject["mode"] = "cpp"
+            inject["value"] = float(spec[3:]) # 6.5
+        elif spec.startswith("hz"):
+            inject["mode"] = "hz"
+            inject["value"] = float(spec[2:]) # 6.5
+        elif spec.startswith("amp"):
+            inject["amplitude"] = float(spec[3:]) # 0.3
+        elif spec.startswith("ph"):
+            inject["phase"] = float(spec[2:]) # 1.5707963
+    
+    return {
+        "generator": "TSMixup",
+        "K": K,
+        "alpha": alpha,
+        "l_min": l_min,
+        "l_max": l_max,
+        "fs": fs,
+        "t_lengths": t_lengths,
+        "inject": inject
+    }
