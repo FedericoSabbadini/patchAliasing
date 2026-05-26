@@ -161,7 +161,10 @@ class TSMixupGenerator:
         spec = self.inject
         parts = []
         if "value" in spec:
-            parts.append(f"cpp{spec.get('value', 0.0)}")
+            if spec["mode"] == "cpp":
+                parts.append(f"cpp{spec['value']}")
+            elif spec["mode"] == "hz":
+                parts.append(f"hz{spec['value']}")
         if "amplitude" in spec:
             parts.append(f"amp{spec.get('amplitude', 1.0)}")
         if "phase" in spec:

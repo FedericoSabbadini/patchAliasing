@@ -193,7 +193,10 @@ class KernelSynthGenerator:
         spec = self.inject
         parts = []
         if "value" in spec:
-            parts.append(f"cpp{float(spec.get('value', 0.0)):.4f}".rstrip("0").rstrip("."))
+            if spec["mode"] == "cpp":
+                parts.append(f"cpp{float(spec['value']):.4f}".rstrip("0").rstrip("."))
+            elif spec["mode"] == "hz":
+                parts.append(f"hz{float(spec['value']):.4f}".rstrip("0").rstrip("."))
         if "amplitude" in spec:
             parts.append(f"amp{float(spec.get('amplitude', 1.0)):.4f}".rstrip("0").rstrip("."))
         if "phase" in spec:
