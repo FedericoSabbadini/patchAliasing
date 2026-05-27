@@ -70,9 +70,7 @@ class KernelSynthGenerator:
                  output_dir="./signals",
                  
                  inject=None, 
-                 P=16,
-
-                name=None
+                 P=16
                  ):
 
 
@@ -92,7 +90,6 @@ class KernelSynthGenerator:
         self.inject = inject # optional injection configuration (None or dict with mode, value, amplitude, phase)
         self.P = P # patch size, needed for cpp-mode injection (if inject is not None and inject.mode == "cpp")
 
-        self.name = name # optional name for the generated signal (if None, a deterministic name will be built based on the parameters and injection configuration)
 
     def _build_kernel_bank(self) -> list[tuple[str, Callable[[np.ndarray, np.ndarray], np.ndarray]]]:
         """Build a bank of base kernels with different parameters."""
@@ -239,10 +236,7 @@ class KernelSynthGenerator:
 
 
     def path(self) -> Path:
-        if self.name:
-            return self.output_dir / f"{self.name}"
-        else:
-            return self._base_path()
+        return self._base_path()
         
     def retrieveDataFromPath(self) -> np.ndarray:
         # return a json/dict of the parameters and injection configuration encoded in the filename, 

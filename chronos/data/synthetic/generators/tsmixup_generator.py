@@ -29,9 +29,7 @@ class TSMixupGenerator:
 
                  inject=None, 
                  P=16,
-                 fs=1.0,
-
-                 name=None,
+                 fs=1.0
                  ):
 
         self.K = K # K is the maximum number of subsequences to mix, randomly chosen between 1 and K for each signal. 
@@ -55,7 +53,6 @@ class TSMixupGenerator:
         self.P = P # P is the patch size, needed for cpp-mode injection to define the frequency of the injected component in terms of cycles per patch.
         # It is relevant for the cpp injection mode, where the frequency of the injected sinusoidal component is defined in terms of how many cycles fit into a patch of length P.
         self.fs = fs
-        self.name = name
 
 
     def _build_datasets(self) -> List[np.ndarray]:
@@ -202,10 +199,7 @@ class TSMixupGenerator:
         plt.close()
 
     def path(self) -> str:
-        if self.name:
-            return self.output_dir / f"{self.name}"
-        else: 
-            return self._base_path()
+        return self._base_path()
         
 
 def retrieveDataFromPath(name:str) -> dict:

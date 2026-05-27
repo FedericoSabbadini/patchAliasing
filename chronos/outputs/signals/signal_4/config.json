@@ -1,0 +1,26 @@
+[
+    {
+        "generator": "tsmixup",
+        "n_realizations": 5,
+        "seed": 14,
+        "params": {
+            "K": 3,
+            "alpha": 1.5,
+            "l_min": 512,
+            "l_max": 512,
+            "fs": 256,
+            "P": 16,
+            "t_lengths": [
+                256,
+                384,
+                512
+            ],
+            "inject": {
+                "mode": "cpp",
+                "value": 6.5,
+                "amplitude": 0.3,
+                "phase": 1.5707963
+            }
+        }
+    }
+]
