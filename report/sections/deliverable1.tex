@@ -14,31 +14,39 @@ This document must address the following key questions:
     \item Implicazioni in termini di sicurezza sul dominio
 \end{itemize}
 
-Possibile flusso logico:
-
-\begin{itemize}
-    \item Comprendere le serie temporali è fonadamentale in molteplici campi, tra questti ... .
-    \item L'analisi delle serie temporali è tradizionalmente affrontata mediante modelli autoregressivi, soluzioni basate su reti neurali rappresentano oggi una possibile alternativa. \cite{oppenheimDiscreteTimeSignalProcessing}
-    \item La possibilità di sfruttare modelli basati sull'architettura transformer, precedentemente trainati su grandi quantità di dati, rappresenta una prospettiva promettente. \cite{wangDeepTimeSeries2026}
-    \item Descrizione di Chronos e delle sue varianti \cite{ansariChronosLearningLanguage2024, ansariChronos2UnivariateUniversal2025, FastAccurateZeroshot2024a} 
-    \item ??altri modelli alternativi?? \cite{liuSundialFamilyHighly2026}
-    \item Questo studio ha l'obiettivo di analizzare il fenomeno dello structural aliasing di serie temporali che si può verificare utilizzando Chronos-Bolt (Chronos2). \cite{paganiPreliminaryInsightsChronos2026}
-    \item Tuttavia, è necessario comprendere la capacità rappresentative di questi modelli. \cite{voitaInformationTheoreticProbingMinimum2020}
-\end{itemize}
-
-\subsection*{Subject of Study}
-Lo studio delle serie temporali ...
-
-L'utilizzo di agentic AI ...
-
-La presente analisi si concentra sulla valutazione della capacità di rappresentazione dei modelli della famiglia Chronos, con particolare attenzione alle distorsioni architetturali dipendenti da periodicità del segnale e tokenizzazione, piuttosto che dalla qualità del sampling.
-
-La possibilità di sfruttare degli agenti basati su Chronos al fine di prendere decisioni in contesti reali, come ad esempio la gestione di infrastrutture critiche, rappresenta una prospettiva promettente. Tuttavia, ...
 
 \subsection*{Intended Audience}
 Questa analisi è rivolta a ricercatori e professionisti che utilizzano modelli della famiglia Chronos per l'analisi e la previsione di serie temporali, nonché a coloro interessati a comprendere le limitazioni e le potenzialità di questi modelli.
 
 \subsection*{Expected Impact}
 Questo studio mira a fornire una comprensione delle relazioni tra caratteristiche del segnale e rappresentazione appresa dal modello, identificare i legami tra frequenza di campionamento, dimensione del patch e stride al fine di proporre possibili soluzioni per mitigare il fenomeno.
+
+This investigation formalizes the phenomenon of \textit{structural aliasing} within patch-based time-series foundation models, focusing specifically on Amazon's Chronos-Bolt framework.
+
+This project implements a highly localized, layer-resolved evaluation blueprint across five structural stages of the transformer decoder backbone: immediately following each encoder and decoder block, as well as directly after the final direct quantile output projection layer. 
+
+By mapping representations across these specific layers, the project isolates where task-relevant signal attributes are preserved or compromised under architectural synchronization constraints. The investigation evaluates the model using a custom hyperparameter configuration, where patch size is set to $P=16$, and stride could be modified within the range of $S \in [8,\ 16]$ to explore the impact of patch geometry on aliasing effects.
+
+\section{Audience Value and Target Impact (The `Why?')}
+This analysis is directly intended for researchers and practitioners utilizing large language models within the Chronos family for time-series analysis, representation learning, and forecasting, as well as individuals interested in characterizing the fundamental limitations, structural boundaries, and latent capabilities of these architectures. The core objective is to challenge the baseline assumption that pre-trained temporal foundation models inherently preserve high-frequency signal attributes when processing continuous data tracks, provided they satisfy classical sampling theorems. 
+
+\section{Audience Value and Target Impact}
+The intended audience for this research comprises automated smart-grid operations engineers, machine learning interpretability researchers, and academic evaluators led by Prof. Benini. The core objective is to challenge the dangerous assumption that pre-trained time-series large language models (LLMs) safely process sub-sampled continuous telemetry streams as long as thse inputs satisfy the classical Nyquist-Shannon sampling theorem. 
+
+We demonstrate that when a high-frequency solar event matches the model's fixed patch geometry, an architectural data deletion occurs that renders the physical event completely invisible to the self-attention mechanism. 
+
+In automated micro-grid load-balancing settings, this representation collapse leads directly to semantic misclassifications, creating secondary vulnerabilities including automated battery over-discharge, flawed natural language explanations, and unmitigated cyber-physical stability risks. This documentation establishes the scene for our future research agenda, outlining known signal gaps and providing a robust conceptual foundation before empirical validation.
+
+\section{Persuasion Strategy and Technical Architecture}
+To construct a rigorous, falsifiable argument that challenges how practitioners trust time-series foundation models, we implement a multi-layered validation and defense pipeline:
+\begin{itemize}
+    \item \textbf{Hierarchical Spectral Partitioning}: We recursively divide the operational frequency band of solar transients into a multi-tiered hierarchy of binary classification bands to isolate decision boundary uncertainty and evaluate probe performance across fine-grained sub-bands.
+    \item \textbf{Information-Theoretic Probing}: We deploy online Minimum Description Length (MDL) probes using continuous replay streams on the extracted hidden states of every individual decoder layer. We use the normalized Space Saving ($SV$) metric to quantify the exact linear decodability of signal attributes.
+    \item \textbf{Causal Intervention}: We apply sequential Least-Squares Concept Erasure (LEACE) across the transformer stack to surgically ablate coarse binary frequency abstractions, measuring the exact causal impact on closed-loop autoregressive forecasting performance via Spectral Root Mean Squared Error (RMSE).
+    \item \textbf{Joint Bayesian Priors}: We implement a probabilistic assessment engine using \texttt{PyMC}. We combine a highly objective \textit{Skeptical Prior} on the structural aliasing effect parameters ($\beta \sim \mathcal{N}(0, 0.1^2)$) with an \textit{Empirical Data-Calibrated Prior} representing real-world hardware instrument noise ($\sigma \sim \text{Half-Normal}(0.0616)$), calculated directly from the nighttime null intervals of \texttt{Dataset-SolarTechLab.csv}.
+    \item \textbf{Dual-Engine Generative Testing}: We evaluate the model's manifold behavior using full \textit{KernelSynth} sum-product randomized kernel trees to model non-stationary background environments, while restricting the \textit{TSMixup} operator to run exclusively over pure sinusoids to maintain a clean algebraic control environment for phase-locking evaluation.
+    \item \textbf{NIST AI RMF 1.0 Integration}: We frame the identified data-deletion mechanism as a formal zero-payload security vulnerability within the \textit{Map}, \textit{Measure}, and \textit{Manage} core functions of the NIST AI Risk Management Framework, evaluating whether proposed algorithmic defenses successfully reduce risk or leave significant residual exposure.
+\end{itemize}
+
 
  

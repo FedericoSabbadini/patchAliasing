@@ -1,0 +1,65 @@
+
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb,amsfonts,amsthm}
+\usepackage{geometry}
+\geometry{a4paper, margin=25mm}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{hyperref}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue!60!black,
+    citecolor=green!50!black,
+    urlcolor=blue!80!black
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\small CS/DT Coursework 2026}
+\lhead{\small Deliverable 1: High-Level Programmatic Document}
+\cfoot{\thepage}
+
+\title{\textbf{Project Specification: Layer-Resolved Structural Aliasing and Cyber-Physical Vulnerabilities in Time-Series Foundation Models}}
+\author{\textbf{Deliverable 1: High-Level Programmatic Document} \\
+Joint Computer Security / Digital Transformation Graduate Program \\
+Coursework Co-Supervision: Prof. Benini \\
+Project Collaborators: Brignoli, Boniotti, and Sabbadini}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Analyse Purpose and Audience (The `What?')}
+This investigation formalizes the phenomenon of \textit{structural aliasing} within patch-based time-series foundation models, focusing specifically on Amazon's Chronos-Bolt framework. The physical boundary of this research is defined by the 1-minute multi-variate telemetry streams contained within \texttt{Dataset-SolarTechLab.csv}, prioritizing global tilted irradiance ($G_{\mathrm{tilt}}$) and active photovoltaic power generation ($P_{\mathrm{PV}}$). 
+
+Unlike traditional macro-level evaluations of foundation model accuracy, this project implements a highly localized, layer-resolved evaluation blueprint across five structural stages of the transformer decoder backbone: immediately following T5 decoder blocks 0, 1, 2, and 3, as well as directly after the final direct quantile output projection layer. 
+
+By mapping representations across these specific layers, the project isolates where task-relevant signal attributes are preserved or compromised under architectural synchronization constraints. The investigation evaluates the model using its standard baseline hyperparameter configuration, where patch size is set to $P=16$ tokens and stride is set to $S=16$ tokens.
+
+\section{Audience Value and Target Impact (The `Why?')}
+The intended audience for this research comprises automated smart-grid operations engineers, machine learning interpretability researchers, and academic evaluators led by Prof. Benini. The core objective is to challenge the dangerous assumption that pre-trained time-series large language models (LLMs) safely process sub-sampled continuous telemetry streams as long as the inputs satisfy the classical Nyquist-Shannon sampling theorem. 
+
+We demonstrate that when a high-frequency solar event matches the model's fixed patch geometry, an architectural data deletion occurs that renders the physical event completely invisible to the self-attention mechanism. 
+
+In automated micro-grid load-balancing settings, this representation collapse leads directly to semantic misclassifications, creating secondary vulnerabilities including automated battery over-discharge, flawed natural language explanations, and unmitigated cyber-physical stability risks. This documentation establishes the scene for our future research agenda, outlining known signal gaps and providing a robust conceptual foundation before empirical validation.
+
+\section{Persuasion Strategy and Technical Architecture (The `How?')}
+To construct a rigorous, falsifiable argument that challenges how practitioners trust time-series foundation models, we implement a multi-layered validation and defense pipeline:
+\begin{itemize}
+    \item \textbf{Hierarchical Spectral Partitioning}: We recursively divide the operational frequency band of solar transients into a multi-tiered hierarchy of binary classification bands to isolate decision boundary uncertainty and evaluate probe performance across fine-grained sub-bands.
+    \item \textbf{Information-Theoretic Probing}: We deploy online Minimum Description Length (MDL) probes using continuous replay streams on the extracted hidden states of every individual decoder layer. We use the normalized Space Saving ($SV$) metric to quantify the exact linear decodability of signal attributes.
+    \item \textbf{Causal Intervention}: We apply sequential Least-Squares Concept Erasure (LEACE) across the transformer stack to surgically ablate coarse binary frequency abstractions, measuring the exact causal impact on closed-loop autoregressive forecasting performance via Spectral Root Mean Squared Error (RMSE).
+    \item \textbf{Joint Bayesian Priors}: We implement a probabilistic assessment engine using \texttt{PyMC}. We combine a highly objective \textit{Skeptical Prior} on the structural aliasing effect parameters ($\beta \sim \mathcal{N}(0, 0.1^2)$) with an \textit{Empirical Data-Calibrated Prior} representing real-world hardware instrument noise ($\sigma \sim \text{Half-Normal}(0.0616)$), calculated directly from the nighttime null intervals of \texttt{Dataset-SolarTechLab.csv}.
+    \item \textbf{Dual-Engine Generative Testing}: We evaluate the model's manifold behavior using full \textit{KernelSynth} sum-product randomized kernel trees to model non-stationary background environments, while restricting the \textit{TSMixup} operator to run exclusively over pure sinusoids to maintain a clean algebraic control environment for phase-locking evaluation.
+    \item \textbf{NIST AI RMF 1.0 Integration}: We frame the identified data-deletion mechanism as a formal zero-payload security vulnerability within the \textit{Map}, \textit{Measure}, and \textit{Manage} core functions of the NIST AI Risk Management Framework, evaluating whether proposed algorithmic defenses successfully reduce risk or leave significant residual exposure.
+\end{itemize}
+
+\section{Open Source and Licensing Compliance}
+In strict compliance with the core open-source policies set forth by the coursework handbook, all project components are developed under a transparent public licensing framework. This technical programmatic document and the subsequent final report are released under the Creative Commons Attribution 4.0 International (CC-BY 4.0) license. All source code, probing scripts, and model intervention wrappers generated across the project lifetime are released under the open-source MIT license, ensuring full reproducibility, fairness of assessment, and academic integrity.
+
+\end{document}
