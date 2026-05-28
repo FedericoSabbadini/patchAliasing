@@ -48,17 +48,26 @@ At first the project will focus on the definition of the phenomenon, particularl
     \item phase-locking condition formal definition;
 \end{itemize}
 
+Then, after defining a set of falsifiable hypoteses, including:
 \begin{itemize}
-    \item analysis of blind spots, temporal allignment and impact of stride modification;
-    \item Use of a light implementation of TSMixup to generate synthetic data by mixing different frequency sinusoidal signals;
-    \item Test of the model on simple sinusoidal signals and TSMixup generated ones to verify the presence of blind spots and phase-locking effects;
-    s
+    \item the existence of frequency-dependent blind spots at harmonics of a patch-induced frequency;
+    \item the dependence of the effect on temporal alignment;
+    \item the impact of patch size, stride, and overlap on the phenomenon.
 \end{itemize}
 
-Possible analysis of signals produced with KernelSynth, if previous analyses have produced evidence of aliasing on synthetic data;
+The project will then focus on the empirical validation of the phenomenon, through:
+\begin{itemize}
+    \item use of a light implementation of TSMixup to generate synthetic data by mixing different frequency sinusoidal signals;
+    \item test of the model on simple sinusoidal signals and TSMixup generated ones to verify the presence of blind spots and phase-locking effects.
+\end{itemize}
 
+Possible analysis of signals produced with KernelSynth, if previous analyses have produced evidence of aliasing on synthetic data are possible, to verify the presence of the phenomenon on more complex signals. 
+
+If the phenomenon is verified on synthetic data, the project will then focus on the analysis of real-world data, through the use of the \texttt{Dataset-SolarTechLab.csv} dataset, which contains 1-minute multivariate telemetry stream of a photovoltaic array.
+
+Finally, the project will focus on the analysis of the phenomenon, through:
 \begin{itemize}
     \item MDL probing after each decoder block to verify the presence, or absence, of frequency information in the hidden states;
     \item Bayesian statistical analysis of the results;
-    \item Possible mitigation strategies discussion.
+    \item Possible mitigation strategies discussion, icluding stride reduction.
 \end{itemize}
