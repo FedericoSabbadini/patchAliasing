@@ -13,7 +13,7 @@ Chronos-Bolt-Tiny operates with a fixed patch size of $P=16$ and a default strid
 
 This study aims to provide a comprehensive understanding of the relationships between raw signal characteristics and the latent representations learned by the model, systematically identifying the critical links between sampling frequency ($f_s$), patch size ($P$), and stride ($S$) in order to propose actionable solutions to mitigate the phenomenon.
 
-Layer-resolved probing is performed on the four encoder and decoder hidden states, plus at the final output probability distribution level. By mapping representations across these specific layers, the project isolates where task-relevant signal attributes are preserved or compromised under architectural synchronization constraints.
+Layer-resolved probing is executed sequentially across the intermediate hidden states of the encoder and decoder blocks, plus at the final output probability distribution level. By mapping representations across these specific layers, the project isolates where task-relevant signal attributes are preserved or compromised under architectural synchronization constraints.
 
 Stride is systematically varied within the range of $S \in [8, 16]$ to explore the explicit impact of patch geometry on aliasing effects.
 
