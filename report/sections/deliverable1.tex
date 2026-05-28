@@ -1,4 +1,4 @@
-This investigation formalizes the phenomenon of \textit{structural aliasing} within patch-based time-series foundation models, focusing specifically on Amazon's Chronos-Bolt framework. The project takes as focus area the load balancing of smart grids.
+This investigation formalizes the phenomenon of \textit{structural aliasing} within patch-based time-series foundation models, focusing specifically on Amazon's Chronos-Bolt framework. The project takes as focus area the load balancing of smart grids. 
 
 \section{Intended Audience}
 This analysis is directly intended for researchers and practitioners utilizing large language models within the Chronos family for time-series analysis, representation learning, and forecasting, as well as individuals interested in characterizing the fundamental limitations, structural boundaries, and latent capabilities of these architectures. 
@@ -61,27 +61,11 @@ The project will focus on the empirical validation of the phenomenon, through:
     \item test of the model on simple sinusoidal signals and TSMixup generated ones to verify the presence of blind spots and phase-locking effects.
 \end{itemize}
 
-Possible analysis of signals produced with KernelSynth, if previous analyses have produced evidence of aliasing on synthetic data are possible, to verify the presence of the phenomenon on more complex signals. 
+Possible analysis of signals produced with KernelSynth, if previous analyses have produced evidence of aliasing on synthetic data are possible, to verify the presence of the phenomenon on more complex signals. If the phenomenon is verified on synthetic data, the project will then focus on the analysis of real-world data, through the use of the \texttt{Dataset-SolarTechLab.csv} dataset, which contains 1-minute multivariate telemetry stream of a photovoltaic array. \newline
 
-If the phenomenon is verified on synthetic data, the project will then focus on the analysis of real-world data, through the use of the \texttt{Dataset-SolarTechLab.csv} dataset, which contains 1-minute multivariate telemetry stream of a photovoltaic array.
-
-Finally, the project will focus on the analysis of the phenomenon, through:
-\begin{itemize}
-    \item MDL probing after each decoder block to verify the presence, or absence, of frequency information in the hidden states;
-    \item 
-
-All effect estimates are obtained through a probabilistic model implemented in PyMC. A \emph{skeptical prior},
-\[
-\beta \sim \mathcal{N}(0,\,0.1^2),
-\]
-encodes prior skepticism about the aliasing effect size. An observation-noise prior,
-\[
-\sigma \sim \mathrm{HalfNormal}(0.0616),
-\]
+Finally, the project will focus on the analysis of the phenomenon, through MDL probing after each decoder block to verify the presence, or absence, of frequency information in the hidden states. All effect estimates are obtained through a probabilistic model implemented in PyMC. A \emph{skeptical prior}, $\beta \sim \mathcal{N}(0,\,0.1^2)$ sencodes prior skepticism about the aliasing effect size. An observation-noise prior, $ \sigma \sim \mathrm{HalfNormal}(0.0616)$
 is calibrated from the empirical standard deviation of \texttt{Power\_W} during nighttime null intervals in the dataset, representing baseline instrument noise under zero-generation conditions.
 
 Posterior distributions, 95\% credible intervals, and Bayes factors comparing the aliasing model against a frequency-flat null model are reported throughout.
 
-\begin{itemize}
-    \item discussion of possible mitigation strategies, including stride reduction.
-\end{itemize}
+Discussion of possible mitigation strategies, including stride reduction.
