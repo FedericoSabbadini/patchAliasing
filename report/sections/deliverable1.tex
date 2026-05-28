@@ -41,15 +41,23 @@ The impact of this project could extend beyond theoretical understanding, as it 
 
 
 \section{Project outline}
+At first the project will focus on the definition of the phenomenon, particularly:
+\begin{itemize}
+    \item formal domain description through OWL2 ontology of the physical system (photovoltaic array, battery storage, national grid, internal load), signal characteristics (frequency, amplitude, time span, phase) and signal patched representations (patch size, stride, sampling frequency);
+    \item patch-based tokenization and patch aliasing formal definition as function of the patch size ($P$), stride ($S$) and sampling frequency($f_s$);
+    \item phase-locking condition formal definition;
+\end{itemize}
 
 \begin{itemize}
-    \item Patch-based tokenization and patch aliasing formal definition;
-    \item Phase-locking analysis;
-    \item Formal domain description through ontology of the physical system (photovoltaic array, battery storage, national grid, internal load), signal characteristics (frequency, amplitude, time span, phase) and signal patched representations (patch size, stride, sampling frequency);
-    \item Analysis of blind spots, temporal allignment and impact of stride modification;
+    \item analysis of blind spots, temporal allignment and impact of stride modification;
     \item Use of a light implementation of TSMixup to generate synthetic data by mixing different frequency sinusoidal signals;
     \item Test of the model on simple sinusoidal signals and TSMixup generated ones to verify the presence of blind spots and phase-locking effects;
-    \item Possible analysis of signals produced with KernelSynth, if previous analyses have produced evidence of aliasing on synthetic data;
+    s
+\end{itemize}
+
+Possible analysis of signals produced with KernelSynth, if previous analyses have produced evidence of aliasing on synthetic data;
+
+\begin{itemize}
     \item MDL probing after each decoder block to verify the presence, or absence, of frequency information in the hidden states;
     \item Bayesian statistical analysis of the results;
     \item Possible mitigation strategies discussion.
