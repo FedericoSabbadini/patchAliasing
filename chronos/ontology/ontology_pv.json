@@ -1,0 +1,50 @@
+{
+  "domain": "photovoltaic_power",
+  "target_variable": "Power_W",
+  "native_sampling_minutes": 1,
+
+  "_note_cpp": "cpp = P * dt_min / period_minutes. Phase-locking (blind spot) when cpp ∈ Z+, 1 ≤ cpp ≤ P/2.",
+
+  "physical_entities": [
+    {"name": "PhotovoltaicArray",  "role": "generation_source",   "output_signal": "Power_W"},
+    {"name": "BatteryStorage",     "role": "energy_buffer",       "connects_to": ["InternalLoad", "NationalGrid"]},
+    {"name": "InternalLoad",       "role": "energy_sink"},
+    {"name": "NationalGrid",       "role": "exchange_interface"}
+  ],
+
+  "signal_representation": {
+    "patch_size_P": 16,
+    "default_stride_S": 16,
+    "context_length_T": 512,
+    "token_nyquist_cpp": 8,
+    "blind_spot_condition": "cpp in Z+, 1 <= cpp <= P/2",
+    "cpp_formula": "cpp = P * dt_min / period_minutes"
+  },
+
+  "concepts": [
+    {"name": "seasonal_cycle",      "kind": "cycle", "period_minutes": 525600, "meaning": "annual irradiance/power variation"},
+    {"name": "diurnal_cycle",       "kind": "cycle", "period_minutes": 1440,   "meaning": "day/night power cycle — dominant pattern"},
+    {"name": "cloud_intermittency", "kind": "cycle", "period_minutes": 8,      "meaning": "fast cloud-induced fluctuations (band ~4-30 min)"},
+    {"name": "solar_noon_peak",     "kind": "state", "period_minutes": null,   "meaning": "midday maximum power"},
+    {"name": "night_zero",          "kind": "state", "period_minutes": null,   "meaning": "zero power at night — rank-1 degenerate regime"},
+    {"name": "inverter_clipping",   "kind": "state", "period_minutes": null,   "meaning": "power capped at inverter rated limit"},
+    {"name": "morning_ramp",        "kind": "event", "period_minutes": null,   "meaning": "sunrise power ramp-up"},
+    {"name": "evening_ramp",        "kind": "event", "period_minutes": null,   "meaning": "sunset power ramp-down"},
+    {"name": "shading_dip",         "kind": "event", "period_minutes": null,   "meaning": "transient drop from passing cloud or obstruction"}
+  ],
+
+  "relations": [
+    {"s": "diurnal_cycle",       "p": "nested_in",    "o": "seasonal_cycle"},
+    {"s": "solar_noon_peak",     "p": "occurs_during","o": "diurnal_cycle"},
+    {"s": "night_zero",          "p": "occurs_during","o": "diurnal_cycle"},
+    {"s": "cloud_intermittency", "p": "modulates",    "o": "diurnal_cycle"},
+    {"s": "morning_ramp",        "p": "transitions",  "o": "night_zero"},
+    {"s": "evening_ramp",        "p": "transitions",  "o": "solar_noon_peak"},
+    {"s": "inverter_clipping",   "p": "caps",         "o": "solar_noon_peak"},
+    {"s": "shading_dip",         "p": "interrupts",   "o": "diurnal_cycle"},
+    {"s": "PhotovoltaicArray",   "p": "produces",     "o": "Power_W"},
+    {"s": "BatteryStorage",      "p": "buffers",      "o": "Power_W"},
+    {"s": "InternalLoad",        "p": "consumes",     "o": "Power_W"},
+    {"s": "NationalGrid",        "p": "exchanges",    "o": "Power_W"}
+  ]
+}
