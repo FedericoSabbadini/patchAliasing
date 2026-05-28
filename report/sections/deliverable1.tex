@@ -11,6 +11,11 @@ This document must address the following key questions:
 
 This investigation formalizes the phenomenon of \textit{structural aliasing} within patch-based time-series foundation models, focusing specifically on Amazon's Chronos-Bolt framework.
 
+\section{Intended Audience}
+This analysis is directly intended for researchers and practitioners utilizing large language models within the Chronos family for time-series analysis, representation learning, and forecasting, as well as individuals interested in characterizing the fundamental limitations, structural boundaries, and latent capabilities of these architectures. 
+
+This study is also explicitly directed toward researchers, engineers, and practitioners working in the field of energy management and domains directly related to this described infrastructure. 
+
 \section{Purpose and Scope}
 This project formalises and empirically validates the phenomenon of \textit{structural aliasing} in patch-based time-series foundation models, using Amazon Chronos-Bolt-Tiny as the target architecture.
 
@@ -24,7 +29,7 @@ Stride is systematically varied within the range of $S \in [1, 16]$ to explore t
 
 The core objective is to challenge the baseline assumption that pre-trained temporal foundation models inherently preserve frequency attributes when processing Nyquist-compliant signals.
 
-\subsection{Domain Description}
+\section{Domain Description}
 To ground this abstract architectural evaluation, the study utilizes a specific physical domain as empirical reference layer. This reference setting models the solar energy produced by a photovoltaic array attached to an internal load, a local storage battery, and the national electricity grid. The explicit operational objective within this system is to evaluate production variations over short-term future horizons so that the system can dynamically modify the internal load, attach and detach the battery unit, with the aim of maintaining internal grid stability and enabling precise anomaly detection. 
 
 Within this infrastructure, a control AI agent is responsible for executing real-time tasks: 
@@ -35,16 +40,10 @@ Within this infrastructure, a control AI agent is responsible for executing real
     \item \textbf{internal grid stability maintenance}, acting as a localized governor to minimize power distribution imbalances before they escape to the national grid interface.
 \end{itemize}
 
-
-\section{Intended Audience}
-This analysis is directly intended for researchers and practitioners utilizing large language models within the Chronos family for time-series analysis, representation learning, and forecasting, as well as individuals interested in characterizing the fundamental limitations, structural boundaries, and latent capabilities of these architectures. 
-
-This study is also explicitly directed toward researchers, engineers, and practitioners working in the field of energy management and domains directly related to this described infrastructure. 
-
 \section{Significance and Impact}
 This subject is of fundamental importance because it explore an unexamined systemic vulnerability native to patch-based temporal foundation architectures. By systematically characterizing the conditions under which structural aliasing emerges, this work will provide critical insights into the fundamental limitations of these models, directly informing the design of more robust architectures and training paradigms. 
 
-For professionals operating within this space, the analysis exposes how algorithmic data-deletion anomalies can propagate through automated distribution pipelines Evaluating how hidden token-space representation collapses can deceive a load-balancing AI agent into executing misaligned control choices, this work provides critical insights required to build high-reliability, fault-tolerant deployment models for smart-grid management systems.
+For professionals operating within this domain, the analysis could expose how algorithmic data-deletion anomalies can propagate through automated distribution pipelines. Evaluating how hidden token-space representation collapses can deceive a load-balancing AI agent into executing misaligned control choices, this work provides critical insights required to build high-reliability, fault-tolerant deployment models for smart-grid management systems.
 
 The impact of this project could extend beyond theoretical understanding, as it has direct implications for the reliability and safety of real-world applications that depend on accurate time-series forecasting and representation learning, particularly in high-stakes domains such as energy management.
 
