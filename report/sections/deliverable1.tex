@@ -68,7 +68,11 @@ If the phenomenon is verified on synthetic data, the project will then focus on 
 Finally, the project will focus on the analysis of the phenomenon, through:
 \begin{itemize}
     \item MDL probing after each decoder block to verify the presence, or absence, of frequency information in the hidden states;
-    \item Bayesian statistical analysis of the results ????????????????????? ??????????? ????? ???????????????? ????????? ?????????;
+    \item 
+
+All effect estimates are obtained through a probabilistic model implemented in PyMC. A *Skeptical Prior* β∼N(0, 0.12)\beta \sim \mathcal{N}(0,\, 0.1^2)
+β∼N(0,0.12) encodes prior scepticism about the aliasing effect size. An observation-noise prior σ∼HalfNormal(0.0616)\sigma \sim \mathrm{HalfNormal}(0.0616)
+σ∼HalfNormal(0.0616) is calibrated from the empirical standard deviation of \texttt{Power\_W} during nighttime null intervals in the dataset, representing baseline instrument noise under zero-generation conditions. Posterior distributions, 95\% credible intervals, and Bayes factors comparing the aliasing model against a frequency-flat null model are reported throughout.
     \item possible mitigation strategies discussion, including stride reduction.
 \end{itemize}
 
