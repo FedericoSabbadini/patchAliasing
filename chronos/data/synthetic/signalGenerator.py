@@ -32,14 +32,15 @@ def plot_print(generator, name):
     generator.plot(signal)
     print(f"\n{Path(generator.path()).name} shape={signal.shape} std={signal.std():.4f}")
 
-def runRandomSignal(K=None, alpha=None, l_min=None, l_max=None, fs=None):
+def runRandomSignal(K=None, alpha=None, l_min=None, l_max=None, fs=None, seed=None):
     """
     Generates a random signal using a tsmixup generator by a random seed
     Then, every parameter is initialized with a random value, related to the tsmixup generator type, and the signal is generated and returned. 
     The random seed is used to ensure reproducibility of the generated signal, and the random parameters are used to create a diverse set of signals that can be used for testing and analysis. The function does not take any input parameters and does not return anything, but it generates and saves a signal based on the randomly chosen generator and parameters.
     """
     # set seed for reproducibility
-    seed = np.random.randint(0, 10000)
+    if seed is None:
+        seed = np.random.randint(0, 10000)
     np.random.seed(seed)
     return runTSMixup({
         "K": np.random.randint(2, 6) if K is None else K,
