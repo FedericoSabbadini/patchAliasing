@@ -1451,7 +1451,6 @@ dependencies = [
     { name = "pymc", version = "5.28.5", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
     { name = "pymc", version = "6.0.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "scikit-learn" },
-    { name = "torch" },
     { name = "tqdm" },
 ]
 
@@ -1465,7 +1464,6 @@ requires-dist = [
     { name = "pillow", specifier = ">=12.2.0" },
     { name = "pymc", specifier = ">=5.28.5" },
     { name = "scikit-learn", specifier = ">=1.8.0" },
-    { name = "torch", specifier = ">=2.12.0" },
     { name = "tqdm", specifier = ">=4.67.3" },
 ]
 
