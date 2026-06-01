@@ -66,7 +66,7 @@
 \usepackage[utf8]{inputenc} % Richiesto per i caratteri internazionali
 \usepackage[T1]{fontenc} % Encoding dei font di output
 
-\usepackage[sfdefault]{inter}
+\usepackage{lmodern}
 \renewcommand{\familydefault}{\sfdefault} % Imposta il font sans-serif come predefinito
 
 \usepackage{microtype} % Ottimizza visivamente la spaziatura del testo
