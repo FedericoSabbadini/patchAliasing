@@ -1,4 +1,4 @@
-This investigation formalizes the phenomenon of \textit{structural aliasing} within patch-based time-series foundation models, focusing specifically on Amazon's Chronos-Bolt framework. The project takes as focus area the load balancing of smart grids. 
+This investigation formalizes the phenomenon of \textit{structural aliasing} within patch-based time-series foundation models, focusing specifically on Amazon's Chronos-Bolt framework.\cite{ansariChronosLearningLanguage2024, FastAccurateZeroshot2024a} The project focuses on smart-grid load balancing. 
 
 \section{Intended Audience}
 This analysis is directly intended for researchers and practitioners utilizing large language models within the Chronos family for time-series analysis, representation learning, and forecasting, as well as individuals interested in characterizing the fundamental limitations, structural boundaries, and latent capabilities of these architectures. 
@@ -6,10 +6,9 @@ This analysis is directly intended for researchers and practitioners utilizing l
 This study is also explicitly directed toward researchers, engineers, and practitioners working in the field of energy management and domains directly related to this described infrastructure. 
 
 \section{Purpose and Scope}
-
 This project formalises and empirically validates the phenomenon of \textit{structural aliasing} in patch-based time-series foundation models, using Amazon Chronos-Bolt-Tiny as the target architecture.
 
-Chronos-Bolt-Tiny operates with a fixed patch size of $P=16$ and a default stride of $S=16$ , a context window of $T=512$ tokens, and four encoder blocks followed by four decoder blocks terminating in a direct quantile projection head.
+Chronos-Bolt-Tiny operates with a fixed patch size of $P=16$, stride of $S=16$ and context window of $T=512$ tokens as default settings, and four encoder blocks followed by four decoder blocks terminating in a direct quantile projection head.\cite{ChronosBoltPipelineAmazonscienceChronosforecastinga}
 
 This study aims to provide a comprehensive understanding of the relationships between raw signal characteristics and the latent representations learned by the model, systematically identifying the critical links between sampling frequency ($f_s$), patch size ($P$), and stride ($S$) in order to propose actionable solutions to mitigate the phenomenon.
 
@@ -20,25 +19,22 @@ Stride is systematically varied within the range of $S \in [8, 16]$ to explore t
 The core objective is to challenge the baseline assumption that pre-trained temporal foundation models inherently preserve frequency attributes when processing Nyquist-compliant signals.
 
 \section{Domain Description}
-
-To ground this abstract architectural evaluation, the study utilizes a specific physical domain as empirical reference layer. This reference setting models the solar energy produced by a photovoltaic array attached to an internal load, a local storage battery, and the national electricity grid. The explicit operational objective within this system is to evaluate production variations over short-term future horizons so that the system can dynamically modify the internal load, attach and detach the battery unit, with the aim of maintaining internal grid stability and enabling precise anomaly detection. 
+To ground this abstract architectural evaluation, the study utilizes a specific physical domain as an empirical reference layer. This reference setting models the solar energy produced by a photovoltaic array attached to an internal load, a local storage battery, and the national electricity grid. The explicit operational objective within this system is to evaluate production variations over short-term future horizons so that the system can dynamically modify the internal load, attach and detach the battery unit, with the aim of maintaining internal grid stability and enabling precise anomaly detection. 
 
 Within this infrastructure, a control AI agent is responsible for executing real-time tasks: dynamic load-balancing, battery dispatch, state-monitoring and active anomaly detection, and internal grid stability maintenance.
 
-\section{Significance and Impact}
-
+\section{Significance and Impact} 
 This subject is relevant because it explores an unexamined systemic vulnerability native to patch-based temporal foundation architectures. By systematically characterizing the conditions under which structural aliasing emerges, this work will provide critical insights into the fundamental limitations of these models, directly informing the design of more robust architectures and training paradigms. 
 
-For professionals operating within this domain, the analysis could expose how algorithmic data-deletion anomalies can propagate through automated distribution pipelines. Evaluating how hidden token-space representation collapses can deceive a load-balancing AI agent into executing misaligned control choices, this work provides critical insights required to build high-reliability, fault-tolerant deployment models for smart-grid management systems.
+For professionals operating within this domain, the analysis could expose how algorithmic data-deletion anomalies can propagate through automated distribution pipelines. By evaluating how hidden token-space representation collapse can deceive a load-balancing AI agent into executing misaligned control choices, this work could provide insights needed for high-reliability, fault-tolerant smart-grid deployments.
 
 The impact of this project could extend beyond theoretical understanding, as it has direct implications for the reliability and safety of real-world applications that depend on accurate time-series forecasting and representation learning, particularly in high-stakes domains such as energy management.
 
-
-\section{Project outline}
+\section{Project Outline}
 At first the project will focus on the definition of the phenomenon, particularly:
 \begin{itemize}
     \item formal domain description through OWL2 ontology of the physical system (photovoltaic array, battery storage, national grid, internal load), signal (frequency, amplitude, timespan, phase) and signal patched representation (patch size, stride, sampling frequency);
-    \item patch-based tokenization and patch aliasing formal definition as function of the patch size ($P$), stride ($S$) and sampling frequency($f_s$);
+    \item patch-based tokenization and patch aliasing formal definition as function of the patch size ($P$), stride ($S$) and sampling frequency ($f_s$);
     \item phase-locking condition formal definition;
 \end{itemize}
 
@@ -51,12 +47,19 @@ Then, after defining a set of falsifiable hypotheses, including:
 
 The project will focus on the empirical validation of the phenomenon, through:
 \begin{itemize}
-    \item use of a light implementation of TSMixup to generate synthetic data by mixing different frequency sinusoidal signals;
+    \item use of a light implementation of TSMixup\cite{ansariChronosLearningLanguage2024} to generate synthetic data by mixing different frequency sinusoidal signals;
     \item test of the model on simple sinusoidal signals and TSMixup generated ones to verify the presence of blind spots and phase-locking effects.
 \end{itemize}
 
-Possible analysis of signals produced with KernelSynth, if previous analyses have produced evidence of aliasing on synthetic data are possible, to verify the presence of the phenomenon on more complex signals. If the phenomenon is verified on synthetic data, the project will then focus on the analysis of real-world data, through the use of the \texttt{Dataset-SolarTechLab.csv} dataset, which contains 1-minute multivariate telemetry stream of a photovoltaic array. \newline
+If previous analyses show evidence of aliasing in synthetic data, the project may analyze signals produced with KernelSynth\cite{ansariChronosLearningLanguage2024} to test whether the phenomenon persists in more complex signals. If the phenomenon is verified on synthetic data, the project will then focus on the analysis of real-world data, through the use of the \texttt{Dataset-SolarTechLab.csv} dataset, which contains one-minute multivariate telemetry stream of a photovoltaic array.\cite{levaPhotovoltaicPowerWeather2020} \newline
 
-Finally, the project will focus on the analysis of the phenomenon, through MDL probing after each decoder block to verify the presence, or absence, of frequency information in the hidden states. The analysis will be performed through the use of Bayesian statistics.
+The project will focus on the analysis of the phenomenon, through MDL probing\cite{voitaInformationTheoreticProbingMinimum2020} after each decoder block to verify the presence, or absence, of frequency information in the hidden states. The analysis will be performed through the use of Bayesian statistics. Discussion of possible mitigation strategies, including stride reduction. 
 
-Discussion of possible mitigation strategies, including stride reduction.
+Finally, the project will include a formal risk assessment grounded in the NIST AI Risk Management Framework (AI RMF) to evaluate structural aliasing as a systematic vulnerability within cyber-physical energy systems. This analysis will outline plausible threat models and attack surfaces, and evaluate whether the proposed mitigation strategies effectively reduce residual exposure for the automated control AI agent. 
+The risk assessment will be structured around the following key points:
+\begin{itemize}
+    \item Context and Attack Surface: identify vulnerable points.
+    \item Threat Modeling: define potential attacks.
+    \item Consequences and Impact: assess system damage.
+    \item Mitigation and Residual Exposure: evaluate remaining risks.
+\end{itemize}
