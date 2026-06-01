@@ -42,7 +42,7 @@
 
 \usepackage[bottom, hang]{footmisc} % Force footnotes to the bottom of the page and to the left margin
 \setlength{\footnotemargin}{6pt} % Horizontal space between the footnote marker and text
-
+\usepackage{indentfirst} % Indent the first paragraph of each section
 %----------------------------------------------------------------------------------------
 %	MARGINS
 %----------------------------------------------------------------------------------------

@@ -51,16 +51,10 @@ The project will focus on the empirical validation of the phenomenon, through:
     \item test of the model on simple sinusoidal signals and TSMixup generated ones to verify the presence of blind spots and phase-locking effects. 
 \end{itemize}
 
-If previous analyses show evidence of aliasing in synthetic data, the project may analyze signals produced with KernelSynth \cite{ansariChronosLearningLanguage2024} to test whether the phenomenon persists in more complex signals. If the phenomenon is verified on synthetic data, the project will then focus on the analysis of real-world data, through the use of the \texttt{Dataset-SolarTechLab.csv} dataset, which contains one-minute multivariate telemetry stream of a photovoltaic array. \cite{levaPhotovoltaicPowerWeather2020} \newline
+If previous analyses show evidence of aliasing in synthetic data, the project may analyze signals produced with KernelSynth \cite{ansariChronosLearningLanguage2024} to test whether the phenomenon persists in more complex signals. If the phenomenon is verified on synthetic data, the project will then focus on the analysis of real-world data, through the use of the \texttt{Dataset-SolarTechLab.csv} dataset, which contains one-minute multivariate telemetry stream of a photovoltaic array. \cite{levaPhotovoltaicPowerWeather2020}
 
 The project will focus on the analysis of the phenomenon, through MDL probing \cite{voitaInformationTheoreticProbingMinimum2020} after each decoder block to verify the presence, or absence, of frequency information in the hidden states. The analysis will be performed through the use of Bayesian statistics. 
 
-Finally, the project will include a formal risk assessment grounded in the NIST AI Risk Management Framework (AI RMF) to evaluate structural aliasing as a systematic vulnerability within cyber-physical energy systems. This analysis will outline plausible threat models and attack surfaces, possible mitigation strategies, including stride reduction. And evaluate whether the proposed mitigation strategies effectively reduce residual exposure for the automated control AI agent. 
+Finally, the project will include a formal risk assessment grounded in the NIST AI Risk Management Framework (AI RMF) \cite{tabassiArtificialIntelligenceRisk2023} to evaluate structural aliasing as a systematic vulnerability within cyber-physical energy systems. This analysis will outline plausible threat models and attack surfaces, possible mitigation strategies, including stride reduction. And evaluate whether the proposed mitigation strategies effectively reduce residual exposure for the automated control AI agent. 
 
-The risk assessment will be structured around the following key points:
-\begin{itemize}
-    \item Context and Attack Surface: identify vulnerable points.
-    \item Threat Modeling: define potential attacks.
-    \item Consequences and Impact: assess system damage.
-    \item Mitigation and Residual Exposure: evaluate remaining risks.
-\end{itemize}
+The risk assessment will be structured around the following key points: context and attack surface, threat modeling, impact, mitigation and residual exposure.
