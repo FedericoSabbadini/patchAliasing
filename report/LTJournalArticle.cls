@@ -67,8 +67,6 @@
 \usepackage[utf8]{inputenc} % Required for inputting international characters
 \usepackage[T1]{fontenc} % Output font encoding for international characters
 
-
-
 \linespread{1.05} % Increase line spacing slightly
 
 \usepackage{microtype} % Slightly tweak font spacing for aesthetics
