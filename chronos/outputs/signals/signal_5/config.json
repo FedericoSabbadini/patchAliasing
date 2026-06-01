@@ -2,19 +2,30 @@
     {
         "generator": "kernelsynth",
         "n_realizations": 5,
-        "seed": 15,
+        "seed": 42,
         "params": {
             "J": 5,
             "l_syn": 512,
             "fs": 256,
             "jitter": 0.0001,
             "P": 16,
-            "inject": {
-                "mode": "cpp",
-                "value": 4.0,
-                "amplitude": 0.01,
-                "phase": 0.0
-            }
+            "inject": [
+                {
+                    "freq_hz": 48.0,
+                    "amplitude": 0.05,
+                    "phase": 0.0
+                },
+                {
+                    "freq_hz": 64.0,
+                    "amplitude": 0.05,
+                    "phase": 0.0
+                },
+                {
+                    "freq_hz": 72.0,
+                    "amplitude": 0.05,
+                    "phase": 0.0
+                }
+            ]
         }
     }
 ]
