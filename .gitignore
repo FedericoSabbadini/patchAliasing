@@ -229,3 +229,6 @@ __marimo__/
 *.toc
 *.bcf
 *.run.xml
+
+# zip for Prism
+report/main.zip

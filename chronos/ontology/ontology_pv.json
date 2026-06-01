@@ -1,50 +1,127 @@
 {
+  "ontology_iri": "http://www.semanticweb.org/solar/ontologies/2026/6/solar-aliasing",
   "domain": "photovoltaic_power",
   "target_variable": "Power_W",
   "native_sampling_minutes": 1,
 
-  "_note_cpp": "cpp = P * dt_min / period_minutes. Phase-locking (blind spot) when cpp ∈ Z+, 1 ≤ cpp ≤ P/2.",
+  "class_hierarchy": {
+    "PhysicalSystem": {
+      "subclasses": {
+        "PhysicalComponent": {
+          "subclasses": {
+            "PhotovoltaicArray": { "disjoint_with": ["BatteryStorage","NationalGrid","InternalLoad"] },
+            "BatteryStorage":    { "disjoint_with": ["NationalGrid","InternalLoad"] },
+            "NationalGrid":      { "disjoint_with": ["InternalLoad"] },
+            "InternalLoad":      {}
+          }
+        }
+      }
+    },
+    "TimeSeriesSignal": {},
+    "PatchedRepresentation": {},
+    "WeatherCondition": {},
+    "SystemState": { "subclasses": { "GenerationState": {}, "AnomalyState": {} } },
+    "AliasingPhenomenon": {},
+    "AgentAction": {}
+  },
 
-  "physical_entities": [
-    {"name": "PhotovoltaicArray",  "role": "generation_source",   "output_signal": "Power_W"},
-    {"name": "BatteryStorage",     "role": "energy_buffer",       "connects_to": ["InternalLoad", "NationalGrid"]},
-    {"name": "InternalLoad",       "role": "energy_sink"},
-    {"name": "NationalGrid",       "role": "exchange_interface"}
+  "object_properties": [
+    { "name": "hasComponent",      "domain": "PhysicalSystem",    "range": "PhysicalComponent" },
+    { "name": "hasSignal",         "domain": "PhysicalComponent", "range": "TimeSeriesSignal" },
+    { "name": "hasRepresentation", "domain": "TimeSeriesSignal",  "range": "PatchedRepresentation", "functional": true },
+    { "name": "hasState",          "domain": "PhysicalComponent", "range": "SystemState" },
+    { "name": "hasWeather",        "domain": "PhysicalSystem",    "range": "WeatherCondition" },
+    { "name": "triggersAction",    "domain": "SystemState",       "range": "AgentAction" },
+    { "name": "affectedBy",        "domain": "TimeSeriesSignal",  "range": "AliasingPhenomenon" }
+  ],
+
+  "data_properties": [
+    { "name": "PV_power",           "domain": "PhotovoltaicArray",    "range": "xsd:float" },
+    { "name": "G_h",                "domain": "PhotovoltaicArray",    "range": "xsd:float" },
+    { "name": "G_tilt",             "domain": "PhotovoltaicArray",    "range": "xsd:float" },
+    { "name": "T_air",              "domain": "WeatherCondition",     "range": "xsd:float" },
+    { "name": "W_speed",            "domain": "WeatherCondition",     "range": "xsd:float" },
+    { "name": "W_direction",        "domain": "WeatherCondition",     "range": "xsd:float" },
+    { "name": "signalFrequency",    "domain": "TimeSeriesSignal",     "range": "xsd:float" },
+    { "name": "amplitude",          "domain": "TimeSeriesSignal",     "range": "xsd:float" },
+    { "name": "timespan",           "domain": "TimeSeriesSignal",     "range": "xsd:float" },
+    { "name": "phase",              "domain": "TimeSeriesSignal",     "range": "xsd:float" },
+    { "name": "patchSize",          "domain": "PatchedRepresentation","range": "xsd:integer" },
+    { "name": "stride",             "domain": "PatchedRepresentation","range": "xsd:integer" },
+    { "name": "samplingFrequency",  "domain": "PatchedRepresentation","range": "xsd:float" }
   ],
 
   "signal_representation": {
-    "patch_size_P": 16,
-    "default_stride_S": 16,
-    "context_length_T": 512,
+    "patchSize": 16,
+    "stride": 16,
+    "context_length": 2048,
+    "samplingFrequency_hz": 0.0167,
     "token_nyquist_cpp": 8,
-    "blind_spot_condition": "cpp in Z+, 1 <= cpp <= P/2",
-    "cpp_formula": "cpp = P * dt_min / period_minutes"
+    "cpp_formula": "cpp = P * dt_min / period_minutes",
+    "blind_spot_condition": "cpp in Z+, 1 <= cpp <= P/2"
   },
 
-  "concepts": [
-    {"name": "seasonal_cycle",      "kind": "cycle", "period_minutes": 525600, "meaning": "annual irradiance/power variation"},
-    {"name": "diurnal_cycle",       "kind": "cycle", "period_minutes": 1440,   "meaning": "day/night power cycle — dominant pattern"},
-    {"name": "cloud_intermittency", "kind": "cycle", "period_minutes": 8,      "meaning": "fast cloud-induced fluctuations (band ~4-30 min)"},
-    {"name": "solar_noon_peak",     "kind": "state", "period_minutes": null,   "meaning": "midday maximum power"},
-    {"name": "night_zero",          "kind": "state", "period_minutes": null,   "meaning": "zero power at night — rank-1 degenerate regime"},
-    {"name": "inverter_clipping",   "kind": "state", "period_minutes": null,   "meaning": "power capped at inverter rated limit"},
-    {"name": "morning_ramp",        "kind": "event", "period_minutes": null,   "meaning": "sunrise power ramp-up"},
-    {"name": "evening_ramp",        "kind": "event", "period_minutes": null,   "meaning": "sunset power ramp-down"},
-    {"name": "shading_dip",         "kind": "event", "period_minutes": null,   "meaning": "transient drop from passing cloud or obstruction"}
+  "inferred_classes": [
+    {
+      "name": "Nighttime_Array", "parent": "PhotovoltaicArray", "state_type": "GenerationState",
+      "owl_restrictions": { "G_h": { "maxInclusive": 10.0 } },
+      "comment": "Pannello in condizione notturna: Irraggiamento <= 10 W/m2"
+    },
+    {
+      "name": "ClearSky_Array", "parent": "PhotovoltaicArray", "state_type": "GenerationState",
+      "owl_restrictions": { "G_h": { "minExclusive": 600.0 }, "PV_power": { "minExclusive": 30.0 } },
+      "comment": "Pannello in produzione ottimale"
+    },
+    {
+      "name": "InverterTrip_Array", "parent": "PhotovoltaicArray", "state_type": "AnomalyState",
+      "owl_restrictions": { "G_h": { "minExclusive": 300.0 }, "PV_power": { "maxInclusive": 0.1 } },
+      "comment": "Irradiance available but output collapsed (critical fault)"
+    },
+    {
+      "name": "Clipping_Array", "parent": "PhotovoltaicArray", "state_type": "AnomalyState",
+      "owl_restrictions": { "G_h": { "minExclusive": 750.0 }, "PV_power": { "minInclusive": 45.0 } },
+      "comment": "Saturazione fisica massima dell'inverter"
+    },
+    {
+      "name": "CollapsedGenerationSignal", "parent": "TimeSeriesSignal", "state_type": "AliasingPhenomenon",
+      "owl_restrictions": { "signalFrequency": { "minExclusive": 130.0 } },
+      "comment": "Segnali >130 Hz portano al collasso del decoder Chronos"
+    },
+    {
+      "name": "PhaseLocked_AliasedSignal", "parent": "TimeSeriesSignal", "state_type": "AliasingPhenomenon",
+      "owl_restrictions": { "signalFrequency": { "minInclusive": 31.9, "maxInclusive": 32.1 } },
+      "comment": "Punto cieco critico del modello (intorno ai 32 Hz)"
+    }
   ],
 
+  "concepts": [
+    { "name": "seasonal_cycle",      "kind": "cycle", "period_minutes": 525600, "meaning": "annual irradiance and PV production variation",        "owl_class": "TimeSeriesSignal" },
+    { "name": "diurnal_cycle",       "kind": "cycle", "period_minutes": 1440,   "meaning": "day-night PV production cycle",                        "owl_class": "TimeSeriesSignal" },
+    { "name": "cloud_intermittency", "kind": "cycle", "period_minutes": 8,      "meaning": "fast cloud-induced fluctuations affecting generation", "owl_class": "TimeSeriesSignal" },
+    { "name": "night_zero",          "kind": "state", "period_minutes": null,    "meaning": "zero PV production during nighttime",                  "owl_class": "Nighttime_Array" },
+    { "name": "clear_sky",           "kind": "state", "period_minutes": null,    "meaning": "optimal PV production under clear sky",                "owl_class": "ClearSky_Array" },
+    { "name": "inverter_clipping",   "kind": "state", "period_minutes": null,    "meaning": "production saturated at inverter maximum",             "owl_class": "Clipping_Array" },
+    { "name": "inverter_trip",       "kind": "state", "period_minutes": null,    "meaning": "irradiance present but output zero",                   "owl_class": "InverterTrip_Array" },
+    { "name": "morning_ramp",        "kind": "event", "period_minutes": null,    "meaning": "sunrise power ramp-up" },
+    { "name": "evening_ramp",        "kind": "event", "period_minutes": null,    "meaning": "sunset power ramp-down" },
+    { "name": "shading_dip",         "kind": "event", "period_minutes": null,    "meaning": "temporary production reduction (clouds/obstructions)" }
+  ],
+
+  "individuals": {
+    "AgentAction":        ["battery_dispatch", "ramp_alert", "curtail_generation", "load_adjustment"],
+    "AliasingPhenomenon": ["token_degeneracy_signature", "signal_aliasing_signature"]
+  },
+
   "relations": [
-    {"s": "diurnal_cycle",       "p": "nested_in",    "o": "seasonal_cycle"},
-    {"s": "solar_noon_peak",     "p": "occurs_during","o": "diurnal_cycle"},
-    {"s": "night_zero",          "p": "occurs_during","o": "diurnal_cycle"},
-    {"s": "cloud_intermittency", "p": "modulates",    "o": "diurnal_cycle"},
-    {"s": "morning_ramp",        "p": "transitions",  "o": "night_zero"},
-    {"s": "evening_ramp",        "p": "transitions",  "o": "solar_noon_peak"},
-    {"s": "inverter_clipping",   "p": "caps",         "o": "solar_noon_peak"},
-    {"s": "shading_dip",         "p": "interrupts",   "o": "diurnal_cycle"},
-    {"s": "PhotovoltaicArray",   "p": "produces",     "o": "Power_W"},
-    {"s": "BatteryStorage",      "p": "buffers",      "o": "Power_W"},
-    {"s": "InternalLoad",        "p": "consumes",     "o": "Power_W"},
-    {"s": "NationalGrid",        "p": "exchanges",    "o": "Power_W"}
+    { "subject": "diurnal_cycle",       "predicate": "nested_in",        "object": "seasonal_cycle" },
+    { "subject": "cloud_intermittency", "predicate": "modulates",        "object": "diurnal_cycle" },
+    { "subject": "morning_ramp",        "predicate": "transitions_from", "object": "night_zero" },
+    { "subject": "evening_ramp",        "predicate": "transitions_from", "object": "clear_sky" },
+    { "subject": "inverter_clipping",   "predicate": "caps",             "object": "clear_sky" },
+    { "subject": "shading_dip",         "predicate": "interrupts",       "object": "diurnal_cycle" },
+    { "subject": "PhotovoltaicArray",   "predicate": "produces",         "object": "Power_W" },
+    { "subject": "BatteryStorage",      "predicate": "buffers",          "object": "Power_W" },
+    { "subject": "InternalLoad",        "predicate": "consumes",         "object": "Power_W" },
+    { "subject": "NationalGrid",        "predicate": "exchanges",        "object": "Power_W" }
   ]
 }
