@@ -1,50 +1,96 @@
+"""
+signalModifier.py — Injects sinusoidal components into existing time-series signals.
+
+All injection is in Hz (absolute frequency).
+cpp is a derived read-only quantity:  cpp = freq_hz * P / fs
+
+Amplitudes are absolute: background = signal - sum(tones) holds bit-exactly.
+"""
 import numpy as np
+from typing import List
+
 
 class SignalModifier:
     def __init__(self, fs: float = 1.0, P: int = 16):
         """
-        Initializes the modifier with sampling and structural metadata.
-        
-        :param fs: Sampling frequency (Hz), required for 'hz' mode.
-        :param P: Patch size, required for 'cpp' mode.
+        Parameters
+        ----------
+        fs : float  Sampling frequency in Hz.
+        P  : int    Patch size (used only for cpp reporting).
         """
-        self.fs = fs
-        self.P = P
+        if fs <= 0:
+            raise ValueError(f"fs must be positive, got {fs}")
+        if P <= 0:
+            raise ValueError(f"P must be positive, got {P}")
+        self.fs = float(fs)
+        self.P  = int(P)
 
-    def addComponent(self, 
-                     signal: np.ndarray, 
-                     amplitude: float, 
-                     frequency: float, 
-                     phase: float = 0.0, 
-                     mode: str = "hz", 
-                     normalize: bool = False) -> np.ndarray:
+    # ------------------------------------------------------------------ #
+    #  Single-component injection                                          #
+    # ------------------------------------------------------------------ #
+    def addComponent(self,
+                     signal: np.ndarray,
+                     freq_hz: float,
+                     amplitude: float,
+                     phase: float = 0.0) -> np.ndarray:
         """
-        Injects a sinusoidal component into an existing time-series signal.
-        
-        :param signal: The base NumPy array signal.
-        :param amplitude: Peak amplitude of the injected wave.
-        :param frequency: Frequency value (either Hz or Cycles Per Patch).
-        :param phase: Phase shift in radians.
-        :param mode: Injected frequency context, either 'hz' or 'cpp'.
-        :param normalize: If True, scales the base signal to std=1 before injection.
-        :return: A new NumPy array containing the modified signal.
-        """
-        # Work on a copy to prevent unintended in-place mutation of the original signal
-        modified_signal = signal.copy()
-        
-        if normalize:
-            std = modified_signal.std()
-            modified_signal = modified_signal / std if std > 1e-8 else modified_signal
+        Inject a single sinusoidal tone into signal.
 
-        n = np.arange(len(modified_signal))
-        
-        if mode == "hz":
-            t = n / self.fs
-            comp = amplitude * np.sin(2 * np.pi * frequency * t + phase)
-        elif mode == "cpp":
-            period_samples = self.P / frequency
-            comp = amplitude * np.sin(2 * np.pi * n / period_samples + phase)
-        else:
-            raise ValueError(f"Unknown mode: {mode}. Choose either 'hz' or 'cpp'.")
-            
-        return modified_signal + comp
+        Returns a copy with the tone added.  Original signal is not modified.
+        """
+        t = np.arange(len(signal)) / self.fs
+        return signal.copy() + amplitude * np.sin(2 * np.pi * freq_hz * t + phase)
+
+    # ------------------------------------------------------------------ #
+    #  Multi-component injection                                           #
+    # ------------------------------------------------------------------ #
+    def addComponents(self,
+                      signal: np.ndarray,
+                      components: List[dict]) -> np.ndarray:
+        """
+        Inject multiple sinusoidal tones in a single call.
+
+        Each component dict must have:
+            - freq_hz   : float
+            - amplitude : float
+            - phase     : float  (optional, default 0.0)
+
+        Returns a copy with all tones summed in.  Original signal not modified.
+        """
+        t   = np.arange(len(signal)) / self.fs
+        out = signal.copy()
+        for c in components:
+            out += float(c["amplitude"]) * np.sin(
+                2 * np.pi * float(c["freq_hz"]) * t + float(c.get("phase", 0.0))
+            )
+        return out
+
+    # ------------------------------------------------------------------ #
+    #  Background recovery                                                 #
+    # ------------------------------------------------------------------ #
+    def recover_background(self,
+                           signal: np.ndarray,
+                           components: List[dict]) -> np.ndarray:
+        """
+        Exactly subtract all injected tones to recover the original background.
+        Requires the same components list used during injection.
+        """
+        t   = np.arange(len(signal)) / self.fs
+        out = signal.copy()
+        for c in components:
+            out -= float(c["amplitude"]) * np.sin(
+                2 * np.pi * float(c["freq_hz"]) * t + float(c.get("phase", 0.0))
+            )
+        return out
+
+    # ------------------------------------------------------------------ #
+    #  Helpers                                                             #
+    # ------------------------------------------------------------------ #
+    def cpp_of(self, freq_hz: float) -> float:
+        """Cycles per patch for a given Hz frequency (derived, read-only)."""
+        return freq_hz * self.P / self.fs
+
+    def is_integer_cpp(self, freq_hz: float, tol: float = 1e-9) -> bool:
+        """True iff freq_hz hits an exact integer-cpp blind spot (within tol)."""
+        cpp = self.cpp_of(freq_hz)
+        return abs(cpp - round(cpp)) < tol
