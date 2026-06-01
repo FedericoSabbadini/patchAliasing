@@ -63,15 +63,13 @@
 %----------------------------------------------------------------------------------------
 %	FONTS
 %----------------------------------------------------------------------------------------
+\usepackage[utf8]{inputenc} % Richiesto per i caratteri internazionali
+\usepackage[T1]{fontenc} % Encoding dei font di output
 
-\usepackage[utf8]{inputenc} % Required for inputting international characters
-\usepackage[T1]{fontenc} % Output font encoding for international characters
+\usepackage{avant} % Carica il font Avant Garde (simile ad Avenir)
+\renewcommand{\familydefault}{\sfdefault} % Imposta il font sans-serif come predefinito
 
-\usepackage[sc]{mathpazo} % Use the Palatino font
-
-\linespread{1.05} % Increase line spacing slightly
-
-\usepackage{microtype} % Slightly tweak font spacing for aesthetics
+\usepackage{microtype} % Ottimizza visivamente la spaziatura del testo
 
 %----------------------------------------------------------------------------------------
 %	HEADERS AND FOOTERS
