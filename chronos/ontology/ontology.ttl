@@ -1,0 +1,151 @@
+@prefix : <http://www.semanticweb.org/solar/ontologies/2026/6/solar-aliasing#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@base <http://www.semanticweb.org/solar/ontologies/2026/6/solar-aliasing> .
+
+<http://www.semanticweb.org/solar/ontologies/2026/6/solar-aliasing> rdf:type owl:Ontology ;
+    rdfs:comment "Ontologia OWL2 DL-Safe. Le regole SWRL sono state tradotte in Classi Definite (Equivalent Classes) per garantire compatibilità universale con Protege."@it ;
+    rdfs:label "Solar Energy Structural Aliasing Ontology (OWL DL Version)"@en .
+
+#################################################################
+#    Object Properties
+#################################################################
+
+:hasComponent rdf:type owl:ObjectProperty ; rdfs:domain :PhysicalSystem ; rdfs:range :PhysicalComponent .
+:hasSignal rdf:type owl:ObjectProperty ; rdfs:domain :PhysicalComponent ; rdfs:range :TimeSeriesSignal .
+:hasRepresentation rdf:type owl:ObjectProperty ; rdfs:domain :TimeSeriesSignal ; rdfs:range :PatchedRepresentation ; rdf:type owl:FunctionalProperty .
+:hasState rdf:type owl:ObjectProperty ; rdfs:domain :PhysicalComponent ; rdfs:range :SystemState .
+:hasWeather rdf:type owl:ObjectProperty ; rdfs:domain :PhysicalSystem ; rdfs:range :WeatherCondition .
+:triggersAction rdf:type owl:ObjectProperty ; rdfs:domain :SystemState ; rdfs:range :AgentAction .
+:affectedBy rdf:type owl:ObjectProperty ; rdfs:domain :TimeSeriesSignal ; rdfs:range :AliasingPhenomenon .
+
+#################################################################
+#    Data Properties
+#################################################################
+
+:PV_power rdf:type owl:DatatypeProperty ; rdfs:domain :PhotovoltaicArray ; rdfs:range xsd:float .
+:G_h rdf:type owl:DatatypeProperty ; rdfs:domain :PhotovoltaicArray ; rdfs:range xsd:float .
+:G_tilt rdf:type owl:DatatypeProperty ; rdfs:domain :PhotovoltaicArray ; rdfs:range xsd:float .
+:T_air rdf:type owl:DatatypeProperty ; rdfs:domain :WeatherCondition ; rdfs:range xsd:float .
+:W_speed rdf:type owl:DatatypeProperty ; rdfs:domain :WeatherCondition ; rdfs:range xsd:float .
+:W_direction rdf:type owl:DatatypeProperty ; rdfs:domain :WeatherCondition ; rdfs:range xsd:float .
+:signalFrequency rdf:type owl:DatatypeProperty ; rdfs:domain :TimeSeriesSignal ; rdfs:range xsd:float .
+:amplitude rdf:type owl:DatatypeProperty ; rdfs:domain :TimeSeriesSignal ; rdfs:range xsd:float .
+:timespan rdf:type owl:DatatypeProperty ; rdfs:domain :TimeSeriesSignal ; rdfs:range xsd:float .
+:phase rdf:type owl:DatatypeProperty ; rdfs:domain :TimeSeriesSignal ; rdfs:range xsd:float .
+:patchSize rdf:type owl:DatatypeProperty ; rdfs:domain :PatchedRepresentation ; rdfs:range xsd:integer .
+:stride rdf:type owl:DatatypeProperty ; rdfs:domain :PatchedRepresentation ; rdfs:range xsd:integer .
+:samplingFrequency rdf:type owl:DatatypeProperty ; rdfs:domain :PatchedRepresentation ; rdfs:range xsd:float .
+
+#################################################################
+#    Base Classes
+#################################################################
+
+:PhysicalSystem rdf:type owl:Class .
+:PhysicalComponent rdf:type owl:Class .
+:PhotovoltaicArray rdf:type owl:Class ; rdfs:subClassOf :PhysicalComponent ; owl:disjointWith :BatteryStorage, :NationalGrid, :InternalLoad .
+:BatteryStorage rdf:type owl:Class ; rdfs:subClassOf :PhysicalComponent ; owl:disjointWith :NationalGrid, :InternalLoad .
+:NationalGrid rdf:type owl:Class ; rdfs:subClassOf :PhysicalComponent ; owl:disjointWith :InternalLoad .
+:InternalLoad rdf:type owl:Class ; rdfs:subClassOf :PhysicalComponent .
+
+:TimeSeriesSignal rdf:type owl:Class .
+:PatchedRepresentation rdf:type owl:Class .
+:WeatherCondition rdf:type owl:Class .
+:SystemState rdf:type owl:Class .
+:GenerationState rdf:type owl:Class ; rdfs:subClassOf :SystemState .
+:AnomalyState rdf:type owl:Class ; rdfs:subClassOf :SystemState .
+:AliasingPhenomenon rdf:type owl:Class .
+:AgentAction rdf:type owl:Class .
+
+#################################################################
+#    Inferred Sub-Classes (OWL DL - Nessun Plugin Necessario)
+#################################################################
+
+# 1. Stato Notturno (Nighttime)
+:Nighttime_Array rdf:type owl:Class ;
+    rdfs:subClassOf :PhotovoltaicArray ;
+    owl:equivalentClass [
+        rdf:type owl:Class ;
+        owl:intersectionOf (
+            :PhotovoltaicArray
+            [ rdf:type owl:Restriction ; owl:onProperty :G_h ; owl:someValuesFrom [ rdf:type rdfs:Datatype ; owl:onDatatype xsd:float ; owl:withRestrictions ( [ xsd:maxInclusive "10.0"^^xsd:float ] ) ] ]
+        )
+    ] ;
+    rdfs:comment "Pannello in condizione notturna: Irraggiamento <= 10 W/m2."@it .
+
+# 2. Cielo Sereno (Clear Sky)
+:ClearSky_Array rdf:type owl:Class ;
+    rdfs:subClassOf :PhotovoltaicArray ;
+    owl:equivalentClass [
+        rdf:type owl:Class ;
+        owl:intersectionOf (
+            :PhotovoltaicArray
+            [ rdf:type owl:Restriction ; owl:onProperty :G_h ; owl:someValuesFrom [ rdf:type rdfs:Datatype ; owl:onDatatype xsd:float ; owl:withRestrictions ( [ xsd:minExclusive "600.0"^^xsd:float ] ) ] ]
+            [ rdf:type owl:Restriction ; owl:onProperty :PV_power ; owl:someValuesFrom [ rdf:type rdfs:Datatype ; owl:onDatatype xsd:float ; owl:withRestrictions ( [ xsd:minExclusive "30.0"^^xsd:float ] ) ] ]
+        )
+    ] ;
+    rdfs:comment "Pannello in produzione ottimale."@it .
+
+# 3. Anomalia: Inverter Trip (Distacco Inverter)
+:InverterTrip_Array rdf:type owl:Class ;
+    rdfs:subClassOf :PhotovoltaicArray ;
+    owl:equivalentClass [
+        rdf:type owl:Class ;
+        owl:intersectionOf (
+            :PhotovoltaicArray
+            [ rdf:type owl:Restriction ; owl:onProperty :G_h ; owl:someValuesFrom [ rdf:type rdfs:Datatype ; owl:onDatatype xsd:float ; owl:withRestrictions ( [ xsd:minExclusive "300.0"^^xsd:float ] ) ] ]
+            [ rdf:type owl:Restriction ; owl:onProperty :PV_power ; owl:someValuesFrom [ rdf:type rdfs:Datatype ; owl:onDatatype xsd:float ; owl:withRestrictions ( [ xsd:maxInclusive "0.1"^^xsd:float ] ) ] ]
+        )
+    ] ;
+    rdfs:comment "C'è sole ma la potenza è crollata a zero (Guasto critico)."@it .
+
+# 4. Anomalia: Saturazione (Clipping)
+:Clipping_Array rdf:type owl:Class ;
+    rdfs:subClassOf :PhotovoltaicArray ;
+    owl:equivalentClass [
+        rdf:type owl:Class ;
+        owl:intersectionOf (
+            :PhotovoltaicArray
+            [ rdf:type owl:Restriction ; owl:onProperty :G_h ; owl:someValuesFrom [ rdf:type rdfs:Datatype ; owl:onDatatype xsd:float ; owl:withRestrictions ( [ xsd:minExclusive "750.0"^^xsd:float ] ) ] ]
+            [ rdf:type owl:Restriction ; owl:onProperty :PV_power ; owl:someValuesFrom [ rdf:type rdfs:Datatype ; owl:onDatatype xsd:float ; owl:withRestrictions ( [ xsd:minInclusive "45.0"^^xsd:float ] ) ] ]
+        )
+    ] ;
+    rdfs:comment "Il pannello è in saturazione fisica massima."@it .
+
+# 5. Collasso Spettrale del Segnale (>130 Hz)
+:CollapsedGenerationSignal rdf:type owl:Class ;
+    rdfs:subClassOf :TimeSeriesSignal ;
+    owl:equivalentClass [
+        rdf:type owl:Class ;
+        owl:intersectionOf (
+            :TimeSeriesSignal
+            [ rdf:type owl:Restriction ; owl:onProperty :signalFrequency ; owl:someValuesFrom [ rdf:type rdfs:Datatype ; owl:onDatatype xsd:float ; owl:withRestrictions ( [ xsd:minExclusive "130.0"^^xsd:float ] ) ] ]
+        )
+    ] ;
+    rdfs:comment "Segnali che superano i 130Hz portano al collasso del decoder Chronos."@it .
+
+# 6. Aliasing per Aggancio di Fase a 32 Hz (Punto Cieco di Chronos-Bolt)
+:PhaseLocked_AliasedSignal rdf:type owl:Class ;
+    rdfs:subClassOf :TimeSeriesSignal ;
+    owl:equivalentClass [
+        rdf:type owl:Class ;
+        owl:intersectionOf (
+            :TimeSeriesSignal
+            [ rdf:type owl:Restriction ; owl:onProperty :signalFrequency ; owl:someValuesFrom [ rdf:type rdfs:Datatype ; owl:onDatatype xsd:float ; owl:withRestrictions ( [ xsd:minInclusive "31.9"^^xsd:float ] [ xsd:maxInclusive "32.1"^^xsd:float ] ) ] ]
+        )
+    ] ;
+    rdfs:comment "Punto cieco critico del modello (intorno ai 32 Hz)."@it .
+
+#################################################################
+#    Individuals
+#################################################################
+:battery_dispatch rdf:type owl:NamedIndividual, :AgentAction .
+:ramp_alert rdf:type owl:NamedIndividual, :AgentAction .
+:curtail_generation rdf:type owl:NamedIndividual, :AgentAction .
+:load_adjustment rdf:type owl:NamedIndividual, :AgentAction .
+
+:token_degeneracy_signature rdf:type owl:NamedIndividual, :AliasingPhenomenon .
+:signal_aliasing_signature rdf:type owl:NamedIndividual, :AliasingPhenomenon .

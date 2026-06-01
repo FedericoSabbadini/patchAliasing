@@ -23,13 +23,7 @@ The core objective is to challenge the baseline assumption that pre-trained temp
 
 To ground this abstract architectural evaluation, the study utilizes a specific physical domain as empirical reference layer. This reference setting models the solar energy produced by a photovoltaic array attached to an internal load, a local storage battery, and the national electricity grid. The explicit operational objective within this system is to evaluate production variations over short-term future horizons so that the system can dynamically modify the internal load, attach and detach the battery unit, with the aim of maintaining internal grid stability and enabling precise anomaly detection. 
 
-Within this infrastructure, a control AI agent is responsible for executing real-time tasks: 
-\begin{itemize}
-    \item \textbf{dynamic load-balancing}, which requires orchestrating the instantaneous routing of generated photovoltaic energy to meet shifting internal consumption demands;
-    \item \textbf{battery dispatch}, which manages the continuous connection, isolation, or disconnection of the physical storage system to act as a buffer for intermittent generation;
-    \item \textbf{state-monitoring and active anomaly detection}, parsing system-wide telemetry to differentiate between standard ambient fluctuations and hard sensor corruptions or hardware faults;
-    \item \textbf{internal grid stability maintenance}, acting as a localized governor to minimize power distribution imbalances before they escape to the national grid interface.
-\end{itemize}
+Within this infrastructure, a control AI agent is responsible for executing real-time tasks: dynamic load-balancing, battery dispatch, state-monitoring and active anomaly detection, and internal grid stability maintenance.
 
 \section{Significance and Impact}
 
