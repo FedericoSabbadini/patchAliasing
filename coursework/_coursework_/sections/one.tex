@@ -1,0 +1,61 @@
+\subsection{Formalization of Patch-Based Tokenization}
+
+Let $\mathbf{x} = \{x[n]\}_{n \in \mathbb{Z}}$ be a discrete-time signal representing the input time series. We define the \textit{patch-based tokenization operator} $\mathcal{T}_{P, S}$ with patch length $P \in \mathbb{N}^+$ and stride $S \in \mathbb{N}^+$ as a mapping that transforms the 1D signal $\mathbf{x}$ into a sequence of vector-valued tokens $\mathbf{T} = \{\mathbf{t}_k\}_{k \in \mathbb{Z}}$, where each token $\mathbf{t}_k \in \mathbb{R}^P$.
+
+The $k$-th token is formally defined as:
+\begin{equation}
+\mathbf{t}_k = \mathcal{T}_{P, S}(\mathbf{x})[k] = \begin{bmatrix} x[kS] \\ x[kS + 1] \\ \vdots \\ x[kS + P - 1] \end{bmatrix}
+\end{equation}
+
+Alternatively, using an element-wise indexing notation where $\mathbf{t}_k[m]$ denotes the $m$-th component of the $k$-th token (for $m \in \{0, 1, \dots, P-1\}$):
+\begin{equation}
+\mathbf{t}_k[m] = x[kS + m]
+\end{equation}
+
+\subsection{Derivation of Patch Indistinguishability Conditions}
+
+We now derive the conditions under which two consecutive tokens, $\mathbf{t}_k$ and $\mathbf{t}_{k+1}$, become identical (indistinguishable to the downstream model architecture). 
+
+By definition, consecutive tokens are identical if and only if $\mathbf{t}_k[m] = \mathbf{t}_{k+1}[m]$ for all $m \in \{0, 1, \dots, P-1\}$. Substituting Equation (2), this yields the system of equations:
+\begin{equation}
+x[kS + m] = x[(k+1)S + m], \quad \forall m \in \{0, 1, \dots, P-1\}
+\end{equation}
+
+Letting $n = kS + m$, Equation (3) states that the signal must satisfy:
+\begin{equation}
+x[n] = x[n + S]
+\end{equation}
+for all time indices $n$ spanned by the consecutive patches, namely $n \in \{kS, kS+1, \dots, kS + P + S - 1\}$.
+
+\subsubsection{Case 1: Periodic Signals (Frequency Domain Characterization)}
+If the underlying discrete signal $\mathbf{x}$ is periodic or contains a dominant periodic component with fundamental period $N_0$, then Equation (4) is satisfied if the tokenization stride $S$ is an integer multiple of the signal's period:
+\begin{equation}
+S = c \cdot N_0, \quad c \in \mathbb{N}^+
+\end{equation}
+
+In terms of normalized angular frequency $\omega_0 = \frac{2\pi}{N_0}$, this condition translates to:
+\begin{equation}
+\omega_0 = \frac{2\pi c}{S}
+\end{equation}
+When Equation (6) holds, the stride perfectly matches the signal's structural frequency, causing every consecutive patch to capture the exact same phase profile of the wave, rendering $\mathbf{t}_k = \mathbf{t}_{k+1}$.
+
+\subsubsection{Case 2: Constant Sub-sequences (Trivial Indistinguishability)}
+If the signal $\mathbf{x}$ exhibits locally invariant dynamics such that the forward finite difference operator over a window of length $P+S$ is zero:
+\begin{equation}
+\Delta_S x[n] = x[n+S] - x[n] = 0
+\end{equation}
+the patches flatten out into identical representations.
+
+\subsection{Characterization of the Loss of Observability}
+
+When consecutive patches become indistinguishable ($\mathbf{t}_k = \mathbf{t}_{k+1}$), a severe \textit{structural aliasing} event occurs, leading to a catastrophic loss of observability in the token space. We characterize this degradation through two lenses:
+
+\begin{enumerate}
+    \item \textbf{Attention Matrix Degeneration:} Modern foundation models rely on self-attention mechanisms. The raw attention score between two token representations $\mathbf{h}_k$ and $\mathbf{h}_j$ (derived from $\mathbf{t}_k$ and $\mathbf{t}_j$) is computed via a dot-product. If $\mathbf{t}_k = \mathbf{t}_{k+1}$, their linear projections are identical ($\mathbf{q}_k = \mathbf{q}_{k+1}$ and $\mathbf{k}_k = \mathbf{k}_{k+1}$). The attention weight matrix $\mathbf{A}$ degenerates into uniform rows:
+    \begin{equation}
+    A_{k, j} = A_{k+1, j}, \quad \forall j
+    \end{equation}
+    The model's causal mask and positional encodings are forced to carry the entire burden of temporal differentiation, completely isolating the model from the underlying signal dynamics.
+    
+    \item \textbf{Phase and Higher-Frequency Masking:} Because the operator $\mathcal{T}_{P, S}$ samples the state space at macro-intervals of $S$, any high-frequency oscillations or intra-patch phase variations occurring at frequencies $\omega > \frac{\pi}{S}$ are completely folded back (aliased) into a static DC component ($\omega_{\text{alias}} = 0$). The model perceives a completely stationary system, rendering the true underlying temporal evolution unobservable.
+\end{enumerate}

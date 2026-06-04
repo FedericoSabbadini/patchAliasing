@@ -1,0 +1,54 @@
+\subsection{Generalized Mathematical Framework of Patch-Stride Phase-Locking}
+
+Consider a continuous-time periodic signal sampled uniformly at a sampling frequency $f_s$, yielding the discrete-time sequence $x[n]$. We isolate and model a fundamental harmonic component of the signal as a discrete sinusoid:
+\begin{equation}
+x[n] = \sin\left(2\pi \frac{f}{f_s} n + \phi\right)
+\end{equation}
+where $f$ denotes the signal frequency satisfying the strict Nyquist criterion ($f < \frac{f_s}{2}$), and $\phi \in [0, 2\pi)$ represents an arbitrary initial phase offset.
+
+\subsubsection{Derivation of the Phase-Locking Frequency Class}
+
+Phase-locking within a grid-based windowing architecture occurs when the structural phase profile of the signal repeats exactly across uniform translational shifts equal to the operational stride $S$. 
+
+Evaluating a forward translation of the sequence by a distance equal to the stride $S$ yields:
+\begin{equation}
+x[n + S] = \sin\left(2\pi \frac{f}{f_s} (n + S) + \phi\right) = \sin\left(2\pi \frac{f}{f_s} n + 2\pi \frac{f \cdot S}{f_s} + \phi\right)
+\end{equation}
+
+For the signal to exhibit absolute periodic alignment with the tokenization grid, the phase accumulation over the interval $S$ must equal an integer multiple of a full rotation ($2\pi$). Thus, we establish the boundary condition:
+\begin{equation}
+2\pi \frac{f \cdot S}{f_s} = 2\pi k, \quad k \in \mathbb{N}^+
+\end{equation}
+
+Solving Equation (3) explicitly for the signal frequency $f$ characterizes the exact class of phase-locking frequencies, denoted as $\mathcal{F}_{\text{lock}}$:
+\begin{equation}
+\mathcal{F}_{\text{lock}} = \left\{ f \in \mathbb{R}^+ \; \middle| \; f = k \cdot \frac{f_s}{S}, \; k \in \mathbb{N}^+ \right\}
+\end{equation}
+
+Defining the fundamental grid frequency as $f_{\text{grid}} = \frac{f_s}{S}$, the phase-locking condition simplifies to $f = k \cdot f_{\text{grid}}$. This proves that phase-locking is an architectural consequence governed entirely by the harmonic alignment between the signal frequency and the stride-based grid frequency.
+
+\subsection{Analysis of Structural Degeneracies and Invariances}
+
+When the input signal frequency belongs to the phase-locking class ($f \in \mathcal{F}_{\text{lock}}$), the resulting impact on the vector-valued token sequence $\mathbf{T} = \{\mathbf{t}_j\}_{j \in \mathbb{Z}}$ (where $\mathbf{t}_j \in \mathbb{R}^P$) is determined by the geometric interplay between $P$ and $S$.
+
+\subsubsection{Case 1: Equal Patch Size and Stride ($P = S$)}
+When the windowing process is strictly contiguous and non-overlapping ($P = S$), the phase-locking condition matches the patch size ($f = k \frac{f_s}{P}$). Substituting this condition into the component-wise definition of the token vector $\mathbf{t}_j[m] = x[jP + m]$ for $m \in \{0, 1, \dots, P-1\}$ yields:
+\begin{equation}
+\mathbf{t}_{j+1}[m] = x[(j+1)P + m] = x[jP + m + P]
+\end{equation}
+Applying the grid invariance condition $x[n+P] = x[n]$ derived from Equation (4):
+\begin{equation}
+\mathbf{t}_{j+1}[m] = x[jP + m] = \mathbf{t}_j[m]
+\end{equation}
+
+Consequently, $\mathbf{t}_{j+1} = \mathbf{t}_j$ for all sequential steps $j$. This induces a \textbf{complete token-level degeneracy}. The sequence of representations collapses into a static series of uniform vectors, eradicating all observable temporal velocity and dynamic gradients for downstream sequence models.
+
+\subsubsection{Case 2: Overlapping Boundaries ($S < P$)}
+In an overlapping configuration, the stride is smaller than the patch length. However, because the phase-locking condition $\mathcal{F}_{\text{lock}}$ is strictly dependent on the stride $S$, the identity $x[n+S] = x[n]$ remains globally valid across all samples. Evaluating the sequential tokens:
+\begin{equation}
+\mathbf{t}_{j+1}[m] = x[(j+1)S + m] = x[jS + m + S] = x[jS + m] = \mathbf{t}_j[m]
+\end{equation}
+Even though individual patches span a wider historical context ($P$), the underlying signal periodicity matches the stride interval perfectly. Thus, consecutive tokens remain structurally identical ($\mathbf{t}_{j+1} = \mathbf{t}_j$), demonstrating that decreasing the stride frequency below the signal frequency preserves token space degeneracy regardless of overlap size.
+
+\subsubsection{Case 3: Disjoint / Underlapping Windows ($S > P$)}
+When $S > P$, spatial gaps occur between successive windows. Under the condition $f \in \mathcal{F}_{\text{lock}}$, the relation $x[n+S] = x[n]$ still ensures that $\mathbf{t}_{j+1} = \mathbf{t}_j$. However, this scenario introduces an additional information risk: the unobserved intervals of length $S-P$ are omitted entirely from tokenization. High-frequency phase variations occurring within those hidden intervals are completely masked, leading to severe under-sampling and a permanent loss of structural observability.
