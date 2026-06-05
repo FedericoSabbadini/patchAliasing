@@ -7,16 +7,14 @@ The $k$-th token is formally defined as:
 \mathbf{t}_k = \mathcal{T}_{P, S}(\mathbf{x})[k] = \begin{bmatrix} x[kS] \\ x[kS + 1] \\ \vdots \\ x[kS + P - 1] \end{bmatrix}
 \end{equation}
 
-Alternatively, using an element-wise indexing notation where $\mathbf{t}_k[m]$ denotes the $m$-th component of the $k$-th token (for $m \in \{0, 1, \dots, P-1\}$):
+Using an element-wise indexing notation where $\mathbf{t}_k[m]$ denotes the $m$-th component of the $k$-th token (for $m \in \{0, 1, \dots, P-1\}$):
 \begin{equation}
 \mathbf{t}_k[m] = x[kS + m]
 \end{equation}
 
 \subsection{Derivation of Patch Indistinguishability Conditions}
 
-We now derive the conditions under which two consecutive tokens, $\mathbf{t}_k$ and $\mathbf{t}_{k+1}$, become identical (indistinguishable to the downstream model architecture). 
-
-By definition, consecutive tokens are identical if and only if $\mathbf{t}_k[m] = \mathbf{t}_{k+1}[m]$ for all $m \in \{0, 1, \dots, P-1\}$. Substituting Equation (2), this yields the system of equations:
+We now derive the conditions under which two consecutive tokens, $\mathbf{t}_k$ and $\mathbf{t}_{k+1}$, become indistinguishable to the model architecture. By definition, consecutive tokens are identical if and only if $\mathbf{t}_k[m] = \mathbf{t}_{k+1}[m]$ for all $m \in \{0, 1, \dots, P-1\}$. Substituting Equation (2), this yields the system of equations:
 \begin{equation}
 x[kS + m] = x[(k+1)S + m], \quad \forall m \in \{0, 1, \dots, P-1\}
 \end{equation}
@@ -27,7 +25,6 @@ x[n] = x[n + S]
 \end{equation}
 for all time indices $n$ spanned by the consecutive patches, namely $n \in \{kS, kS+1, \dots, kS + P + S - 1\}$.
 
-\subsubsection{Case 1: Periodic Signals (Frequency Domain Characterization)}
 If the underlying discrete signal $\mathbf{x}$ is periodic or contains a dominant periodic component with fundamental period $N_0$, then Equation (4) is satisfied if the tokenization stride $S$ is an integer multiple of the signal's period:
 \begin{equation}
 S = c \cdot N_0, \quad c \in \mathbb{N}^+
@@ -38,13 +35,6 @@ In terms of normalized angular frequency $\omega_0 = \frac{2\pi}{N_0}$, this con
 \omega_0 = \frac{2\pi c}{S}
 \end{equation}
 When Equation (6) holds, the stride perfectly matches the signal's structural frequency, causing every consecutive patch to capture the exact same phase profile of the wave, rendering $\mathbf{t}_k = \mathbf{t}_{k+1}$.
-
-\subsubsection{Case 2: Constant Sub-sequences (Trivial Indistinguishability)}
-If the signal $\mathbf{x}$ exhibits locally invariant dynamics such that the forward finite difference operator over a window of length $P+S$ is zero:
-\begin{equation}
-\Delta_S x[n] = x[n+S] - x[n] = 0
-\end{equation}
-the patches flatten out into identical representations.
 
 \subsection{Characterization of the Loss of Observability}
 
