@@ -1,6 +1,6 @@
 \subsection{Formalization of Patch-Based Tokenization}
 
-Let $\mathbf{x} = \{x[n]\}_{n \in \mathbb{Z}}$ be a discrete-time signal representing the input time series. We define the \textit{patch-based tokenization operator} $\mathcal{T}_{P, S}$ with patch length $P \in \mathbb{N}^+$ and stride $S \in \mathbb{N}^+$ as a mapping that transforms the 1D signal $\mathbf{x}$ into a sequence of vector-valued tokens $\mathbf{T} = \{\mathbf{t}_k\}_{k \in \mathbb{Z}}$, where each token $\mathbf{t}_k \in \mathbb{R}^P$.
+Let $\mathbf{x} = \{x[n]\}_{n \in \mathbb{Z}}$ be a discrete-time signal representing the input time series. We define the \textit{patch-based tokenization operator} $\mathcal{T}_{P, S}$ with patch length $P \in \mathbb{N}^+$ and stride $S \in \mathbb{N}^+$ as a mapping that transforms the signal $\mathbf{x}$ into a sequence of vector-valued tokens $\mathbf{T} = \{\mathbf{t}_k\}_{k \in \mathbb{Z}}$, where each token $\mathbf{t}_k \in \mathbb{R}^P$.
 
 The $k$-th token is formally defined as:
 \begin{equation}
@@ -48,9 +48,15 @@ the patches flatten out into identical representations.
 
 \subsection{Characterization of the Loss of Observability}
 
-When consecutive patches become indistinguishable ($\mathbf{t}_k = \mathbf{t}_{k+1}$), a severe \textit{structural aliasing} event occurs, leading to a catastrophic loss of observability in the token space. We characterize this degradation through two lenses:
+When consecutive patches become indistinguishable ($\mathbf{t}_k = \mathbf{t}_{k+1}$), a severe \textit{structural aliasing} event occurs, leading to a catastrophic loss of observability in the token space. We characterize this degradation through three lenses:
 
 \begin{enumerate}
+    \item \textbf{Rank Deficiency in the Embedding Space:} Let $\mathbf{M} = [\mathbf{t}_k, \mathbf{t}_{k+1}, \dots, \mathbf{t}_{k+L-1}] \in \mathbb{R}^{P \times L}$ be the local trajectory matrix constructed by the tokenization layer. If Equation (4) holds, then $\mathbf{t}_k = \mathbf{t}_{k+1} = \dots = \mathbf{t}_{k+L-1}$. The column rank of $\mathbf{M}$ collapses to 1:
+    \begin{equation}
+    \text{rank}(\mathbf{M}) = 1
+    \end{equation}
+    Consequently, the token sequence loses all geometric variance across time steps.
+    
     \item \textbf{Attention Matrix Degeneration:} Modern foundation models rely on self-attention mechanisms. The raw attention score between two token representations $\mathbf{h}_k$ and $\mathbf{h}_j$ (derived from $\mathbf{t}_k$ and $\mathbf{t}_j$) is computed via a dot-product. If $\mathbf{t}_k = \mathbf{t}_{k+1}$, their linear projections are identical ($\mathbf{q}_k = \mathbf{q}_{k+1}$ and $\mathbf{k}_k = \mathbf{k}_{k+1}$). The attention weight matrix $\mathbf{A}$ degenerates into uniform rows:
     \begin{equation}
     A_{k, j} = A_{k+1, j}, \quad \forall j
