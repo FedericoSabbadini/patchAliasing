@@ -27,8 +27,7 @@ x[kS+m],
 m\in\{0,\ldots,P-1\}.
 \end{equation}
 
-\subsection{Generalized Mathematical Framework of Patch-Stride Phase-Locking}
-
+\subsection{Phase-Locking and Patch Indistinguishability}
 Consider a continuous-time periodic signal sampled uniformly at sampling frequency $f_s$, yielding the discrete-time sequence $x[n]$. We isolate a fundamental harmonic component and model it as
 
 \begin{equation}
@@ -40,19 +39,9 @@ x[n]
 \right),
 \end{equation}
 
-where $f$ denotes the signal frequency satisfying the Nyquist criterion
+where $f$ denotes the signal frequency satisfying the Nyquist criterion $f < \frac{f_s}{2}$, and $\phi\in[0,2\pi)$ is an arbitrary phase offset.
 
-\begin{equation}
-f < \frac{f_s}{2},
-\end{equation}
-
-and $\phi\in[0,2\pi)$ is an arbitrary phase offset.
-
-\subsubsection{Derivation of the Phase-Locking Frequency Class}
-
-Phase-locking occurs when the structural phase profile of the signal repeats exactly under a translational shift equal to the stride $S$.
-
-Evaluating a stride translation yields
+Phase-locking occurs when the structural phase profile of the signal repeats exactly under a translational shift equal to the stride $S$. Evaluating a stride translation yields
 
 \begin{equation}
 \label{eq:stride_translation}
@@ -71,15 +60,28 @@ x[n+S]
 \right).
 \end{equation}
 
-For exact alignment with the tokenization grid, the phase accumulation over one stride must correspond to an integer number of full rotations:
+For exact alignment between the signal and the tokenization operator, the phase accumulation over one stride must correspond to an integer number of $2\pi$--periods $2\pi\frac{fS}{f_s}=2\pi c, \qquad c\in\mathbb{N}^{+}$.
+
+As a result, the signal exhibits exact stride-period translational invariance
 
 \begin{equation}
-\label{eq:phase_boundary}
-2\pi\frac{fS}{f_s}
+\label{eq:stride_translation}
+x[n+S]
 =
-2\pi c,
-\qquad
-c\in\mathbb{N}^{+}.
+\sin\!\left(
+2\pi\frac{f}{f_s}n
++
+2\pi c
++
+\phi
+\right)
+=
+\sin\!\left(
+2\pi\frac{f}{f_s}n
++\phi
+\right)
+=
+x[n].
 \end{equation}
 
 Solving for $f$ yields the phase-locking frequency class
@@ -110,8 +112,6 @@ f_{\mathrm{grid}}
 \end{equation}
 
 the admissible phase-locking frequencies correspond to integer harmonics of $f_{\mathrm{grid}}$ that remain below the Nyquist limit.
-
-\subsection{General Patch Indistinguishability Theorem}
 
 The collapse of consecutive tokens is not restricted to sinusoidal signals. Consider an arbitrary discrete-time signal satisfying the translational invariance condition
 
