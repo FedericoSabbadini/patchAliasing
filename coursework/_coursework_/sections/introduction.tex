@@ -1,0 +1,26 @@
+Time-series forecasting stands as a cornerstone of modern predictive analytics, vital for interpreting and anticipating the dynamic, state-dependent behaviors inherent to complex systems. Whether predicting fluctuating loads in renewable energy grids, identifying macro-economic trends, or monitoring structural health in industrial machinery, the ability to project historical sequential data into future horizons shifts organizational strategy from reactive mitigation to proactive optimization. As systems grow increasingly interconnected and generate data at unprecedented scales, the demand for forecasting frameworks capable of parsing intricate temporal dynamics has driven a massive evolution in modeling methodologies.
+
+\subsection{Signal Acquisition, Pre-Processing, and the Nyquist-Shannon Theorem}
+Regardless of the downstream modeling architecture utilized, the predictive fidelity of any forecasting pipeline remains strictly bounded by the digital representation of the underlying signal. This representation relies heavily on initial data acquisition, signal conditioning, and pre-processing protocols.
+
+The fundamental mathematical boundary governing the digitization of continuous physical processes is the Nyquist-Shannon sampling theorem. The theorem dictates that a continuous-time signal containing frequency components can be perfectly captured and reconstructed without loss of information if and only if it is sampled uniformly at a sampling frequency $f_s$ that is strictly greater than twice the highest frequency component ($f_{\max}$) present within the signal:
+\begin{equation}
+\label{eq:nyquist_criterion}
+f_s > 2f_{\max}.
+\end{equation}
+The threshold $f_N = \frac{f_s}{2}$ is defined as the Nyquist frequency. When a system violates this criterion---either due to an insufficient sampling rate or the absence of a proper low-pass anti-aliasing filter---high-frequency components beyond the Nyquist limit fold back into the lower spectrum. This distortive phenomenon, known as \textit{aliasing}, introduces spurious, artificial low-frequency components that permanently mask and corrupt the true underlying dynamics of the signal. While classical aliasing is a hardware-level digitization artifact, an analogous form of structural distortion can manifest downstream within digital downsampling or patch-based tokenization operations, directly compromising a model's capacity to observe authentic temporal patterns.
+
+\subsection{Evolution of Forecasting Methodologies}
+
+\subsubsection{Traditional Statistical Frameworks}
+Historically, time-series analysis relied on classical statistical models such as AutoRegressive Integrated Moving Average (ARIMA) and Exponential Smoothing (ETS). These traditional methods are deeply rooted in mathematical theory, offering high interpretability, exact statistical guarantees, and robust performance on stable, low-dimensional datasets. However, they rely heavily on strict underlying assumptions such as linearity, stationarity, and explicit seasonal decomposition. Consequently, classical approaches frequently struggle when confronted with high-frequency tracking, non-linear multi-rate variations, or large-scale datasets spanning cross-correlated variables.
+
+\subsubsection{Deep Learning and Transformer-Based Architectures}
+To capture complex, non-linear temporal behaviors without rigid feature engineering, the paradigm shifted toward deep learning. Early architectures leveraged Recurrent Neural Networks (RNNs), Long Short-Term Memory (LSTM) networks, and Convolutional Neural Networks (CNNs) to map temporal sequences sequentially. 
+
+More recently, the state of the art has been dominated by transformer-based architectures. By replacing recurrent bottlenecks with self-attention mechanisms, transformers can process sequences in parallel and explicitly compute dependencies between distant time steps. This allows the model to learn both localized high-frequency fluctuations and long-range macro-patterns simultaneously, forming highly adaptive architectures that can be fine-tuned to specific downstream industrial or scientific applications.
+
+\subsubsection{Time-Series Foundation Models and the Chronos Family}
+Representing the cutting edge of this evolution is the emergence of time-series foundation models, most notably exemplified by the \textit{Chronos} family of frameworks. Unifying time-series forecasting with the architectures powering modern natural language processing, Chronos treats time-series values not as continuous regressions, but as discrete language tokens. 
+
+The framework tokenizes real-valued historical data by quantizing values into discrete buckets via a scaling and binning operator. These numerical tokens are then fed directly into standard transformer language model backbones (such as T5). Trained on billions of diverse data points spanning synthetic and real-world domains, Chronos exhibits powerful zero-shot generalization, accurately predicting future trajectories across entirely unseen systems without requiring task-specific structural retraining or structural fine-tuning. This reliance on discrete tokenization windows, however, introduces novel architectural interactions with signal frequencies, exposing the model to localized structural vulnerabilities when processing periodic inputs.

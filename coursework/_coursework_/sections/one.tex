@@ -1,57 +1,395 @@
-\subsection{Formalization of Patch-Based Tokenization}
+Let $\mathbf{x} = \{x[n]\}_{n \in \mathbb{Z}}$ be a discrete-time signal representing the input time series. We define the patch-based tokenization operator $\mathcal{T}_{P,S}$ with patch length $P \in \mathbb{N}^{+}$ and stride $S \in \mathbb{N}^{+}$ as a mapping that transforms the signal $\mathbf{x}$ into a sequence of vector-valued tokens $\mathbf{T}=\{\mathbf{t}_k\}_{k\in\mathbb{Z}}$, where each token $\mathbf{t}_k\in\mathbb{R}^{P}$.
 
-Let $\mathbf{x} = \{x[n]\}_{n \in \mathbb{Z}}$ be a discrete-time signal representing the input time series. We define the \textit{patch-based tokenization operator} $\mathcal{T}_{P, S}$ with patch length $P \in \mathbb{N}^+$ and stride $S \in \mathbb{N}^+$ as a mapping that transforms the signal $\mathbf{x}$ into a sequence of vector-valued tokens $\mathbf{T} = \{\mathbf{t}_k\}_{k \in \mathbb{Z}}$, where each token $\mathbf{t}_k \in \mathbb{R}^P$.
+The $k$-th token is defined as
 
-The $k$-th token is formally defined as:
 \begin{equation}
-\mathbf{t}_k = \mathcal{T}_{P, S}(\mathbf{x})[k] = \begin{bmatrix} x[kS] \\ x[kS + 1] \\ \vdots \\ x[kS + P - 1] \end{bmatrix}
+\label{eq:token_def}
+\mathbf{t}_k
+=
+\mathcal{T}_{P,S}(\mathbf{x})[k]
+=
+\begin{bmatrix}
+x[kS] \\
+x[kS+1] \\
+\vdots \\
+x[kS+P-1]
+\end{bmatrix}.
 \end{equation}
 
-Using an element-wise indexing notation where $\mathbf{t}_k[m]$ denotes the $m$-th component of the $k$-th token (for $m \in \{0, 1, \dots, P-1\}$):
+Using element-wise indexing notation,
+
 \begin{equation}
-\mathbf{t}_k[m] = x[kS + m]
+\label{eq:element_def}
+\mathbf{t}_k[m]
+=
+x[kS+m],
+\qquad
+m\in\{0,\ldots,P-1\}.
 \end{equation}
 
-\subsection{Derivation of Patch Indistinguishability Conditions}
+\subsection{Generalized Mathematical Framework of Patch-Stride Phase-Locking}
 
-We now derive the conditions under which two consecutive tokens, $\mathbf{t}_k$ and $\mathbf{t}_{k+1}$, become indistinguishable to the model architecture. By definition, consecutive tokens are identical if and only if $\mathbf{t}_k[m] = \mathbf{t}_{k+1}[m]$ for all $m \in \{0, 1, \dots, P-1\}$. Substituting Equation (2), this yields the system of equations:
+Consider a continuous-time periodic signal sampled uniformly at sampling frequency $f_s$, yielding the discrete-time sequence $x[n]$. We isolate a fundamental harmonic component and model it as
+
 \begin{equation}
-x[kS + m] = x[(k+1)S + m], \quad \forall m \in \{0, 1, \dots, P-1\}
+\label{eq:sinusoid}
+x[n]
+=
+\sin\!\left(
+2\pi\frac{f}{f_s}n+\phi
+\right),
 \end{equation}
 
-Letting $n = kS + m$, Equation (3) states that the signal must satisfy:
-\begin{equation}
-x[n] = x[n + S]
-\end{equation}
-for all time indices $n$ spanned by the consecutive patches, namely $n \in \{kS, kS+1, \dots, kS + P + S - 1\}$.
+where $f$ denotes the signal frequency satisfying the Nyquist criterion
 
-If the underlying discrete signal $\mathbf{x}$ is periodic or contains a dominant periodic component with fundamental period $N_0$, then Equation (4) is satisfied if the tokenization stride $S$ is an integer multiple of the signal's period:
 \begin{equation}
-S = c \cdot N_0, \quad c \in \mathbb{N}^+
+f < \frac{f_s}{2},
 \end{equation}
 
-In terms of normalized angular frequency $\omega_0 = \frac{2\pi}{N_0}$, this condition translates to:
+and $\phi\in[0,2\pi)$ is an arbitrary phase offset.
+
+\subsubsection{Derivation of the Phase-Locking Frequency Class}
+
+Phase-locking occurs when the structural phase profile of the signal repeats exactly under a translational shift equal to the stride $S$.
+
+Evaluating a stride translation yields
+
 \begin{equation}
-\omega_0 = \frac{2\pi c}{S}
+\label{eq:stride_translation}
+x[n+S]
+=
+\sin\!\left(
+2\pi\frac{f}{f_s}(n+S)+\phi
+\right)
+=
+\sin\!\left(
+2\pi\frac{f}{f_s}n
++
+2\pi\frac{fS}{f_s}
++
+\phi
+\right).
 \end{equation}
-When Equation (6) holds, the stride perfectly matches the signal's structural frequency, causing every consecutive patch to capture the exact same phase profile of the wave, rendering $\mathbf{t}_k = \mathbf{t}_{k+1}$.
+
+For exact alignment with the tokenization grid, the phase accumulation over one stride must correspond to an integer number of full rotations:
+
+\begin{equation}
+\label{eq:phase_boundary}
+2\pi\frac{fS}{f_s}
+=
+2\pi c,
+\qquad
+c\in\mathbb{N}^{+}.
+\end{equation}
+
+Solving for $f$ yields the phase-locking frequency class
+
+\begin{equation}
+\label{eq:flock_set}
+\mathcal{F}_{\mathrm{lock}}
+=
+\left\{
+f\in\mathbb{R}^{+}
+\;\middle|\;
+f
+=
+c\frac{f_s}{S},
+\;
+c\in\mathbb{N}^{+},
+\;
+f<\frac{f_s}{2}
+\right\}.
+\end{equation}
+
+Defining the fundamental grid frequency
+
+\begin{equation}
+f_{\mathrm{grid}}
+=
+\frac{f_s}{S},
+\end{equation}
+
+the admissible phase-locking frequencies correspond to integer harmonics of $f_{\mathrm{grid}}$ that remain below the Nyquist limit.
+
+\subsection{General Patch Indistinguishability Theorem}
+
+The collapse of consecutive tokens is not restricted to sinusoidal signals. Consider an arbitrary discrete-time signal satisfying the translational invariance condition
+
+\begin{equation}
+\label{eq:general_periodicity}
+x[n+S]
+=
+x[n],
+\qquad
+\forall n.
+\end{equation}
+
+Using Equation \eqref{eq:element_def},
+
+\begin{equation}
+\mathbf{t}_{k+1}[m]
+=
+x[(k+1)S+m]
+=
+x[kS+m+S].
+\end{equation}
+
+Applying Equation \eqref{eq:general_periodicity} gives
+
+\begin{equation}
+\mathbf{t}_{k+1}[m]
+=
+x[kS+m]
+=
+\mathbf{t}_k[m].
+\end{equation}
+
+Since this equality holds for every component,
+
+\begin{equation}
+\label{eq:general_token_collapse}
+\mathbf{t}_{k+1}
+=
+\mathbf{t}_k.
+\end{equation}
+
+Consequently, any signal exhibiting exact stride-period translational invariance produces identical consecutive tokens regardless of the patch length $P$.
+
+\subsection{Sinusoidal Signals as a Special Case}
+
+We now show that sinusoidal signals belong to the broader class defined above whenever their frequency lies in $\mathcal{F}_{\mathrm{lock}}$.
+
+Defining the normalized angular frequency
+
+\begin{equation}
+\omega_0
+=
+2\pi\frac{f}{f_s},
+\end{equation}
+
+and substituting Equation \eqref{eq:flock_set} yields
+
+\begin{equation}
+\label{eq:omega_lock}
+\omega_0
+=
+\frac{2\pi c}{S}
+\quad\Longrightarrow\quad
+\omega_0S
+=
+2\pi c.
+\end{equation}
+
+For any sample index $n$,
+
+\begin{align}
+x[n+S]
+&=
+\sin\!\left(
+\omega_0(n+S)+\phi
+\right)
+\\
+&=
+\sin\!\left(
+\omega_0n
++
+\omega_0S
++
+\phi
+\right)
+\\
+&=
+\sin\!\left(
+\omega_0n
++
+2\pi c
++
+\phi
+\right)
+\\
+&=
+\sin\!\left(
+\omega_0n+\phi
+\right)
+\\
+&=
+x[n].
+\end{align}
+
+Therefore every sinusoid satisfying
+
+\begin{equation}
+f
+=
+c\frac{f_s}{S}
+\end{equation}
+
+belongs to the translationally invariant class of Equation \eqref{eq:general_periodicity}, and thus satisfies
+
+\begin{equation}
+\mathbf{t}_{k+1}
+=
+\mathbf{t}_k.
+\end{equation}
 
 \subsection{Characterization of the Loss of Observability}
 
-When consecutive patches become indistinguishable ($\mathbf{t}_k = \mathbf{t}_{k+1}$), a severe \textit{structural aliasing} event occurs, leading to a catastrophic loss of observability in the token space. We characterize this degradation through three lenses:
+When consecutive patches become indistinguishable, a localized structural aliasing event occurs. This degradation can be characterized through three complementary perspectives.
 
 \begin{enumerate}
-    \item \textbf{Rank Deficiency in the Embedding Space:} Let $\mathbf{M} = [\mathbf{t}_k, \mathbf{t}_{k+1}, \dots, \mathbf{t}_{k+L-1}] \in \mathbb{R}^{P \times L}$ be the local trajectory matrix constructed by the tokenization layer. If Equation (4) holds, then $\mathbf{t}_k = \mathbf{t}_{k+1} = \dots = \mathbf{t}_{k+L-1}$. The column rank of $\mathbf{M}$ collapses to 1:
-    \begin{equation}
-    \text{rank}(\mathbf{M}) = 1
-    \end{equation}
-    Consequently, the token sequence loses all geometric variance across time steps.
-    
-    \item \textbf{Attention Matrix Degeneration:} Modern foundation models rely on self-attention mechanisms. The raw attention score between two token representations $\mathbf{h}_k$ and $\mathbf{h}_j$ (derived from $\mathbf{t}_k$ and $\mathbf{t}_j$) is computed via a dot-product. If $\mathbf{t}_k = \mathbf{t}_{k+1}$, their linear projections are identical ($\mathbf{q}_k = \mathbf{q}_{k+1}$ and $\mathbf{k}_k = \mathbf{k}_{k+1}$). The attention weight matrix $\mathbf{A}$ degenerates into uniform rows:
-    \begin{equation}
-    A_{k, j} = A_{k+1, j}, \quad \forall j
-    \end{equation}
-    The model's causal mask and positional encodings are forced to carry the entire burden of temporal differentiation, completely isolating the model from the underlying signal dynamics.
-    
-    \item \textbf{Phase and Higher-Frequency Masking:} Because the operator $\mathcal{T}_{P, S}$ samples the state space at macro-intervals of $S$, any high-frequency oscillations or intra-patch phase variations occurring at frequencies $\omega > \frac{\pi}{S}$ are completely folded back (aliased) into a static DC component ($\omega_{\text{alias}} = 0$). The model perceives a completely stationary system, rendering the true underlying temporal evolution unobservable.
+
+\item \textbf{Rank Deficiency in the Embedding Space}
+
+Let
+
+\begin{equation}
+\mathbf{M}
+=
+[\mathbf{t}_k,\mathbf{t}_{k+1},\ldots,\mathbf{t}_{k+L-1}]
+\in
+\mathbb{R}^{P\times L}
+\end{equation}
+
+be the local trajectory matrix.
+
+If two consecutive tokens become identical, then the corresponding columns become linearly dependent. Consequently, the trajectory matrix cannot achieve full rank:
+
+\begin{equation}
+\operatorname{rank}(\mathbf{M})
+<
+\min(P,L).
+\end{equation}
+
+More generally, every duplicated token introduces at least one linear dependency and therefore cannot increase the matrix rank. Repeated patch collapse systematically compresses the effective dimensionality of the local trajectory manifold and reduces the geometric diversity available to downstream embedding layers.
+
+\item \textbf{Content Degeneration in Self-Attention}
+
+If consecutive patches satisfy
+
+\begin{equation}
+\mathbf{t}_k
+=
+\mathbf{t}_{k+1},
+\end{equation}
+
+their content representations become identical.
+
+For transformer architectures without positional information,
+
+\begin{equation}
+\mathbf{q}_k
+=
+\mathbf{q}_{k+1},
+\qquad
+\mathbf{k}_k
+=
+\mathbf{k}_{k+1}.
+\end{equation}
+
+Consequently, rows $k$ and $k+1$ of the content-derived attention score matrix become identical.
+
+Modern transformer architectures generally employ positional encodings, rotary embeddings, or relative positional biases. Such mechanisms can still distinguish consecutive positions. Nevertheless, the content-derived component of the attention mechanism becomes degenerate, forcing the model to rely increasingly on positional information to break the symmetry introduced by token collapse.
+
+\item \textbf{Loss of Sub-Stride Observability}
+
+The tokenization operator observes the signal only at stride-separated locations. This induces an effective observation frequency
+
+\begin{equation}
+f_{\mathrm{eff}}
+=
+\frac{f_s}{S},
+\end{equation}
+
+with associated effective Nyquist frequency
+
+\begin{equation}
+f_{N,\mathrm{eff}}
+=
+\frac{f_s}{2S}.
+\end{equation}
+
+Signal dynamics occurring at temporal scales shorter than the stride interval become progressively harder to observe through the token sequence.
+
+Under phase-locking conditions, consecutive tokens become identical and the local representation collapses into a stationary state. Fine-grained phase evolution and high-frequency variations occurring between token boundaries therefore become hidden from the observable representation presented to the model.
+
 \end{enumerate}
+
+\subsection{Analysis of Structural Degeneracies and Invariances}
+
+When $f\in\mathcal{F}_{\mathrm{lock}}$, the resulting behavior depends on the relationship between $P$ and $S$.
+
+\subsubsection{Case 1: Equal Patch Size and Stride ($P=S$)}
+
+When patches are contiguous and non-overlapping,
+
+\begin{equation}
+P=S.
+\end{equation}
+
+Equation \eqref{eq:general_periodicity} directly implies
+
+\begin{equation}
+\mathbf{t}_{j+1}
+=
+\mathbf{t}_j
+\qquad
+\forall j.
+\end{equation}
+
+The token sequence collapses into a static series of identical vectors, eliminating all observable temporal variation.
+
+\subsubsection{Case 2: Overlapping Windows ($S<P$)}
+
+When the stride is smaller than the patch length,
+
+\begin{equation}
+S<P,
+\end{equation}
+
+the translational invariance condition remains valid:
+
+\begin{equation}
+x[n+S]
+=
+x[n].
+\end{equation}
+
+Therefore,
+
+\begin{equation}
+\mathbf{t}_{j+1}
+=
+\mathbf{t}_j.
+\end{equation}
+
+Even though each token spans a larger temporal context, exact stride-period alignment forces consecutive tokens to remain identical. Consequently, overlap alone cannot prevent token-space degeneracy.
+
+\subsubsection{Case 3: Disjoint Windows ($S>P$)}
+
+When
+
+\begin{equation}
+S>P,
+\end{equation}
+
+gaps of length $S-P$ appear between successive windows.
+
+Under the phase-locking condition,
+
+\begin{equation}
+x[n+S]
+=
+x[n],
+\end{equation}
+
+which still guarantees
+
+\begin{equation}
+\mathbf{t}_{j+1}
+=
+\mathbf{t}_j.
+\end{equation}
+
+However, the interval separating consecutive windows remains completely unobserved by the tokenization operator. Consequently, distinct signals may produce exactly the same token sequence despite exhibiting different dynamics within the hidden intervals.
+
+In this regime, the observation operator becomes non-injective: multiple underlying trajectories can map to an identical token representation. This creates a stronger form of information loss than simple token degeneracy because portions of the signal become permanently unrecoverable from the tokenized representation.
