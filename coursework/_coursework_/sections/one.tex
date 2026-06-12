@@ -216,14 +216,6 @@ f_{\mathrm{eff}}
 \frac{f_s}{S},
 \end{equation}
 
-with associated effective Nyquist frequency
-
-\begin{equation}
-f_{N,\mathrm{eff}}
-=
-\frac{f_s}{2S}.
-\end{equation}
-
 Signal dynamics occurring at temporal scales shorter than the stride interval become progressively harder to observe through the token sequence.
 
 Under phase-locking conditions, consecutive tokens become identical and the local representation collapses into a stationary state. Fine-grained phase evolution and high-frequency variations occurring between token boundaries therefore become hidden from the observable representation presented to the model.
@@ -288,17 +280,7 @@ When
 S>P,
 \end{equation}
 
-gaps of length $S-P$ appear between successive windows.
-
-Under the phase-locking condition,
-
-\begin{equation}
-x[n+S]
-=
-x[n],
-\end{equation}
-
-which still guarantees
+gaps of length $S-P$ appear between successive windows. Under the phase-locking condition, which still guarantees
 
 \begin{equation}
 \mathbf{t}_{j+1}
