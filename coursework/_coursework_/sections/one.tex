@@ -60,7 +60,16 @@ x[n+S]
 \right).
 \end{equation}
 
-For exact alignment between the signal and the tokenization operator, the phase accumulation over one stride must correspond to an integer number of $2\pi$--periods $2\pi\frac{fS}{f_s}=2\pi c, \qquad c\in\mathbb{N}^{+}$.
+For exact alignment between the signal and the tokenization operator, the phase accumulation over one stride must correspond to an integer number of $2\pi$--periods
+
+\begin{equation}
+\label{eq:phase_boundary}
+2\pi\frac{fS}{f_s}
+=
+2\pi c,
+\qquad
+c\in\mathbb{N}^{+}.
+\end{equation}
 
 As a result, the signal exhibits exact stride-period translational invariance
 
@@ -84,7 +93,7 @@ x[n+S]
 x[n].
 \end{equation}
 
-Solving for $f$ yields the phase-locking frequency class
+Solving Equation \eqref{eq:phase_boundary} for $f$ yields the phase-locking frequency class, which is the class of frequencies that produce exact stride-period translational invariance, we denote that as $\mathcal{F}_{\mathrm{lock}}$:
 
 \begin{equation}
 \label{eq:flock_set}
@@ -103,16 +112,6 @@ f<\frac{f_s}{2}
 \right\}.
 \end{equation}
 
-Defining the fundamental grid frequency
-
-\begin{equation}
-f_{\mathrm{grid}}
-=
-\frac{f_s}{S},
-\end{equation}
-
-the admissible phase-locking frequencies correspond to integer harmonics of $f_{\mathrm{grid}}$ that remain below the Nyquist limit.
-
 The collapse of consecutive tokens is not restricted to sinusoidal signals. Consider an arbitrary discrete-time signal satisfying the translational invariance condition
 
 \begin{equation}
@@ -124,7 +123,7 @@ x[n],
 \forall n.
 \end{equation}
 
-Using Equation \eqref{eq:element_def},
+Taking into account two consecutive tokens, and using the element-wise notation from Equation \eqref{eq:element_def} and applying Equation \eqref{eq:general_periodicity} gives
 
 \begin{equation}
 \mathbf{t}_{k+1}[m]
@@ -132,12 +131,6 @@ Using Equation \eqref{eq:element_def},
 x[(k+1)S+m]
 =
 x[kS+m+S].
-\end{equation}
-
-Applying Equation \eqref{eq:general_periodicity} gives
-
-\begin{equation}
-\mathbf{t}_{k+1}[m]
 =
 x[kS+m]
 =
@@ -154,83 +147,6 @@ Since this equality holds for every component,
 \end{equation}
 
 Consequently, any signal exhibiting exact stride-period translational invariance produces identical consecutive tokens regardless of the patch length $P$.
-
-\subsection{Sinusoidal Signals as a Special Case}
-
-We now show that sinusoidal signals belong to the broader class defined above whenever their frequency lies in $\mathcal{F}_{\mathrm{lock}}$.
-
-Defining the normalized angular frequency
-
-\begin{equation}
-\omega_0
-=
-2\pi\frac{f}{f_s},
-\end{equation}
-
-and substituting Equation \eqref{eq:flock_set} yields
-
-\begin{equation}
-\label{eq:omega_lock}
-\omega_0
-=
-\frac{2\pi c}{S}
-\quad\Longrightarrow\quad
-\omega_0S
-=
-2\pi c.
-\end{equation}
-
-For any sample index $n$,
-
-\begin{align}
-x[n+S]
-&=
-\sin\!\left(
-\omega_0(n+S)+\phi
-\right)
-\\
-&=
-\sin\!\left(
-\omega_0n
-+
-\omega_0S
-+
-\phi
-\right)
-\\
-&=
-\sin\!\left(
-\omega_0n
-+
-2\pi c
-+
-\phi
-\right)
-\\
-&=
-\sin\!\left(
-\omega_0n+\phi
-\right)
-\\
-&=
-x[n].
-\end{align}
-
-Therefore every sinusoid satisfying
-
-\begin{equation}
-f
-=
-c\frac{f_s}{S}
-\end{equation}
-
-belongs to the translationally invariant class of Equation \eqref{eq:general_periodicity}, and thus satisfies
-
-\begin{equation}
-\mathbf{t}_{k+1}
-=
-\mathbf{t}_k.
-\end{equation}
 
 \subsection{Characterization of the Loss of Observability}
 
