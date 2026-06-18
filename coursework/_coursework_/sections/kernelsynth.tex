@@ -1,0 +1,55 @@
+\begin{algorithm}
+\caption{KernelSynth: Synthetic Data Generation using Gaussian Processes}
+\label{alg:kernelsynth}
+\begin{algorithmic}[1]
+\Require Kernel bank $\mathcal{K}$ listed in \autoref{tab:kernelsynth_bank}; maximum kernels per time series $J=5$; generated length $l_{\mathrm{syn}}=1024$; optional numerical jitter $\epsilon=0$.
+\Ensure A synthetic time series $x_{1:l_{\mathrm{syn}}}$.
+\State $j \sim U\{1,J\}$ \Comment{sample the number of kernels}
+\State $\{\kappa_1(t,t'),\ldots,\kappa_j(t,t')\} \overset{\mathrm{i.i.d.}}{\sim} \mathcal{K}$ \Comment{sample kernels with replacement}
+\State $t \gets \operatorname{linspace}(0,1,l_{\mathrm{syn}})$
+\State $\kappa^\star(t,t') \gets \kappa_1(t,t')$ \Comment{initialize the composite covariance}
+\For{$i \gets 2$ to $j$}
+    \State $\star \sim U\{+,\times\}$ \Comment{sample a binary composition operator}
+    \State $\kappa^\star(t,t') \gets \kappa^\star(t,t') \star \kappa_i(t,t')$ \Comment{compose kernels}
+\EndFor
+\If{$\epsilon > 0$}
+    \State $\kappa^\star(t,t') \gets \kappa^\star(t,t') + \epsilon I$
+\EndIf
+\State $x_{1:l_{\mathrm{syn}}} \sim \mathcal{GP}(0,\kappa^\star(t,t'))$ \Comment{sample from the GP prior}
+\State \Return $x_{1:l_{\mathrm{syn}}}$
+\end{algorithmic}
+\end{algorithm}
+
+\begin{table}[htbp]
+\caption{Kernel bank $\mathcal{K}$ used by KernelSynth.}
+\label{tab:kernelsynth_bank}
+\small
+\begin{tabular}{L{0.21\linewidth} L{0.38\linewidth} L{0.32\linewidth}}
+\toprule
+Kernel & Formula & Hyperparameters \\
+\midrule
+Constant &
+$\kappa_{\mathrm{Const}}(x,x')=C$ &
+$C=1$ \\
+White Noise &
+$\kappa_{\mathrm{White}}(x,x')=\sigma_n \cdot \mathbf{1}_{x=x'}$ &
+$\sigma_n \in \{0.1,1\}$ \\
+Linear &
+$\kappa_{\mathrm{Lin}}(x,x')=\sigma_0^2+x\cdot x'$ &
+$\sigma_0 \in \{0,1,10\}$ \\
+RBF &
+$\kappa_{\mathrm{RBF}}(x,x')=\exp\!\left(-\frac{\lVert x-x'\rVert^2}{2l^2}\right)$ &
+$l \in \{0.1,1,10\}$ \\
+Rational Quadratic &
+$\kappa_{\mathrm{RQ}}(x,x')=\left(1+\frac{\lVert x-x'\rVert^2}{2\alpha}\right)^{-\alpha}$ &
+$\alpha \in \{0.1,1,10\}$, $l=1$ \\
+Periodic &
+$\kappa_{\mathrm{Per}}(x,x')=\exp\!\left(-2\sin^2\!\left(\pi\frac{\lVert x-x'\rVert}{p/l_{\mathrm{syn}}}\right)\right)$ &
+\begin{tabular}[t]{@{}l@{}}
+$p \in \{24,48,96,168,336,672,$\\
+$7,14,30,60,365,730,$\\
+$4,26,52,4,6,12,4,40,10\}$
+\end{tabular} \\
+\bottomrule
+\end{tabular}
+\end{table}
