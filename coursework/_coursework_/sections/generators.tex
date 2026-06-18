@@ -2,7 +2,7 @@
 \caption{Light TSMixup: Controlled Sinusoidal Time Series Mixup}
 \label{alg:light_tsmixup}
 \begin{algorithmic}[1]
-\Require Sinusoidal pool $\mathcal{P}=\{p_1,\ldots,p_{N_p}\}$, where each $p_n$ is defined by frequency $f_n$, amplitude $A_n$, phase $\phi_n$, source length $T_n$, and sampling frequency $f_s$; maximum components $K=3$; symmetric Dirichlet concentration $\alpha=1.5$; minimum and maximum augmented lengths $(l_{\min}=128,l_{\max}=2048)$.
+\Require Sinusoidal pool $\mathcal{P}=\{p_1,\ldots,p_{N_p}\}$, where each $p_n$ is defined by frequency $f_n$, amplitude $A_n$, phase $\phi_n$, source length $T_n$, and sampling frequency $f_s$; maximum components $K=10$; symmetric Dirichlet concentration $\alpha=1.5$; minimum and maximum augmented lengths $(l_{\min}=128,l_{\max}=2048)$.
 \Ensure An augmented time series.
 \State $k \sim U\{1,K\}$ \Comment{number of sinusoidal components to mix}
 \State $l \sim U\{l_{\min},l_{\max}\}$ \Comment{length of the augmented time series}
