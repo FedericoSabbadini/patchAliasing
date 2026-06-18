@@ -59,6 +59,8 @@
 ]{geometry}
 
 \usepackage{amsmath, amssymb, amsthm}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
 
 %----------------------------------------------------------------------------------------
 %	FONTS
@@ -66,6 +68,7 @@
 
 \usepackage[utf8]{inputenc} % Required for inputting international characters
 \usepackage[T1]{fontenc} % Output font encoding for international characters
+\usepackage{lmodern} % Use scalable Latin Modern fonts with T1 encoding
 
 \linespread{1.05} % Increase line spacing slightly
 

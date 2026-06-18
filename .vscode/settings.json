@@ -1,6 +1,6 @@
 {
   "latex-workshop.latex.recipe.default": "first",
-  "latex-workshop.latex.outDir": "%DIR%/build",
+  "latex-workshop.latex.outDir": "%DIR%",
   "latex-workshop.latex.autoClean.run": "never",
   "latex-workshop.latex.clean.method": "glob",
   "latex-workshop.latex.recipes": [
@@ -18,24 +18,24 @@
     {
       "name": "coursework-pdflatex",
       "command": "powershell",
-      "args": [
-        "-NoProfile",
-        "-ExecutionPolicy",
-        "Bypass",
-        "-Command",
-        "Set-Location -LiteralPath '%DIR%'; pdflatex -interaction=nonstopmode -halt-on-error -synctex=1 -output-directory=build '%DOCFILE%.tex'"
-      ]
-    },
-    {
-      "name": "coursework-biber",
+          "args": [
+            "-NoProfile",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-Command",
+            "Set-Location -LiteralPath '%DIR%'; pdflatex -interaction=nonstopmode -halt-on-error -synctex=1 '%DOCFILE%.tex'"
+          ]
+        },
+        {
+          "name": "coursework-biber",
       "command": "powershell",
-      "args": [
-        "-NoProfile",
-        "-ExecutionPolicy",
-        "Bypass",
-        "-Command",
-        "Set-Location -LiteralPath '%DIR%'; biber --input-directory build --output-directory build '%DOCFILE%'"
+          "args": [
+            "-NoProfile",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-Command",
+            "Set-Location -LiteralPath '%DIR%'; biber '%DOCFILE%'"
+          ]
+        }
       ]
     }
-  ]
-}

@@ -23,6 +23,10 @@
 
 \usepackage{etoolbox} % Required for conditional logic and easily changing commands
 
+\usepackage{lmodern}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
 \newtoggle{unnumberedsections} % Create toggle for a class option
 \settoggle{unnumberedsections}{false} % Default value for the class option
 \DeclareOption{unnumberedsections}{\settoggle{unnumberedsections}{true}} % Set the class option toggle if the class option was used in the template
