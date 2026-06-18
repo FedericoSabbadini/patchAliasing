@@ -224,6 +224,18 @@
 
 \newcommand{\footertext}[1]{\renewcommand{\footertext}{#1}}
 
+\newcounter{appendixletter}
+\renewcommand{\theappendixletter}{\Alph{appendixletter}}
+\renewcommand{\theHappendixletter}{appendix.\Alph{appendixletter}}
+\providecommand*{\appendixletterautorefname}{Appendix}
+
+\newcommand{\appendixsection}[2]{%
+	\refstepcounter{appendixletter}%
+	\section*{Appendix \theappendixletter: #1}%
+	\addcontentsline{toc}{section}{Appendix \theappendixletter: #1}%
+	\label{#2}%
+}
+
 
 %----------------------------------------------------------------------------------------
 %	ABSTRACT NAME

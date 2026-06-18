@@ -8,7 +8,7 @@ The core ontology architecture bridges the gap between cyber-physical energy sys
     \item \textbf{Inferred Operational States:} Dynamic metadata classified into generation levels (\texttt{pv:GenerationState}), systemic disruptions (\texttt{pv:AnomalyState}), control directives (\texttt{pv:AgentAction}), and signal degradation hazards (\texttt{pv:AliasingEvent}).
 \end{itemize}
 
-\section{Core Concept Taxonomy}
+\subsection{Core Concept Taxonomy}
 The formal classes defined within the schema are explicitly detailed below:
 \begin{description}
     \item[\texttt{pv:PhotovoltaicArray}] The primary renewable energy asset. Characterized by panel count and nameplate nominal capacity. Source of telemetry streams; associated with weather conditions and subject to environmental/electrical anomalies.
@@ -19,7 +19,7 @@ The formal classes defined within the schema are explicitly detailed below:
     \item[\texttt{pv:PatchedSignal}] The Chronos-specific tokenized structure derived from a raw signal. Governed by a selected window chunking mechanism ($patchSize$, $stride$), establishing a structural $overlapRatio$ and a downstream $patchInducedFrequency$.
 \end{description}
 
-\section{Semantic Relations \& Properties}
+\subsection{Semantic Relations \& Properties}
 
 \subsection{Object Properties (Entity-to-Entity Relationships)}
 The physical, functional, and inferred linkages across concepts are formalized using the following object properties:
@@ -44,7 +44,7 @@ Key quantitative attributes defining system conditions include:
     \item \textbf{Signal Descriptors:} \texttt{pv:samplingFrequencyHz} ($f_s$), \texttt{pv:fundamentalFrequencyHz} ($f_0$), \texttt{pv:phaseRad} ($\phi$).
 \end{itemize}
 
-\section{Knowledge-Driven Inference System (SWRL Rules)}
+\subsection{Knowledge-Driven Inference System (SWRL Rules)}
 Real-time diagnostic, classification, and mitigation logic are automated using a rule-based engine. The standard logical form of these production rules is detailed below:
 
 \subsection{Environmental Context Extraction}
@@ -129,7 +129,7 @@ Based on inferred operating profiles, actions are dynamically mapped to handle g
 \texttt{pv:hasGenerationState}(?pv, \texttt{pv:Overcast}) &\vee \texttt{pv:hasGenerationState}(?pv, \texttt{pv:Nighttime}) \\ \longrightarrow \texttt{pv:triggersAction}(?pv, \texttt{pv:LoadAdjustment})
 \end{align}
 
-\section{Chronos Structural Aliasing Hypotheses}
+\subsection{Chronos Structural Aliasing Hypotheses}
 The key scientific contribution of this architecture lies in identifying information loss bounds during time-series patching. The model detects structural blind spots via frequency domain reasoning:
 
 \subsection{Hypothesis H1 \& H1b: Patch-Induced Frequency Blind Spots}
