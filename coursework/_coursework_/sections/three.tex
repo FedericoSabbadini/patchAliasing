@@ -15,7 +15,7 @@ Based on this parametric environment, we define three distinct, falsifiable hypo
     \begin{equation}
     f = n \cdot f_p = n \left(\frac{f_s}{S}\right), \quad n \in \mathbb{N}^+
     \end{equation}
-    Under this boundary condition, the column rank of the local trajectory matrix collapses to unity, rendering the internal dynamics of the patch unobservable to downstream self-attention mechanisms.
+    Under this boundary condition, the column rank of the local trajectory matrix collapses: $\mathrm{rank}(\mathbf{M}) = 1$ under full integer phase-locking, and $\mathrm{rank}(\mathbf{M}) \leq q$ under rational phase-locking with denominator $q$ (see Section~\ref{sec:one}).
     \item \textbf{Falsifiability Criterion:} This hypothesis is falsified if empirical probing models or closed-loop reconstruction tasks demonstrate uniform representation fidelity across the operational band $[2, \frac{f_s}{2}] \text{ Hz}$, without exhibiting statistically significant localized performance degradation or info-loss anomalies at the exact integer harmonics of $f_p$.
 \end{itemize}
 
@@ -23,11 +23,20 @@ Based on this parametric environment, we define three distinct, falsifiable hypo
 \begin{itemize}
     \item \textbf{Ontological Alignment:} \texttt{pv:PhaseAliasingEffect} (asserted via SWRL inference rule \texttt{R20}).
     \item \textbf{Statement:} The magnitude of structural information loss at an aliased harmonic frequency is non-deterministic and varies as a function of the temporal alignment between the signal's peak-trough dynamics and the rigid boundaries of the tokenization grid.
-    \item \textbf{Mathematical Boundary:} For a fixed harmonic frequency $f \in \mathcal{F}_{\text{lock}}$, translating the initial phase offset $\phi$ (\texttt{pv:phaseRad}) within the discrete-time sinusoid:
+    \item \textbf{Mathematical Boundary:}
+    For a fixed harmonic frequency $f \in \mathcal{F}_{\text{lock}}$ and phase offset $\phi\in[0,2\pi)$ in the signal
     \begin{equation}
-    x[n] = \sin\left(2\pi \frac{f}{f_s} n + \phi\right), \quad \phi \in [0, 2\pi)
+    x[n] = \sin\left(2\pi \frac{f}{f_s} n + \phi\right),
     \end{equation}
-    modifies the specific sub-sequence frozen inside each individual patch window. If the phase shift satisfies $\phi \in (0, S)$, it induces a structural misalignment that alters the component-wise values of consecutive token vectors, systematically modulating the token space fidelity.
+    {\color{red}the phase offset $\phi$ (radians) displaces the signal by
+    \begin{equation}
+    \tau = \frac{\phi\, f_s}{2\pi f} \quad \text{(samples)}
+    \end{equation}
+    relative to the patch grid origin.
+    Structural misalignment occurs when $\tau \bmod S \neq 0$, equivalently when
+    \begin{equation}
+    \phi \notin \left\{2\pi k \cdot \frac{f\,S}{f_s} : k \in \mathbb{Z}\right\}.
+    \end{equation}}
     \item \textbf{Falsifiability Criterion:} This hypothesis is falsified if information-theoretic tracking metrics (such as the Space Saving metric $SV$) or empirical probing classification accuracies remain strictly invariant across all randomly generated phase displacements $\phi \sim \text{Uniform}(0, 2\pi)$ at a locked harmonic frequency, proving that boundary location exercises no control over latent feature degradation.
 \end{itemize}
 
@@ -36,9 +45,9 @@ Based on this parametric environment, we define three distinct, falsifiable hypo
     \item \textbf{Ontological Alignment:} \texttt{pv:OverlapEffect} (asserted via SWRL inference rule \texttt{R21}).
     \item \textbf{Statement:} Altering the geometric relationship between the patch window length and the translational step size shifts the failure mode of the token space, moving the representation from absolute vector degeneracy to high-dimensional contextual redundancy.
     \item \textbf{Mathematical Boundary:} The geometric interaction is dictated by the token overlap ratio $or$ (\texttt{pv:overlapRatio}):
-    \begin{equation}
-    or = \frac{P - S}{P}
-    \end{equation}
-    When $or = 0$ ($P = S$), the windowing is strictly contiguous and non-overlapping; satisfying Equation (2) forces consecutive tokens to be mathematically identical ($\mathbf{t}_j = \mathbf{t}_{j+1}$), wiping out temporal gradients. When $or \to 1$ ($S \ll P$), successive patches share massive historical context; although the stride-bound phase-locking condition $x[n+S] = x[n]$ still holds, the expanded patch dimension $P$ forces tokens to capture intra-patch phase variations that break the absolute vector identity, shifting the error into an over-smoothed informational redundancy.
-    \item \textbf{Falsifiability Criterion:} This hypothesis is falsified if varying the architectural parameters $P$ and $S$ while keeping a locked signal frequency $f$ yields an identical trajectory matrix rank profile and an identical distribution of downstream transformer attention weights, proving that the geometric layout of the patch grid does not modulate the structural aliasing expression.
+\begin{equation}
+	or = \frac{P - S}{P}
+\end{equation}
+When $or = 0$ ($P = S$), the windowing is strictly contiguous and non-overlapping; satisfying Equation (2) forces consecutive tokens to be mathematically identical ($\mathbf{t}_j = \mathbf{t}_{j+1}$), wiping out temporal gradients. When $or \to 1$ ($S \ll P$), successive patches share massive historical context; although the stride-bound phase-locking condition $x[n+S] = x[n]$ still holds, the expanded patch dimension $P$ forces tokens to capture intra-patch phase variations that break the absolute vector identity, shifting the error into an over-smoothed informational redundancy.
+\item \textbf{Falsifiability Criterion:} This hypothesis is falsified if varying the architectural parameters $P$ and $S$ while keeping a locked signal frequency $f$ yields an identical trajectory matrix rank profile and an identical distribution of downstream transformer attention weights, proving that the geometric layout of the patch grid does not modulate the structural aliasing expression.
 \end{itemize}

@@ -10,13 +10,29 @@ f_s > 2f_{\max}.
 \end{equation}
 The threshold $f_N = \frac{f_s}{2}$ is defined as the Nyquist frequency. When a system violates this criterion, either due to an insufficient sampling rate or the absence of a proper low-pass anti-aliasing filter, high-frequency components beyond the Nyquist limit fold back into the lower spectrum. This distortive phenomenon, known as \textit{aliasing}, introduces spurious, artificial low-frequency components that permanently mask and corrupt the true underlying dynamics of the signal.
 
+
+{\color{red}This work addresses a distinct, architecturally induced phenomenon: \emph{structural aliasing}.
+Unlike classical aliasing, structural aliasing does not arise from an insufficient sampling rate ---
+the signal is correctly Nyquist-sampled at $f_s$.
+Instead, it emerges from the interaction between signal periodicity and the patch tokenization grid,
+making certain frequencies effectively invisible to the model despite being fully representable
+in the discrete sample sequence.}
+
 \subsection{Evolution of Forecasting Methodologies}
 Historically, time-series analysis relied on classical statistical models such as AutoRegressive Integrated Moving Average (ARIMA) and Exponential Smoothing (ETS). These traditional methods are deeply rooted in mathematical theory, offering high interpretability, exact statistical guarantees, and robust performance on stable, low-dimensional datasets. However, they rely heavily on strict underlying assumptions such as linearity, and stationarity.
 
-To capture complex, non-linear temporal behaviors without rigid feature engineering, the paradigm shifted toward deep learning. Early architectures leveraged Recurrent Neural Networks (RNNs), Long Short-Term Memory (LSTM) networks, and Convolutional Neural Networks (CNNs) to map temporal sequences sequentially. 
+To capture complex, non-linear temporal behaviors without rigid feature engineering, the paradigm shifted toward deep learning. Early architectures leveraged Recurrent Neural Networks (RNNs), Long Short-Term Memory (LSTM) networks, and Convolutional Neural Networks (CNNs) to map temporal sequences sequentially.
+{\color{red}These architectures operate on the raw scalar sequence and therefore do not introduce
+patch-based structural aliasing --- that risk is specific to the windowed tokenization
+strategies adopted by transformer-based foundation models.}
 
 More recently, the state of the art has been dominated by transformer-based architectures. By replacing recurrent bottlenecks with self-attention mechanisms, transformers can process sequences in parallel and explicitly compute dependencies between distant time steps. This allows the model to learn both localized high-frequency fluctuations and long-range macro-patterns simultaneously, forming highly adaptive architectures that can be fine-tuned to specific downstream industrial or scientific applications.
 
-Representing the cutting edge of this evolution is the emergence of time-series foundation models, most notably exemplified by the \textit{Chronos} family of frameworks. Unifying time-series forecasting with the architectures powering modern natural language processing, Chronos treats time-series values not as continuous regressions, but as discrete language tokens. 
+Representing the cutting edge of this evolution is the emergence of time-series foundation models, most notably exemplified by the \textit{Chronos} family of frameworks. Unifying time-series forecasting with the architectures powering modern natural language processing, Chronos treats time-series values not as continuous regressions, but as discrete language tokens. The framework tokenizes real-valued historical data by quantizing values into discrete buckets via a scaling and binning operator.
 
-The framework tokenizes real-valued historical data by quantizing values into discrete buckets via a scaling and binning operator. These numerical tokens are then fed directly into standard transformer language model backbones (such as T5). Trained on billions of diverse data points spanning synthetic and real-world domains, Chronos exhibits powerful zero-shot generalization, accurately predicting future trajectories across entirely unseen systems without requiring task-specific structural retraining or structural fine-tuning. This reliance on discrete tokenization windows, however, introduces novel architectural interactions with signal frequencies, exposing the model to localized structural vulnerabilities when processing periodic inputs.
+{\color{red}
+This paper targets Chronos-Bolt, the Chronos 1.0 successor variant, which introduces patch-based
+tokenization as a key efficiency improvement in terms of sequence length and scalability over the original architecture.
+All formal claims in this document apply to Chronos-Bolt's patch preprocessing stage,
+not to the value-quantization scheme of original Chronos.
+}

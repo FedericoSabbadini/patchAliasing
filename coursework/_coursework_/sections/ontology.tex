@@ -137,39 +137,53 @@ The patch tokenization process introduces an artificial operating frequency prof
 \begin{equation}
 f_p = \frac{f_s}{S}
 \end{equation}
-Where $f_s$ represents the raw Nyquist sampling rate and $S$ denotes the token step stride. 
+Where $f_s$ represents the raw Nyquist sampling rate and $S$ denotes the token step stride.
+
+{\color{red}The appropriate detection tolerance derives from the frequency resolution of the
+context window of length $N_\mathrm{context}$ samples:
+\begin{equation}
+\delta f \approx \frac{f_s}{N_\mathrm{context}}.
+\end{equation}
+For Chronos-Bolt default context lengths (512--2048 samples), this gives
+$\delta f \in [f_s/2048,\, f_s/512]$.
+The tolerance fraction $\varepsilon = \delta f / f_p = S/N_\mathrm{context}$ must be
+validated empirically --- whether $\pm 10\%$ is wider or narrower than this resolution
+depends on the specific $S$ and $N_\mathrm{context}$ chosen.}
+
 
 \begin{itemize}
-    \item \textbf{Primary Blind Spot (H1):} If the continuous signal's structural fundamental frequency ($f_0$, such as the daily diurnal solar cycle) aligns directly with the token boundaries, a tracking blind spot forms at the fundamental harmonic region ($n=1$):
+    \item \textbf{Primary Blind Spot (H1):}
     \begin{equation}
     \begin{aligned}
     \texttt{Signal}(?s) &\wedge \texttt{tokenizes}(?s, ?ps) \wedge \texttt{fundamentalFrequencyHz}(?s, ?f_0) \wedge \texttt{patchInducedFrequencyHz}(?ps, ?f_p) \\
-    &\wedge \texttt{swrlb:divide}(?r, ?f_0, ?f_p) \wedge (?r \ge 0.9) \wedge (?r \le 1.1) \\
+    %% FIXED: replaced hardcoded 0.9/1.1 with ε-parameterised bounds
+    &\wedge \texttt{swrlb:divide}(?r, ?f_0, ?f_p) \wedge (?r \ge 1-\varepsilon) \wedge (?r \le 1+\varepsilon) \\
     &\longrightarrow \texttt{exhibitsAliasing}(?ps, \texttt{H1\_BlindSpot})
     \end{aligned}
     \end{equation}
-    
-    \item \textbf{Secondary Harmonic Blind Spot (H1b):} Re-occurs at the second harmonic ($n=2$) boundary layer:
+
+    \item \textbf{Secondary Harmonic Blind Spot (H1b):}
     \begin{equation}
     \begin{aligned}
     \texttt{Signal}(?s) &\wedge \texttt{tokenizes}(?s, ?ps) \wedge \texttt{fundamentalFrequencyHz}(?s, ?f_0) \wedge \texttt{patchInducedFrequencyHz}(?ps, ?f_p) \\
-    &\wedge \texttt{swrlb:divide}(?r, ?f_0, ?f_p) \wedge (?r \ge 1.85) \wedge (?r \le 2.15) \\
+    &\wedge \texttt{swrlb:divide}(?r, ?f_0, ?f_p) \wedge (?r \ge 2-\varepsilon) \wedge (?r \le 2+\varepsilon) \\
     &\longrightarrow \texttt{exhibitsAliasing}(?ps, \texttt{H1b\_BlindSpot})
     \end{aligned}
     \end{equation}
 \end{itemize}
 
+
 \subsection{Hypothesis H2: Phase Aliasing Effect}
 Vulnerabilities appear when temporal offsets misalign with chunk window anchors, corrupting early representation extraction features ($0 < \phi < S$):
 \begin{equation}
-\begin{aligned}
-\texttt{Signal}(?s) &\wedge \texttt{tokenizes}(?s, ?ps) \wedge \texttt{phaseRad}(?s, ?\phi) \wedge \texttt{stride}(?ps, ?S) \\
-&\wedge (?\phi > 0.0) \wedge (?\phi < ?S) \longrightarrow \texttt{exhibitsAliasing}(?ps, \texttt{H2\_Phase})
+	\begin{aligned}
+		\texttt{Signal}(?s) &\wedge \texttt{tokenizes}(?s, ?ps) \wedge \texttt{phaseRad}(?s, ?\phi) \wedge \texttt{stride}(?ps, ?S) \\
+		&\wedge (?\phi > 0.0) \wedge (?\phi < ?S) \longrightarrow \texttt{exhibitsAliasing}(?ps, \texttt{H2\_Phase})
 \end{aligned}
 \end{equation}
 
 \subsection{Hypothesis H3: Overlap Information Distortion}
 When the overlap configuration ratio ($\gamma = \frac{N_p - S}{N_p}$) drops below a critical information-theoretic bound ($\gamma < 0.5$), consecutive contextual patches display heavy text-token gaps, rendering trend forecasts highly unstable:
 \begin{equation}
-\texttt{PatchedSignal}(?ps) \wedge \texttt{overlapRatio}(?ps, ?or) \wedge (?or < 0.5) \longrightarrow \texttt{exhibitsAliasing}(?ps, \texttt{H3\_Overlap})
+	\texttt{PatchedSignal}(?ps) \wedge \texttt{overlapRatio}(?ps, ?or) \wedge (?or < 0.5) \longrightarrow \texttt{exhibitsAliasing}(?ps, \texttt{H3\_Overlap})
 \end{equation}

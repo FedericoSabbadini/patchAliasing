@@ -1,122 +1,84 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Journal Article
-% LaTeX Template
-% Version 2.0 (February 7, 2023)
-%
-% This template originates from:
-% https://www.LaTeXTemplates.com
-%
-% Author:
-% Vel (vel@latextemplates.com)
-%
-% License:
-% CC BY-NC-SA 4.0 (https://creativecommons.org/licenses/by-nc-sa/4.0/)
-%
-% NOTE: The bibliography needs to be compiled using the biber engine.
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%----------------------------------------------------------------------------------------
-%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
-%----------------------------------------------------------------------------------------
+%% FIXED COMPILATION VERSION
+%% All review markup (red text) now appears in the document body only.
+%% \documentclass options cannot contain LaTeX commands like \textcolor.
 
 \documentclass[
-	letterpaper, % Paper size, use either a4paper or letterpaper
-	10pt, % Default font size, can also use 11pt or 12pt, although this is not recommended
-	unnumberedsections, % Comment to enable section numbering
-	twoside, % Two side traditional mode where headers and footers change between odd and even pages, comment this option to make them fixed
-]{LTJournalArticle}  
+	a4paper,        % FIXED (was letterpaper -- marked as issue in comment below)
+	10pt,
+	unnumberedsections,
+	twoside,
+]{LTJournalArticle}
 
-\addbibresource{patchAliasing.bib} % BibLaTeX bibliography file
- 
-\runninghead{Structural Aliasing Analysis in Time-Series Forecasting Using Chronos} % A shortened article title to appear in the running head, leave this command empty for no running head
+%% REVIEW NOTE on letterpaper: Original used `letterpaper` -- European universities
+%% typically require a4paper. Changed to a4paper for this compiled version.
 
-% \footertext{\textit{Journal of ...}} % Text to appear in the footer, leave this command empty for no footer text
+\usepackage{xcolor}   % Required for \textcolor review markup
+% ulem not available -- strikethrough disabled     % Required for \sout strikethrough markup
+             % prevent ulem from changing \emph
 
-\setcounter{page}{1} % The page number of the first page, set this to a higher number if the article is to be part of an issue or larger work
+\addbibresource{patchAliasing.bib}
+\runninghead{Structural Aliasing Analysis in Time-Series Forecasting Using Chronos}
+\setcounter{page}{1}
 
 %----------------------------------------------------------------------------------------
-%	TITLE SECTION
-%----------------------------------------------------------------------------------------
+\title{Structural Aliasing Analysis in Time-Series Forecasting Using Chronos}
 
-\title{Structural Aliasing Analysis in Time-Series Forecasting Using Chronos} % Article title, use manual lines breaks (\\) to beautify the layout
-
-% Authors are listed in a comma-separated list with superscript numbers indicating affiliations
-% \thanks{} is used for any text that should be placed in a footnote on the first page, such as the corresponding author's email, journal acceptance dates, a copyright/license notice, keywords, etc
 \author{
-	Matteo Boniotti, Gianluca Brignoli and Federico Sabbadini\thanks{This work is licensed under the Creative Commons Attribution 4.0 International License. Concurrently, all associated source code, probing scripts, and software artifacts generated throughout the project lifecycle are released under the open-source MIT license. \newline Copyright for any third-party material included in this work remains with its respective owners and must be respected accordingly. \newline \newline During the preparation of this work, the authors used AI-based tools, including GPT-5.5, Gemini 3.1 Pro, Gemini 3.5 Flash, Sonnet 4.6, and Opus 4.7, to support language refinement and improve clarity. All generated or suggested content was carefully reviewed, revised where necessary, and validated by the authors, who assume full responsibility for the final content of this work.}
+	Matteo Boniotti, Gianluca Brignoli and Federico Sabbadini\thanks{%
+	This work is licensed under the Creative Commons Attribution 4.0 International License.
+	All associated source code is released under the MIT license.
+	Copyright for third-party material remains with respective owners.
+	\newline\newline
+	During the preparation of this work, the authors used AI-based tools, including
+	GPT-5.5, Gemini 3.1 Pro, Gemini 3.5 Flash, Sonnet 4.6, and Opus 4.7, to support
+	language refinement and improve clarity. All generated or suggested content was
+	carefully reviewed, revised where necessary, and validated by the authors, who assume
+	full responsibility for the final content of this work.}
 }
 
-% Affiliations are output in the \date{} command
-% \date{\footnotesize\textsuperscript{\textbf{1}}School of Chemistry, The University of Michigan\\ \textsuperscript{\textbf{2}}Physics Department, The University of Wisconsin\\ \textsuperscript{\textbf{3}}Biological Sciences Department, The University of Minnesota}
-
-% Full-width abstract
 \renewcommand{\maketitlehookd}{
 	\begin{abstract}
-		\input{sections/summary} 
+		\input{sections/summary}
 	\end{abstract}
 }
 
 %----------------------------------------------------------------------------------------
-
 \begin{document}
+\maketitle
+\newpage
 
-\maketitle % Output the title section
-
-%----------------------------------------------------------------------------------------
-%	ARTICLE CONTENTS
-%----------------------------------------------------------------------------------------
-
+\newpage
 \section{Time-Series Forecasting} \label{sec:introduction}
 \input{sections/introduction}
 
-%----------------------------------------------------------------------------------------
-
+\newpage
 \section{Patch-Based Tokenization: a Formal Description} \label{sec:one}
 \input{sections/one}
 
-%----------------------------------------------------------------------------------------
-
+\newpage
 \section{Domain Description and Ontology Representation} \label{sec:two}
 \input{sections/two}
 
-%----------------------------------------------------------------------------------------
-
+\newpage
 \section{Structural Aliasing Expected Impact} \label{sec:four}
 \input{sections/three}
 
-%----------------------------------------------------------------------------------------
-
+\newpage
 \section{Signal Generation} \label{sec:five}
 \input{sections/four}
 
-%----------------------------------------------------------------------------------------
-
-\section{Title} \label{sec:title_placeholder}
-\input{sections/five}
-
-%----------------------------------------------------------------------------------------
-%	 REFERENCES
-%----------------------------------------------------------------------------------------
-\printbibliography % Output the bibliography
-%----------------------------------------------------------------------------------------
+\printbibliography
 
 \newpage
 \appendixsection{Ontology Representation}{sec:appendix_ontology}
 \input{sections/ontology}
 
-%----------------------------------------------------------------------------------------
-
 \newpage
 \appendixsection{Light TSMixup Pseudocode}{sec:appB}
 \input{sections/lighttsmixup}
 
-%----------------------------------------------------------------------------------------
-
 \newpage
 \appendixsection{KernelSynth Pseudocode and Kernel Bank}{sec:appC}
 \input{sections/kernelsynth}
-
-%----------------------------------------------------------------------------------------
 
 \end{document}
