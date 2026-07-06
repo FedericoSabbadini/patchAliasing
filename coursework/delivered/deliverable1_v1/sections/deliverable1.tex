@@ -1,0 +1,155 @@
+This investigation formalizes the phenomenon of \textit{structural aliasing} within patch-based time-series foundation models, focusing specifically on Amazon's Chronos-Bolt framework. \cite{ansariChronosLearningLanguage2024, FastAccurateZeroshot2024a} The project focuses on smart-grid load balancing. 
+
+\section{Domain Description}
+To ground this abstract architectural evaluation, the study utilizes a specific physical domain as an empirical reference layer. This reference setting models the solar energy produced by a photovoltaic array attached to an internal load, a local storage battery, and the national electricity grid. The explicit operational objective within this system is to evaluate production variations over short-term future horizons so that the system can dynamically modify the internal load, attach and detach the battery unit, with the aim of maintaining internal grid stability and enabling precise anomaly detection. 
+
+Within this infrastructure, a control AI agent is responsible for executing real-time tasks: dynamic load-balancing, battery dispatch, state-monitoring and active anomaly detection, and internal grid stability maintenance.
+
+This analysis is directly intended for researchers, engineers and practitioners utilizing large language models within the Chronos family for time-series analysis, representation learning, and forecasting, as well as individuals working in the field of energy management which are interested in characterizing the fundamental limitations, structural boundaries, and latent capabilities of these architectures. 
+
+\section{Purpose and Scope}
+This project formalizes and empirically validates the phenomenon of \textit{structural aliasing} in patch-based time-series foundation models, using Amazon Chronos-Bolt-Tiny as the target architecture.
+
+Chronos-Bolt-Tiny operates with a fixed patch size of $P=16$, stride of $S=16$ and context window of $T=512$ tokens as default settings; its architecture comprises four encoder blocks followed by four decoder blocks terminating in a direct quantile projection head. \cite{ChronosBoltPipelineAmazonscienceChronosforecastinga}
+
+This study aims to provide a comprehensive understanding of the relationships between raw signal characteristics and the latent representations learned by the model, systematically identifying the critical links between sampling frequency ($f_s$), patch size ($P$), and stride ($S$) in order to propose actionable solutions to mitigate the phenomenon.
+
+The core objective is to challenge the baseline assumption that pre-trained temporal foundation models inherently preserve frequency attributes when processing Nyquist-compliant signals.
+
+\section{Signal Generation and Dataset}
+The project utilizes a combination of synthetic and real-world datasets to evaluate the presence and impact of structural aliasing. 
+
+At first, the investigation employs synthetic signals to establish a controlled environment for testing the model's response to known frequency components. To do so elementary sinusoidal signals are generated with varying frequencies, amplitudes, and phases to systematically probe the model's ability to capture and represent these characteristics. A second set of synthetic data is generated using a light implementation of TSMixup \cite{ansariChronosLearningLanguage2024}, which creates mixed-frequency sinusoidal signals to simulate various signal conditions.
+
+If previous analyses show evidence of aliasing, the project may analyze signals produced with KernelSynth \cite{ansariChronosLearningLanguage2024} to test whether the phenomenon persists in more complex signals. The project will then focus on the analysis of real-world data, through the use of the \texttt{Dataset-SolarTechLab.csv} dataset, which contains one-minute multivariate telemetry stream of a photovoltaic array. \cite{levaPhotovoltaicPowerWeather2020}
+
+\section{Mathematical Formulation}
+The project provides a formal domain description through OWL2 ontology representation of: the physical system (photovoltaic array, battery storage, national grid, internal load), the signal (frequency, amplitude, timespan, phase) and its patched representation (patch size, stride, sampling frequency). See \autoref{sec:appendixA} for a possible ontology representation of the domain.
+
+The investigation focuses on the formal definition of the phenomenon of structural aliasing, starting from the tokenization operator and describing phase-locking conditions. The project then formalizes the relationship between the signal frequency, patch size, stride, and sampling frequency, providing a mathematical framework to analyze the conditions under which structural aliasing occurs.
+
+Let $\mathbf{x} = \{x[n]\}_{n \in \mathbb{Z}}$ be a discrete-time signal representing the input time series. We define the patch-based tokenization operator $\mathcal{T}_{P,S}$ with patch length $P \in \mathbb{N}^{+}$ and stride $S \in \mathbb{N}^{+}$ as a mapping that transforms the signal $\mathbf{x}$ into a sequence of vector-valued tokens $\mathbf{T}=\{\mathbf{t}_k\}_{k\in\mathbb{Z}}$, where each token $\mathbf{t}_k\in\mathbb{R}^{P}$. The $k$-th token is defined as
+
+\begin{equation}
+\label{eq:token_def}
+\mathbf{t}_k
+=
+\mathcal{T}_{P,S}(\mathbf{x})[k]
+=
+\begin{bmatrix}
+x[kS] \\
+x[kS+1] \\
+\vdots \\
+x[kS+P-1]
+\end{bmatrix}.
+\end{equation}
+
+Considering a continuous-time periodic signal sampled uniformly at sampling frequency $f_s$, yielding the discrete-time sequence $x[n]$. We isolate a fundamental harmonic component as
+
+\begin{equation}
+\label{eq:sinusoid}
+x[n]
+=
+\sin\!\left(
+2\pi\frac{f}{f_s}n+\phi
+\right),
+\end{equation}
+
+where $f$ denotes the signal frequency satisfying the Nyquist criterion $f < \frac{f_s}{2}$, and $\phi\in[0,2\pi)$ is an arbitrary phase offset.
+
+Phase-locking occurs when the structural phase profile of the signal repeats exactly under a translational shift equal to the stride $S$. Evaluating a stride translation yields
+
+\begin{equation}
+\label{eq:stride_translation}
+x[n+S]
+=
+\sin\!\left(
+2\pi\frac{f}{f_s}(n+S)+\phi
+\right)
+=
+\sin\!\left(
+2\pi\frac{f}{f_s}n
++
+2\pi\frac{fS}{f_s}
++
+\phi
+\right).
+\end{equation}
+
+For exact alignment between the signal and the tokenization operator, the phase accumulation over one stride must correspond to an integer number of $2\pi$--periods
+
+\begin{equation}
+\label{eq:phase_boundary}
+2\pi\frac{fS}{f_s}
+=
+2\pi c,
+\qquad
+c\in\mathbb{N}^{+}.
+\end{equation}
+
+As a result, the signal exhibits exact stride-period translational invariance
+
+\begin{equation}
+\label{eq:stride_translation_invariance}
+x[n+S]
+=
+\sin\!\left(
+2\pi\frac{f}{f_s}n
++
+2\pi c
++
+\phi
+\right)
+=
+\sin\!\left(
+2\pi\frac{f}{f_s}n
++\phi
+\right)
+=
+x[n].
+\end{equation}
+
+Solving Equation \eqref{eq:phase_boundary} for $f$ yields the phase-locking frequency class $\mathcal{F}_{\mathrm{lock}}$, which is defined as the set of frequencies producing indistinguishable token sequences:
+
+\begin{equation}
+\label{eq:flock_set}
+\mathcal{F}_{\mathrm{lock}}
+=
+\left\{
+f\in\mathbb{R}^{+}
+\;\middle|\;
+f
+=
+c\frac{f_s}{S},
+\;
+c\in\mathbb{N}^{+},
+\;
+f<\frac{f_s}{2}
+\right\}.
+\end{equation}
+
+Then, after defining a set of falsifiable hypotheses, including:
+\begin{itemize}
+    \item the existence of frequency-dependent blind spots at harmonics of a patch-induced frequency;
+    \item the dependence of the effect on temporal alignment;
+    \item the impact of patch size, stride, and overlap.
+\end{itemize}
+
+\section{Methodology}
+The project will focus on the analysis of the phenomenon, through MDL probing \cite{voitaInformationTheoreticProbingMinimum2020} after each decoder block to verify the presence, or absence, of frequency information in the hidden states. The analysis will be performed through the use of Bayesian statistics. 
+
+Layer-resolved probing is executed sequentially across the intermediate hidden states of the encoder and decoder blocks, plus at the final output probability distribution level. By mapping representations across these specific layers, the project isolates where task-relevant signal attributes are preserved or compromised under architectural synchronization constraints.
+
+Stride and patch size are systematically varied according to the value reported in \autoref{sec:appendixB} to explore the explicit impact of patch geometry on aliasing effects. Stride and patch size changes requires model retraining, which is performed using the pipeline and the dataset described in \autoref{sec:appendixC}
+
+
+Finally, the project will include a formal risk assessment grounded in the NIST AI Risk Management Framework (AI RMF) \cite{tabassiArtificialIntelligenceRisk2023} to evaluate structural aliasing as a systematic vulnerability within cyber-physical energy systems. This analysis will outline plausible threat models and attack surfaces, possible mitigation strategies (including stride reduction), and an evaluation of whether the proposed mitigation strategies effectively reduce residual exposure for the automated control AI agent. 
+
+The risk assessment will be structured around the following key points: context and attack surface, threat modeling, impact, mitigation and residual exposure.
+
+\section{Significance and Impact} 
+This subject is relevant because it explores an unexamined systemic vulnerability native to patch-based temporal foundation architectures. By systematically characterizing the conditions under which structural aliasing emerges, this work will provide critical insights into the fundamental limitations of these models, directly informing the design of more robust architectures and training paradigms. 
+
+For professionals operating within this domain, the analysis could expose how algorithmic data-deletion anomalies can propagate through automated distribution pipelines. By evaluating how hidden token-space representation collapse can deceive a load-balancing AI agent into executing misaligned control choices, this work could provide insights needed for high-reliability, fault-tolerant smart-grid deployments.
+
+The impact of this project could extend beyond theoretical understanding, as it has direct implications for the reliability and safety of real-world applications that depend on accurate time-series forecasting and representation learning, particularly in high-stakes domains such as energy management.
