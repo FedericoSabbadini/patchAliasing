@@ -29,7 +29,8 @@ python train_sweep.py
 The default sweep is 6 configs × 3 seeds = 18 runs. It is **resumable**: any run that has
 already written a `DONE` marker is skipped, so you can relaunch after an interruption.
 For a quick end-to-end validation on a new machine, temporarily set `MAX_STEPS` low
-(e.g. 20), run, then set it back to `10_000`.
+(e.g. 20) **and** `SHUFFLE_BUFFER_SIZE` low (e.g. 100 — at the official 100 000 the stream
+must download ~100k series before the first batch), then restore `10_000` / `100_000`.
 
 ## Configuration (the `(P, S)` grid)
 
@@ -112,36 +113,42 @@ retraining.
 etc. are fixed at the Chronos/Bolt defaults. This is the only way to attribute a behavioural
 difference to P/S.
 
-### Adopted from the official reference — kept
-Design choices taken from `train.py` (tagged `# [CHRONOS-REF]` in the source) that we keep because they
-protect comparability between P/S runs:
-- **Warmup + linear LR schedule** (`WARMUP_RATIO`, `LR_SCHEDULER_TYPE`): from random weights
-  a constant LR is unstable in early steps; if that instability hit different P/S configs
-  differently it could masquerade as an aliasing effect.
-- **Stream shuffle buffer** (`SHUFFLE_BUFFER_SIZE`): a streamed dataset reads shards in
-  order; shuffling breaks correlations between consecutive batches.
-- **AdamW + weight decay + gradient-norm clipping**, and **fixed-step training**, as in the
-  official setup.
-Plus the Bolt API itself (model class, config keys, forward signature, quantiles, default
-`context_length`/`prediction_length`) — all `# [CHRONOS-REF]`.
+### Aligned to the official reference (tagged `# [CHRONOS-REF]` in the source)
+All optimisation and data-pipeline **values** come from the official published pipeline
+(`train.py` + `chronos-t5-tiny.yaml`, the only Chronos training recipe Amazon has released),
+and the model-facing code follows the `chronos_bolt.py` source exactly:
+- **LR 1e-3, weight decay 0.0, warmup 0.0, linear LR decay** — the exact official values.
+  (The official pipeline trains from scratch *without* warmup; `initializer_factor=0.05`,
+  which the Bolt-tiny config ships, is what keeps early steps stable.)
+- **AdamW (fused on CUDA)** — official `optim: adamw_torch_fused`; **grad-clip 1.0** — the
+  HF Trainer default `max_grad_norm` implicitly used by `train.py`.
+- **Batch 32** — official `per_device_train_batch_size: 32` with grad-accum 1.
+- **Shuffle buffer 100 000** — official `shuffle_buffer_length` (lower it only for smoke tests).
+- **Window sampling**: split point uniform with **`min_past=60`** context points and a full
+  64-step future (mirrors `ExpectedNumInstanceSampler` + `InstanceSplitter`); series with
+  fewer than `min_past + 64` points or **> 90% missing** are dropped (`has_enough_observations`);
+  **`drop_prob=0.2`** random NaN-injection augmentation per series (official
+  `ChronosDataset` default).
+- **fp32 compute with TF32 matmuls** on compute-capability ≥ 8 GPUs — official
+  `tf32: true` behaviour, including the capability guard. No AMP, no GradScaler.
+- **Seeding via `transformers.set_seed`** — as in `train.py`.
+- **The NaN contract** (critical, verified in `chronos_bolt.py`): Bolt encodes "unobserved"
+  as **NaN**. `InstanceNorm` computes loc/scale with `nanmean` *before* the mask is applied,
+  so missing values and the left-padding of short contexts are passed as **NaN, never
+  zero-filled** — the model itself zeroes them *after* normalization. Zero-filling would
+  corrupt the normalization statistics (empirically: ~2.6× inflated loss at init).
 
-### Adopted from the reference but deliberately NOT added
-- **`transformers.Trainer` / `TrainingArguments`** — a production wrapper (logging,
-  distributed checkpointing); scientifically irrelevant to a P/S comparison, adds
-  dependencies and complexity.
-- **Length-weighted window sampling** (`ExpectedNumInstanceSampler`) — it changes the data
-  distribution *identically for every P/S config*, so it does not help isolate P/S; it only
-  raises fidelity to the official pre-training regime, which this study explicitly does not
-  claim to reproduce. We use uniform random window extraction instead.
+### Deliberate deviations from the official regime (uniform across all runs)
+- **`MAX_STEPS` 10 000 vs official 200 000** — fixed compute budget; valid because variants
+  are compared only against each other and the budget is identical for every run.
+- **Log/save cadence** (50/1000 vs official 500/100k) — denser diagnostics for short runs.
+- **No `transformers.Trainer`** — a production wrapper; the manual loop reproduces the same
+  optimisation mathematics (verified value-by-value above) without the dependency.
+- **`num_workers=0`** — equivalent single-stream loading (official used 1 worker).
+- **No `torch_compile`** — startup overhead across 18 short runs; no change to the math.
 
 ### Project scaffolding written here (untagged in the source)
-Everything not tagged `# [CHRONOS-REF]` is written for this study, mostly to make the first (remote,
-unattended) run safe and the results comparable:
-- **bfloat16 autocast** when supported (fp16 + `GradScaler` fallback, fp32 on CPU): a
-  T5-backbone trained from scratch is prone to fp16 overflow → NaN.
-- **NaN handling**: unobserved samples are zero-filled while the real mask is preserved;
-  windows with a fully-unobserved context or target are skipped.
 - **Early abort on non-finite loss**: one bad run fails fast instead of burning hours; the
   sweep continues with the next config.
-- **The `(P, S, seed)` sweep loop, per-run seeding, resumability (`DONE` marker), the
-  per-model `run_config.json` provenance, and the aggregate `manifest.csv`.**
+- **The `(P, S, seed)` sweep loop, resumability (`DONE` marker), the per-model
+  `run_config.json` provenance, the aggregate `manifest.csv`, and the tqdm progress bar.**
