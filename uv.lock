@@ -1442,29 +1442,39 @@ name = "patchaliasing"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "accelerate" },
     { name = "black" },
     { name = "chronos-forecasting" },
+    { name = "huggingface-hub" },
     { name = "isort" },
     { name = "matplotlib" },
+    { name = "numpy" },
     { name = "pandas" },
     { name = "pillow" },
     { name = "pymc", version = "5.28.5", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
     { name = "pymc", version = "6.0.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "scikit-learn" },
+    { name = "torch" },
     { name = "tqdm" },
+    { name = "transformers" },
 ]
 
 [package.metadata]
 requires-dist = [
+    { name = "accelerate", specifier = ">=1.13.0" },
     { name = "black", specifier = ">=26.5.1" },
     { name = "chronos-forecasting", specifier = ">=2.2.2" },
+    { name = "huggingface-hub", specifier = ">=0.36.2" },
     { name = "isort", specifier = ">=8.0.1" },
     { name = "matplotlib", specifier = ">=3.10.9" },
+    { name = "numpy", specifier = ">=2.4.6" },
     { name = "pandas", specifier = ">=3.0.3" },
     { name = "pillow", specifier = ">=12.2.0" },
     { name = "pymc", specifier = ">=5.28.5" },
     { name = "scikit-learn", specifier = ">=1.8.0" },
+    { name = "torch", specifier = ">=2.12.0" },
     { name = "tqdm", specifier = ">=4.67.3" },
+    { name = "transformers", specifier = ">=4.57.6" },
 ]
 
 [[package]]

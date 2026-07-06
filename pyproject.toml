@@ -5,13 +5,18 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.11.9"
 dependencies = [
+    "accelerate>=1.13.0",
     "black>=26.5.1",
     "chronos-forecasting>=2.2.2",
+    "huggingface-hub>=0.36.2",
     "isort>=8.0.1",
     "matplotlib>=3.10.9",
+    "numpy>=2.4.6",
     "pandas>=3.0.3",
     "pillow>=12.2.0",
     "pymc>=5.28.5",
     "scikit-learn>=1.8.0",
+    "torch>=2.12.0",
     "tqdm>=4.67.3",
+    "transformers>=4.57.6",
 ]
