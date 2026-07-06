@@ -8,6 +8,7 @@ dependencies = [
     "accelerate>=1.13.0",
     "black>=26.5.1",
     "chronos-forecasting>=2.2.2",
+    "datasets>=5.0.0",
     "huggingface-hub>=0.36.2",
     "isort>=8.0.1",
     "matplotlib>=3.10.9",

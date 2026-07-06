@@ -1,0 +1,39 @@
+{
+  "provenance": {
+    "P": 16,
+    "S": 16,
+    "seed": 42,
+    "overlap_ratio": 0.0,
+    "approx_num_patches": 128,
+    "base_model_id": "amazon/chronos-bolt-tiny",
+    "hf_repo": "autogluon/chronos_datasets",
+    "dataset_config": "training_corpus_tsmixup_10m",
+    "context_length": 2048,
+    "prediction_length": 64,
+    "quantiles": [
+      0.1,
+      0.2,
+      0.3,
+      0.4,
+      0.5,
+      0.6,
+      0.7,
+      0.8,
+      0.9
+    ],
+    "batch_size": 32,
+    "max_steps": 10000,
+    "lr": 0.0001,
+    "weight_decay": 0.01,
+    "grad_clip_norm": 1.0,
+    "lr_scheduler": "linear",
+    "warmup_ratio": 0.05,
+    "shuffle_buffer": 1000,
+    "precision": "fp32",
+    "device": "cpu",
+    "gpu": null,
+    "git_commit": "1436c0d263ef48a5c4417bed9576768388ec77a6",
+    "torch": "2.12.0+cpu",
+    "n_params_millions": 8.653
+  }
+}

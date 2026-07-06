@@ -119,12 +119,18 @@ def make_window_dataset(hf_stream, total_length: int, context_length: int, seed:
     import torch                              # tensors are built here, per worker
     from torch.utils.data import IterableDataset  # streaming source has no length -> IterableDataset
 
+    horizon = total_length - context_length  # = PREDICTION_LENGTH (target length per instance)
+
     class ChronosStreamingWindowDataset(IterableDataset):  # yields ready-to-forward training windows
         """Yield (context, mask, target, target_mask) windows from the HF TSMixup stream.
 
-        Series shorter than context+prediction are skipped. Unobserved (NaN) samples are
-        zero-filled but flagged in the mask, and windows with a fully-unobserved context
-        or target are skipped (their loss would be undefined).
+        A series only needs a full target (horizon points) plus at least one context point;
+        shorter contexts are LEFT-PADDED to context_length and the pad is flagged unobserved
+        in the mask (exactly how Chronos-Bolt handles short contexts). This matters because
+        the corpus series (~1024) are shorter than context_length+horizon (2112), so a
+        "require the full window" filter would discard every series and never yield a batch.
+        Unobserved (NaN) samples are zero-filled but flagged in the mask; instances with a
+        fully-unobserved context or target are skipped (their loss would be undefined).
         """
 
         def __iter__(self):                  # generator called once per DataLoader worker
@@ -137,21 +143,28 @@ def make_window_dataset(hf_stream, total_length: int, context_length: int, seed:
                             f"Check the schema of {HF_REPO}/{DATASET_CONFIG}."
                         )
                     values = np.asarray(row["target"], dtype=np.float32)  # [CHRONOS-REF] the full series values
-                    if values.shape[0] < total_length:  # [CHRONOS-REF] drop series too short for context+prediction (train.py filters short series)
-                        continue              # skip and try the next series
-                    start = int(rng.integers(0, values.shape[0] - total_length + 1))  # uniform random window start (our simplification; train.py uses length-weighted sampling, deliberately not adopted)
-                    window = values[start:start + total_length]  # slice one context+target window
+                    L = values.shape[0]        # series length
+                    if L < horizon + 1:        # need a full target (horizon) + at least one context point
+                        continue               # too short to form any instance -> next series
+                    end = int(rng.integers(horizon + 1, L + 1))  # random target end (augmentation): guarantees full horizon + >=1 ctx point
+                    tgt_raw = values[end - horizon:end]  # the forecast target (length horizon)
+                    ctx_src = values[:end - horizon]     # all context available before the target (length >= 1)
 
-                    ctx_raw = window[:context_length]   # the context part
-                    tgt_raw = window[context_length:]   # the target (forecast) part
-                    ctx_mask = ~np.isnan(ctx_raw)        # True where a context value is observed
-                    tgt_mask = ~np.isnan(tgt_raw)        # True where a target value is observed
-                    if not ctx_mask.any() or not tgt_mask.any():  # nothing to condition on / predict
-                        continue              # skip degenerate windows
+                    if ctx_src.shape[0] >= context_length:      # enough history: keep the most recent context_length points
+                        ctx_raw = ctx_src[-context_length:]      # [CHRONOS-REF] right-aligned context (most recent values)
+                        ctx_obs = ~np.isnan(ctx_raw)             # observed where not NaN
+                    else:                                        # [CHRONOS-REF] short context -> left-pad to context_length (Bolt pads short contexts)
+                        pad = context_length - ctx_src.shape[0]  # number of padding positions on the left
+                        ctx_raw = np.concatenate([np.zeros(pad, np.float32), ctx_src])  # pad values (masked out below)
+                        ctx_obs = np.concatenate([np.zeros(pad, bool), ~np.isnan(ctx_src)])  # padded positions are unobserved
+
+                    tgt_mask = ~np.isnan(tgt_raw)   # True where a target value is observed
+                    if not ctx_obs.any() or not tgt_mask.any():  # nothing to condition on / predict
+                        continue               # skip degenerate instances
 
                     yield {                   # one training example, keyed for the Bolt forward()
                         "context": torch.from_numpy(np.nan_to_num(ctx_raw, nan=0.0)),  # zero-fill NaNs, keep real mask (our robustness choice)
-                        "mask": torch.from_numpy(ctx_mask),          # [CHRONOS-REF] observation mask for the context (Bolt forward arg)
+                        "mask": torch.from_numpy(ctx_obs),           # [CHRONOS-REF] observation mask for the context (Bolt forward arg)
                         "target": torch.from_numpy(np.nan_to_num(tgt_raw, nan=0.0)),   # zero-fill target NaNs
                         "target_mask": torch.from_numpy(tgt_mask),   # [CHRONOS-REF] observation mask for the target (Bolt forward arg)
                     }
@@ -212,6 +225,7 @@ def train_one(P: int, S: int, seed: int, out_dir: Path) -> RunResult:
     import torch                               # heavy imports kept inside the run (fast --help, clean sweep startup)
     from torch.utils.data import DataLoader    # batches windows from the IterableDataset
     from transformers import get_scheduler     # [CHRONOS-REF] HF LR scheduler factory (warmup+linear, as in train.py)
+    from tqdm.auto import tqdm                  # live progress bar over training steps (as in the reference notebook)
 
     if out_dir.joinpath("DONE").exists():      # resumability: this model is already fully trained
         print(f"[skip] {out_dir.name} already DONE")
@@ -280,7 +294,9 @@ def train_one(P: int, S: int, seed: int, out_dir: Path) -> RunResult:
             return next(data_iter)
 
     status = "done"                            # optimistic; flipped to "failed-nan" on a bad step
-    for step in range(1, MAX_STEPS + 1):       # [CHRONOS-REF] fixed-step training loop (train.py trains by max_steps)
+    pbar = tqdm(range(1, MAX_STEPS + 1),       # live progress bar over the fixed step budget...
+                desc=out_dir.name, dynamic_ncols=True)  # ...labelled with this run's id, auto-width
+    for step in pbar:                          # [CHRONOS-REF] fixed-step training loop (train.py trains by max_steps)
         batch = {k: v.to(device) for k, v in _next_batch().items()}  # move the batch to the device
         optimizer.zero_grad(set_to_none=True)  # [CHRONOS-REF] clear grads before the step
 
@@ -294,7 +310,7 @@ def train_one(P: int, S: int, seed: int, out_dir: Path) -> RunResult:
         loss_value = float(loss.detach().cpu())  # scalarise for logging + NaN check
         if not np.isfinite(loss_value):        # guard: non-finite loss (fp16 overflow / bad data)
             status = "failed-nan"              # mark the run failed
-            print(f"[abort] non-finite loss at step {step} — skipping rest of this run.")
+            tqdm.write(f"[abort] non-finite loss at step {step} — skipping rest of this run.")  # note above the bar
             break                              # stop this run; the sweep continues with the next config
 
         scaler.scale(loss).backward()          # [CHRONOS-REF] backward (scaled for fp16; identity for bf16/fp32)
@@ -305,14 +321,16 @@ def train_one(P: int, S: int, seed: int, out_dir: Path) -> RunResult:
         lr_scheduler.step()                    # [CHRONOS-REF] advance the LR schedule
 
         loss_history.append(loss_value)        # record the step loss
-        if step % LOG_EVERY == 0:              # periodic console log
+        pbar.set_postfix(loss=f"{loss_value:.4f}",  # live per-step readout on the bar: current loss...
+                         lr=f"{lr_scheduler.get_last_lr()[0]:.2e}")  # ...and current learning rate
+        if step % LOG_EVERY == 0:              # periodic durable log line (survives in the captured stdout)
             sps = step / (time.time() - t0)    # steps/sec so far
-            print(f"step={step}/{MAX_STEPS} loss={np.mean(loss_history[-LOG_EVERY:]):.4f} "  # smoothed loss
-                  f"lr={lr_scheduler.get_last_lr()[0]:.2e} {sps:.2f} it/s")
+            tqdm.write(f"step={step}/{MAX_STEPS} loss={np.mean(loss_history[-LOG_EVERY:]):.4f} "  # smoothed loss
+                       f"lr={lr_scheduler.get_last_lr()[0]:.2e} {sps:.2f} it/s")  # written above the bar
         if step % SAVE_EVERY == 0:             # periodic checkpoint
             ck = out_dir / f"checkpoint-{step}"  # checkpoint subfolder inside this model's dir
             model.save_pretrained(ck)          # [CHRONOS-REF] HF-style checkpoint save
-            print(f"  saved {ck.name}")
+            tqdm.write(f"  saved {ck.name}")   # note above the bar
 
     steps_per_sec = (len(loss_history) / (time.time() - t0)) if loss_history else 0.0  # final throughput
     result = RunResult(                        # assemble the manifest record for this run
