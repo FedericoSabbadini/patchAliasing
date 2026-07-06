@@ -1,0 +1,444 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.3 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{0}
+  \datalist[entry]{none/global//global/global/global}
+    \entry{ansariChronosLearningLanguage2024}{online}{}{}
+      \name{author}{18}{}{%
+        {{hash=41c1df44b5f36b0d60799a18f13c8345}{%
+           family={Ansari},
+           familyi={A\bibinitperiod},
+           given={Abdul\bibnamedelima Fatir},
+           giveni={A\bibinitperiod\bibinitdelim F\bibinitperiod}}}%
+        {{hash=83fc4e25ebfa5fbdb577e9666d000bab}{%
+           family={Stella},
+           familyi={S\bibinitperiod},
+           given={Lorenzo},
+           giveni={L\bibinitperiod}}}%
+        {{hash=453c44acc624f19e83afc64fc3f2c7d5}{%
+           family={Turkmen},
+           familyi={T\bibinitperiod},
+           given={Caner},
+           giveni={C\bibinitperiod}}}%
+        {{hash=e29804fa90fc95b4f5ac7f0cdae3ad75}{%
+           family={Zhang},
+           familyi={Z\bibinitperiod},
+           given={Xiyuan},
+           giveni={X\bibinitperiod}}}%
+        {{hash=2ed72f6f0ac89030f49a5a25a629ad49}{%
+           family={Mercado},
+           familyi={M\bibinitperiod},
+           given={Pedro},
+           giveni={P\bibinitperiod}}}%
+        {{hash=b2fa30baa7440b5771ad403f32d4d4a2}{%
+           family={Shen},
+           familyi={S\bibinitperiod},
+           given={Huibin},
+           giveni={H\bibinitperiod}}}%
+        {{hash=c695e4e0319891565c3a85e483d80f31}{%
+           family={Shchur},
+           familyi={S\bibinitperiod},
+           given={Oleksandr},
+           giveni={O\bibinitperiod}}}%
+        {{hash=a3edf426c05893fe420aba2808f54985}{%
+           family={Rangapuram},
+           familyi={R\bibinitperiod},
+           given={Syama\bibnamedelima Sundar},
+           giveni={S\bibinitperiod\bibinitdelim S\bibinitperiod}}}%
+        {{hash=cbfe4eae76121b23e3d46ac8e89db292}{%
+           family={Arango},
+           familyi={A\bibinitperiod},
+           given={Sebastian\bibnamedelima Pineda},
+           giveni={S\bibinitperiod\bibinitdelim P\bibinitperiod}}}%
+        {{hash=2af2a26e64fa346203a9fb016a9f04f9}{%
+           family={Kapoor},
+           familyi={K\bibinitperiod},
+           given={Shubham},
+           giveni={S\bibinitperiod}}}%
+        {{hash=a4cb0817196346e47494c15b6f02f9fb}{%
+           family={Zschiegner},
+           familyi={Z\bibinitperiod},
+           given={Jasper},
+           giveni={J\bibinitperiod}}}%
+        {{hash=6851b298e705d87a9d644d809ab44cc2}{%
+           family={Maddix},
+           familyi={M\bibinitperiod},
+           given={Danielle\bibnamedelima C.},
+           giveni={D\bibinitperiod\bibinitdelim C\bibinitperiod}}}%
+        {{hash=c8cf19241225247d6d07dbf8a516b8ed}{%
+           family={Wang},
+           familyi={W\bibinitperiod},
+           given={Hao},
+           giveni={H\bibinitperiod}}}%
+        {{hash=6428c5852da0dfbdd50e39418c9571bf}{%
+           family={Mahoney},
+           familyi={M\bibinitperiod},
+           given={Michael\bibnamedelima W.},
+           giveni={M\bibinitperiod\bibinitdelim W\bibinitperiod}}}%
+        {{hash=de356d9ce5a80fb1c54f81b13e4ab4b5}{%
+           family={Torkkola},
+           familyi={T\bibinitperiod},
+           given={Kari},
+           giveni={K\bibinitperiod}}}%
+        {{hash=f58290185dfd014024f7abaf3fc0d0f2}{%
+           family={Wilson},
+           familyi={W\bibinitperiod},
+           given={Andrew\bibnamedelima Gordon},
+           giveni={A\bibinitperiod\bibinitdelim G\bibinitperiod}}}%
+        {{hash=788936496107a6d83806631aa1d699c0}{%
+           family={Bohlke-Schneider},
+           familyi={B\bibinithyphendelim S\bibinitperiod},
+           given={Michael},
+           giveni={M\bibinitperiod}}}%
+        {{hash=a9292a8838878275e725f037bc757f7e}{%
+           family={Wang},
+           familyi={W\bibinitperiod},
+           given={Yuyang},
+           giveni={Y\bibinitperiod}}}%
+      }
+      \strng{namehash}{3b3f6d1c99c023b1a9d6ab544472af0c}
+      \strng{fullhash}{6a07888d43afecf31bf39eb49f5f136d}
+      \strng{fullhashraw}{6a07888d43afecf31bf39eb49f5f136d}
+      \strng{bibnamehash}{3b3f6d1c99c023b1a9d6ab544472af0c}
+      \strng{authorbibnamehash}{3b3f6d1c99c023b1a9d6ab544472af0c}
+      \strng{authornamehash}{3b3f6d1c99c023b1a9d6ab544472af0c}
+      \strng{authorfullhash}{6a07888d43afecf31bf39eb49f5f136d}
+      \strng{authorfullhashraw}{6a07888d43afecf31bf39eb49f5f136d}
+      \field{extraname}{1}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{shorttitle}
+      \field{abstract}{We introduce Chronos, a simple yet effective framework for pretrained probabilistic time series models. Chronos tokenizes time series values using scaling and quantization into a fixed vocabulary and trains existing transformer-based language model architectures on these tokenized time series via the cross-entropy loss. We pretrained Chronos models based on the T5 family (ranging from 20M to 710M parameters) on a large collection of publicly available datasets, complemented by a synthetic dataset that we generated via Gaussian processes to improve generalization. In a comprehensive benchmark consisting of 42 datasets, and comprising both classical local models and deep learning methods, we show that Chronos models: (a) significantly outperform other methods on datasets that were part of the training corpus; and (b) have comparable and occasionally superior zero-shot performance on new datasets, relative to methods that were trained specifically on them. Our results demonstrate that Chronos models can leverage time series data from diverse domains to improve zero-shot accuracy on unseen forecasting tasks, positioning pretrained models as a viable tool to greatly simplify forecasting pipelines.}
+      \field{day}{4}
+      \field{eprintclass}{cs.LG}
+      \field{eprinttype}{arXiv}
+      \field{month}{11}
+      \field{pubstate}{prepublished}
+      \field{shorttitle}{Chronos}
+      \field{title}{Chronos: {{Learning}} the {{Language}} of {{Time Series}}}
+      \field{urlday}{13}
+      \field{urlmonth}{5}
+      \field{urlyear}{2026}
+      \field{year}{2024}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \verb{doi}
+      \verb 10.48550/arXiv.2403.07815
+      \endverb
+      \verb{eprint}
+      \verb 2403.07815
+      \endverb
+      \verb{file}
+      \verb /Users/gianlucabrignoli/Zotero/storage/45QCGFYH/Ansari et al. - 2024 - Chronos Learning the Language of Time Series.pdf
+      \endverb
+      \verb{urlraw}
+      \verb http://arxiv.org/abs/2403.07815
+      \endverb
+      \verb{url}
+      \verb http://arxiv.org/abs/2403.07815
+      \endverb
+      \keyw{Computer Science - Artificial Intelligence,Computer Science - Machine Learning}
+    \endentry
+    \entry{FastAccurateZeroshot2024a}{online}{}{}
+      \name{author}{4}{}{%
+        {{hash=41c1df44b5f36b0d60799a18f13c8345}{%
+           family={Ansari},
+           familyi={A\bibinitperiod},
+           given={Abdul\bibnamedelima Fatir},
+           giveni={A\bibinitperiod\bibinitdelim F\bibinitperiod}}}%
+        {{hash=453c44acc624f19e83afc64fc3f2c7d5}{%
+           family={Turkmen},
+           familyi={T\bibinitperiod},
+           given={Caner},
+           giveni={C\bibinitperiod}}}%
+        {{hash=c695e4e0319891565c3a85e483d80f31}{%
+           family={Shchur},
+           familyi={S\bibinitperiod},
+           given={Oleksandr},
+           giveni={O\bibinitperiod}}}%
+        {{hash=83fc4e25ebfa5fbdb577e9666d000bab}{%
+           family={Stella},
+           familyi={S\bibinitperiod},
+           given={Lorenzo},
+           giveni={L\bibinitperiod}}}%
+      }
+      \strng{namehash}{3b3f6d1c99c023b1a9d6ab544472af0c}
+      \strng{fullhash}{1d9fe479d14030a938fca9bbecc89fb6}
+      \strng{fullhashraw}{1d9fe479d14030a938fca9bbecc89fb6}
+      \strng{bibnamehash}{3b3f6d1c99c023b1a9d6ab544472af0c}
+      \strng{authorbibnamehash}{3b3f6d1c99c023b1a9d6ab544472af0c}
+      \strng{authornamehash}{3b3f6d1c99c023b1a9d6ab544472af0c}
+      \strng{authorfullhash}{1d9fe479d14030a938fca9bbecc89fb6}
+      \strng{authorfullhashraw}{1d9fe479d14030a938fca9bbecc89fb6}
+      \field{extraname}{2}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{day}{2}
+      \field{hour}{10}
+      \field{minute}{20}
+      \field{month}{12}
+      \field{second}{13}
+      \field{timezone}{-08\bibtzminsep 00}
+      \field{title}{Fast and Accurate Zero-Shot Forecasting with {{Chronos-Bolt}} and {{AutoGluon}} | {{Artificial Intelligence}}}
+      \field{urlday}{13}
+      \field{urlmonth}{5}
+      \field{urlyear}{2026}
+      \field{year}{2024}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \verb{file}
+      \verb /Users/gianlucabrignoli/Zotero/storage/T2EIEKSP/fast-and-accurate-zero-shot-forecasting-with-chronos-bolt-and-autogluon.html
+      \endverb
+      \verb{urlraw}
+      \verb https://aws.amazon.com/blogs/machine-learning/fast-and-accurate-zero-shot-forecasting-with-chronos-bolt-and-autogluon/
+      \endverb
+      \verb{url}
+      \verb https://aws.amazon.com/blogs/machine-learning/fast-and-accurate-zero-shot-forecasting-with-chronos-bolt-and-autogluon/
+      \endverb
+    \endentry
+    \entry{ChronosBoltPipelineAmazonscienceChronosforecastinga}{online}{}{}
+      \list{organization}{1}{%
+        {DeepWiki}%
+      }
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labeltitlesource}{title}
+      \field{abstract}{The `ChronosBoltPipeline` provides a high-performance forecasting interface for Chronos-Bolt models, a patch-based variant of the original Chronos architecture. Chronos-Bolt achieves up to 250x faster}
+      \field{langid}{english}
+      \field{title}{{{ChronosBoltPipeline}} | Amazon-Science/Chronos-Forecasting}
+      \field{urlday}{13}
+      \field{urlmonth}{5}
+      \field{urlyear}{2026}
+      \field{urldateera}{ce}
+      \verb{file}
+      \verb /Users/gianlucabrignoli/Zotero/storage/Y3CVBUDY/2.html
+      \endverb
+      \verb{urlraw}
+      \verb https://deepwiki.com/amazon-science/chronos-forecasting/2.4-chronosboltpipeline
+      \endverb
+      \verb{url}
+      \verb https://deepwiki.com/amazon-science/chronos-forecasting/2.4-chronosboltpipeline
+      \endverb
+    \endentry
+    \entry{levaPhotovoltaicPowerWeather2020}{dataset}{}{}
+      \name{author}{5}{}{%
+        {{hash=13c9d358d811c1a18186a2140a772eed}{%
+           family={Leva},
+           familyi={L\bibinitperiod},
+           given={Sonia},
+           giveni={S\bibinitperiod}}}%
+        {{hash=26440abec0e8bfea6a0b2430fc5633bd}{%
+           family={Nespoli},
+           familyi={N\bibinitperiod},
+           given={Alfredo},
+           giveni={A\bibinitperiod}}}%
+        {{hash=5598d601a5993ff139649ee57ebd858b}{%
+           family={Pretto},
+           familyi={P\bibinitperiod},
+           given={Silvia},
+           giveni={S\bibinitperiod}}}%
+        {{hash=9fb341ba8bb82d31b1c0c5ac8d9238d7}{%
+           family={Mussetta},
+           familyi={M\bibinitperiod},
+           given={Marco},
+           giveni={M\bibinitperiod}}}%
+        {{hash=30faacea54111e3a383b10f0989eedbf}{%
+           family={Ogliari},
+           familyi={O\bibinitperiod},
+           given={Emanuele},
+           giveni={E\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {IEEE DataPort}%
+      }
+      \strng{namehash}{4f9f89d8ff5099abf880510c18b57370}
+      \strng{fullhash}{98ab2303c772063911326ee858c15ef7}
+      \strng{fullhashraw}{98ab2303c772063911326ee858c15ef7}
+      \strng{bibnamehash}{4f9f89d8ff5099abf880510c18b57370}
+      \strng{authorbibnamehash}{4f9f89d8ff5099abf880510c18b57370}
+      \strng{authornamehash}{4f9f89d8ff5099abf880510c18b57370}
+      \strng{authorfullhash}{98ab2303c772063911326ee858c15ef7}
+      \strng{authorfullhashraw}{98ab2303c772063911326ee858c15ef7}
+      \field{sortinit}{5}
+      \field{sortinithash}{20e9b4b0b173788c5dace24730f47d8c}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{This dataset includes PV power production measured on the SolarTech Lab, Politecnico di Milano, Italy. Data are freely available for scientific research purpose and further data validation.In particular, the dataset is composed of the following variables and specifics, with a time resolution of 1 minute:Timestamp: column with time recordings; the data format is “dd-MM-yyyy hh:mm:ss”, with the time always expressed in Central European Time (CET).Pm: power recordings from the PV module (W); module tilt: 30°.Tair: ambient temperature (°C) measured by the weather station described in SolarTech Lab website (http://www.solartech.polimi.it/instrumentation/).GHI: measured Global Horizontal Irradiance (W/m2).GPOA: global irradiance measured on the plane of array (30°).Ws: measured wind speed (m/s).Wd: measured wind direction (°), assuming 0° east, positive south.It is worth noticing that this dataset includes original measurements, i.e. these raw data can be used for any additional post-processing, validation and further research. When a value is missing in the original measurements recording, a “NaN” is reported.}
+      \field{day}{23}
+      \field{month}{9}
+      \field{title}{Photovoltaic Power and Weather Parameters}
+      \field{urlday}{1}
+      \field{urlmonth}{6}
+      \field{urlyear}{2026}
+      \field{year}{2020}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \verb{doi}
+      \verb 10.21227/42V0-JZ14
+      \endverb
+      \verb{urlraw}
+      \verb https://ieee-dataport.org/open-access/photovoltaic-power-and-weather-parameters
+      \endverb
+      \verb{url}
+      \verb https://ieee-dataport.org/open-access/photovoltaic-power-and-weather-parameters
+      \endverb
+      \keyw{Machine Learning,neural network,Nowcasting,Photovoltaics,Power forecast}
+    \endentry
+    \entry{voitaInformationTheoreticProbingMinimum2020}{inproceedings}{}{}
+      \name{author}{2}{}{%
+        {{hash=973dc1e9a54af2863fc0897552758be3}{%
+           family={Voita},
+           familyi={V\bibinitperiod},
+           given={Elena},
+           giveni={E\bibinitperiod}}}%
+        {{hash=38c1cf91413109beb40bd024b86e0969}{%
+           family={Titov},
+           familyi={T\bibinitperiod},
+           given={Ivan},
+           giveni={I\bibinitperiod}}}%
+      }
+      \name{editor}{4}{}{%
+        {{hash=073903bf4f8271f1a80b3fdcc63d92c2}{%
+           family={Webber},
+           familyi={W\bibinitperiod},
+           given={Bonnie},
+           giveni={B\bibinitperiod}}}%
+        {{hash=fcbee11f57094a6fbbfcbf494f023974}{%
+           family={Cohn},
+           familyi={C\bibinitperiod},
+           given={Trevor},
+           giveni={T\bibinitperiod}}}%
+        {{hash=f3b78337b03e473fdd1fe07b5b127389}{%
+           family={He},
+           familyi={H\bibinitperiod},
+           given={Yulan},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=621013bf54d3546375ad71f17f020b5b}{%
+           family={Liu},
+           familyi={L\bibinitperiod},
+           given={Yang},
+           giveni={Y\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {Online}%
+      }
+      \list{publisher}{1}{%
+        {Association for Computational Linguistics}%
+      }
+      \strng{namehash}{39bea236f1388f935e10244126082df2}
+      \strng{fullhash}{39bea236f1388f935e10244126082df2}
+      \strng{fullhashraw}{39bea236f1388f935e10244126082df2}
+      \strng{bibnamehash}{39bea236f1388f935e10244126082df2}
+      \strng{authorbibnamehash}{39bea236f1388f935e10244126082df2}
+      \strng{authornamehash}{39bea236f1388f935e10244126082df2}
+      \strng{authorfullhash}{39bea236f1388f935e10244126082df2}
+      \strng{authorfullhashraw}{39bea236f1388f935e10244126082df2}
+      \strng{editorbibnamehash}{7126226c96b902f79c86c0a19c719ffe}
+      \strng{editornamehash}{7126226c96b902f79c86c0a19c719ffe}
+      \strng{editorfullhash}{b493927e65eacfc394fe1e594cf72a89}
+      \strng{editorfullhashraw}{b493927e65eacfc394fe1e594cf72a89}
+      \field{sortinit}{6}
+      \field{sortinithash}{b33bc299efb3c36abec520a4c896a66d}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{To measure how well pretrained representations encode some linguistic property, it is common to use accuracy of a probe, i.e. a classifier trained to predict the property from the representations. Despite widespread adoption of probes, differences in their accuracy fail to adequately reflect differences in representations. For example, they do not substantially favour pretrained representations over randomly initialized ones. Analogously, their accuracy can be similar when probing for genuine linguistic labels and probing for random synthetic tasks. To see reasonable differences in accuracy with respect to these random baselines, previous work had to constrain either the amount of probe training data or its model size. Instead, we propose an alternative to the standard probes, information-theoretic probing with minimum description length (MDL). With MDL probing, training a probe to predict labels is recast as teaching it to effectively transmit the data. Therefore, the measure of interest changes from probe accuracy to the description length of labels given representations. In addition to probe quality, the description length evaluates “the amount of effort” needed to achieve the quality. This amount of effort characterizes either (i) size of a probing model, or (ii) the amount of data needed to achieve the high quality. We consider two methods for estimating MDL which can be easily implemented on top of the standard probing pipelines: variational coding and online coding. We show that these methods agree in results and are more informative and stable than the standard probes.}
+      \field{booktitle}{Proceedings of the 2020 {{Conference}} on {{Empirical Methods}} in {{Natural Language Processing}} ({{EMNLP}})}
+      \field{eventtitle}{{{EMNLP}} 2020}
+      \field{month}{11}
+      \field{title}{Information-{{Theoretic Probing}} with {{Minimum Description Length}}}
+      \field{urlday}{13}
+      \field{urlmonth}{5}
+      \field{urlyear}{2026}
+      \field{year}{2020}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{183\bibrangedash 196}
+      \range{pages}{14}
+      \verb{doi}
+      \verb 10.18653/v1/2020.emnlp-main.14
+      \endverb
+      \verb{file}
+      \verb /Users/gianlucabrignoli/Zotero/storage/2HEIYU9B/Voita e Titov - 2020 - Information-Theoretic Probing with Minimum Description Length.pdf
+      \endverb
+      \verb{urlraw}
+      \verb https://aclanthology.org/2020.emnlp-main.14/
+      \endverb
+      \verb{url}
+      \verb https://aclanthology.org/2020.emnlp-main.14/
+      \endverb
+    \endentry
+    \entry{tabassiArtificialIntelligenceRisk2023}{report}{}{}
+      \name{author}{1}{}{%
+        {{hash=da4d6f760817f258d4447d01266d3298}{%
+           family={Tabassi},
+           familyi={T\bibinitperiod},
+           given={Elham},
+           giveni={E\bibinitperiod}}}%
+      }
+      \list{institution}{1}{%
+        {National Institute of Standards and Technology (U.S.)}%
+      }
+      \list{location}{1}{%
+        {Gaithersburg, MD}%
+      }
+      \strng{namehash}{da4d6f760817f258d4447d01266d3298}
+      \strng{fullhash}{da4d6f760817f258d4447d01266d3298}
+      \strng{fullhashraw}{da4d6f760817f258d4447d01266d3298}
+      \strng{bibnamehash}{da4d6f760817f258d4447d01266d3298}
+      \strng{authorbibnamehash}{da4d6f760817f258d4447d01266d3298}
+      \strng{authornamehash}{da4d6f760817f258d4447d01266d3298}
+      \strng{authorfullhash}{da4d6f760817f258d4447d01266d3298}
+      \strng{authorfullhashraw}{da4d6f760817f258d4447d01266d3298}
+      \field{sortinit}{7}
+      \field{sortinithash}{108d0be1b1bee9773a1173443802c0a3}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{As directed by the National Artificial Intelligence Initiative Act of 2020 (P.L. 116-283), the goal of the AI RMF is to offer a resource to the organizations designing, developing, deploying, or using AI systems to help manage the many risks of AI and promote trustworthy and responsible development and use of AI systems. The Framework is intended to be voluntary, rights-preserving, non-sector specific, and use-case agnostic, providing flexibility to organizations of all sizes and in all sectors and throughout society to implement the approaches in the Framework. The AI RMF is intended to be practical, to adapt to the AI landscape as AI technologies continue to develop, and to be operationalized by organizations in varying degrees and capacities so society can benefit from AI while also being protected from its potential harms.}
+      \field{day}{26}
+      \field{month}{1}
+      \field{number}{NIST AI 100-1}
+      \field{title}{Artificial {{Intelligence Risk Management Framework}} ({{AI RMF}} 1.0)}
+      \field{urlday}{1}
+      \field{urlmonth}{6}
+      \field{urlyear}{2026}
+      \field{year}{2023}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{NIST AI 100\bibrangedash 1}
+      \range{pages}{-1}
+      \verb{doi}
+      \verb 10.6028/NIST.AI.100-1
+      \endverb
+      \verb{file}
+      \verb /Users/gianlucabrignoli/Zotero/storage/AUWBI7MR/Tabassi - 2023 - Artificial Intelligence Risk Management Framework (AI RMF 1.0).pdf
+      \endverb
+      \verb{urlraw}
+      \verb http://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf
+      \endverb
+      \verb{url}
+      \verb http://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf
+      \endverb
+    \endentry
+  \enddatalist
+\endrefsection
+\endinput
+
