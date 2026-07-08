@@ -84,7 +84,7 @@ WEIGHT_DECAY = 0.0                            # [CHRONOS-REF] official uses HF T
 GRAD_CLIP_NORM = 1.0                          # [CHRONOS-REF] HF Trainer default max_grad_norm=1.0, implicitly used by train.py
 LR_SCHEDULER_TYPE = "linear"                  # [CHRONOS-REF] lr_scheduler_type: linear (chronos-t5-tiny.yaml)
 WARMUP_RATIO = 0.0                            # [CHRONOS-REF] warmup_ratio: 0.0 (chronos-t5-tiny.yaml) — official trains from scratch WITHOUT warmup
-SHUFFLE_BUFFER_SIZE = 100_000                 # [CHRONOS-REF] shuffle_buffer_length: 100_000 (chronos-t5-tiny.yaml); lower it only for smoke tests
+SHUFFLE_BUFFER_SIZE = 10_000                  # reduced from official 100k to avoid HF streaming timeouts; still provides good randomisation for 10k-step runs
 MIN_PAST = 60                                 # [CHRONOS-REF] min_past: 60 (chronos-t5-tiny.yaml) — window sampler requires >= 60 context points
 MAX_MISSING_PROP = 0.9                        # [CHRONOS-REF] max_missing_prop: 0.9 — drop series with > 90% missing values
 DROP_PROB = 0.2                               # [CHRONOS-REF] drop_prob=0.2 (train.py ChronosDataset default): random NaN injection augmentation

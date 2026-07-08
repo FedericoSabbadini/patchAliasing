@@ -1,0 +1,2 @@
+P,S,seed,overlap_ratio,approx_num_patches,n_params_millions,max_steps,steps_completed,final_loss,mean_last_100,steps_per_sec,status,precision,device
+16,16,42,0.0,128,8.653,10000,10000,30.616600036621094,7123.123284606933,9.94,done,fp32+tf32,cuda

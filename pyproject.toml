@@ -3,7 +3,7 @@ name = "patchaliasing"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.11.9"
+requires-python = ">=3.11.9,<3.13"
 dependencies = [
     "accelerate>=1.13.0",
     "black>=26.5.1",
@@ -17,7 +17,6 @@ dependencies = [
     "pillow>=12.2.0",
     "pymc>=5.28.5",
     "scikit-learn>=1.8.0",
-    "torch>=2.12.0",
     "tqdm>=4.67.3",
     "transformers>=4.57.6",
 ]
