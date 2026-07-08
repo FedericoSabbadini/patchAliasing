@@ -38,5 +38,21 @@
     "git_commit": "8ad984bf89500a3de82bd2e3f12716cde5dc63ee",
     "torch": "2.12.0.dev20260408+cu128",
     "n_params_millions": 8.653
+  },
+  "result": {
+    "P": 16,
+    "S": 12,
+    "seed": 42,
+    "overlap_ratio": 0.25,
+    "approx_num_patches": 170,
+    "n_params_millions": 8.653,
+    "max_steps": 10000,
+    "steps_completed": 10000,
+    "final_loss": 30.733911514282227,
+    "mean_last_100": 7123.196468105316,
+    "steps_per_sec": 9.85,
+    "status": "done",
+    "precision": "fp32+tf32",
+    "device": "cuda"
   }
 }
