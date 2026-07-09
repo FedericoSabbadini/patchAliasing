@@ -1,12 +1,19 @@
 """
-train_sweep.py — Chronos-Bolt Tiny from-scratch (P, S, seed) sweep driver. FINAL VERSION.
+train_sweep.py — Chronos-Bolt Tiny from-scratch (P, S) sweep driver. FINAL VERSION.
 
 Training only (no evaluation/inference). Each run retrains Chronos-Bolt Tiny FROM SCRATCH
-(random weights) on the official Chronos pre-training corpus
-(autogluon/chronos_datasets / training_corpus_tsmixup_10m, streamed), varying ONLY the
-patch geometry input_patch_size (P) and input_patch_stride (S). Everything else is fixed
-at the official Chronos training values so any downstream difference in
-structural-aliasing probes is attributable to P/S.
+(random weights) on the FULL official Chronos pre-training data:
+  - TSMixup  (autogluon/chronos_datasets / training_corpus_tsmixup_10m,  10M series)
+  - KernelSynth (autogluon/chronos_datasets / training_corpus_kernel_synth_1m, 1M series)
+interleaved at the official 9:1 ratio (TSMixup : KernelSynth).
+
+TSMixup is itself an augmentation of 28 real-world open-source datasets (Monash, M-comps,
+Kaggle — energy, transport, weather, finance, etc.); KernelSynth is purely synthetic
+(Gaussian Process priors). Together they reproduce the full official training diet.
+
+Only the patch geometry input_patch_size (P) and input_patch_stride (S) varies across
+runs. Everything else is fixed at the official Chronos training values so any downstream
+difference in structural-aliasing probes is attributable to P/S.
 
 Just run the file:
 
@@ -32,7 +39,7 @@ Provenance markers on code lines:
 Deliberate deviations from the official regime (uniform across all runs, documented in
 README_retraining.md): MAX_STEPS 10k vs 200k (compute budget; variants are compared only
 against each other), LOG/SAVE cadence, num_workers=0 (single-stream equivalence),
-torch_compile off (startup overhead across 18 short runs; no math change).
+torch_compile off (startup overhead across 6 short runs; no math change).
 ---------------------------------------------------------------------------------------
 NaN CONTRACT (critical, verified against chronos_bolt.py source): Chronos-Bolt encodes
 "unobserved" as NaN. InstanceNorm computes loc/scale with nanmean BEFORE the mask is
@@ -66,7 +73,7 @@ PS_GRID: list[tuple[int, int]] = [          # our experimental design (not from 
     (8, 8),     # patch-size axis, contiguous
     (24, 24),   # patch-size axis, contiguous
 ]
-SEEDS: list[int] = [42, 43, 44]             # 3 seeds per config to separate P/S effect from seed noise
+SEEDS: list[int] = [42]                      # 1 seed per config (full official data diet makes multi-seed less critical)
 
 BASE_MODEL_ID = "amazon/chronos-bolt-tiny"  # [CHRONOS-REF] official Bolt-tiny checkpoint (architecture ref only; weights NOT loaded)
 
@@ -75,7 +82,9 @@ PREDICTION_LENGTH = 64                       # [CHRONOS-REF] Bolt-tiny config va
 QUANTILES = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]  # [CHRONOS-REF] the 9 quantiles Bolt is trained on
 
 HF_REPO = "autogluon/chronos_datasets"       # [CHRONOS-REF] official Chronos datasets repository on HuggingFace
-DATASET_CONFIG = "training_corpus_tsmixup_10m"  # [CHRONOS-REF] official TSMixup pre-training corpus (10M series)
+DATASET_CONFIG_TSMIXUP = "training_corpus_tsmixup_10m"      # [CHRONOS-REF] TSMixup pre-training corpus (10M series, augmented from 28 real datasets)
+DATASET_CONFIG_KERNELSYNTH = "training_corpus_kernel_synth_1m"  # [CHRONOS-REF] KernelSynth synthetic corpus (1M GP-sampled series)
+TSMIXUP_RATIO = 9                            # [CHRONOS-REF] official mixing: 9 TSMixup series per 1 KernelSynth (9:1 ratio from the paper)
 
 BATCH_SIZE = 32                              # [CHRONOS-REF] per_device_train_batch_size=32, grad-accum=1 (chronos-t5-tiny.yaml)
 MAX_STEPS = 10_000                           # DEVIATION: 10k vs official 200k — fixed compute budget, identical across runs
@@ -84,7 +93,7 @@ WEIGHT_DECAY = 0.0                            # [CHRONOS-REF] official uses HF T
 GRAD_CLIP_NORM = 1.0                          # [CHRONOS-REF] HF Trainer default max_grad_norm=1.0, implicitly used by train.py
 LR_SCHEDULER_TYPE = "linear"                  # [CHRONOS-REF] lr_scheduler_type: linear (chronos-t5-tiny.yaml)
 WARMUP_RATIO = 0.0                            # [CHRONOS-REF] warmup_ratio: 0.0 (chronos-t5-tiny.yaml) — official trains from scratch WITHOUT warmup
-SHUFFLE_BUFFER_SIZE = 10_000                  # reduced from official 100k to avoid HF streaming timeouts; still provides good randomisation for 10k-step runs
+SHUFFLE_BUFFER_SIZE = 10_000                  # reduced from official 100k to avoid HF streaming timeouts; still provides good randomisation for 10k-step runs; applied to BOTH streams
 MIN_PAST = 60                                 # [CHRONOS-REF] min_past: 60 (chronos-t5-tiny.yaml) — window sampler requires >= 60 context points
 MAX_MISSING_PROP = 0.9                        # [CHRONOS-REF] max_missing_prop: 0.9 — drop series with > 90% missing values
 DROP_PROB = 0.2                               # [CHRONOS-REF] drop_prob=0.2 (train.py ChronosDataset default): random NaN injection augmentation
@@ -119,25 +128,31 @@ def _approx_num_patches(context_length: int, P: int, S: int) -> int:
 # ============================================================================ #
 #  Dataset                                                                       #
 # ============================================================================ #
-def build_stream(seed: int):                 # open the HF corpus as a shuffled streaming iterator
+def build_streams(seed: int):                # open both HF corpora as shuffled streaming iterators
     from datasets import load_dataset        # [CHRONOS-REF] HuggingFace datasets (the corpus lives there)
-    stream = load_dataset(                    # [CHRONOS-REF] open the official corpus...
-        HF_REPO, DATASET_CONFIG,             # [CHRONOS-REF] ...repo + config selected above
-        split="train", streaming=True,       # [CHRONOS-REF] stream instead of downloading the whole 10M-series corpus
-    )
-    return stream.shuffle(                    # [CHRONOS-REF] shuffle the training stream (train.py PseudoShuffledIterableDataset)...
-        seed=seed, buffer_size=SHUFFLE_BUFFER_SIZE,  # [CHRONOS-REF] ...with the official buffer length (100k)
-    )
+    tsmixup = load_dataset(                   # [CHRONOS-REF] open the TSMixup corpus (10M series from 28 real datasets)
+        HF_REPO, DATASET_CONFIG_TSMIXUP,
+        split="train", streaming=True,
+    ).shuffle(seed=seed, buffer_size=SHUFFLE_BUFFER_SIZE)  # [CHRONOS-REF] shuffle (train.py PseudoShuffledIterableDataset)
+    kernelsynth = load_dataset(               # [CHRONOS-REF] open the KernelSynth corpus (1M GP synthetic series)
+        HF_REPO, DATASET_CONFIG_KERNELSYNTH,
+        split="train", streaming=True,
+    ).shuffle(seed=seed, buffer_size=SHUFFLE_BUFFER_SIZE)  # [CHRONOS-REF] shuffle with the same buffer length
+    return tsmixup, kernelsynth
 
 
-def make_window_dataset(hf_stream, total_length: int, context_length: int, seed: int):
+def make_window_dataset(tsmixup_stream, kernelsynth_stream, total_length: int,
+                        context_length: int, seed: int):
     import torch                              # tensors are built here, per worker
     from torch.utils.data import IterableDataset  # streaming source has no length -> IterableDataset
 
     horizon = total_length - context_length  # = PREDICTION_LENGTH (target length per instance)
 
     class ChronosStreamingWindowDataset(IterableDataset):  # yields ready-to-forward training windows
-        """Yield (context, mask, target, target_mask) windows from the HF TSMixup stream.
+        """Yield (context, mask, target, target_mask) windows from both HF streams.
+
+        Interleaves TSMixup and KernelSynth at the official 9:1 ratio (TSMIXUP_RATIO
+        series from TSMixup, then 1 from KernelSynth, repeating).
 
         Mirrors the official train.py pipeline (ExpectedNumInstanceSampler + InstanceSplitter
         + FilterTransformation), adapted from GluonTS to a plain HF stream:
@@ -151,50 +166,65 @@ def make_window_dataset(hf_stream, total_length: int, context_length: int, seed:
         the model zeroes them after normalization — see NaN CONTRACT in the module docstring.
         """
 
+        def _interleaved(self):              # yield raw rows from both streams at the 9:1 ratio
+            tsmixup_iter = iter(tsmixup_stream)    # iterator over the TSMixup corpus
+            ks_iter = iter(kernelsynth_stream)      # iterator over the KernelSynth corpus
+            while True:                       # [CHRONOS-REF] cycle forever (train.py wraps datasets in Cyclic)
+                for _ in range(TSMIXUP_RATIO):  # [CHRONOS-REF] 9 series from TSMixup...
+                    try:
+                        yield next(tsmixup_iter)
+                    except StopIteration:     # corpus exhausted -> restart
+                        tsmixup_iter = iter(tsmixup_stream)
+                        yield next(tsmixup_iter)
+                try:                          # [CHRONOS-REF] ...then 1 from KernelSynth
+                    yield next(ks_iter)
+                except StopIteration:         # corpus exhausted -> restart
+                    ks_iter = iter(kernelsynth_stream)
+                    yield next(ks_iter)
+
         def __iter__(self):                  # generator called once per DataLoader worker
             rng = np.random.default_rng(seed)  # per-iterator RNG so window sampling is reproducible
-            while True:                       # [CHRONOS-REF] cycle the corpus forever (train.py wraps datasets in Cyclic)
-                for row in hf_stream:         # [CHRONOS-REF] iterate raw series from the official stream
-                    if "target" not in row:   # schema guard: the value column must be present
-                        raise KeyError(       # fail loudly with a helpful message if the schema changed
-                            f"Row has no 'target' field (keys={list(row)}). "
-                            f"Check the schema of {HF_REPO}/{DATASET_CONFIG}."
-                        )
-                    values = np.asarray(row["target"], dtype=np.float32)  # [CHRONOS-REF] the full series values
-                    L = values.shape[0]        # series length
-                    if L < MIN_PAST + horizon: # [CHRONOS-REF] has_enough_observations: min_length = min_past + prediction_length
-                        continue               # too short -> next series
-                    if np.isnan(values).mean() > MAX_MISSING_PROP:  # [CHRONOS-REF] has_enough_observations: max_missing_prop
-                        continue               # mostly missing -> next series
+            for row in self._interleaved():   # iterate interleaved series from both streams
+                if "target" not in row:       # schema guard: the value column must be present
+                    raise KeyError(
+                        f"Row has no 'target' field (keys={list(row)}). "
+                        f"Check the schema of {HF_REPO}."
+                    )
+                values = np.asarray(row["target"], dtype=np.float32)  # [CHRONOS-REF] the full series values
+                L = values.shape[0]            # series length
+                if L < MIN_PAST + horizon:     # [CHRONOS-REF] has_enough_observations: min_length = min_past + prediction_length
+                    continue                   # too short -> next series
+                if np.isnan(values).mean() > MAX_MISSING_PROP:  # [CHRONOS-REF] has_enough_observations: max_missing_prop
+                    continue                   # mostly missing -> next series
 
-                    drop_p = rng.uniform(0.0, DROP_PROB)  # [CHRONOS-REF] preprocess_entry: drop_p ~ U(0, drop_prob)
-                    if drop_p > 0.0:           # [CHRONOS-REF] randomly turn observations into missing values (NaN)
-                        values = values.copy() # do not mutate the stream's buffer
-                        values[rng.random(L) < drop_p] = np.nan  # [CHRONOS-REF] element-wise drop with prob drop_p
+                drop_p = rng.uniform(0.0, DROP_PROB)  # [CHRONOS-REF] preprocess_entry: drop_p ~ U(0, drop_prob)
+                if drop_p > 0.0:               # [CHRONOS-REF] randomly turn observations into missing values (NaN)
+                    values = values.copy()     # do not mutate the stream's buffer
+                    values[rng.random(L) < drop_p] = np.nan  # [CHRONOS-REF] element-wise drop with prob drop_p
 
-                    end = int(rng.integers(MIN_PAST + horizon, L + 1))  # [CHRONOS-REF] split uniform with min_past context + full future (ExpectedNumInstanceSampler)
-                    tgt_raw = values[end - horizon:end]  # the forecast target (length horizon; may contain NaN)
-                    ctx_src = values[:end - horizon]     # all history before the target (length >= MIN_PAST)
+                end = int(rng.integers(MIN_PAST + horizon, L + 1))  # [CHRONOS-REF] split uniform with min_past context + full future (ExpectedNumInstanceSampler)
+                tgt_raw = values[end - horizon:end]  # the forecast target (length horizon; may contain NaN)
+                ctx_src = values[:end - horizon]     # all history before the target (length >= MIN_PAST)
 
-                    if ctx_src.shape[0] >= context_length:      # enough history: keep the most recent context_length points
-                        ctx_raw = ctx_src[-context_length:]      # [CHRONOS-REF] InstanceSplitter past_length window (most recent values)
-                    else:                                        # [CHRONOS-REF] short context -> LEFT-pad to context_length with NaN (dummy_value=np.nan)
-                        pad = context_length - ctx_src.shape[0]  # number of padding positions on the left
-                        ctx_raw = np.concatenate([np.full(pad, np.nan, np.float32), ctx_src])  # NaN padding: excluded by nanmean, masked in attention
+                if ctx_src.shape[0] >= context_length:      # enough history: keep the most recent context_length points
+                    ctx_raw = ctx_src[-context_length:]      # [CHRONOS-REF] InstanceSplitter past_length window (most recent values)
+                else:                                        # [CHRONOS-REF] short context -> LEFT-pad to context_length with NaN (dummy_value=np.nan)
+                    pad = context_length - ctx_src.shape[0]  # number of padding positions on the left
+                    ctx_raw = np.concatenate([np.full(pad, np.nan, np.float32), ctx_src])  # NaN padding: excluded by nanmean, masked in attention
 
-                    ctx_obs = ~np.isnan(ctx_raw)     # True where a context value is observed (padding/missing = False)
-                    tgt_obs = ~np.isnan(tgt_raw)     # True where a target value is observed
-                    if not ctx_obs.any():            # [CHRONOS-REF] FilterTransformation: >= 1 observed past point required
-                        continue                     # nothing to condition on -> skip
-                    if not tgt_obs.any():            # our guard: a fully-missing target contributes zero loss — skip the wasted sample
-                        continue
+                ctx_obs = ~np.isnan(ctx_raw)     # True where a context value is observed (padding/missing = False)
+                tgt_obs = ~np.isnan(tgt_raw)     # True where a target value is observed
+                if not ctx_obs.any():            # [CHRONOS-REF] FilterTransformation: >= 1 observed past point required
+                    continue                     # nothing to condition on -> skip
+                if not tgt_obs.any():            # our guard: a fully-missing target contributes zero loss — skip the wasted sample
+                    continue
 
-                    yield {                   # one training example, keyed for the Bolt forward()
-                        "context": torch.from_numpy(ctx_raw),        # [CHRONOS-REF] raw context, NaN = unobserved (Bolt's native encoding)
-                        "mask": torch.from_numpy(ctx_obs),           # [CHRONOS-REF] observation mask for the context (Bolt forward arg)
-                        "target": torch.from_numpy(tgt_raw),         # [CHRONOS-REF] raw target, NaN = unobserved (loss masks them)
-                        "target_mask": torch.from_numpy(tgt_obs),    # [CHRONOS-REF] observation mask for the target (Bolt forward arg)
-                    }
+                yield {                       # one training example, keyed for the Bolt forward()
+                    "context": torch.from_numpy(ctx_raw),        # [CHRONOS-REF] raw context, NaN = unobserved (Bolt's native encoding)
+                    "mask": torch.from_numpy(ctx_obs),           # [CHRONOS-REF] observation mask for the context (Bolt forward arg)
+                    "target": torch.from_numpy(tgt_raw),         # [CHRONOS-REF] raw target, NaN = unobserved (loss masks them)
+                    "target_mask": torch.from_numpy(tgt_obs),    # [CHRONOS-REF] observation mask for the target (Bolt forward arg)
+                }
 
     return ChronosStreamingWindowDataset()   # instance the DataLoader will wrap
 
@@ -254,8 +284,19 @@ def train_one(P: int, S: int, seed: int, out_dir: Path) -> RunResult:
     from tqdm.auto import tqdm                  # live progress bar over training steps
 
     if out_dir.joinpath("DONE").exists():      # resumability: this model is already fully trained
-        print(f"[skip] {out_dir.name} already DONE")
         prev = json.loads(out_dir.joinpath("run_config.json").read_text())  # reload its recorded result
+        prov_prev = prev.get("provenance", {})  # data regime this DONE run was actually trained under
+        if (prov_prev.get("dataset_tsmixup") != DATASET_CONFIG_TSMIXUP  # guard: a DONE marker is only a valid
+                or prov_prev.get("dataset_kernelsynth") != DATASET_CONFIG_KERNELSYNTH  # skip if it was produced
+                or prov_prev.get("tsmixup_ratio") != TSMIXUP_RATIO):    # under the SAME data regime as now...
+            raise RuntimeError(                # ...otherwise skipping it would silently mix data regimes across the sweep
+                f"{out_dir.name} has a DONE marker from a DIFFERENT data regime "
+                f"(recorded tsmixup={prov_prev.get('dataset_tsmixup') or prov_prev.get('dataset_config')}, "
+                f"kernelsynth={prov_prev.get('dataset_kernelsynth')}, ratio={prov_prev.get('tsmixup_ratio')}); "
+                f"current config is {DATASET_CONFIG_TSMIXUP} + {DATASET_CONFIG_KERNELSYNTH} at {TSMIXUP_RATIO}:1. "
+                f"Move or delete this directory to retrain it — do NOT leave the sweep half-old-half-new."
+            )
+        print(f"[skip] {out_dir.name} already DONE")
         return RunResult(**{k: prev["result"][k] for k in RunResult.__dataclass_fields__})  # reconstruct the record
 
     out_dir.mkdir(parents=True, exist_ok=True)  # create this model's dedicated folder
@@ -268,8 +309,9 @@ def train_one(P: int, S: int, seed: int, out_dir: Path) -> RunResult:
     model, chronos_config = build_model(P, S, device)  # from-scratch Bolt for this (P, S)
     n_params = sum(p.numel() for p in model.parameters())  # count parameters actually built
 
-    stream = build_stream(seed)                # open the shuffled corpus stream (seed-dependent order)
-    dataset = make_window_dataset(stream, CONTEXT_LENGTH + PREDICTION_LENGTH, CONTEXT_LENGTH, seed)  # window generator
+    tsmixup_stream, ks_stream = build_streams(seed)  # open both shuffled corpus streams (seed-dependent order)
+    dataset = make_window_dataset(tsmixup_stream, ks_stream,  # [CHRONOS-REF] interleaved at 9:1 ratio
+                                  CONTEXT_LENGTH + PREDICTION_LENGTH, CONTEXT_LENGTH, seed)
     loader = DataLoader(dataset, batch_size=BATCH_SIZE, num_workers=0)  # single-process loading (equivalent to official dataloader_num_workers=1 single stream)
 
     try:                                       # [CHRONOS-REF] optim: adamw_torch_fused (chronos-t5-tiny.yaml)
@@ -287,7 +329,9 @@ def train_one(P: int, S: int, seed: int, out_dir: Path) -> RunResult:
         "P": P, "S": S, "seed": seed,          # the experimental coordinates
         "overlap_ratio": round((P - S) / P, 4),  # derived geometry
         "approx_num_patches": _approx_num_patches(CONTEXT_LENGTH, P, S),  # derived token-sequence length (excl. [REG])
-        "base_model_id": BASE_MODEL_ID, "hf_repo": HF_REPO, "dataset_config": DATASET_CONFIG,  # [CHRONOS-REF] official sources used
+        "base_model_id": BASE_MODEL_ID, "hf_repo": HF_REPO,  # [CHRONOS-REF] official sources used
+        "dataset_tsmixup": DATASET_CONFIG_TSMIXUP, "dataset_kernelsynth": DATASET_CONFIG_KERNELSYNTH,
+        "tsmixup_ratio": TSMIXUP_RATIO,      # [CHRONOS-REF] official 9:1 interleaving ratio
         "context_length": CONTEXT_LENGTH, "prediction_length": PREDICTION_LENGTH,  # [CHRONOS-REF] Bolt defaults in effect
         "quantiles": QUANTILES, "batch_size": BATCH_SIZE,  # [CHRONOS-REF] Bolt quantiles / official batch size
         "max_steps": MAX_STEPS, "lr": LR, "weight_decay": WEIGHT_DECAY,  # budget (ours) + official LR/WD

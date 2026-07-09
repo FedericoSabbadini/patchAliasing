@@ -3,11 +3,19 @@
 ## Purpose and scope
 
 `train_sweep.py` does **training only** — no evaluation, no inference. It retrains
-Chronos-Bolt Tiny **from scratch** (random weights, *not* fine-tuning) on the official
-Chronos pre-training corpus, varying **only** the patch geometry `input_patch_size` (P)
-and `input_patch_stride` (S). It produces one checkpoint per `(P, S, seed)`, named so the
-downstream structural-aliasing pipeline (signal generation, probing, Bayesian analysis)
-can consume and compare them.
+Chronos-Bolt Tiny **from scratch** (random weights, *not* fine-tuning) on the **full
+official Chronos pre-training data**, varying **only** the patch geometry
+`input_patch_size` (P) and `input_patch_stride` (S). It produces one checkpoint per
+`(P, S, seed)`, named so the downstream structural-aliasing pipeline (signal generation,
+probing, Bayesian analysis) can consume and compare them.
+
+The training data reproduces the official diet:
+- **TSMixup** (`training_corpus_tsmixup_10m`, 10M series) — augmented from 28 real-world
+  open-source datasets (Monash, M-competitions, Kaggle; energy, transport, weather, finance,
+  etc.) via Dirichlet-weighted convex combinations.
+- **KernelSynth** (`training_corpus_kernel_synth_1m`, 1M series) — purely synthetic,
+  sampled from Gaussian Process priors with a composite kernel bank.
+- Interleaved at the **official 9:1 ratio** (9 TSMixup series per 1 KernelSynth).
 
 Everything except P/S is held fixed across runs, so any downstream difference is
 attributable to the patch geometry and not to some other setup variable — the necessary
@@ -15,8 +23,7 @@ condition for the quantitative comparison in the report.
 
 The retrained variants are compared **only against each other**, never against the stock
 pretrained checkpoint. That is why a small fixed step budget is acceptable (the
-under-training is identical across runs and cancels out) and why each `(P, S)` is repeated
-over several seeds — to separate a real P/S effect from seed noise.
+under-training is identical across runs and cancels out).
 
 ## How to run
 
@@ -26,7 +33,7 @@ No flags. Edit the config block at the top of the file, then:
 python train_sweep.py
 ```
 
-The default sweep is 6 configs × 3 seeds = 18 runs. It is **resumable**: any run that has
+The default sweep is 6 configs × 1 seed = 6 runs. It is **resumable**: any run that has
 already written a `DONE` marker is skipped, so you can relaunch after an interruption.
 For a quick end-to-end validation on a new machine, temporarily set `MAX_STEPS` low
 (e.g. 20) **and** `SHUFFLE_BUFFER_SIZE` low (e.g. 100 — at the official 100 000 the stream
@@ -102,11 +109,13 @@ embedding block's input dimension (`input_patch_size · 2`, patch values concate
 the observation mask), so a P=16 checkpoint's weights cannot be loaded into a P≠16 model.
 This is a real fact about the Bolt patch-embedding, not a modelling assumption.
 
-### One corpus: `training_corpus_tsmixup_10m`
-The official TSMixup pre-training corpus (10M series), loaded in **streaming** mode (no full
-download). KernelSynth (1M, auxiliary, ~10% in the Chronos paper) is not mixed in: a single
-corpus avoids two-stream mixing logic without losing representativeness for a "tiny"
-retraining.
+### Full official training data: TSMixup + KernelSynth
+Both official corpora are used, loaded in **streaming** mode (no full download):
+- `training_corpus_tsmixup_10m` (10M series) — TSMixup augmentations of 28 real-world
+  open-source datasets (the real datasets are already baked into this corpus).
+- `training_corpus_kernel_synth_1m` (1M series) — synthetic GP time series.
+Interleaved at the **official 9:1 ratio** (9 TSMixup series per 1 KernelSynth), matching
+the paper's training mixture (Ansari et al. 2024).
 
 ### Only P and S vary between runs
 `context_length`, `prediction_length`, `quantiles`, batch size, learning rate, schedule,
@@ -145,7 +154,7 @@ and the model-facing code follows the `chronos_bolt.py` source exactly:
 - **No `transformers.Trainer`** — a production wrapper; the manual loop reproduces the same
   optimisation mathematics (verified value-by-value above) without the dependency.
 - **`num_workers=0`** — equivalent single-stream loading (official used 1 worker).
-- **No `torch_compile`** — startup overhead across 18 short runs; no change to the math.
+- **No `torch_compile`** — startup overhead across 6 short runs; no change to the math.
 
 ### Project scaffolding written here (untagged in the source)
 - **Early abort on non-finite loss**: one bad run fails fast instead of burning hours; the
