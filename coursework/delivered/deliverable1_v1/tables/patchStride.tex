@@ -1,17 +1,16 @@
-\begin{table}[h]
+\begin{table}[ht]
     \centering
-    \begin{tabular}{|c|c|c|}
-        \hline
-        Training run & Patch & Stride \\
-        \hline
-        1 & 8 & 4 \\
-        2 & 8 & 8 \\
-        3 & 16 & 8 \\
-        4 & 16 & 12 \\
-        5 & 16 & 16 \\
-        6 & 24 & 16 \\
-        7 & 24 & 24 \\
-        \hline
+    \begin{tabular}{cccl}
+        \toprule
+        \textbf{Run ID} & \textbf{Patch Size ($P$)} & \textbf{Stride ($S$)} \\
+        \midrule
+        1 & 16 & 4\\
+        2 & 16 & 8\\
+        3 & 16 & 12\\
+        4 & 16 & 16\\
+        5 & 8  & 8\\
+        6 & 24 & 24\\
+        \bottomrule 
     \end{tabular}
     \caption{Patch and stride parameters used for model training.}
     \label{tab:patchStride}

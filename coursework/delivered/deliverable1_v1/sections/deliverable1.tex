@@ -1,4 +1,4 @@
-This investigation formalizes the phenomenon of \textit{structural aliasing} within patch-based time-series foundation models, focusing specifically on Amazon's Chronos-Bolt framework. \cite{ansariChronosLearningLanguage2024, FastAccurateZeroshot2024a} The project focuses on smart-grid load balancing. 
+This investigation formalizes the phenomenon of \textit{structural aliasing} within patch-based time-series foundation models, focusing specifically on Amazon's Chronos-Bolt framework.\cite{ansariChronosLearningLanguage2024, FastAccurateZeroshot2024a} The project focuses on smart-grid load balancing. 
 
 \section{Domain Description}
 To ground this abstract architectural evaluation, the study utilizes a specific physical domain as an empirical reference layer. This reference setting models the solar energy produced by a photovoltaic array attached to an internal load, a local storage battery, and the national electricity grid. The explicit operational objective within this system is to evaluate production variations over short-term future horizons so that the system can dynamically modify the internal load, attach and detach the battery unit, with the aim of maintaining internal grid stability and enabling precise anomaly detection. 
@@ -10,23 +10,16 @@ This analysis is directly intended for researchers, engineers and practitioners 
 \section{Purpose and Scope}
 This project formalizes and empirically validates the phenomenon of \textit{structural aliasing} in patch-based time-series foundation models, using Amazon Chronos-Bolt-Tiny as the target architecture.
 
-Chronos-Bolt-Tiny operates with a fixed patch size of $P=16$, stride of $S=16$ and context window of $T=512$ tokens as default settings; its architecture comprises four encoder blocks followed by four decoder blocks terminating in a direct quantile projection head. \cite{ChronosBoltPipelineAmazonscienceChronosforecastinga}
+Chronos-Bolt-Tiny operates with a fixed patch size of $P=16$, stride of $S=16$ and context window of $T=512$ tokens as default settings; its architecture comprises four encoder blocks followed by four decoder blocks terminating in a direct quantile projection head.\cite{ChronosBoltPipelineAmazonscienceChronosforecastinga}
 
 This study aims to provide a comprehensive understanding of the relationships between raw signal characteristics and the latent representations learned by the model, systematically identifying the critical links between sampling frequency ($f_s$), patch size ($P$), and stride ($S$) in order to propose actionable solutions to mitigate the phenomenon.
 
 The core objective is to challenge the baseline assumption that pre-trained temporal foundation models inherently preserve frequency attributes when processing Nyquist-compliant signals.
 
-\section{Signal Generation and Dataset}
-The project utilizes a combination of synthetic and real-world datasets to evaluate the presence and impact of structural aliasing. 
-
-At first, the investigation employs synthetic signals to establish a controlled environment for testing the model's response to known frequency components. To do so elementary sinusoidal signals are generated with varying frequencies, amplitudes, and phases to systematically probe the model's ability to capture and represent these characteristics. A second set of synthetic data is generated using a light implementation of TSMixup \cite{ansariChronosLearningLanguage2024}, which creates mixed-frequency sinusoidal signals to simulate various signal conditions.
-
-If previous analyses show evidence of aliasing, the project may analyze signals produced with KernelSynth \cite{ansariChronosLearningLanguage2024} to test whether the phenomenon persists in more complex signals. The project will then focus on the analysis of real-world data, through the use of the \texttt{Dataset-SolarTechLab.csv} dataset, which contains one-minute multivariate telemetry stream of a photovoltaic array. \cite{levaPhotovoltaicPowerWeather2020}
-
 \section{Mathematical Formulation}
-The project provides a formal domain description through OWL2 ontology representation of: the physical system (photovoltaic array, battery storage, national grid, internal load), the signal (frequency, amplitude, timespan, phase) and its patched representation (patch size, stride, sampling frequency). See \autoref{sec:appendixA} for a possible ontology representation of the domain.
+The project provides a formal domain description through OWL2 ontology representation of: the physical system (photovoltaic array, battery storage, national grid, internal load), the signal (frequency, amplitude, timespan, phase) and its patched representation (patch size, stride, sampling frequency). See \autoref{sec:appendixA} for a formal description of the ontology.
 
-The investigation focuses on the formal definition of the phenomenon of structural aliasing, starting from the tokenization operator and describing phase-locking conditions. The project then formalizes the relationship between the signal frequency, patch size, stride, and sampling frequency, providing a mathematical framework to analyze the conditions under which structural aliasing occurs.
+The investigation focuses on the formal definition of the phenomenon of structural aliasing, starting from the tokenization operator and describing phase-locking conditions. The project then formalizes the relationship between the signal frequency, patch size, stride, and sampling frequency, providing a mathematical framework to analyze the conditions under which structural aliasing occurs. 
 
 Let $\mathbf{x} = \{x[n]\}_{n \in \mathbb{Z}}$ be a discrete-time signal representing the input time series. We define the patch-based tokenization operator $\mathcal{T}_{P,S}$ with patch length $P \in \mathbb{N}^{+}$ and stride $S \in \mathbb{N}^{+}$ as a mapping that transforms the signal $\mathbf{x}$ into a sequence of vector-valued tokens $\mathbf{T}=\{\mathbf{t}_k\}_{k\in\mathbb{Z}}$, where each token $\mathbf{t}_k\in\mathbb{R}^{P}$. The $k$-th token is defined as
 
@@ -128,21 +121,62 @@ f<\frac{f_s}{2}
 \right\}.
 \end{equation}
 
-Then, after defining a set of falsifiable hypotheses, including:
-\begin{itemize}
-    \item the existence of frequency-dependent blind spots at harmonics of a patch-induced frequency;
-    \item the dependence of the effect on temporal alignment;
-    \item the impact of patch size, stride, and overlap.
-\end{itemize}
+--- DA SISTEMARE ---
+
+Ipotesi H1, H2, H3
+
+--- DA SISTEMARE ---
+
+\section{Signal Generation and Dataset}
+The project utilizes a combination of synthetic and real-world datasets to evaluate the presence and impact of structural aliasing. 
+
+The investigation employs synthetic signals to establish a controlled environment for testing the model's response to known frequency components. To do so elementary sinusoidal signals are generated with varying frequencies, amplitudes, and phases to systematically probe the model's ability to capture and represent these characteristics. A second set of synthetic data is generated using a light implementation of TSMixup\cite{ansariChronosLearningLanguage2024}, which creates mixed-frequency sinusoidal signals to simulate various signal conditions.
+
+If previous analyses show evidence of aliasing, the project may analyze signals produced with KernelSynth\cite{ansariChronosLearningLanguage2024} to test whether the phenomenon persists in more complex signals. The project will then focus on the analysis of real-world data, through the use of the \texttt{Dataset-SolarTechLab.csv} dataset, which contains one-minute multivariate telemetry stream of a photovoltaic array.\cite{levaPhotovoltaicPowerWeather2020}
 
 \section{Methodology}
-The project will focus on the analysis of the phenomenon, through MDL probing \cite{voitaInformationTheoreticProbingMinimum2020} after each decoder block to verify the presence, or absence, of frequency information in the hidden states. The analysis will be performed through the use of Bayesian statistics. 
+At first the Chronos Bolt-tiny model available on the HuggingFace Hub is used to evaluate the presence of structural aliasing in the default configuration, with patch size $P=16$ and stride $S=16$. To evaluate the presence and impact of structural aliasing, the project will analyze a set of synthetic signals with varying frequency characteristics. At first the Chronos Bolt-tiny model is tested over simple sine waves with known frequency sistematically varieted between 2 Hz and 256 Hz with 1 Hz increments, those tests are used to evaluate the presence of strcuctural aliasing.
+
+Stride and patch size are then systematically varied according to the value reported in \autoref{tab:patchStride} to explore the explicit impact of patch geometry on aliasing effects. Since variations in the values of stride and patch size require a new training of the model we have selected a restricted set of parameters for which the model is re-trained.
+
+\input{tables/patchStride.tex}
+
+To obtain a comprehensive understanding of the impact of stride and patch size on the presence of structural aliasing, we have selected a set of reduced stride and patch size values, and a set of increased stride and patch size values, to evaluate the possibility of mitigating the phenomenon. We have decided to re-train the model also for the default values of patch and stride, with the aim of having a baseline for comparison with the other configurations. Further possible training of the model with patch size fixed to 16 and stride 1 and/or 15 to evaluate the impact of small, and the most extreme, variation of the stride  on the presence of structural aliasing and performance of the model.
+
+We also considered the case of fixed patch size to default value 16 and variable stride to evaluate the impact of stride on the presence of structural aliasing.
+
+The training procedure is based over the information provided by the official documentation about Chronos using 10M data produced with TSMixup and 1M data produced by KernelSynth.\cite{ansariChronosLearningLanguage2024a}. 
+
+--- DA SISTEMARE ---
+
+Possible description of the number of epochs and other parameters of the training procedure.
+
+--- DA SISTEMARE ---
+
+\section{Models Evaluation}
+After model re-training a second set of synthetic signals is used to evaluate the presence of structural aliasing in the new models. This second set of synthetic signals includes:
+\begin{itemize}
+    \item \textbf{Sine Wave Signals:} simple sine waves with known frequency sistematically varieted between 2 Hz and 256 Hz with 1 Hz increments, to assess the model's ability to capture and represent periodic components across a range of frequencies.
+    \item \textbf{Time Series Mixup Signals:} 100 signals generated by the light version of TSMixup procedure, mixing multiple sine waves of different frequencies; to evaluate the model's capacity to disentangle and represent complex frequency interactions.
+\end{itemize}
+
+This set of 355 test signals is used for all the re-trained models, to evaluate the impact of stride and patch size on the model's ability to capture and represent frequency information.
+
+Optionally, if previous analyses show evidence of aliasing, the project may analyze test signals from a third set, including 100 signals generated using the KernelSynth tool. Also this set of test signals is used for all the re-trained models, to evaluate the impact of stride and patch size on the model's ability to capture and represent frequency information in more complex signals.
+
+During the analysis a SEED is set to ensure reproducibility of the results.
+
+--- DA SISTEMARE ---
+
+The project will focus on the analysis of the phenomenon, through MDL probing \cite{voitaInformationTheoreticProbingMinimum2020} after each decoder block to verify the presence, or absence, of frequency information in the hidden states.
 
 Layer-resolved probing is executed sequentially across the intermediate hidden states of the encoder and decoder blocks, plus at the final output probability distribution level. By mapping representations across these specific layers, the project isolates where task-relevant signal attributes are preserved or compromised under architectural synchronization constraints.
 
-Stride and patch size are systematically varied according to the value reported in \autoref{sec:appendixB} to explore the explicit impact of patch geometry on aliasing effects. Stride and patch size changes requires model retraining, which is performed using the pipeline and the dataset described in \autoref{sec:appendixC}
+Bayesian analysis.
 
+--- DA SISTEMARE ---
 
+\section{Security Implication and Risk Assessment}
 Finally, the project will include a formal risk assessment grounded in the NIST AI Risk Management Framework (AI RMF) \cite{tabassiArtificialIntelligenceRisk2023} to evaluate structural aliasing as a systematic vulnerability within cyber-physical energy systems. This analysis will outline plausible threat models and attack surfaces, possible mitigation strategies (including stride reduction), and an evaluation of whether the proposed mitigation strategies effectively reduce residual exposure for the automated control AI agent. 
 
 The risk assessment will be structured around the following key points: context and attack surface, threat modeling, impact, mitigation and residual exposure.
