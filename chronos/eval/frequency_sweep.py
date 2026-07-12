@@ -13,8 +13,8 @@ which is a *frequency-response* phenomenon. This script instead:
   3. Measures AMPLITUDE RECOVERY and PHASE ERROR by least-squares-fitting a sinusoid
      at the known frequency to each model's median forecast — robust for short,
      non-integer-period horizons where a raw FFT is too coarse.
-  4. Frames the result as LOCAL-vs-LOCAL (the controlled comparison); the official
-     model is drawn only as a thin grey reference ceiling.
+  4. The official amazon/chronos-bolt-tiny (P=16, S=16, 200k steps, full corpus) serves
+     as the p16-s16 data point — the strongest possible S=16 anchor for the stride axis.
   5. Overlays the THEORETICAL aliasing nulls at f = k * fs / P (integer cpp) on the
      curves, so the plot either confirms patch aliasing or rules it out.
   6. Saves a tidy metrics.csv (one row per model x frequency) plus the figures.
@@ -58,9 +58,10 @@ from tones import make_tone, cpp as cpp_of, cpp_to_freq
 #  CONFIG — the only things to edit                                            #
 # ============================================================================ #
 REPO = "federicosabbadini/chronos-bolt-patch-sweep"   # where the retrained variants live
-OFFICIAL_MODEL = "amazon/chronos-bolt-tiny"           # reference ceiling (200k-step official)
+OFFICIAL_MODEL = "amazon/chronos-bolt-tiny"           # the official model IS p16-s16 (200k, full data)
+OFFICIAL_LABEL = "p16-s16 (official)"                 # treated as the P=16 S=16 data point, not a separate ceiling
 MODEL_NAMES = [                                        # the P/S variants (local-vs-local comparison)
-    "p16-s16-seed42", "p16-s12-seed42", "p16-s8-seed42",
+    "p16-s12-seed42", "p16-s8-seed42",
     "p16-s4-seed42", "p8-s8-seed42", "p24-s24-seed42",
 ]
 
@@ -190,13 +191,14 @@ def null_freqs(P: int, fmax: float) -> list[float]:
 # ============================================================================ #
 #  Plots                                                                        #
 # ============================================================================ #
-def plot_recovery(all_rows: dict[str, list[dict]], official_label: str):
-    """Primary figure: amplitude recovery vs frequency, local-vs-local + official reference."""
+def plot_recovery(all_rows: dict[str, list[dict]]):
+    """Primary figure: amplitude recovery vs frequency — all models as equal participants."""
     fig, ax = plt.subplots(figsize=(13, 6))
     fmax = float(FREQS.max())
 
     # theoretical nulls for each patch size present (grey verticals, one style per P)
-    for P, ls in zip(sorted({parse_ps(n)[0] for n in MODEL_NAMES}), [":", "--", "-."]):
+    all_labels = list(all_rows.keys())
+    for P, ls in zip(sorted({parse_ps(n)[0] for n in all_labels}), [":", "--", "-."]):
         for j, f0 in enumerate(null_freqs(P, fmax)):
             ax.axvline(f0, color="grey", ls=ls, alpha=0.5, lw=1,
                        label=f"P={P} nulls (k*fs/P)" if j == 0 else None)
@@ -205,13 +207,10 @@ def plot_recovery(all_rows: dict[str, list[dict]], official_label: str):
         f = [r["freq"] for r in rows]
         rec = np.array([r["recovery_mean"] for r in rows])
         std = np.array([r["recovery_std"] for r in rows])
-        if label == official_label:
-            ax.plot(f, rec, color="0.35", lw=2.5, label="Official (reference ceiling)", zorder=5)
-        else:
-            line, = ax.plot(f, rec, lw=2, marker="o", ms=3, label=label)
-            ax.fill_between(f, rec - std, rec + std, color=line.get_color(), alpha=0.15)
+        line, = ax.plot(f, rec, lw=2, marker="o", ms=3, label=label)
+        ax.fill_between(f, rec - std, rec + std, color=line.get_color(), alpha=0.15)
 
-    ax.axhline(1.0, color="green", lw=1, ls="--", alpha=0.6)  # perfect recovery
+    ax.axhline(1.0, color="green", lw=1, ls="--", alpha=0.6)
     ax.set_xlabel("signal frequency [Hz]"); ax.set_ylabel("amplitude recovery (pred / ground truth)")
     ax.set_title("Patch-aliasing frequency response\n(recovery dips at f = k*fs/P confirm patch aliasing)")
     ax.set_ylim(-0.05, 1.35); ax.grid(True, alpha=0.3)
@@ -220,7 +219,7 @@ def plot_recovery(all_rows: dict[str, list[dict]], official_label: str):
     plt.close(fig)
 
 
-def plot_recovery_cpp(all_rows: dict[str, list[dict]], official_label: str):
+def plot_recovery_cpp(all_rows: dict[str, list[dict]]):
     """Aliasing-native figure: recovery vs cycles-per-patch (cpp = freq*P/fs).
 
     Because each model's x-axis is its own cpp, the theoretical nulls of EVERY model —
@@ -229,16 +228,13 @@ def plot_recovery_cpp(all_rows: dict[str, list[dict]], official_label: str):
     """
     fig, ax = plt.subplots(figsize=(13, 6))
     cpp_max = max(r["cpp"] for rows in all_rows.values() for r in rows)
-    for k in range(1, int(cpp_max) + 1):          # integer cpp = predicted nulls (all P)
+    for k in range(1, int(cpp_max) + 1):
         ax.axvline(k, color="grey", ls="--", alpha=0.5, lw=1,
                    label="integer cpp (predicted nulls)" if k == 1 else None)
     for label, rows in all_rows.items():
         c = [r["cpp"] for r in rows]
         rec = [r["recovery_mean"] for r in rows]
-        if label == official_label:
-            ax.plot(c, rec, color="0.35", lw=2.5, label="Official (reference ceiling)", zorder=5)
-        else:
-            ax.plot(c, rec, lw=2, marker="o", ms=3, label=f"{label} (P={parse_ps(label)[0]})")
+        ax.plot(c, rec, lw=2, marker="o", ms=3, label=f"{label} (P={parse_ps(label)[0]})")
     ax.axhline(1.0, color="green", lw=1, ls="--", alpha=0.6)
     ax.set_xlabel("cycles per patch  cpp = freq * P / fs"); ax.set_ylabel("amplitude recovery")
     ax.set_title("Patch aliasing in the native coordinate\n(every P's nulls collapse onto integer cpp)")
@@ -249,10 +245,12 @@ def plot_recovery_cpp(all_rows: dict[str, list[dict]], official_label: str):
 
 
 def plot_stride_group(all_rows: dict[str, list[dict]]):
-    """Focus figure: the P=16 stride axis (S=16->4) — does overlap fill the null?"""
-    p16 = [n for n in MODEL_NAMES if parse_ps(n)[0] == 16]
+    """Focus figure: the P=16 stride axis (S=16->4) — does overlap fill the null?
+    The official model serves as the S=16 anchor (best-trained P=16 S=16 available)."""
+    p16 = [n for n in all_rows if parse_ps(n)[0] == 16]
     if not p16:
         return
+    p16.sort(key=lambda n: parse_ps(n)[1], reverse=True)  # S=16 first
     fig, ax = plt.subplots(figsize=(12, 6))
     for f0 in null_freqs(16, float(FREQS.max())):
         ax.axvline(f0, color="grey", ls="--", alpha=0.5, lw=1)
@@ -262,22 +260,19 @@ def plot_stride_group(all_rows: dict[str, list[dict]]):
                 lw=2, marker="o", ms=3, label=f"{label} (S={parse_ps(label)[1]})")
     ax.axhline(1.0, color="green", lw=1, ls="--", alpha=0.6)
     ax.set_xlabel("signal frequency [Hz]"); ax.set_ylabel("amplitude recovery")
-    ax.set_title("Stride / overlap axis (P=16): smaller stride S should fill the aliasing null")
+    ax.set_title("Stride / overlap axis (P=16): does reducing stride S fill the aliasing null?")
     ax.set_ylim(-0.05, 1.35); ax.grid(True, alpha=0.3); ax.legend(fontsize=9)
     fig.tight_layout(); fig.savefig(OUTPUT_DIR / "recovery_stride_axis.png", dpi=200, bbox_inches="tight")
     plt.close(fig)
 
 
-def plot_phase(all_rows: dict[str, list[dict]], official_label: str):
+def plot_phase(all_rows: dict[str, list[dict]]):
     """Phase error vs frequency."""
     fig, ax = plt.subplots(figsize=(13, 6))
     for label, rows in all_rows.items():
         f = [r["freq"] for r in rows]
         pe = np.degrees([r["phase_err_mean"] for r in rows])
-        if label == official_label:
-            ax.plot(f, pe, color="0.35", lw=2.5, label="Official (reference)")
-        else:
-            ax.plot(f, pe, lw=2, marker="o", ms=3, label=label)
+        ax.plot(f, pe, lw=2, marker="o", ms=3, label=label)
     ax.set_xlabel("signal frequency [Hz]"); ax.set_ylabel("|phase error| [degrees]")
     ax.set_title("Phase error vs frequency"); ax.grid(True, alpha=0.3)
     ax.legend(bbox_to_anchor=(1.02, 1), loc="upper left", fontsize=8)
@@ -297,9 +292,10 @@ def main():
 
     all_rows: dict[str, list[dict]] = {}
 
-    print(f"\nLoading official reference: {OFFICIAL_MODEL}")
+    # Official amazon/chronos-bolt-tiny IS the P=16 S=16 data point (200k, full corpus)
+    print(f"\nLoading {OFFICIAL_LABEL}: {OFFICIAL_MODEL}")
     official = ChronosBoltPipeline.from_pretrained(OFFICIAL_MODEL, device_map=DEVICE)
-    all_rows["official"] = evaluate_model(official, "official")
+    all_rows[OFFICIAL_LABEL] = evaluate_model(official, OFFICIAL_LABEL)
 
     for name in MODEL_NAMES:
         print(f"\nLoading {name}")
@@ -316,10 +312,10 @@ def main():
             w.writerows(rows)
     print(f"\nSaved {csv_path}")
 
-    plot_recovery(all_rows, "official")
-    plot_recovery_cpp(all_rows, "official")
+    plot_recovery(all_rows)
+    plot_recovery_cpp(all_rows)
     plot_stride_group(all_rows)
-    plot_phase(all_rows, "official")
+    plot_phase(all_rows)
     print(f"Saved figures to {OUTPUT_DIR}")
 
     # console summary: mean recovery + measured null depth per model
@@ -330,10 +326,9 @@ def main():
         nulls = null_freqs(P, float(FREQS.max()))
         note = ""
         if nulls:
-            # recovery at the frequency nearest the first theoretical null
             i = int(np.argmin(np.abs(FREQS - nulls[0])))
             note = f" | recovery@first-null({nulls[0]:.0f}Hz)={rec[i]:.3f}"
-        print(f"  {label:18s} mean_recovery={rec.mean():.3f}{note}")
+        print(f"  {label:24s} mean_recovery={rec.mean():.3f}{note}")
 
 
 if __name__ == "__main__":
