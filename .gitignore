@@ -232,3 +232,8 @@ __marimo__/
 
 # zip for Prism
 report/main.zip
+
+# Model weights (on HuggingFace, not in git)
+chronos/outputs/models/
+# Local training data subset
+chronos/data/corpus/
