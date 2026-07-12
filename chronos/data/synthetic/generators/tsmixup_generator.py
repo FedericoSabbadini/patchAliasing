@@ -20,10 +20,14 @@ Amplitudes are absolute (no background normalisation) so that:
 N.B. TSMixup background generation is sampling-rate agnostic; injection is fs-dependent.
 """
 from __future__ import annotations
+import sys as _sys
 from pathlib import Path
 from typing import List, Optional
 import numpy as np
 import matplotlib.pyplot as plt
+
+_sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # make synthetic/ importable
+from tones import tone_on_grid, cpp as _cpp   # canonical injection convention + cpp (single source of truth)
 
 
 class TSMixupGenerator:
@@ -90,12 +94,12 @@ class TSMixupGenerator:
             return signal
         out = signal.copy()
         for c in self.inject:
-            out += c["amplitude"] * np.sin(2 * np.pi * c["freq_hz"] * t + c["phase"])
+            out += tone_on_grid(t, c["freq_hz"], c["amplitude"], c["phase"])  # canonical tone (tones.py)
         return out
 
     def cpp_of(self, freq_hz: float) -> float:
         """Cycles per patch for a given frequency in Hz (derived, read-only)."""
-        return freq_hz * self.P / self.fs
+        return _cpp(freq_hz, self.P, self.fs)
 
     # ------------------------------------------------------------------ #
     #  Dataset construction                                                #
