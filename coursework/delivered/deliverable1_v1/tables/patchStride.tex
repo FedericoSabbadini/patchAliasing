@@ -1,17 +1,18 @@
-\begin{table}[ht]
+\begin{table}[H]
     \centering
-    \begin{tabular}{cccl}
+    \small
+    \begin{tabular}{ccccccc}
         \toprule
-        \textbf{Run ID} & \textbf{Patch Size ($P$)} & \textbf{Stride ($S$)} \\
+        \textbf{Run} & \textbf{Patch ($P$)} & \textbf{Stride ($S$)} & \textbf{overlap} & \textbf{\#patch @2048} & \textbf{steps} & \textbf{time} \\
         \midrule
-        1 & 16 & 4\\
-        2 & 16 & 8\\
-        3 & 16 & 12\\
-        4 & 16 & 16\\
-        5 & 8  & 8\\
-        6 & 24 & 24\\
-        \bottomrule 
+        1 & 16 & 4  & 0.75 & 509 & 100k & 4.1\,h \\
+        2 & 16 & 8  & 0.50 & 255 & 100k & 2.6\,h \\
+        3 & 16 & 12 & 0.25 & 170 & 100k & 2.8\,h \\
+        4 & 16 & 16 & 0.00 & 128 & 200k$^\dagger$ & --- \\
+        5 & 8  & 8  & 0.00 & 256 & 100k & 2.7\,h \\
+        6 & 24 & 24 & 0.00 & 86  & 100k & 2.8\,h \\
+        \bottomrule
     \end{tabular}
-    \caption{Patch and stride parameters used for model training.}
+    \caption{Patch/stride configurations retrained from scratch (seed 42); \emph{time} is the wall-clock on the RTX 5060 Laptop GPU. $^\dagger$The $P{=}16,\,S{=}16$ point is the official Amazon checkpoint (200k steps), used as baseline and not retrained.}
     \label{tab:patchStride}
 \end{table}
