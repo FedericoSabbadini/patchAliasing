@@ -121,11 +121,24 @@ f<\frac{f_s}{2}
 \right\}.
 \end{equation}
 
---- DA SISTEMARE ---
+The derivation above shows that a stride translation of length $S$ leaves a single stride-locked sinusoid unchanged, $x_f[n+S]=x_f[n]$ for $f\in\mathcal F_{lock}$: this repetition of consecutive patches of one signal is not an evidence that two distinct signals become indistinguishable to the model. 
 
-Ipotesi H1, H2, H3
+Structural aliasing is treated as an emergent, falsifiable property of the trained representations: two frequency-matched but distinct signals $x,y$ structurally alias at layer $l$ if:
 
---- DA SISTEMARE ---
+\begin{equation}
+    \lVert R_l(x)-R_l(y)\rVert_2\le\varepsilon
+\end{equation} 
+
+Where $R_l$ is the representation at layer $l$, $\lVert\cdot\rVert_2$ is the Euclidean norm, and $\varepsilon$ is a pre-registered threshold. This reframes $\mathcal F_{lock}$ as the candidate class where such collisions are hypothesised to occur. In particular, the project will test the following hypotheses.
+
+\textbf{H1:} if $f\in\mathcal F_{lock}$, the model is
+expected to recover less information about the signal than at nearby non-locked frequencies $f\pm\delta$, measured as higher MDL description length and lower forecast amplitude recovery. No such loss, or a loss that is not localized near $f$, will refute
+H1.
+
+\textbf{H2:} when $S$ is changed while $P$ is fixed, the locations of any local degradation will move proportionally to $1/S$. An effect that remains tied to $P$ rather than $S$ will refute the proposed stride-lock
+mechanism.
+
+\textbf{H3:} a layer-wise increase in the MDL required to decode tone presence or frequency at stride-locked conditions will predict a paired deterioration in forecast amplitude recovery and WQL. If forecast degradation occurs without representational loss, or vice versa, the claim of an internal representation bottleneck will not be supported.
 
 \section{Signal Generation and Dataset}
 The project utilizes a combination of synthetic and real-world datasets to evaluate the presence and impact of structural aliasing. 
