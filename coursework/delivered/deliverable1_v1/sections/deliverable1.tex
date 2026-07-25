@@ -131,9 +131,7 @@ Structural aliasing is treated as an emergent, falsifiable property of the train
 
 Where $R_l$ is the representation at layer $l$, $\lVert\cdot\rVert_2$ is the Euclidean norm, and $\varepsilon$ is a pre-registered threshold. This reframes $\mathcal F_{lock}$ as the candidate class where such collisions are hypothesised to occur. In particular, the project will test the following hypotheses.
 
-\textbf{H1:} if $f\in\mathcal F_{lock}$, the model is
-expected to recover less information about the signal than at nearby non-locked frequencies $f\pm\delta$, measured as higher MDL description length and lower forecast amplitude recovery. No such loss, or a loss that is not localized near $f$, will refute
-H1.
+\textbf{H1:} if $f\in[f_k-\varepsilon,f_k+\varepsilon]$, where $f_k\in\mathcal F_{lock}$, the model recovers less information, we expect: higher MDL codelength and lower forecast amplitude recovery than at fixed controls $f_k\pm\delta$, $\delta\gg\varepsilon$. Absent or non-localized loss refutes H1.
 
 \textbf{H2:} when $S$ is changed while $P$ is fixed, the locations of any local degradation will move proportionally to $1/S$. An effect that remains tied to $P$ rather than $S$ will refute the proposed stride-lock
 mechanism.
@@ -150,22 +148,23 @@ If previous analyses show evidence of aliasing, the project may analyze signals 
 \section{Methodology}
 At first the Chronos Bolt-tiny model available on the HuggingFace Hub is used to evaluate the presence of structural aliasing in the default configuration, with patch size $P=16$ and stride $S=16$. To evaluate the presence and impact of structural aliasing, the project will analyze a set of synthetic signals with varying frequency characteristics. Then the Chronos Bolt-tiny model is tested over simple sine waves with known frequency sistematically varieted between 2 Hz and 256 Hz with 1 Hz increments, those tests are used to evaluate the presence of strcuctural aliasing.
 
-Since any change to $P$ or $S$ requires retraining, we retrain a restricted grid around the default $P{=}16,\,S{=}16$ baseline (\autoref{tab:patchStride}): three reduced strides at fixed $P{=}16$ ($S{=}12,8,4$) isolate the effect of patch overlap, while two contiguous patch sizes ($P{=}8,24$) isolate that of patch width. The extreme strides $S{=}1$ and $S{=}15$ at $P{=}16$ remain as possible extensions, probing the largest and smallest overlap.
+Since any change to $P$ or $S$ requires retraining, we retrain a restricted grid around the default $P=16,\,S=16$ baseline (see \autoref{tab:patchStride}): three reduced strides at fixed $P=16$ ($S=12,8,4$) isolate the effect of patch overlap, while two contiguous patch sizes ($P=8,24$) isolate that of patch width. The extreme strides $S=1$ and $S=15$ at $P=16$ remain as possible extensions, probing the largest and smallest overlap.
 
 \input{tables/patchStride.tex}
 
-Each $(P,S)$ configuration is retrained \emph{from scratch}: changing $P$ resizes the first patch-embedding block, so weights are not transferable. Loading only the \texttt{chronos-bolt-tiny} architecture, the loop reproduces the official recipe (fused AdamW, linear LR $10^{-3}$, \texttt{fp32+TF32}, masked quantile loss) on the two official corpora --- TSMixup (10M) and KernelSynth (1M) --- streamed at the 9:1 ratio.\cite{ansariChronosLearningLanguage2024a} Every hyperparameter stays at its official value (\autoref{tab:trainParams}); only $(P,S)$ varies, and a uniform $100$k-step budget (vs.\ $200$k) is used since the variants are compared only against each other. Training ran on one Alienware 16 Aurora (NVIDIA RTX 5060 Laptop GPU, 8\,GB VRAM; 32\,GB RAM), ${\approx}15$\,h in total ($2.6$--$4.1$\,h per model). 
-If necessary, the project may extend the training budget to the full parameters.
+Each $(P,S)$ configuration is retrained from scratch: changing $P$ resizes the first patch-embedding block, so weights are not transferable. Loading only the \texttt{chronos-bolt-tiny} architecture, the loop reproduces the official recipe (fused AdamW, linear LR $10^{-3}$, \texttt{fp32+TF32}, masked quantile loss) on the two official corpora: TSMixup (10M) and KernelSynth (1M) streamed at the 9:1 ratio.\cite{ansariChronosLearningLanguage2024a} Every hyperparameter stays at its official value (see \autoref{tab:trainParams}); only $(P,S)$ varies, and a uniform $100$k-step budget (vs. $200$k) is used since the variants are compared only against each other. 
+
+Training ran on one Alienware 16 Aurora (NVIDIA RTX 5060 Laptop GPU, 8\,GB VRAM; 32\,GB RAM), ${\approx}15$,h in total ($2.6$--$4.1$,h per model). If necessary, the project may extend the training budget to the full parameters.
 
 \input{tables/trainParams.tex}
 
 \begin{figure}[t]
     \centering
     \includegraphics[width=\linewidth]{figures/multi_frequency_panel.png}
-    \caption{Forecast quality of the retrained models. Per frequency (rows), each $64$-step forecast (dashed) vs.\ ground truth (green); titles give cycles-per-patch at $P{=}16$ (\emph{cpp}). The real model performances are better than the retrained, due to the larger training budget and more extensive corpora.}
+    \caption{Forecast quality of the retrained models. Per frequency (rows), each $64$-step forecast (dashed) vs.\ ground truth (green); titles give cycles-per-patch at $P=16$ (\emph{cpp}). The real model performances are better than the retrained, due to the larger training budget and more extensive corpora.}
     \label{fig:multiFreqPanel}
 \end{figure}
-
+\newpage
 \section{Models Evaluation}
 After model re-training a second set of synthetic signals is used to evaluate the presence of structural aliasing in the new models. This second set of synthetic signals includes:
 \begin{itemize}
@@ -175,15 +174,18 @@ After model re-training a second set of synthetic signals is used to evaluate th
 
 This set of 355 test signals is used for all the re-trained models, to evaluate the impact of stride and patch size on the model's ability to capture and represent frequency information.
 
-Optionally, if previous analyses show evidence of aliasing, the project may analyze test signals from a third set, including 100 signals generated using the KernelSynth tool. Also this set of test signals is used for all the re-trained models, to evaluate the impact of stride and patch size on the model's ability to capture and represent frequency information in more complex signals.
+Optionally, if previous analyses show evidence of aliasing, the project may analyze test signals from a third set, including 100 signals generated using the KernelSynth tool. Also this set of test signals is used for all the re-trained models, to evaluate the impact of stride and patch size on the model's ability to capture and represent frequency information in more complex signals. During the analysis a SEED is set to ensure reproducibility of the results.
 
-During the analysis a SEED is set to ensure reproducibility of the results.
-
---- DA SISTEMARE ---
-
+\subsection{Probing Methodology}
 The project will focus on the analysis of the phenomenon, through MDL probing \cite{voitaInformationTheoreticProbingMinimum2020} after each decoder block to verify the presence, or absence, of frequency information in the hidden states.
 
-Layer-resolved probing is executed sequentially across the intermediate hidden states of the encoder and decoder blocks, plus at the final output probability distribution level. By mapping representations across these specific layers, the project isolates where task-relevant signal attributes are preserved or compromised under architectural synchronization constraints.
+Representations are probed at the single 256-dimensional $[\mathrm{REG}]$ decoder-query vector after each encoder and decoder block, avoiding the dimensionality mismatch of probing the full flattened patch sequence. Rather than isolated locked-vs-control point
+comparisons, a dense per-frequency accuracy/codelength profile is obtained via a hierarchical binary band-classification probe swept across the operational spectrum, with non-redundant phase sampling $S_f=\min\{f_s/\gcd(f,f_s)-1,\,N\}$ in place of independently drawn random phases
+
+The locked band $f_k\pm\varepsilon$ is read off this profile and compared against pre-specified controls at $f_k\pm\delta$, $\delta\gg\varepsilon$, using online codelength and forecast amplitude recovery as the two metrics, against shuffled-label and random-init controls. A codelength increase localized to the locked band at a given layer supports H1 there; a corresponding drop in
+amplitude recovery supports H3. See Pagani et al. \cite{paganiPreliminaryInsightsChronos2026} for the band-classification and phase-sampling procedure this adapts.
+
+--- DA SISTEMARE ---
 
 Bayesian analysis.
 
