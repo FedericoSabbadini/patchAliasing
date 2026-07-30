@@ -87,13 +87,13 @@ DATASET_CONFIG_KERNELSYNTH = "training_corpus_kernel_synth_1m"  # [CHRONOS-REF] 
 TSMIXUP_RATIO = 9                            # [CHRONOS-REF] official mixing: 9 TSMixup series per 1 KernelSynth (9:1 ratio from the paper)
 
 BATCH_SIZE = 32                              # [CHRONOS-REF] per_device_train_batch_size=32, grad-accum=1 (chronos-t5-tiny.yaml)
-MAX_STEPS = 100_000                           # DEVIATION: 10k vs official 200k — fixed compute budget, identical across runs
+MAX_STEPS = 100_000                           # DEVIATION: 100k vs official 200k — fixed compute budget, identical across runs
 LR = 1e-3                                     # [CHRONOS-REF] learning_rate: 0.001 (chronos-t5-tiny.yaml)
 WEIGHT_DECAY = 0.0                            # [CHRONOS-REF] official uses HF Trainer default weight_decay=0.0 (no override anywhere)
 GRAD_CLIP_NORM = 1.0                          # [CHRONOS-REF] HF Trainer default max_grad_norm=1.0, implicitly used by train.py
 LR_SCHEDULER_TYPE = "linear"                  # [CHRONOS-REF] lr_scheduler_type: linear (chronos-t5-tiny.yaml)
 WARMUP_RATIO = 0.0                            # [CHRONOS-REF] warmup_ratio: 0.0 (chronos-t5-tiny.yaml) — official trains from scratch WITHOUT warmup
-SHUFFLE_BUFFER_SIZE = 10_000                  # reduced from official 100k to avoid HF streaming timeouts; still provides good randomisation for 10k-step runs; applied to BOTH streams
+SHUFFLE_BUFFER_SIZE = 10_000                  # reduced from official 100k to avoid HF streaming timeouts; still provides good randomisation for 100k-step runs; applied to BOTH streams
 MIN_PAST = 60                                 # [CHRONOS-REF] min_past: 60 (chronos-t5-tiny.yaml) — window sampler requires >= 60 context points
 MAX_MISSING_PROP = 0.9                        # [CHRONOS-REF] max_missing_prop: 0.9 — drop series with > 90% missing values
 DROP_PROB = 0.2                               # [CHRONOS-REF] drop_prob=0.2 (train.py ChronosDataset default): random NaN injection augmentation

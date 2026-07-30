@@ -148,7 +148,7 @@ and the model-facing code follows the `chronos_bolt.py` source exactly:
   corrupt the normalization statistics (empirically: ~2.6× inflated loss at init).
 
 ### Deliberate deviations from the official regime (uniform across all runs)
-- **`MAX_STEPS` 10 000 vs official 200 000** — fixed compute budget; valid because variants
+- **`MAX_STEPS` 100 000 vs official 200 000** — fixed compute budget; valid because variants
   are compared only against each other and the budget is identical for every run.
 - **Log/save cadence** (50/1000 vs official 500/100k) — denser diagnostics for short runs.
 - **No `transformers.Trainer`** — a production wrapper; the manual loop reproduces the same

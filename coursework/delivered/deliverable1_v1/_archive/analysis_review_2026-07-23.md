@@ -1,3 +1,9 @@
+> ⚠️ **ARCHIVIATO / OBSOLETO (superato).** Questa review è del 23/07/2026 e riflette uno stato
+> precedente del deliverable. Da allora sono stati recepiti: reframing "ripetizione ≠ indistinguibilità",
+> ipotesi H1–H3 (H4 rimossa), Probing Methodology allineata (encoder+decoder `[REG]` + `output_reg`
+> + `output_head`, controlli shuffled + random-init, fasi `S_f`), banda 250 Hz, tabella patchStride.
+> Tenuto solo come storia. Per lo stato corrente vedere `sections/deliverable1.tex`.
+
 # Review tecnico ed editoriale di `deliverable1_v1`
 
 Data della revisione: 23 luglio 2026.
