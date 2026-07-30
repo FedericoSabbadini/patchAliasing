@@ -1,0 +1,189 @@
+This appendix documents the revisions made to Deliverable 1 in response to the feedback received on the first submission. Entries are grouped under the headings used in that feedback so that each comment can be traced to the corresponding change. The revised document is written under the extended allowance of 2\,000 words granted with the feedback.
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{p{4.0cm} p{7.2cm} p{3.4cm}}
+\toprule
+\textbf{Feedback point} & \textbf{Change made} & \textbf{Where} \\
+\midrule
+Domain Description before Purpose and Scope
+  & Section order inverted.
+  & Domain Description \\
+Intended Audience shortened or integrated
+  & Standalone section removed; content condensed into a single paragraph.
+  & Domain Description, final paragraph \\
+Significance and Impact after the project outline
+  & Moved from third to last section of the body.
+  & Significance and Impact \\
+Dedicated Data section
+  & Added; test signals and datasets no longer described across several sections.
+  & Data and Evaluation \\
+State the intended mathematical formulation
+  & New section: tokenisation operator, phase-locking conditions, locked
+    frequency class, operational definition of structural aliasing.
+  & Mathematical Formulation, Eqs.~(1)--(8) \\
+Reformulate the hypotheses explicitly
+  & Objectives replaced by H1--H3, each with a predicted direction, the metric
+    used and an explicit refutation criterion.
+  & Aliasing implications \\
+Make the probing experiments precise
+  & New section stating the probed representations, the metric, the probe
+    points compared and the controls.
+  & Probing Methodology \\
+Simplify the experimental pipeline
+  & Staged as: default checkpoint on clean sinusoids, then the retrained
+    $(P,S)$ grid, then complex synthetic signals, then the photovoltaic data.
+  & Data and Evaluation; Methodology \\
+Clarify whether stride changes require retraining
+  & Retraining shown to be necessary for both $P$ and $S$; the training recipe,
+    its departures from the published one and their reasons are tabulated.
+  & Methodology, Tables~1--2 \\
+Explore strides on both sides of the default
+  & Admissibility constraint stated and the symmetric design built within it.
+  & Methodology \\
+Describe the planned priors
+  & Likelihoods, link function and all priors stated, with justification.
+  & Bayesian Analysis, Eqs.~(9)--(10) \\
+\bottomrule
+\end{tabular}
+\caption{Summary of the feedback received on the first submission and of the
+corresponding revisions.}
+\label{tab:changelog}
+\end{table}
+
+\subsection{Structure and organisation}
+\begin{itemize}
+  \item The order of the opening sections was inverted so that the application
+        context precedes the statement of purpose. The document now opens with
+        Domain Description, followed by Purpose and Scope.
+  \item The standalone \emph{Intended Audience} section, previously two
+        paragraphs, was removed. Its content was condensed into a single
+        paragraph closing the Domain Description.
+  \item \emph{Significance and Impact} was moved to the end of the body, after
+        the reader has seen the formalisation, the data, the experimental
+        design and the risk assessment.
+  \item A dedicated \emph{Data and Evaluation} section was added. It now holds
+        the synthetic sine sweep, the sinusoidal-mixer set, the KernelSynth
+        contingency and the photovoltaic dataset, which in the first submission
+        were split between \emph{Purpose and Scope} and \emph{Project Outline}.
+  \item The single \emph{Project Outline} section was replaced by separate
+        sections for the formalisation, the data, the training procedure, the
+        probing protocol, the statistical analysis and the risk assessment.
+  \item An appendix was added for the domain formalisation, so that the
+        ontology does not consume the word allowance of the body.
+\end{itemize}
+
+\subsection{Mathematical formulation and hypotheses}
+\begin{itemize}
+  \item A \emph{Mathematical Formulation} section was added. The first
+        submission announced the formalisation as a planned activity but did
+        not outline it.
+  \item The patch-based tokenisation operator $\mathcal{T}_{P,S}$ is defined
+        explicitly as a map from the sampled signal to a sequence of
+        vector-valued tokens, Eq.~(1).
+  \item The signal model and the Nyquist constraint under which the phenomenon
+        is studied are stated, Eq.~(2).
+  \item The stride-translation derivation is given in full: the phase
+        accumulated over one stride, Eq.~(3), the alignment condition on that
+        accumulation, Eq.~(4), and the resulting exact stride-period
+        invariance, Eq.~(5). The analogous condition for a shift of one patch
+        length follows as Eq.~(6).
+  \item The two conditions are collected into the phase-locking frequency class
+        $\mathcal{F}_{\mathrm{lock}}$, Eq.~(7), expressed as a function of
+        $f_s$, $P$ and $S$.
+  \item It is now stated explicitly that self-repetition of consecutive patches
+        is a property of a single signal and is not by itself evidence that two
+        distinct signals become indistinguishable. The derived invariance and
+        the empirical claim are therefore kept separate, and structural
+        aliasing is given an operational, falsifiable definition at the level
+        of the learned representations, Eq.~(8).
+  \item The three items previously listed as objectives were reformulated as
+        hypotheses H1, H2 and H3. Each now states a predicted direction, the
+        quantity in which the effect should appear, the comparison against
+        which it is measured, and the observation that would refute it.
+  \item The ontology, previously a single bullet, is set out in
+        Appendix~\ref{sec:appendixA}. The generation-state axioms are given in
+        full; the anomaly, aliasing-event and agent-action axioms are described
+        but not yet formalised, and are submitted at this stage for feedback on
+        the modelling approach before the remaining rules are written.
+\end{itemize}
+
+\subsection{Experimental methodology}
+\begin{itemize}
+  \item A \emph{Probing Methodology} section was added, replacing the single
+        sentence of the first submission.
+  \item The probed representation is now specified: the 256-dimensional
+        $[\mathrm{REG}]$ vector captured after each encoder block and each
+        decoder block, together with the pre-projection input and the projected
+        quantile output. The reason for probing this per-block vector rather
+        than the flattened patch sequence is given.
+  \item The first submission probed only after each decoder block. Probing the
+        encoder as well allows the stage at which frequency information is lost
+        to be located rather than merely detected.
+  \item The metric is specified as a prequential MDL codelength, reported as a
+        normalised codelength saving so that probe points of different
+        dimensionality are compared on the same footing, together with the
+        classification tasks on which it is computed and two controls, one with
+        shuffled labels and one with an untrained network of identical
+        architecture.
+  \item A dense per-frequency accuracy profile was added, with deterministic
+        non-redundant phase sampling in place of independently drawn random
+        phases.
+  \item The pipeline was simplified and ordered: the theoretical predictions
+        are first tested on clean synthetic sinusoids with the released
+        checkpoint, the architectural blind spots are then localised across the
+        retrained configurations, and the photovoltaic dataset is used last, as
+        an application case.
+\end{itemize}
+
+\subsection{Patch stride experiments}
+\begin{itemize}
+  \item It is now stated that any change to $P$ or $S$ requires retraining from
+        scratch, with the reason for each: a change of $P$ resizes the
+        patch-embedding block, and a change of $S$ alters the inter-patch
+        dynamics the model has learned. The first submission announced a sweep
+        over $S \in [8,16]$ without addressing this point.
+  \item Table~1 reports the configurations retrained for this submission,
+        with overlap, number of patches over the context window, step budget
+        and wall-clock time.
+  \item Table~2 compares every training hyperparameter against the published
+        Chronos recipe and isolates the only departures from it, each with the
+        constraint that motivates it.
+  \item It is stated that the complete Chronos-Bolt training recipe is not
+        publicly released, so the training loop is a budget-matched adaptation
+        of the published Chronos-T5 recipe rather than an exact reproduction.
+        The reduced step budget is applied uniformly to every configuration,
+        including the default one, so that comparisons across stride values are
+        not confounded by training budget. The released checkpoint is used only
+        as an external forecast-quality reference.
+  \item The exclusion of $S=4$ is justified rather than left implicit.
+  \item The context window of Chronos-Bolt-Tiny is corrected to $T=2048$
+        samples; the first submission reported $T=512$ tokens.
+  \item Preliminary training runs are reported, with the hardware used and the
+        total wall-clock time. Figure~1 is included as evidence that the
+        proposed configurations train to a usable state within the available
+        budget; it is not offered as an analysis of the phenomenon, which
+        belongs to the later deliverables.
+\end{itemize}
+
+\subsection{Bayesian analysis}
+\begin{itemize}
+  \item A \emph{Bayesian Analysis} section was added, replacing the single
+        sentence of the first submission.
+  \item The analysis is now split into a relative and an absolute part. The
+        relative part pairs each locked frequency with matched controls either
+        side of it and reduces the pair to a logarithmic contrast, Eq.~(9), so
+        that the localised effect is separated from the overall trend in
+        forecast quality with frequency.
+  \item The likelihood for the contrasts is stated, and a heavy-tailed choice
+        is adopted to limit the influence of individual configurations. The
+        prior on the population effect is given together with the reason for
+        centring it at zero.
+  \item The absolute part is specified as a Gamma regression with a log link,
+        Eq.~(10), with the priors on the lock coefficient and on the dispersion
+        parameter stated explicitly.
+  \item The planned inference is stated: credible intervals and the posterior
+        probability of an effect exceeding a pre-registered size, rather than
+        point estimates alone.
+\end{itemize}
