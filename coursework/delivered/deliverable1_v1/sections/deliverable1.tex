@@ -129,19 +129,19 @@ Structural aliasing is treated as an emergent, falsifiable property of the train
     \lVert R_l(x)-R_l(y)\rVert_2\le\varepsilon
 \end{equation} 
 
-where $R_l$ is the representation at layer $l$, $\lVert\cdot\rVert_2$ is the Euclidean norm, and $\varepsilon$ is a pre-registered threshold. This reframes $\mathcal F_{lock}$ as the candidate class where such collisions are hypothesised to occur. In particular, the project will test the following hypotheses.
+where $R_l$ is the representation at layer $l$, $\lVert\cdot\rVert_2$ is the Euclidean norm, and $\varepsilon$ is a pre-registered threshold. 
+
+\subsection{Aliasing implications}
+The above derivation reframes $\mathcal F_{lock}$ as the candidate class where such collisions are hypothesised to occur. In particular, the project will test the following hypotheses.
 
 \textbf{H1:} if $f\in[f_k-\varepsilon,f_k+\varepsilon]$, where $f_k\in\mathcal F_{lock}$, the model recovers less information, we expect: higher MDL codelength and lower forecast amplitude recovery than at fixed controls $f_k\pm\delta$, $\delta\gg\varepsilon$. Absent or non-localized loss refutes H1.
 
---- PROVVISORIO ---
+\textbf{H2:} the magnitude of degradation at a locked frequency $f_k\in\mathcal F_{lock}$ is a property of the stride/patch alignment, not of the signal's own phase: across the $S_{f_k}$ phase offsets already sampled at $f_k$, the accuracy drop relative to the $f_k\pm\delta$ control is expected to stay approximately constant.
+A drop whose size varies systematically with phase, rather than only with frequency, refutes H2.
 
-\textbf{H2:} $F_{lock}$ is phase independent ????.
+\textbf{H3:} when $S$ is varied while $P$ is fixed, the locations of any local degradation will move proportionally to $1/S$, tracking $\mathcal F_{lock}(S)$. An effect that remains tied to $P$ rather than $S$ will refute the proposed stride-lock mechanism and H3.
 
-\textbf{H3:} a layer-wise increase in the MDL required to decode tone presence or frequency at stride-locked conditions will predict a paired deterioration in forecast amplitude recovery and WQL (Weighted Quantile Loss). If forecast degradation occurs without representational loss, or vice versa, the claim of an internal representation bottleneck will not be supported.
-
-\textbf{H4:} when $S$ is changed while $P$ is fixed, the locations of any local degradation will move proportionally to $1/S$. An effect that remains tied to $P$ rather than $S$ will refute the proposed stride-lock mechanism.
-
---- PROVVISORIO ---
+\textbf{H4:} a layer-wise increase in the MDL required to decode tone presence or frequency at stride-locked conditions will predict a paired deterioration in forecast amplitude recovery and WQL (Weighted Quantile Loss). If forecast degradation occurs without representational loss, or vice versa, the claim of an internal representation bottleneck will not be supported.
 
 \section{Data and Evaluation}
 Two sets of synthetic signals are used to evaluate the presence of structural aliasing in the new models. These include:
@@ -162,10 +162,11 @@ Initially, the Chronos Bolt-tiny model available on the Hugging Face Hub is used
 Since any change to $P$ or $S$ requires retraining, we retrain a restricted grid around the default $P=16,\,S=16$ baseline (see \autoref{tab:patchStride}): three reduced strides at fixed $P=16$ ($S=12,8,4$) isolate the effect of patch overlap, while two contiguous patch sizes ($P=8,24$) isolate that of patch width. The extreme strides $S=1$ and $S=15$ at $P=16$ remain as possible extensions, probing the largest and smallest overlap.
 
 \input{tables/patchStride.tex}
-
-Each $(P,S)$ configuration is retrained from scratch: changing $P$ resizes the first patch-embedding block, so weights are not transferable. Loading only the \texttt{chronos-bolt-tiny} architecture, the loop reproduces the official recipe (fused AdamW, linear LR $10^{-3}$, \texttt{fp32+TF32}, masked quantile loss) on the two official corpora: TSMixup (10M) and KernelSynth (1M) streamed at the 9:1 ratio.\cite{ansariChronosLearningLanguage2024a} Every hyperparameter stays at its official value (see \autoref{tab:trainParams}); only $(P,S)$ varies, and a uniform $100$k-step budget (vs. $200$k) is used since the variants are compared only against each other. 
-
+\medskip
 \input{tables/trainParams.tex}
+\medskip
+
+Each $(P,S)$ configuration is retrained from scratch: changing $P$ resizes the first patch-embedding block, so weights are not transferable. Loading only the \texttt{chronos-bolt-tiny} architecture, the loop reproduces the official recipe (fused AdamW, linear LR $10^{-3}$, \texttt{fp32+TF32}, masked quantile loss) on the two official corpora: TSMixup (10M) and KernelSynth (1M) streamed at the 9:1 ratio\cite{ansariChronosLearningLanguage2024a}. Every hyperparameter stays at its official value (see \autoref{tab:trainParams}); only $(P,S)$ varies, and a uniform $100$k-step budget (vs. $200$k) is used since the variants are compared only against each other. 
 
 Training ran on one Alienware 16 Aurora (NVIDIA RTX 5060 Laptop GPU, 8\,GB VRAM; 32\,GB RAM), ${\approx}15\,\mathrm{h}$ in total ($2.6$--$4.1\,\mathrm{h}$ per model).
 
@@ -198,14 +199,46 @@ profile is obtained at the projected output by sweeping the same band-classifica
 operational spectrum, with non-redundant phase sampling $S_f=\min\{f_s/\gcd(f,f_s)-1,\,N\}$ replacing
 independently drawn random phases.
 
-\subsection{Analysis}
---- DA SISTEMARE ---
+\subsection{Bayesian Analysis}
+We employ a two-part Bayesian framework to quantify both relative local degradation and absolute performance losses across hypotheses $H1$--$H4$.
 
-Bayesian analysis.
+\subsubsection{Local Contrast Analysis:}
+to test localized recovery drop at stride-lock for each retrained model configuration $(P, S)$ and training seed, signals at exact $f_k\in \mathcal{F}_{\text{lock}}$ are paired with control signals at offset frequencies $f_k \pm 0.25 f_s / S$, keeping phase, baseline amplitude, noise level, and background process parameters identical. Letting $R$ denote the forecast amplitude recovery ratio, we define the paired logarithmic local contrast $d$ as:
 
-Prior information.
+\begin{equation}
+d 
+= 
+\log(R_k + 0.01) 
+- 
+\frac{\log(R_- + 0.01) 
++ 
+\log(R_+ + 0.01)}{2}
+\end{equation}
 
---- DA SISTEMARE ---
+where $R_k$ is the recovery at $f_k$, and $R_{\pm}$ are recoveries at the control frequencies $f_k \pm 0.25 f_s / S$. A contrast value of $d < 0$ directly indicates localized forecast attenuation induced by phase-locking.
+
+Contrasts are modeled using a heavy-tailed $\text{Student-}t_4(\mu_i, \sigma^2)$ likelihood. The population phase-lock effect $\bar{\beta}$ receives a weakly informative prior $\bar{\beta} \sim \text{Student-}t_4(0, 0.5)$, centered at zero due to the absence of prior quantitative estimates in the literature.
+
+\subsubsection{Absolute Performance Analysis:}
+to evaluate raw non-negative metrics, specifically Weighted Quantile Loss (WQL) and prequential MDL codelength $L(D)$, we use a Bayesian Gamma regression model with a log link:
+
+\begin{equation}
+y_i 
+\sim 
+\text{Gamma}(\text{shape} = k, \, \text{mean} = \mu_i)
+= 
+\alpha_0 
++ 
+\theta_{\text{lock}} 
+\cdot 
+\text{IsLocked}
+\end{equation}
+
+where $\text{IsLocked} \in \{0, 1\}$ flags phase-lock conditions, and $\theta_{\text{lock}} \sim \mathcal{N}(0, 0.5)$ captures the relative codelength expansion. 
+
+The Gamma shape parameter receives a weakly informative prior, $k \sim \text{Gamma}(2, 0.1)$, allowing the model to adaptively capture metric dispersion.
+
+\subsubsection{Inference:} planned posterior inference will evaluate $95\%$ credible intervals, the posterior probability of at least $20\%$ attenuation, and prior/posterior predictive checks.
 
 \section{Security Implications and Risk Assessment}
 Finally, the project will include a formal risk assessment grounded in the NIST AI Risk Management Framework (AI RMF) \cite{tabassiArtificialIntelligenceRisk2023} to evaluate structural aliasing as a systematic vulnerability within cyber-physical energy systems. This analysis will outline plausible threat models and attack surfaces, possible mitigation strategies (including stride reduction), and an evaluation of whether the proposed mitigation strategies effectively reduce residual exposure for the automated control AI agent. 
