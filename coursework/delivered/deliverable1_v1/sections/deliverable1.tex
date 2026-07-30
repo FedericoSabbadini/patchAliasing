@@ -133,10 +133,15 @@ where $R_l$ is the representation at layer $l$, $\lVert\cdot\rVert_2$ is the Euc
 
 \textbf{H1:} if $f\in[f_k-\varepsilon,f_k+\varepsilon]$, where $f_k\in\mathcal F_{lock}$, the model recovers less information, we expect: higher MDL codelength and lower forecast amplitude recovery than at fixed controls $f_k\pm\delta$, $\delta\gg\varepsilon$. Absent or non-localized loss refutes H1.
 
-\textbf{H2:} when $S$ is changed while $P$ is fixed, the locations of any local degradation will move proportionally to $1/S$. An effect that remains tied to $P$ rather than $S$ will refute the proposed stride-lock
-mechanism.
+--- PROVVISORIO ---
 
-\textbf{H3:} a layer-wise increase in the MDL required to decode tone presence or frequency at stride-locked conditions will predict a paired deterioration in forecast amplitude recovery and WQL. If forecast degradation occurs without representational loss, or vice versa, the claim of an internal representation bottleneck will not be supported.
+\textbf{H2:} $F_{lock}$ is phase independent ????.
+
+\textbf{H3:} a layer-wise increase in the MDL required to decode tone presence or frequency at stride-locked conditions will predict a paired deterioration in forecast amplitude recovery and WQL (Weighted Quantile Loss). If forecast degradation occurs without representational loss, or vice versa, the claim of an internal representation bottleneck will not be supported.
+
+\textbf{H4:} when $S$ is changed while $P$ is fixed, the locations of any local degradation will move proportionally to $1/S$. An effect that remains tied to $P$ rather than $S$ will refute the proposed stride-lock mechanism.
+
+--- PROVVISORIO ---
 
 \section{Data and Evaluation}
 Two sets of synthetic signals are used to evaluate the presence of structural aliasing in the new models. These include:
@@ -160,13 +165,13 @@ Since any change to $P$ or $S$ requires retraining, we retrain a restricted grid
 
 Each $(P,S)$ configuration is retrained from scratch: changing $P$ resizes the first patch-embedding block, so weights are not transferable. Loading only the \texttt{chronos-bolt-tiny} architecture, the loop reproduces the official recipe (fused AdamW, linear LR $10^{-3}$, \texttt{fp32+TF32}, masked quantile loss) on the two official corpora: TSMixup (10M) and KernelSynth (1M) streamed at the 9:1 ratio.\cite{ansariChronosLearningLanguage2024a} Every hyperparameter stays at its official value (see \autoref{tab:trainParams}); only $(P,S)$ varies, and a uniform $100$k-step budget (vs. $200$k) is used since the variants are compared only against each other. 
 
+\input{tables/trainParams.tex}
+
 Training ran on one Alienware 16 Aurora (NVIDIA RTX 5060 Laptop GPU, 8\,GB VRAM; 32\,GB RAM), ${\approx}15\,\mathrm{h}$ in total ($2.6$--$4.1\,\mathrm{h}$ per model).
 
 Forecasting quality of the retrained models is shown in \autoref{fig:multiFreqPanel}. If necessary, the project may extend the training budget to the full parameters.
 
-\input{tables/trainParams.tex}
-
-\begin{figure}[h]
+\begin{figure}[t]
     \centering
     \includegraphics[width=\linewidth]{figures/multi_frequency_panel.png}
     \caption{Forecast quality of the retrained models. Per frequency (rows), each $64$-step forecast (dashed) vs.\ ground truth (green); titles give cycles-per-patch at $P=16$ (\emph{cpp}). The real model performances are better than the retrained, due to the larger training budget and more extensive corpora.}
@@ -174,11 +179,24 @@ Forecasting quality of the retrained models is shown in \autoref{fig:multiFreqPa
 \end{figure}
 
 \subsection{Probing Methodology}
-Representations are probed, through MDL probing \cite{voitaInformationTheoreticProbingMinimum2020}, at the single 256-dimensional $[\mathrm{REG}]$ decoder-query vector after each encoder and decoder block, avoiding the dimensionality mismatch of probing the full flattened patch sequence. Rather than isolated locked-vs-control point
-comparisons, a dense per-frequency accuracy/codelength profile is obtained via a hierarchical binary band-classification probe swept across the operational spectrum, with non-redundant phase sampling $S_f=\min\{f_s/\gcd(f,f_s)-1,\,N\}$ in place of independently drawn random phases.
+Following MDL probing \cite{voitaInformationTheoreticProbingMinimum2020},
+the $256$-dimensional $[\mathrm{REG}]$ representation is captured after each encoder block and each
+decoder block, plus two points at the output stage: the pre-projection $256$-d $[\mathrm{REG}]$ input,
+and the projected quantile output (Pagani et al.'s $h_4$ \cite{paganiPreliminaryInsightsChronos2026}),
+where the compression drop reported in the source paper is concentrated. Probing this single
+per-block vector, rather than the full flattened patch sequence, avoids a dimensionality mismatch
+across stages and patch/stride variants.
 
-The locked band $f_k\pm\varepsilon$ is read off this profile and compared against pre-specified controls at $f_k\pm\delta$, $\delta\gg\varepsilon$, using online codelength and forecast amplitude recovery as the two metrics, against shuffled-label and random-init controls. A codelength increase localized to the locked band at a given layer supports H1 there; a corresponding drop in
-amplitude recovery supports H3. See Pagani et al. \cite{paganiPreliminaryInsightsChronos2026} for the band-classification and phase-sampling procedure this adapts.
+All probe points are compared on the same footing via a
+prequential-MDL codelength $L(D)$, reported as compression $\mathrm{SV}=1-L(D)/L_{\mathrm{uniform}}(D)$,
+computed independently per probe point for each of the seven hierarchical band-classification tasks
+\cite{paganiPreliminaryInsightsChronos2026}. Each value is benchmarked against a shuffled-label control ($\mathrm{SV}\le 0$ confirms the probe is not memorising noise) and a random-initialisation control
+(identical untrained architecture, isolating learned information from architectural artefacts).
+
+Independently, a dense per-frequency classification-accuracy
+profile is obtained at the projected output by sweeping the same band-classification probe across the
+operational spectrum, with non-redundant phase sampling $S_f=\min\{f_s/\gcd(f,f_s)-1,\,N\}$ replacing
+independently drawn random phases.
 
 \subsection{Analysis}
 --- DA SISTEMARE ---
