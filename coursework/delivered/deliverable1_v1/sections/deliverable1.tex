@@ -141,8 +141,6 @@ A drop whose size varies systematically with phase, rather than only with freque
 
 \textbf{H3:} when $S$ is varied while $P$ is fixed, the locations of any local degradation will move proportionally to $1/S$, tracking $\mathcal F_{lock}(S)$. An effect that remains tied to $P$ rather than $S$ will refute the proposed stride-lock mechanism and H3.
 
-\textbf{H4:} a layer-wise increase in the MDL required to decode tone presence or frequency at stride-locked conditions will predict a paired deterioration in forecast amplitude recovery and WQL (Weighted Quantile Loss). If forecast degradation occurs without representational loss, or vice versa, the claim of an internal representation bottleneck will not be supported.
-
 \section{Data and Evaluation}
 Two sets of synthetic signals are used to evaluate the presence of structural aliasing in the new models. These include:
 \begin{itemize}
@@ -200,7 +198,7 @@ operational spectrum, with non-redundant phase sampling $S_f=\min\{f_s/\gcd(f,f_
 independently drawn random phases.
 
 \subsection{Bayesian Analysis}
-We employ a two-part Bayesian framework to quantify both relative local degradation and absolute performance losses across hypotheses $H1$--$H4$.
+We employ a two-part Bayesian framework to quantify both relative local degradation and absolute performance losses across hypotheses $H1$--$H3$.
 
 \subsubsection{Local Contrast Analysis:}
 to test localized recovery drop at stride-lock for each retrained model configuration $(P, S)$ and training seed, signals at exact $f_k\in \mathcal{F}_{\text{lock}}$ are paired with control signals at offset frequencies $f_k \pm 0.25 f_s / S$, keeping phase, baseline amplitude, noise level, and background process parameters identical. Letting $R$ denote the forecast amplitude recovery ratio, we define the paired logarithmic local contrast $d$ as:
@@ -220,7 +218,7 @@ where $R_k$ is the recovery at $f_k$, and $R_{\pm}$ are recoveries at the contro
 Contrasts are modeled using a heavy-tailed $\text{Student-}t_4(\mu_i, \sigma^2)$ likelihood. The population phase-lock effect $\bar{\beta}$ receives a weakly informative prior $\bar{\beta} \sim \text{Student-}t_4(0, 0.5)$, centered at zero due to the absence of prior quantitative estimates in the literature.
 
 \subsubsection{Absolute Performance Analysis:}
-to evaluate raw non-negative metrics, specifically Weighted Quantile Loss (WQL) and prequential MDL codelength $L(D)$, we use a Bayesian Gamma regression model with a log link:
+to evaluate raw non-negative metric specifically prequential MDL codelength $L(D)$, we use a Bayesian Gamma regression model with a log link:
 
 \begin{equation}
 y_i 
@@ -238,7 +236,7 @@ where $\text{IsLocked} \in \{0, 1\}$ flags phase-lock conditions, and $\theta_{\
 
 The Gamma shape parameter receives a weakly informative prior, $k \sim \text{Gamma}(2, 0.1)$, allowing the model to adaptively capture metric dispersion.
 
-\subsubsection{Inference:} planned posterior inference will evaluate $95\%$ credible intervals, the posterior probability of at least $20\%$ attenuation, and prior/posterior predictive checks.
+\subsubsection{Inference:} planned posterior inference will evaluate $95\%$ credible intervals and the posterior probability of at least $20\%$ attenuation.
 
 \section{Security Implications and Risk Assessment}
 Finally, the project will include a formal risk assessment grounded in the NIST AI Risk Management Framework (AI RMF) \cite{tabassiArtificialIntelligenceRisk2023} to evaluate structural aliasing as a systematic vulnerability within cyber-physical energy systems. This analysis will outline plausible threat models and attack surfaces, possible mitigation strategies (including stride reduction), and an evaluation of whether the proposed mitigation strategies effectively reduce residual exposure for the automated control AI agent. 
