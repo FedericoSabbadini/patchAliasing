@@ -102,7 +102,40 @@ x[n+S]
 x[n].
 \end{equation}
 
-Solving Equation \eqref{eq:phase_boundary} for $f$ yields the phase-locking frequency class $\mathcal{F}_{\mathrm{lock}}$, which is defined as the set of frequencies producing stride-period self-repetition:
+The same derivation can be applied taking into account sinusoidal components where the signal repeats exactly under translational shifts equal to the patch size $P$, yielding a similar phase-locking condition
+
+\begin{equation}
+\label{eq:phase_boundary_2}
+2\pi\frac{fP}{f_s}
+=
+2\pi k,
+\qquad
+k\in\mathbb{N}^{+}.
+\end{equation}
+
+As a result, the signal exhibits exact patch-period translational invariance
+
+\begin{equation}
+\label{eq:stride_translation_invariance}
+x[n+P]
+=
+\sin\!\left(
+2\pi\frac{f}{f_s}n
++
+2\pi k
++
+\phi
+\right)
+=
+\sin\!\left(
+2\pi\frac{f}{f_s}n
++\phi
+\right)
+=
+x[n].
+\end{equation}
+
+Solving \autoref{eq:phase_boundary} and \autoref{eq:phase_boundary_2} for $f$ yields the phase-locking frequency class $\mathcal{F}_{\mathrm{lock}}$, which is defined as the set of frequencies producing stride-period self-repetition
 
 \begin{equation}
 \label{eq:flock_set}
@@ -113,9 +146,13 @@ f\in\mathbb{R}^{+}
 \;\middle|\;
 f
 =
-c\frac{f_s}{S},
+c\frac{f_s}{S}
+\land
+f
+=
+k\frac{f_s}{P},
 \;
-c\in\mathbb{N}^{+},
+c, k\in\mathbb{N}^{+},
 \;
 f<\frac{f_s}{2}
 \right\}.
@@ -155,14 +192,13 @@ Optionally, if previous analyses show evidence of aliasing, the project may anal
 Also, those tests are undertaken for all the re-trained models, to evaluate the impact of stride and patch size on the model's ability to capture and represent frequency information in more complex signals. During the analysis a SEED is set to ensure reproducibility of the results.
 
 \section{Methodology}
+\input{tables/patchStride.tex}
+\input{tables/trainParams.tex}
 Initially, the Chronos Bolt-tiny model available on the Hugging Face Hub is used to evaluate the presence of structural aliasing in the default configuration, with patch size $P=16$ and stride $S=16$. To evaluate the presence and impact of structural aliasing, the project will analyze a set of synthetic signals with varying frequency characteristics. Then the Chronos Bolt-tiny model is tested on simple sine waves with known frequency systematically varied between 2 Hz and 250 Hz with 1 Hz increments, those tests are used to evaluate the presence of structural aliasing.
 
-Since any change to $P$ or $S$ requires retraining, we retrain a restricted grid around the default $P=16,\,S=16$ baseline (see \autoref{tab:patchStride}): three reduced strides at fixed $P=16$ ($S=12,8,4$) isolate the effect of patch overlap, while two contiguous patch sizes ($P=8,24$) isolate that of patch width. The extreme strides $S=1$ and $S=15$ at $P=16$ remain as possible extensions, probing the largest and smallest overlap.
 
-\input{tables/patchStride.tex}
-\medskip
-\input{tables/trainParams.tex}
-\medskip
+
+Since any change to $P$ or $S$ requires retraining, we retrain a restricted grid around the default $P=16,\,S=16$ baseline (see \autoref{tab:patchStride}): three reduced strides at fixed $P=16$ ($S=12,8,4$) isolate the effect of patch overlap, while two contiguous patch sizes ($P=8,24$) isolate that of patch width. The extreme strides $S=1$ and $S=15$ at $P=16$ remain as possible extensions, probing the largest and smallest overlap.
 
 Each $(P,S)$ configuration is retrained from scratch: changing $P$ resizes the first patch-embedding block, so weights are not transferable. Loading only the \texttt{chronos-bolt-tiny} architecture, the loop reproduces the official recipe (fused AdamW, linear LR $10^{-3}$, \texttt{fp32+TF32}, masked quantile loss) on the two official corpora: TSMixup (10M) and KernelSynth (1M) streamed at the 9:1 ratio\cite{ansariChronosLearningLanguage2024a}. Every hyperparameter stays at its official value (see \autoref{tab:trainParams}); only $(P,S)$ varies, and a uniform $100$k-step budget (vs. $200$k) is used since the variants are compared only against each other. 
 
