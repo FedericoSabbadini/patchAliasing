@@ -102,37 +102,19 @@ x[n+S]
 x[n].
 \end{equation}
 
-The same derivation can be applied taking into account sinusoidal components where the signal repeats exactly under translational shifts equal to the patch size $P$, yielding a similar phase-locking condition
+The same derivation can be applied taking into account translational shifts equal to the patch size $P$, yielding a similar phase-locking condition
 
 \begin{equation}
 \label{eq:phase_boundary_2}
 2\pi\frac{fP}{f_s}
 =
-2\pi k,
-\qquad
-k\in\mathbb{N}^{+}.
-\end{equation}
-
-As a result, the signal exhibits exact patch-period translational invariance
-
-\begin{equation}
-\label{eq:stride_translation_invariance}
+2\pi k
+\Rightarrow
 x[n+P]
 =
-\sin\!\left(
-2\pi\frac{f}{f_s}n
-+
-2\pi k
-+
-\phi
-\right)
-=
-\sin\!\left(
-2\pi\frac{f}{f_s}n
-+\phi
-\right)
-=
-x[n].
+x[n],
+\qquad
+k\in\mathbb{N}^{+}.
 \end{equation}
 
 Solving \autoref{eq:phase_boundary} and \autoref{eq:phase_boundary_2} for $f$ yields the phase-locking frequency class $\mathcal{F}_{\mathrm{lock}}$, which is defined as the set of frequencies producing stride-period self-repetition
@@ -189,55 +171,42 @@ This set of 349 test signals is used for all the re-trained models, to evaluate 
 
 Optionally, if previous analyses show evidence of aliasing, the project may analyze test signals from a third set, including 100 signals generated using the KernelSynth\cite{ansariChronosLearningLanguage2024} tool, to test whether the phenomenon persists in more complex signals. The project will then focus on the analysis of real-world data, through the use of the \texttt{Dataset-SolarTechLab.csv} dataset, which contains a one-minute-resolution multivariate telemetry stream of a photovoltaic array\cite{levaPhotovoltaicPowerWeather2020}.
 
-Also, those tests are undertaken for all the re-trained models, to evaluate the impact of stride and patch size on the model's ability to capture and represent frequency information in more complex signals. During the analysis a SEED is set to ensure reproducibility of the results.
+Also, those tests are undertaken for all the re-trained models, to evaluate the impact of stride and patch size on the model's ability to capture and represent frequency information in more complex signals. During the analysis a seed is set to ensure reproducibility of the results.
 
 \section{Methodology}
 \input{tables/patchStride.tex}
 \input{tables/trainParams.tex}
 Initially, the Chronos Bolt-tiny model available on the Hugging Face Hub is used to evaluate the presence of structural aliasing in the default configuration, with patch size $P=16$ and stride $S=16$. To evaluate the presence and impact of structural aliasing, the project will analyze a set of synthetic signals with varying frequency characteristics. Then the Chronos Bolt-tiny model is tested on simple sine waves with known frequency systematically varied between 2 Hz and 250 Hz with 1 Hz increments, those tests are used to evaluate the presence of structural aliasing.
 
+Since any change to $P$ or $S$ requires retraining, we retrain a restricted grid around the default $P=16,\,S=16$ baseline (see \autoref{tab:patchStride}): two reduced strides at fixed $P=16$ isolate the effect of patch overlap, while two contiguous patch sizes isolate that of patch width. We exclude $S=4$: its stride-lock class $\mathcal F_{\mathrm{lock}}=\{128,256,\dots\}$ has one member inside the valid-forecast band; therefore yields no informative local $H1$/$H3$ contrast on the integer-Hz grid. The extreme strides $S=1$ and $S=15$ at $P=16$ remain as possible extensions, probing the largest and smallest overlap.
 
-
-Since any change to $P$ or $S$ requires retraining, we retrain a restricted grid around the default $P=16,\,S=16$ baseline (see \autoref{tab:patchStride}): two reduced strides at fixed $P=16$ ($S=12,8$) isolate the effect of patch overlap, while two contiguous patch sizes ($P=8,24$) isolate that of patch width. We exclude $S=4$: its stride-lock class $\mathcal F_{\mathrm{lock}}=\{c\,f_s/S\}=\{128,256,\dots\}$ has no member inside the valid-forecast band (the model collapses well below Nyquist), and $128\,\mathrm{Hz}$ is moreover shared by every configuration; $S=4$ therefore yields no informative local $H1$/$H3$ contrast on the integer-Hz grid. Rather than introduce off-grid probe frequencies that would still fall in the collapse region, $S=4$ is dropped; $S\in\{8,12,16\}$ retain stride-locks inside the valid band. The extreme strides $S=1$ and $S=15$ at $P=16$ remain as possible extensions, probing the largest and smallest overlap.
-
-Each $(P,S)$ configuration is retrained from scratch: changing $P$ resizes the first patch-embedding block, so weights are not transferable. Loading only the \texttt{chronos-bolt-tiny} architecture, the loop follows the \emph{published Chronos-T5} training recipe (fused AdamW, linear LR $10^{-3}$, \texttt{fp32+TF32}, masked quantile loss) on the two official corpora, TSMixup (10M) and KernelSynth (1M) streamed at the 9:1 ratio\cite{ansariChronosLearningLanguage2024a}; the complete Chronos-Bolt recipe is not publicly released, so this is a budget-matched adaptation of the published hyperparameters rather than an exact reproduction. Every hyperparameter stays at its published value (see \autoref{tab:trainParams}); only $(P,S)$ varies, and a uniform $100$k-step budget (vs.\ $200$k) is applied to \emph{all} configurations, including the $P{=}S{=}16$ baseline, so the comparison is not confounded by training budget. A single seed ($42$) is used for now; multiple seeds remain a planned extension.
-
-Training ran on one Alienware 16 Aurora (NVIDIA RTX 5060 Laptop GPU, 8\,GB VRAM; 32\,GB RAM), ${\approx}15\,\mathrm{h}$ in total ($2.6$--$4.1\,\mathrm{h}$ per model).
-
-Forecasting quality of the retrained models is shown in \autoref{fig:multiFreqPanel}. If necessary, the project may extend the training budget to the full parameters.
-
-\begin{figure}[t]
+\begin{figure}[!b]
     \centering
     \includegraphics[width=\linewidth]{figures/multi_frequency_panel.png}
     \caption{Forecast quality of the retrained models. Per frequency (rows), each $64$-step forecast (dashed) vs.\ ground truth (green); titles give cycles-per-patch at $P=16$ (\emph{cpp}). The real model performances are better than the retrained, due to the larger training budget and more extensive corpora.}
     \label{fig:multiFreqPanel}
 \end{figure}
 
+Each $(P,S)$ configuration is retrained from scratch: changing $P$ resizes the first patch-embedding block, so weights are not transferable. Loading only the \texttt{chronos-bolt-tiny} architecture, the loop follows the \emph{published Chronos-T5} training recipe (fused AdamW, linear LR $10^{-3}$, \texttt{fp32+TF32}, masked quantile loss) on the two official corpora, TSMixup (10M) and KernelSynth (1M) streamed at the 9:1 ratio\cite{ansariChronosLearningLanguage2024a}; the complete Chronos-Bolt recipe is not publicly released, so this is a budget-matched adaptation of the published hyperparameters rather than an exact reproduction. Every hyperparameter stays at its published value (see \autoref{tab:trainParams}); only $(P,S)$ varies, and a uniform $100$k-step budget (vs.\ $200$k) is applied to \emph{all} configurations, including the $P{=}S{=}16$ baseline, so the comparison is not confounded by training budget. A single seed ($42$) is used for now; multiple seeds remain a planned extension.
+
+\medskip 
+\medskip
+
+Training ran on one Alienware 16 Aurora (NVIDIA RTX 5060 Laptop GPU, 8\,GB VRAM; 32\,GB RAM), ${\approx}15\,\mathrm{h}$ in total ($2.6$--$4.1\,\mathrm{h}$ per model).
+
+Forecasting quality of the retrained models is shown in \autoref{fig:multiFreqPanel}. If necessary, the project may extend the training budget to the full parameters.
+
 \subsection{Probing Methodology}
-Following MDL probing \cite{voitaInformationTheoreticProbingMinimum2020},
-the $256$-dimensional $[\mathrm{REG}]$ representation is captured after each encoder block and each
-decoder block, plus two points at the output stage: the pre-projection $256$-d $[\mathrm{REG}]$ input,
-and the projected quantile output (Pagani et al.'s $h_4$ \cite{paganiPreliminaryInsightsChronos2026}),
-where the compression drop reported in the source paper is concentrated. Probing this single
-per-block vector, rather than the full flattened patch sequence, avoids a dimensionality mismatch
-across stages and patch/stride variants.
+Following MDL probing \cite{voitaInformationTheoreticProbingMinimum2020}, the $256$-dimensional $[\mathrm{REG}]$ representation is captured after each encoder block and each decoder block, plus two points at the output stage: the pre-projection $256$-d $[\mathrm{REG}]$ input, and the projected quantile output (Pagani et al.'s $h_4$ \cite{paganiPreliminaryInsightsChronos2026}), where the compression drop reported in the source paper is concentrated. Probing this single per-block vector, rather than the full flattened patch sequence, avoids a dimensionality mismatch across stages and patch/stride variants.
 
-All probe points are compared on the same footing via a
-prequential-MDL codelength $L(D)$, reported as compression $\mathrm{SV}=1-L(D)/L_{\mathrm{uniform}}(D)$,
-computed independently per probe point for each of the seven hierarchical band-classification tasks
-\cite{paganiPreliminaryInsightsChronos2026}. Each value is benchmarked against a shuffled-label control ($\mathrm{SV}\le 0$ confirms the probe is not memorising noise) and a random-initialisation control
-(identical untrained architecture, isolating learned information from architectural artefacts).
+All probe points are compared on the same footing via a prequential-MDL codelength $L(D)$, reported as compression $\mathrm{SV}=1-L(D)/L_{\mathrm{uniform}}(D)$, computed independently per probe point for each of the seven hierarchical band-classification tasks \cite{paganiPreliminaryInsightsChronos2026}. Each value is benchmarked against a shuffled-label control ($\mathrm{SV}\le 0$ confirms the probe is not memorising noise) and a random-initialisation control (identical untrained architecture, isolating learned information from architectural artefacts).
 
-Independently, a dense per-frequency classification-accuracy
-profile is obtained at the projected output by sweeping the same band-classification probe across the
-operational spectrum, with non-redundant phase sampling $S_f=\min\{f_s/\gcd(f,f_s)-1,\,N\}$ replacing
-independently drawn random phases.
+Independently, a dense per-frequency classification-accuracy profile is obtained at the projected output by sweeping the same band-classification probe across the operational spectrum, with non-redundant phase sampling $S_f=\min\{f_s/\gcd(f,f_s)-1,\,N\}$ replacing independently drawn random phases.
 
 \subsection{Bayesian Analysis}
 We employ a two-part Bayesian framework to quantify both relative local degradation and absolute performance losses across hypotheses $H1$--$H3$. The analysis is conducted only in the frequency range in which are observed valid forecasts, we expect it to be a subset of $[2,250]\,\mathrm{Hz}$.
 
-\subsubsection{Local Contrast Analysis:}
-to test localized recovery drop at stride-lock for each retrained model configuration $(P, S)$ and training seed, signals at exact $f_k\in \mathcal{F}_{\text{lock}}$ are paired with control signals at offset frequencies $f_k \pm 0.25 f_s / S$, keeping phase, baseline amplitude, noise level, and background process parameters identical. Letting $R$ denote the forecast amplitude recovery ratio, we define the paired logarithmic local contrast $d$ as:
+\subsubsection{Local Contrast Analysis:} to test localized recovery drop at stride-lock for each retrained model configuration $(P, S)$ and training seed, signals at exact $f_k\in \mathcal{F}_{\text{lock}}$ are paired with control signals at offset frequencies $f_k \pm 0.25 f_s / S$, keeping phase, baseline amplitude, noise level, and background process parameters identical. Letting $R$ denote the forecast amplitude recovery ratio, we define the paired logarithmic local contrast $d$ as:
 
 \begin{equation}
 d 
@@ -253,8 +222,7 @@ where $R_k$ is the recovery at $f_k$, and $R_{\pm}$ are recoveries at the contro
 
 Contrasts are modeled using a heavy-tailed $\text{Student-}t_4(\mu_i, \sigma^2)$ likelihood. The population phase-lock effect $\bar{\beta}$ receives a weakly informative prior $\bar{\beta} \sim \text{Student-}t_4(0, 0.5)$, centered at zero due to the absence of prior quantitative estimates in the literature.
 
-\subsubsection{Absolute Performance Analysis:}
-to evaluate raw non-negative metric specifically prequential MDL codelength $L(D)$, we use a Bayesian Gamma regression model with a log link:
+\subsubsection{Absolute Performance Analysis:} to evaluate raw non-negative metric specifically prequential MDL codelength $L(D)$, we use a Bayesian Gamma regression model with a log link:
 
 \begin{equation}
 y_i 

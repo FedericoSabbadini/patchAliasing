@@ -1,13 +1,11 @@
 The core ontology architecture bridges the gap between cyber-physical energy systems and deep learning signal processing domain knowledge. It categorizes the application setting into five main conceptual pillars rooted under the ontological hierarchy:
 
 \begin{itemize}
-    \item \textbf{Physical Subsystem (\texttt{pv:PhysicalComponent}):} Represents the hardware infrastructure of the micro-grid, including the solar array, electrochemical storage, consumer loads, and the macro grid tie.
-    \item \textbf{Cognitive Layer (\texttt{pv:ControlAgent}):} The artificial intelligence system responsible for autonomous grid optimization, load balancing, dispatch scheduling, and proactive vulnerability mitigation.
-    \item \textbf{Signal Processing Layer (\texttt{pv:Signal}, \texttt{pv:PatchedSignal}):} Tracks the raw telemetry inputs (both time-domain features and frequency-domain components) along with their tokenized representation configurations (patch dimensions, stride values) tailored for the Chronos foundation architecture.
-    \item \textbf{Environmental Tracking (\texttt{pv:WeatherObservation}):} Captures concurrent meteorological snapshots (air temperature, wind vectors) influencing structural physics and electrical efficiency.
-    \item \textbf{Inferred Operational States:} Dynamic metadata classified into generation levels
-    (\texttt{pv:GenerationState}), systemic disruptions (\texttt{pv:AnomalyState}), control directives
-    (\texttt{pv:AgentAction}), and signal degradation hazards (\texttt{pv:AliasingEvent}).
+    \item \textbf{Physical Subsystem (\texttt{pv:PhysicalComponent}):} represents the hardware infrastructure of the micro-grid, including the solar array, electrochemical storage, consumer loads, and the macro grid tie.
+    \item \textbf{Cognitive Layer (\texttt{pv:ControlAgent}):} the artificial intelligence system responsible for autonomous grid optimization, load balancing, dispatch scheduling, and proactive vulnerability mitigation.
+    \item \textbf{Signal Processing Layer (\texttt{pv:Signal}, \texttt{pv:PatchedSignal}):} tracks the raw telemetry inputs (both time-domain features and frequency-domain components) along with their tokenized representation configurations (patch dimensions, stride values) tailored for the Chronos foundation architecture.
+    \item \textbf{Environmental Tracking (\texttt{pv:WeatherObservation}):} captures concurrent meteorological snapshots (air temperature, wind vectors) influencing structural physics and electrical efficiency.
+    \item \textbf{Inferred Operational States:} dynamic metadata classified into generation (\texttt{pv:GenerationState}), systemic disruptions (\texttt{pv:AnomalyState}), control directives (\texttt{pv:AgentAction}), and signal degradation hazards (\texttt{pv:AliasingEvent}).
 \end{itemize}
 
 \subsection{Generation States}
@@ -19,7 +17,6 @@ A formal description of the state of the photovoltaic array is provided through 
 \end{aligned}
 \end{equation}
 
-
 \begin{equation}
 \begin{aligned}
 \texttt{PhotovoltaicArray}(?pv) &\wedge \texttt{measures}(?pv, ?s) \wedge \texttt{tiltedIrradianceWm2}(?s, ?g) \\
@@ -28,7 +25,6 @@ A formal description of the state of the photovoltaic array is provided through 
 \end{aligned}
 \end{equation}
 
-
 \begin{equation}
 \begin{aligned}
 \texttt{PhotovoltaicArray}(?pv) &\wedge \texttt{measures}(?pv, ?s) \wedge \texttt{tiltedIrradianceWm2}(?s, ?g) \\
@@ -36,7 +32,6 @@ A formal description of the state of the photovoltaic array is provided through 
 &\longrightarrow \texttt{hasGenerationState}(?pv, \texttt{Overcast})
 \end{aligned}
 \end{equation}
-
 
 \begin{equation}
 \begin{aligned}
