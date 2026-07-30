@@ -61,8 +61,8 @@ REPO = "federicosabbadini/chronos-bolt-patch-sweep"   # where the retrained vari
 OFFICIAL_MODEL = "amazon/chronos-bolt-tiny"           # the official model IS p16-s16 (200k, full data)
 OFFICIAL_LABEL = "p16-s16 (official)"                 # treated as the P=16 S=16 data point, not a separate ceiling
 MODEL_NAMES = [                                        # the P/S variants (local-vs-local comparison)
-    "p16-s12-seed42", "p16-s8-seed42",
-    "p16-s4-seed42", "p8-s8-seed42", "p24-s24-seed42",
+    "p16-s12-seed42", "p16-s8-seed42",                 # S=4 dropped: its stride-lock (128 Hz) is
+    "p8-s8-seed42", "p24-s24-seed42",                  # in the collapse band -> no informative test
 ]
 
 FS = 512                       # sampling frequency [Hz] (matches the notebook probe)

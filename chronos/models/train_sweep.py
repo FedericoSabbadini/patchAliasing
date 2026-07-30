@@ -63,13 +63,14 @@ import numpy as np                          # [CHRONOS-REF] array math for windo
 #  CONFIG — the only things to edit                                            #
 # ============================================================================ #
 # (P, S) grid. Two-axis design (S <= P everywhere, so no unobserved gaps):
-#   - P=16 row varies S (overlap/stride axis):  or = (P-S)/P = 0, .25, .5, .75
+#   - P=16 row varies S (overlap/stride axis):  or = (P-S)/P = 0, .25, .5
 #   - contiguous row (or=0) varies P (patch-size axis): P = 8, 16, 24
+# NOTE: S=4 (or=0.75) is dropped — its stride-lock class F_lock={c*fs/S}={128,...} has no
+#       member inside the valid-forecast band, so it gives no informative H1/H3 test.
 PS_GRID: list[tuple[int, int]] = [          # our experimental design (not from Chronos)
     (16, 16),   # baseline, contiguous (16/16 is the stock Bolt-tiny geometry)  # [CHRONOS-REF]
     (16, 12),   # or = 0.25
     (16, 8),    # or = 0.50
-    (16, 4),    # or = 0.75  (heaviest: ~509 patches @ context 2048)
     (8, 8),     # patch-size axis, contiguous
     (24, 24),   # patch-size axis, contiguous
 ]
