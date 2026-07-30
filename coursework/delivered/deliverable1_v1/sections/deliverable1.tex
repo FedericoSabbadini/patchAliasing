@@ -198,7 +198,7 @@ operational spectrum, with non-redundant phase sampling $S_f=\min\{f_s/\gcd(f,f_
 independently drawn random phases.
 
 \subsection{Bayesian Analysis}
-We employ a two-part Bayesian framework to quantify both relative local degradation and absolute performance losses across hypotheses $H1$--$H3$.
+We employ a two-part Bayesian framework to quantify both relative local degradation and absolute performance losses across hypotheses $H1$--$H3$. The analysis is conducted only in the frequency range in which are observed valid forecasts, we expect it to be a subset of $[2,250]\,\mathrm{Hz}$.
 
 \subsubsection{Local Contrast Analysis:}
 to test localized recovery drop at stride-lock for each retrained model configuration $(P, S)$ and training seed, signals at exact $f_k\in \mathcal{F}_{\text{lock}}$ are paired with control signals at offset frequencies $f_k \pm 0.25 f_s / S$, keeping phase, baseline amplitude, noise level, and background process parameters identical. Letting $R$ denote the forecast amplitude recovery ratio, we define the paired logarithmic local contrast $d$ as:
