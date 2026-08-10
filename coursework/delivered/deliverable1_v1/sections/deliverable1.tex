@@ -142,13 +142,7 @@ f<\frac{f_s}{2}
 
 The derivation above shows that some translations leave a sinusoid unchanged, this repetition is not evidence that two distinct signals become indistinguishable to the model. 
 
-Structural aliasing is treated as an emergent, falsifiable property of the trained representations: two frequency-matched but distinct signals $x,y$ structurally alias at layer $l$ if:
-
-\begin{equation}
-    \lVert R_l(x)-R_l(y)\rVert_2\le\varepsilon
-\end{equation} 
-
-where $R_l$ is the representation at layer $l$, $\lVert\cdot\rVert_2$ is the Euclidean norm, and $\varepsilon$ is a pre-registered threshold. 
+Structural aliasing is treated as an emergent, falsifiable property of the trained representations\cite{paganiPreliminaryInsightsChronos2026}. At a phase-lock the patch tokens collapse onto one another ($\mathbf{t}_k=\mathbf{t}_{k+1}$), so two distinct inputs can map to the same token sequence. We therefore diagnose it not by a fixed distance between representations, but by whether the signal's frequency can still be read back from the model's internal representation: structural aliasing is present when this recovery degrades at a locked frequency relative to nearby, non-locked ones.
 
 \subsection{Aliasing implications}
 The above derivation reframes $\mathcal F_{lock}$ as the candidate class where such collisions are hypothesised to occur. In particular, the project tests the following hypotheses.
