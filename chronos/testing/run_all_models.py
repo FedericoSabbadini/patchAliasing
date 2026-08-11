@@ -13,9 +13,13 @@ own figures — nothing here re-plots anything, and no notebook has to be edited
     python run_all_models.py --only contamination.ipynb   # run just one notebook
 
 Each notebook writes its figures where it always does:
-    chronosBolt_layer_probing.ipynb -> outputs/per_model/p{P}-s{S}/       (FIG1/3/4/5/5b, …)
+    chronosBolt_layer_probing.ipynb -> outputs/per_model/p{P}-s{S}/       (FIG3/5/5b, …)
     contamination.ipynb             -> outputs/contamination/p{P}-s{S}/    (recovery_at_lock, …)
 The fully executed copy of each notebook is also saved under outputs/executed/p{P}-s{S}/.
+
+After the notebooks, `hypotheses.py` is run once per model (H1/H2/H3 verdicts + figures ->
+outputs/hypotheses/p{P}-s{S}/) and once with --cross (the cross-geometry collapse table +
+figure). Skip it with --no-hypotheses.
 """
 from __future__ import annotations
 
@@ -51,12 +55,24 @@ def run_notebook(nb: str, P: int, S: int, smoke: bool) -> bool:
     return r.returncode == 0
 
 
+def run_hypotheses(P: int, S: int, cross: bool = False) -> bool:
+    """Run hypotheses.py for one model (H1/H2/H3) or the cross-geometry table. True on success."""
+    cmd = [sys.executable, "hypotheses.py"] + (["--cross"] if cross else ["--P", str(P), "--S", str(S)])
+    print("    -> hypotheses.py" + (" --cross" if cross else f" --P {P} --S {S}"))
+    r = subprocess.run(cmd, cwd=HERE)
+    if r.returncode != 0:
+        print(f"    !! FAILED: hypotheses.py ({'cross' if cross else tl.model_tag(P, S)}) (exit {r.returncode})")
+    return r.returncode == 0
+
+
 def main(argv: list[str]):
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("models", nargs="*", help="p{P}-s{S} tags to run (default: all)")
     ap.add_argument("--smoke", action="store_true", help="fast coarse-grid pass (PROBE_SMOKE=1)")
     ap.add_argument("--only", action="append", choices=NOTEBOOKS,
                     help="run only this notebook (repeatable)")
+    ap.add_argument("--no-hypotheses", action="store_true",
+                    help="skip the H1/H2/H3 hypotheses.py runs")
     args = ap.parse_args(argv)
 
     wanted = set(args.models) or None
@@ -79,6 +95,14 @@ def main(argv: list[str]):
                 continue
             if not run_notebook(nb, P, S, args.smoke):
                 failures.append((tl.model_tag(P, S), nb))
+        if not args.no_hypotheses and not args.only:
+            if not run_hypotheses(P, S):
+                failures.append((tl.model_tag(P, S), "hypotheses.py"))
+
+    if not args.no_hypotheses and not args.only and len(models) > 1:
+        print("\n=== cross-geometry (H3) ===")
+        if not run_hypotheses(0, 0, cross=True):
+            failures.append(("cross", "hypotheses.py"))
 
     print("\n" + ("all runs succeeded." if not failures
                   else f"{len(failures)} run(s) failed: {failures}"))
