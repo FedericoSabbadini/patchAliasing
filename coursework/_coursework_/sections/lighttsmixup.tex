@@ -1,17 +1,1 @@
-\begin{algorithm}
-\caption{Light TSMixup: Controlled Sinusoidal Time Series Mixup}
-\label{alg:light_tsmixup}
-\begin{algorithmic}[1]
-\Require Sinusoidal pool $\mathcal{P}=\{p_1,\ldots,p_{N_p}\}$, where each $p_n$ is defined by frequency $f_n$, amplitude $A_n$, phase $\phi_n$, source length $T_n$, and sampling frequency $f_s$; maximum components $K=10$; symmetric Dirichlet concentration $\alpha=1.5$; minimum and maximum augmented lengths $(l_{\min}=128,l_{\max}=2048)$.
-\Ensure An augmented time series.
-\State $k \sim U\{1,K\}$ \Comment{number of sinusoidal components to mix}
-\State $l \sim U\{l_{\min},l_{\max}\}$ \Comment{length of the augmented time series}
-\For{$i \gets 1$ to $k$}
-    \State $n \sim U\{1,N_p\}$ \Comment{sample a sinusoidal source}
-    \State $x^{(i)}_{1:l} \gets \operatorname{SampleSegment}(p_n,l,f_s)$ \Comment{generate or crop a length-$l$ segment}
-    \State $\tilde{x}^{(i)}_{1:l} \gets x^{(i)}_{1:l} \Big/ \left(\frac{1}{l}\sum_{j=1}^{l}\left|x^{(i)}_j\right|\right)$ \Comment{apply mean scaling}
-\EndFor
-\State $[\lambda_1,\ldots,\lambda_k] \sim \operatorname{Dir}([\alpha_1=\alpha,\ldots,\alpha_k=\alpha])$ \Comment{sample mixing weights}
-\State \Return $\sum_{i=1}^{k}\lambda_i\tilde{x}^{(i)}_{1:l}$ \Comment{take a weighted combination of scaled signals}
-\end{algorithmic}
-\end{algorithm}
+\input{listings/tsmixup.tex}
