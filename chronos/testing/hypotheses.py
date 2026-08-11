@@ -31,6 +31,8 @@ outputs/hypotheses/collapse_sites_all_models.csv.
 from __future__ import annotations
 
 import argparse
+import os
+import sys
 from math import gcd
 from pathlib import Path
 
@@ -50,6 +52,42 @@ PRED = 64                # forecast horizon
 BAND = (2, 250)          # analysis band, strictly below Nyquist
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
+# --------------------------------------------------------------------------- #
+#  signal mode: pure sinusoid (default) vs realistic TSMixup background + tone
+# --------------------------------------------------------------------------- #
+# By default every test uses a PURE sinusoid: this isolates the geometry, so the token collapse is
+# EXACTLY 0 at a stride lock (t_k = t_{k+1}) — the clean definition of the phenomenon. With
+# --background (or HYP_BACKGROUND=1) the tone instead rides on a unit-variance TSMixup background
+# at SNR=4 (the SAME construction as the probing notebook). That is the realistic-signal cross-check:
+# the exact degeneracy becomes a deep but non-zero DIP (the background breaks patch identity), while
+# the recovery-based verdicts H1/H2 are unchanged. Background outputs are written to *_bg paths so
+# they never overwrite the pure-sinusoid figures.
+USE_BG = os.environ.get("HYP_BACKGROUND", "0") == "1"
+TONE_SNR = 4.0                     # tone amplitude over unit-variance background (probing convention)
+_GEN_P = 16                        # patch passed to the generator (background is P-independent)
+_bg_cache: dict = {}
+_sg = None
+
+
+def _load_generator():
+    global _sg
+    if _sg is None:
+        p = str(Path(__file__).resolve().parent.parent / "data" / "synthetic")
+        if p not in sys.path:
+            sys.path.insert(0, p)
+        import signalGenerator as sg
+        _sg = sg
+    return _sg
+
+
+def _background(n: int, seed: int) -> np.ndarray:
+    """One TSMixup background realisation of length n (no injection)."""
+    sg = _load_generator()
+    p = {"K": 10, "alpha": 1.5, "l_min": n, "l_max": n, "fs": FS, "P": _GEN_P,
+         "t_lengths": [n // 2, n, n]}
+    tmp = Path(__file__).resolve().parent / "outputs" / "_gen_tmp"
+    return np.asarray(sg.runTSMixup(p, seed, tmp).generate(), float).ravel()[:n]
+
 
 # --------------------------------------------------------------------------- #
 #  signal + measurement helpers
@@ -57,6 +95,22 @@ DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 def make_tone(f: float, phase: float = 0.0, n: int = CTX, amp: float = 1.0) -> np.ndarray:
     t = np.arange(n) / FS
     return (amp * np.sin(2 * np.pi * f * t + phase)).astype(np.float32)
+
+
+def signal(f: float, phase: float = 0.0, n: int = CTX) -> np.ndarray:
+    """Context builder. Pure tone (default) or unit-variance TSMixup background + tone (USE_BG).
+
+    The background is deterministic per (f, phase) and generated once at full length (CTX+PRED),
+    then sliced, so the forecast target `signal(f,phase,CTX+PRED)[CTX:]` is the true continuation
+    of the context `signal(f,phase,CTX)`."""
+    if not USE_BG:
+        return make_tone(f, phase, n)
+    key = (round(float(f), 3), round(float(phase), 4))
+    if key not in _bg_cache:
+        b = _background(CTX + PRED, (abs(hash(key)) % (2 ** 31)) + 1)
+        s = b.std()
+        _bg_cache[key] = (b / s if s > 1e-8 else b).astype(np.float32)
+    return (_bg_cache[key][:n] + make_tone(f, phase, n, TONE_SNR)).astype(np.float32)
 
 
 def phases_Sf(f: float, n_max: int = 8) -> np.ndarray:
@@ -77,10 +131,12 @@ class Model:
     """Thin wrapper: loads (P,S) once and exposes forecast-recovery + token-collapse."""
 
     def __init__(self, P: int, S: int):
+        global _GEN_P
         self.pipe, self.label = tl.load_pipeline(P, S, device=DEVICE)
         cfg = self.pipe.model.config.chronos_config
         self.P = cfg["input_patch_size"]
         self.S = cfg["input_patch_stride"]
+        _GEN_P = self.P                        # background is P-independent, but keep it in sync
         qs = list(cfg["quantiles"])
         self.qi = qs.index(0.5) if 0.5 in qs else len(qs) // 2
         self._emb = self.pipe.model.input_patch_embedding
@@ -92,11 +148,11 @@ class Model:
 
     def recovery(self, f: float, phase: float = 0.0) -> tuple[float, float]:
         """Forecast amplitude recovery R = amp(forecast)/amp(truth) and phase error [deg]."""
-        ctx = make_tone(f, phase)
+        ctx = signal(f, phase)
         fc = self.forecast(ctx)
         t_fut = (np.arange(CTX, CTX + len(fc))) / FS
         a_hat, ph_hat = fit_amp_phase(fc, t_fut, f)
-        a_true, ph_true = fit_amp_phase(make_tone(f, phase, CTX + len(fc))[CTX:], t_fut, f)
+        a_true, ph_true = fit_amp_phase(signal(f, phase, CTX + len(fc))[CTX:], t_fut, f)
         R = a_hat / max(a_true, 1e-9)
         dphase = np.degrees(np.abs(np.angle(np.exp(1j * (ph_hat - ph_true)))))
         return float(R), float(dphase)
@@ -107,7 +163,7 @@ class Model:
         cap: dict = {}
         h = self._emb.register_forward_hook(lambda m, i, o: cap.__setitem__("t", o.detach().float().cpu().numpy()))
         try:
-            self.forecast(make_tone(f, phase))
+            self.forecast(signal(f, phase))
         finally:
             h.remove()
         tok = cap["t"][0]                       # [n_patches, d_model]
@@ -125,6 +181,24 @@ def stride_locks(S: int, fmax: float) -> list[int]:
     return [round(c * FS / S) for c in range(1, int(fmax * S / FS) + 1)]
 
 
+def detect_collapse_sites(freqs: np.ndarray, coll: np.ndarray) -> list[int]:
+    """Frequencies where the across-patch token std collapses.
+
+    Pure sinusoid: an exact zero (within 2% of the global spread) — the clean degeneracy.
+    Background+tone: the background breaks patch identity so the std never reaches 0; instead we
+    detect a prominent local minimum that dips to <=75% of its local (±6 Hz) baseline."""
+    if not USE_BG:
+        thr = 0.02 * coll.max()
+        return [int(f) for f, c in zip(freqs, coll) if c <= thr]
+    sites, w = [], 6
+    for i in range(1, len(coll) - 1):
+        lo, hi = max(0, i - w), min(len(coll), i + w + 1)
+        local = np.median(np.concatenate([coll[lo:i], coll[i + 1:hi]]))
+        if coll[i] <= coll[i - 1] and coll[i] <= coll[i + 1] and local > 0 and coll[i] <= 0.75 * local:
+            sites.append(int(freqs[i]))
+    return sites
+
+
 # --------------------------------------------------------------------------- #
 #  H3 — do the collapse sites sit where the geometry predicts, and move with it?
 # --------------------------------------------------------------------------- #
@@ -132,8 +206,7 @@ def test_H3(m: Model, out: Path, n_phase: int = 3) -> dict:
     freqs = np.arange(BAND[0], BAND[1] + 1, dtype=float)
     coll = np.array([np.mean([m.collapse(f, ph) for ph in phases_Sf(f, n_phase)]) for f in freqs])
 
-    thr = 0.02 * coll.max()                    # "collapsed" = within 2% of the global spread floor
-    measured = [int(f) for f, c in zip(freqs, coll) if c <= thr]
+    measured = detect_collapse_sites(freqs, coll)
     # The across-patch token collapse (t_k = t_{k+1}) is a STRIDE-lock effect: consecutive patches
     # see identical samples iff x[n+S]=x[n], i.e. f = c*fs/S.  (The patch-integration null k*fs/P is
     # a different, within-patch effect; it coincides with the stride family only when S=P.)
@@ -156,11 +229,14 @@ def test_H3(m: Model, out: Path, n_phase: int = 3) -> dict:
         ax.axvline(f, color="#1565c0", ls="-", lw=1.0, alpha=.7)
     for f in pred_stride:
         ax.axvline(f, color="#6a1b9a", ls="--", lw=1.0, alpha=.7)
-    ax.axhline(thr, color="gray", ls=":", lw=1, label=f"collapse threshold ({thr:.3f})")
+    if not USE_BG:
+        thr = 0.02 * coll.max()
+        ax.axhline(thr, color="gray", ls=":", lw=1, label=f"collapse threshold ({thr:.3f})")
     ax.plot([], [], color="#1565c0", label=f"predicted patch null  k*fs/P  (P={m.P})")
     ax.plot([], [], color="#6a1b9a", ls="--", label=f"predicted stride lock c*fs/S (S={m.S})")
     ax.set_xlabel("frequency [Hz]"); ax.set_ylabel("token collapse  (0 = identical patches)")
-    ax.set_title(f"H3 — {m.label}: collapse minima land on k*fs/P and c*fs/S")
+    mode = "TSMixup background + tone" if USE_BG else "pure sinusoid"
+    ax.set_title(f"H3 — {m.label} [{mode}]: collapse minima land on k*fs/P and c*fs/S")
     ax.legend(fontsize=8, loc="upper right"); ax.margins(x=0.01)
     fig.tight_layout(); fig.savefig(out / "H3_collapse_sites.png", dpi=140, bbox_inches="tight")
     plt.close(fig)
@@ -257,23 +333,24 @@ def test_H2(m: Model, out: Path, n_phase: int = 10) -> dict:
 # --------------------------------------------------------------------------- #
 def cross_collapse_table(n_phase: int = 3) -> None:
     root = Path("outputs/hypotheses"); root.mkdir(parents=True, exist_ok=True)
+    suf = "_bg" if USE_BG else ""
     freqs = np.arange(BAND[0], BAND[1] + 1, dtype=float)
     lines = ["model,P,S,stride_locks_integer,measured_collapse_freqs"]
-    print("\n=== H3 across geometry: token-collapse sites follow the STRIDE grid c*fs/S ===")
+    mode = "TSMixup background + tone" if USE_BG else "pure sinusoid"
+    print(f"\n=== H3 across geometry [{mode}]: token-collapse sites follow the STRIDE grid c*fs/S ===")
     print("   (only integer-Hz stride-locks are on the sweep grid; non-integer ones are undercounted)")
     spectra = []                                          # (label, S, freqs, collapse curve, measured)
     for (P, S) in tl.ALL_MODELS:
         m = Model(P, S)
         coll = np.array([np.mean([m.collapse(f, ph) for ph in phases_Sf(f, n_phase)]) for f in freqs])
-        thr = 0.02 * coll.max()
-        measured = [int(f) for f, c in zip(freqs, coll) if c <= thr]
+        measured = detect_collapse_sites(freqs, coll)
         # integer-Hz members of the stride-lock grid c*fs/S inside the band (what the 1 Hz sweep sees)
         pred = sorted({int(round(c * FS / m.S)) for c in range(1, m.S)
                        if (c * FS) % m.S == 0 and BAND[0] <= c * FS / m.S <= BAND[1]})
         print(f"  p{m.P}-s{m.S:<3} stride-locks(int) {pred}  ->  measured {measured}")
         lines.append(f"p{m.P}-s{m.S},{m.P},{m.S},{' '.join(map(str,pred))},{' '.join(map(str,measured))}")
         spectra.append((f"p{m.P}-s{m.S}", m.S, freqs, coll, measured))
-    (root / "collapse_sites_all_models.csv").write_text("\n".join(lines), encoding="utf-8")
+    (root / f"collapse_sites_all_models{suf}.csv").write_text("\n".join(lines), encoding="utf-8")
 
     # figure: one row per model, collapse curve + measured sites; the sites clearly MOVE with S,
     # and they are IDENTICAL in shape whatever the training budget (structural, not learned).
@@ -284,14 +361,14 @@ def cross_collapse_table(n_phase: int = 3) -> None:
             ax.axvline(f, color="#6a1b9a", ls="--", lw=1.0, alpha=.7)
         ax.set_yticks([]); ax.set_ylabel(label, rotation=0, ha="right", va="center", fontsize=9)
         ax.margins(x=0.01)
-    axes[0].set_title("H3 across geometry — token-collapse sites (dashed) move with the stride grid c·fs/S\n"
+    axes[0].set_title(f"H3 across geometry [{mode}] — token-collapse sites (dashed) move with the stride grid c·fs/S\n"
                       "(identical structure at every training budget → the collapse is geometric, not learned)",
                       fontsize=11)
     axes[-1].set_xlabel("frequency [Hz]")
-    fig.tight_layout(); fig.savefig(root / "H3_collapse_sites_all_models.png", dpi=140, bbox_inches="tight")
+    fig.tight_layout(); fig.savefig(root / f"H3_collapse_sites_all_models{suf}.png", dpi=140, bbox_inches="tight")
     plt.close(fig)
-    print(f"  saved -> {root/'collapse_sites_all_models.csv'}")
-    print(f"  saved -> {root/'H3_collapse_sites_all_models.png'}")
+    print(f"  saved -> {root/('collapse_sites_all_models'+suf+'.csv')}")
+    print(f"  saved -> {root/('H3_collapse_sites_all_models'+suf+'.png')}")
 
 
 # --------------------------------------------------------------------------- #
@@ -300,15 +377,23 @@ def main() -> None:
     ap.add_argument("--P", type=int, default=16)
     ap.add_argument("--S", type=int, default=16)
     ap.add_argument("--cross", action="store_true", help="H3 collapse-site table over ALL models")
+    ap.add_argument("--background", action="store_true",
+                    help="ride the tone on a unit-variance TSMixup background (probing convention); "
+                         "outputs go to *_bg paths. Default: pure sinusoid.")
     args = ap.parse_args()
+
+    global USE_BG
+    USE_BG = USE_BG or args.background
+    mode = "TSMixup background + tone" if USE_BG else "pure sinusoid"
 
     if args.cross:
         cross_collapse_table()
         return
 
     m = Model(args.P, args.S)
-    out = Path(f"outputs/hypotheses/p{m.P}-s{m.S}"); out.mkdir(parents=True, exist_ok=True)
-    print(f"loaded: {m.label}  (P={m.P}, S={m.S})  device={DEVICE}")
+    suf = "_bg" if USE_BG else ""
+    out = Path(f"outputs/hypotheses/p{m.P}-s{m.S}{suf}"); out.mkdir(parents=True, exist_ok=True)
+    print(f"loaded: {m.label}  (P={m.P}, S={m.S})  device={DEVICE}  | signal mode: {mode}")
 
     h3 = test_H3(m, out)
     h1 = test_H1(m, out)

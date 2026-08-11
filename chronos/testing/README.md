@@ -35,14 +35,35 @@ python hypotheses.py --P 16 --S 8        # H1/H2/H3 for one model
 python hypotheses.py --cross             # H3 collapse-site table + figure, all models
 ```
 
+### Signal mode: pure sinusoid (default) vs realistic background
+
+By default `hypotheses.py` and `contamination.ipynb` use **pure sinusoids** — this isolates the
+geometry, so the phenomenon shows its clean signature (the token collapse is *exactly* 0 at a lock,
+the contamination cost is measurable). A **realistic-signal cross-check** is available that rides the
+tone on a **unit-variance TSMixup background at SNR = 4** — the *same* construction the probing
+notebook uses. It writes to parallel `*_bg` paths and never overwrites the pure-sinusoid figures:
+
+```bash
+python hypotheses.py --P 16 --S 8 --background     # -> outputs/hypotheses/p16-s8_bg/
+python hypotheses.py --cross --background          # -> outputs/hypotheses/..._bg.{png,csv}
+CONTAM_BACKGROUND=1 jupyter nbconvert --execute contamination.ipynb   # -> contamination/p16-s16_bg/
+```
+
+What the cross-check shows (see the dedicated section below): **H1/H2/H3 verdicts are unchanged**, the
+collapse dips still land exactly on `c·fs/S` (and the background even exposes the *non-integer*
+stride locks), but the contamination effect is **diluted into the noise**. So pure sinusoids remain
+the primary analysis; the background is a supplementary robustness check, not a replacement.
+
 Outputs:
 
 ```
 outputs/
   per_model/p{P}-s{S}/     FIG3_space_saving, FIG5_reconstruction, FIG5b_generated_signals
   contamination/p16-s16/   recovery_at_lock, impact_on_others
+  contamination/p16-s16_bg/  same two figures, TSMixup background under the signal
   hypotheses/p{P}-s{S}/    H1_local_contrast, H2_phase_invariance, H3_collapse_sites
-  hypotheses/              H3_collapse_sites_all_models.png, collapse_sites_all_models.csv
+  hypotheses/p{P}-s{S}_bg/ same three figures, tone on a TSMixup background
+  hypotheses/              H3_collapse_sites_all_models{,_bg}.png, collapse_sites_all_models{,_bg}.csv
   executed/p{P}-s{S}/      the fully-executed copy of each notebook
 ```
 
@@ -164,6 +185,32 @@ no longer mislabels a gain as a drop.
 - **H3** (lock sites move with the geometry) — **supported on every model**: measured collapse sites
   equal the integer stride grid `c·fs/S` and shift as `S` changes (see the table above and
   `H3_collapse_sites_all_models.png`).
+
+## Realistic-signal cross-check — pure sinusoid vs TSMixup background
+
+The deliverable's Data section prescribes **two** signal sets: pure sine waves (2–250 Hz) and
+TSMixup mixtures. The hypothesis/contamination tests use the **pure** set (to isolate the geometry);
+the probing notebook uses the **TSMixup** set (to test decodability under a realistic background).
+To confirm the conclusions are not an artefact of the clean input, every test was re-run with the
+tone riding on a unit-variance TSMixup background at SNR = 4 (`--background` / `CONTAM_BACKGROUND=1`).
+Result: **the conclusions hold; only the sharpness changes.**
+
+| test | pure sinusoid (primary) | TSMixup background + tone | changed? |
+|---|---|---|---|
+| **H3** collapse sites | exact zeros, clean PASS on the integer `c·fs/S` grid (all 6 models) | dips stay on `c·fs/S` and even reveal the **non-integer** locks (43/85 Hz for S=12; 21/43 Hz for S=24); std no longer hits 0 | mechanism identical, **more** locks visible |
+| **H1** localized loss | REFUTED (5/6; the sole loss is `cpp=3`) | REFUTED (5/6) | **no** |
+| **H2** phase-invariance | SUPPORTED (6/6), CV 0.01–0.16 | SUPPORTED (6/6), CV 0.08–0.17 | **no** |
+| **Contamination** (16-16) | without 0.55 → +critical 0.41, +non-critical 0.50 → **critical-specific +0.09** | without 0.45 → +critical 0.25, +non-critical 0.27 → **critical-specific +0.01** | effect **diluted into the noise** |
+
+*Reading the difference.* H3's exact-zero degeneracy is a property of the *noise-free* signal:
+under a background the consecutive patches are no longer literally identical, so the collapse becomes
+a deep **dip** (2–3× below the off-lock baseline) instead of a zero — but it sits on exactly the same
+stride grid, which is why the background version is a confirmation, not a contradiction. H1/H2 are
+geometry-driven and therefore background-independent. Contamination is the one test that *weakens*:
+a broadband background depresses every carrier roughly equally, so the critical-vs-ordinary gap
+shrinks from +0.09 to noise. **Conclusion: pure sinusoids are the correct primary tool; the
+background cross-check corroborates H1/H2/H3 and shows the contamination effect is real but small
+once realistic energy is present.**
 
 ## No data leakage
 
