@@ -1,0 +1,152 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Journal Article
+% LaTeX Template
+% Version 2.0 (February 7, 2023)
+%
+% This template originates from:
+% https://www.LaTeXTemplates.com
+%
+% Author:
+% Vel (vel@latextemplates.com)
+%
+% License:
+% CC BY-NC-SA 4.0 (https://creativecommons.org/licenses/by-nc-sa/4.0/)
+%
+% NOTE: The bibliography needs to be compiled using the biber engine.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[
+	letterpaper, % Paper size, use either a4paper or letterpaper
+	10pt, % Default font size, can also use 11pt or 12pt, although this is not recommended
+	unnumberedsections, % Comment to enable section numbering
+	twoside, % Two side traditional mode where headers and footers change between odd and even pages, comment this option to make them fixed
+]{LTJournalArticle}  
+
+\addbibresource{patchAliasing.bib} % BibLaTeX bibliography file
+
+\usepackage{float} % enables the [H] float specifier to pin figures/tables in place
+
+\runninghead{Changelog} % A shortened article title to appear in the running head, leave this command empty for no running head
+
+% \footertext{\textit{Journal of ...}} % Text to appear in the footer, leave this command empty for no footer text
+
+\setcounter{page}{1} % The page number of the first page, set this to a higher number if the article is to be part of an issue or larger work
+
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION
+%----------------------------------------------------------------------------------------
+
+\title{Changelog} % Article title, use manual lines breaks (\\) to beautify the layout
+
+% Authors are listed in a comma-separated list with superscript numbers indicating affiliations
+% \thanks{} is used for any text that should be placed in a footnote on the first page, such as the corresponding author's email, journal acceptance dates, a copyright/license notice, keywords, etc
+\author{
+	Matteo Boniotti, Gianluca Brignoli and Federico Sabbadini\thanks{This work is licensed under the Creative Commons Attribution 4.0 International License. Concurrently, all associated source code, probing scripts, and software artifacts generated throughout the project lifecycle are released under the open-source MIT license. \newline Copyright for any third-party material included in this work remains with its respective owners and must be respected accordingly. \newline \newline During the preparation of this work, the authors used AI-based tools, including GPT-5.5, Gemini 3.6 Flash, Sonnet 5, and Opus 4.6, to support language refinement and improve clarity. All generated or suggested content was carefully reviewed, revised where necessary, and validated by the authors, who assume full responsibility for the final content of this work.}
+}
+
+% Affiliations are output in the \date{} command
+% \date{\footnotesize\textsuperscript{\textbf{1}}School of Chemistry, The University of Michigan\\ \textsuperscript{\textbf{2}}Physics Department, The University of Wisconsin\\ \textsuperscript{\textbf{3}}Biological Sciences Department, The University of Minnesota}
+
+% Full-width abstract
+%\renewcommand{\maketitlehookd}{%
+	%\begin{abstract}
+		%\noindent Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent porttitor arcu luctus, imperdiet urna iaculis, mattis eros. Pellentesque iaculis odio vel nisl ullamcorper, nec faucibus ipsum molestie. Sed dictum nisl non aliquet porttitor. Etiam vulputate arcu dignissim, finibus sem et, viverra nisl. Aenean luctus congue massa, ut laoreet metus ornare in. Nunc fermentum nisi imperdiet lectus tincidunt vestibulum at ac elit. Nulla mattis nisl eu malesuada suscipit. Aliquam arcu turpis, ultrices sed luctus ac, vehicula id metus. Morbi eu feugiat velit, et tempus augue. Proin ac mattis tortor. Donec tincidunt, ante rhoncus luctus semper, arcu lorem lobortis justo, nec convallis ante quam quis lectus. Aenean tincidunt sodales massa, et hendrerit tellus mattis ac. Sed non pretium nibh. Donec cursus maximus luctus. Vivamus lobortis eros et massa porta porttitor.
+	%\end{abstract}
+%}
+
+%----------------------------------------------------------------------------------------
+\renewcommand{\arraystretch}{1.75}
+
+\begin{document}
+ 
+\maketitle % Output the title section
+ 
+\begin{table}[!b]
+\centering
+\small
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{@{} m{3.8cm} m{7.4cm} m{3.2cm} @{}}
+\toprule
+\textbf{Feedback point} & \textbf{Change made} & \textbf{Where} \\
+\midrule
+Domain Description before Purpose and Scope
+  & Section order inverted.
+  & Domain Description \\
+\hline
+Intended Audience shortened or integrated
+  & Standalone section removed; content condensed into one paragraph.
+  & Domain Description, final paragraph \\
+\hline
+Significance and Impact after the project outline
+  & Moved to last body section.
+  & Significance and Impact \\
+\hline
+Dedicated Data section
+  & Added; signals and datasets consolidated from multiple sections.
+  & Data and Evaluation \\
+\hline
+State the intended mathematical formulation
+  & New section: tokenisation operator, phase-locking conditions, locked
+    frequency class, operational definition of structural aliasing.
+  & Mathematical Formulation, Eqs.~(1)--(8) \\
+\hline
+Reformulate the hypotheses explicitly
+  & Objectives replaced by H1--H3 with predicted direction, metric and
+    refutation criterion.
+  & Aliasing implications \\
+\hline
+Make the probing experiments precise
+  & New section: probed representations, metric, probe points and controls.
+  & Probing Methodology \\
+\hline
+Simplify the experimental pipeline
+  & Staged: default checkpoint on sinusoids $\to$ retrained $(P,S)$ grid
+    $\to$ complex synthetics $\to$ photovoltaic data.
+  & Data and Evaluation; Methodology \\
+\hline
+Clarify whether stride changes require retraining
+  & Retraining necessity shown for both $P$ and $S$; recipe and departures
+    tabulated.
+  & Methodology, Tables~1--2 \\
+\hline
+Explore strides on both sides of the default
+  & Admissibility constraint $S \le P$ stated; symmetric design built on the
+    $P{=}S$ diagonal: $\{8,16,24\}$.
+  & Methodology \\
+\hline
+Describe the planned priors
+  & Likelihoods, link function and all priors stated with justification.
+  & Bayesian Analysis, Eqs.~(9)--(10) \\
+\bottomrule
+\end{tabular}
+\caption{Summary of the feedback and corresponding revisions.}
+\label{tab:changelog}
+\end{table}
+
+This document records the revisions made to Deliverable~1 in response to the feedback received on the first submission (version dated 4~June~2026). Entries are grouped under the headings used in that feedback. The revised document is written under the extended allowance of 2\,000 words granted with the feedback.
+ 
+\subsection{Structure and organisation}
+The document now opens with \emph{Domain Description}, followed by \emph{Purpose and Scope}. The standalone \emph{Intended Audience} section was condensed into a closing paragraph of \emph{Domain Description}, and \emph{Significance and Impact} was moved to the end of the body. The single \emph{Project Outline} section was replaced by dedicated sections (formalisation, data, methodology, probing, statistics, risk assessment), and a \emph{Data and Evaluation} section consolidates all signals and datasets previously spread across multiple sections. The ontology was moved to Appendix~A.
+ 
+\subsection{Mathematical formulation and hypotheses}
+A \emph{Mathematical Formulation} section was added, where the first submission only announced it as planned work. It defines the tokenisation operator $\mathcal{T}_{P,S}$ (Eq.~1), the signal model with Nyquist constraint (Eq.~2), the full stride-translation derivation (Eqs.~3--5), the analogous patch-length condition (Eq.~6), and the phase-locking frequency class $\mathcal{F}_{\mathrm{lock}}$ as a function of $f_s$, $P$ and $S$ (Eq.~7). It is now stated that patch self-repetition does not by itself imply that two distinct signals become indistinguishable; structural aliasing is given a separate operational definition at the representation level (Eq.~8). The three former objectives were reformulated as hypotheses H1--H3, each with a predicted direction, the relevant metric, and an explicit refutation criterion. The ontology is set out in Appendix~A; the generation-state axioms are given in full, while the remaining axiom families are outlined for feedback before formalisation.
+ 
+\subsection{Experimental methodology}
+A Probing Methodology section replaces the single sentence of the first submission, specifying the probed representations, the MDL-based metric with its controls, and the per-frequency accuracy profile. Probing was extended from decoder-only to include the encoder, so that the stage at which frequency information is lost can be localised. The pipeline was simplified and staged: clean sinusoids first, then the retrained $(P,S)$ grid, then the photovoltaic application.
+ 
+\subsection{Patch stride experiments}
+It is now stated that changing $P$ or $S$ requires retraining (the former resizes the patch-embedding block, the latter alters inter-patch dynamics). Table~1 reports the five retrained configurations; Table~2 compares all hyperparameters against the published Chronos recipe and isolates the departures. The unpublished Chronos-Bolt recipe is approximated with the published Chronos-T5 one, under a uniform 100k-step budget to avoid confounding. Configurations with $S > P$ are excluded: they discard samples between patches, confounding structural aliasing with data loss. The requested symmetry is realised on the $P=S$ diagonal ($\{8,16,24\}$), the only axis admitting neighbours on both sides under $S\le P$.
+ 
+The context window was corrected to $T = 2048$ samples (the first submission reported $T = 512$ tokens). The exclusion of $S = 4$ is now justified. Figure~1 is included as evidence that the configurations train to a usable state; it is not offered as analysis, which belongs to later deliverables.
+
+A mitigation strategy and its link to agent behaviour were also added: reducing $S$ shrinks $\mathcal{F}_{\mathrm{lock}}$, and the \texttt{pv:AliasingEvent} class lets the control agent flag reduced confidence at locked frequencies.
+ 
+\subsection{Bayesian analysis}
+A \emph{Bayesian Analysis} section was added. It splits the analysis into a relative part (logarithmic local contrast $d$ pairing each locked frequency with matched controls, Eq.~9, under a heavy-tailed Student-$t_4$ likelihood with prior $\bar\beta \sim \text{Student-}t_4(0,0.5)$) and an absolute part (Gamma regression with log link on MDL codelength, Eq.~10, with priors on $\theta_{\text{lock}}$ and the shape parameter). Planned inference: 95\% credible intervals and posterior probability of ${\ge}20\%$ attenuation.
+
+\end{document}
