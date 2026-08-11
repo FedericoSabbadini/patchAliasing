@@ -1,0 +1,50 @@
+The core ontology architecture bridges the gap between cyber-physical energy systems and deep learning signal processing domain knowledge. It categorizes the application setting into five main conceptual pillars rooted under the ontological hierarchy:
+
+\begin{itemize}
+    \item \textbf{Physical Subsystem (\texttt{pv:PhysicalComponent}):} represents the hardware infrastructure of the micro-grid, including the solar array, electrochemical storage, consumer loads, and the macro grid tie.
+    \item \textbf{Cognitive Layer (\texttt{pv:ControlAgent}):} the artificial intelligence system responsible for autonomous grid optimization, load balancing, dispatch scheduling, and proactive vulnerability mitigation.
+    \item \textbf{Signal Processing Layer (\texttt{pv:Signal}, \texttt{pv:PatchedSignal}):} tracks the raw telemetry inputs (both time-domain features and frequency-domain components) along with their tokenized representation configurations (patch dimensions, stride values) tailored for the Chronos foundation architecture.
+    \item \textbf{Environmental Tracking (\texttt{pv:WeatherObservation}):} captures concurrent meteorological snapshots (air temperature, wind vectors) influencing structural physics and electrical efficiency.
+    \item \textbf{Inferred Operational States:} dynamic metadata classified into generation (\texttt{pv:GenerationState}), systemic disruptions (\texttt{pv:AnomalyState}), control directives (\texttt{pv:AgentAction}), and signal degradation hazards (\texttt{pv:AliasingEvent}).
+\end{itemize}
+
+\subsection{Generation States}
+A formal description of the state of the photovoltaic array is provided through the following axioms, which define the generation state based on the measured tilted irradiance in W/m\textsuperscript{2}:
+\begin{equation}
+\begin{aligned}
+\texttt{PhotovoltaicArray}(?pv) &\wedge \texttt{measures}(?pv, ?s) \wedge \texttt{tiltedIrradianceWm2}(?s, ?g) \wedge (?g \ge 800.0) \\
+&\longrightarrow \texttt{hasGenerationState}(?pv, \texttt{ClearSky})
+\end{aligned}
+\end{equation}
+
+\begin{equation}
+\begin{aligned}
+\texttt{PhotovoltaicArray}(?pv) &\wedge \texttt{measures}(?pv, ?s) \wedge \texttt{tiltedIrradianceWm2}(?s, ?g) \\
+&\wedge (?g \ge 150.0) \wedge (?g < 800.0) \\
+&\longrightarrow \texttt{hasGenerationState}(?pv, \texttt{PartialCloud})
+\end{aligned}
+\end{equation}
+
+\begin{equation}
+\begin{aligned}
+\texttt{PhotovoltaicArray}(?pv) &\wedge \texttt{measures}(?pv, ?s) \wedge \texttt{tiltedIrradianceWm2}(?s, ?g) \\
+&\wedge (?g > 0.0) \wedge (?g < 150.0) \\
+&\longrightarrow \texttt{hasGenerationState}(?pv, \texttt{Overcast})
+\end{aligned}
+\end{equation}
+
+\begin{equation}
+\begin{aligned}
+\texttt{PhotovoltaicArray}(?pv) &\wedge \texttt{measures}(?pv, ?s) \wedge \texttt{tiltedIrradianceWm2}(?s, ?g) \wedge (?g \le 0.0) \\
+&\longrightarrow \texttt{hasGenerationState}(?pv, \texttt{Nighttime})
+\end{aligned}
+\end{equation}
+
+\subsection{Anomaly States}
+Formal description of the anomaly states which could be detected in the photovoltaic array, based on the measured irradiance and the measured power.
+
+\subsection{Aliasing Event} 
+Formal description of the aliasing event, detected when the frequency of the signal is part of the frequency class $\mathcal{F}_{\mathrm{lock}}$.
+
+\subsection{Agent Actions}
+Formal description of the action taken by the control agent, based on the current state and aliasing event.
