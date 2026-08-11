@@ -1,120 +1,47 @@
 [
-    {
-        "generator": "kernelsynth",
-        "n_realizations": 5,
-        "seed": 11,
-        "params": {
-            "J": 5,
-            "l_syn": 512,
-            "fs": 256,
-            "jitter": 1e-4,
-            "P": 16,
-            "inject": [
-                {"freq_hz": 126.4, "amplitude": 3.0,  "phase": 1.5707963}
-            ]
-        },
-        "_note": "cpp=7.9, dominant tone"
-    },
-    {
-        "generator": "kernelsynth",
-        "n_realizations": 5,
-        "seed": 11,
-        "params": {
-            "J": 5,
-            "l_syn": 512,
-            "fs": 256,
-            "jitter": 1e-4,
-            "P": 16,
-            "inject": [
-                {"freq_hz": 126.4, "amplitude": 0.03, "phase": 1.5707963}
-            ]
-        },
-        "_note": "cpp=7.9, low amplitude"
-    },
-    {
-        "generator": "kernelsynth",
-        "n_realizations": 5,
-        "seed": 12,
-        "params": {
-            "J": 5,
-            "l_syn": 512,
-            "fs": 256,
-            "jitter": 1e-4,
-            "P": 16,
-            "inject": [
-                {"freq_hz": 117.92, "amplitude": 0.05, "phase": 1.5707963}
-            ]
-        },
-        "_note": "cpp=7.37"
-    },
-    {
-        "generator": "tsmixup",
-        "n_realizations": 5,
-        "seed": 13,
-        "params": {
-            "K": 3,
-            "alpha": 1.5,
-            "l_min": 512,
-            "l_max": 512,
-            "fs": 256,
-            "P": 16,
-            "t_lengths": [256, 384, 512],
-            "inject": [
-                {"freq_hz": 120.0, "amplitude": 0.03, "phase": 1.5707963}
-            ]
-        },
-        "_note": "cpp=7.5"
-    },
-    {
-        "generator": "tsmixup",
-        "n_realizations": 5,
-        "seed": 14,
-        "params": {
-            "K": 3,
-            "alpha": 1.5,
-            "l_min": 512,
-            "l_max": 512,
-            "fs": 256,
-            "P": 16,
-            "t_lengths": [256, 384, 512],
-            "inject": [
-                {"freq_hz": 104.0, "amplitude": 0.3, "phase": 1.5707963}
-            ]
-        },
-        "_note": "cpp=6.5"
-    },
-    {
-        "generator": "kernelsynth",
-        "n_realizations": 5,
-        "seed": 15,
-        "params": {
-            "J": 5,
-            "l_syn": 512,
-            "fs": 256,
-            "jitter": 1e-4,
-            "P": 16,
-            "inject": [
-                {"freq_hz": 64.0, "amplitude": 0.01, "phase": 0.0}
-            ]
-        },
-        "_note": "cpp=4.0 — INTEGER cpp, structural aliasing candidate"
-    },
-    {
-        "generator": "kernelsynth",
-        "n_realizations": 5,
-        "seed": 16,
-        "params": {
-            "J": 5,
-            "l_syn": 512,
-            "fs": 256,
-            "jitter": 1e-4,
-            "P": 16,
-            "inject": [
-                {"freq_hz": 64.0,  "amplitude": 0.01, "phase": 0.0},
-                {"freq_hz": 96.0,  "amplitude": 0.01, "phase": 0.0},
-                {"freq_hz": 120.0, "amplitude": 0.01, "phase": 1.5707963}
-            ]
-        },
-        "_note": "multi-tone: cpp=4 (blind), cpp=6 (blind), cpp=7.5 (non-blind)"
-    }
+  {"generator": "kernelsynth", "seed": 101, "params": {"J": 5, "l_syn": 576, "fs": 512, "jitter": 1e-4, "P": 16,
+    "inject": [{"freq_hz": 32.0, "amplitude": 2.0, "phase": 0.0}]}, "_note": "cpp=1 CRITICAL (patch lock fs/P)"},
+  {"generator": "tsmixup", "seed": 102, "params": {"K": 3, "alpha": 1.5, "l_min": 576, "l_max": 576, "fs": 512, "P": 16, "t_lengths": [288, 432, 576],
+    "inject": [{"freq_hz": 32.0, "amplitude": 2.0, "phase": 1.5707963}]}, "_note": "cpp=1 CRITICAL"},
+
+  {"generator": "kernelsynth", "seed": 103, "params": {"J": 5, "l_syn": 576, "fs": 512, "jitter": 1e-4, "P": 16,
+    "inject": [{"freq_hz": 64.0, "amplitude": 2.0, "phase": 0.0}]}, "_note": "cpp=2 CRITICAL"},
+  {"generator": "tsmixup", "seed": 104, "params": {"K": 3, "alpha": 1.5, "l_min": 576, "l_max": 576, "fs": 512, "P": 16, "t_lengths": [288, 432, 576],
+    "inject": [{"freq_hz": 64.0, "amplitude": 2.0, "phase": 1.5707963}]}, "_note": "cpp=2 CRITICAL"},
+
+  {"generator": "kernelsynth", "seed": 105, "params": {"J": 5, "l_syn": 576, "fs": 512, "jitter": 1e-4, "P": 16,
+    "inject": [{"freq_hz": 96.0, "amplitude": 2.0, "phase": 0.0}]}, "_note": "cpp=3 CRITICAL"},
+  {"generator": "tsmixup", "seed": 106, "params": {"K": 3, "alpha": 1.5, "l_min": 576, "l_max": 576, "fs": 512, "P": 16, "t_lengths": [288, 432, 576],
+    "inject": [{"freq_hz": 96.0, "amplitude": 2.0, "phase": 1.5707963}]}, "_note": "cpp=3 CRITICAL"},
+
+  {"generator": "kernelsynth", "seed": 107, "params": {"J": 5, "l_syn": 576, "fs": 512, "jitter": 1e-4, "P": 16,
+    "inject": [{"freq_hz": 128.0, "amplitude": 2.0, "phase": 0.0}]}, "_note": "cpp=4 CRITICAL"},
+  {"generator": "tsmixup", "seed": 108, "params": {"K": 3, "alpha": 1.5, "l_min": 576, "l_max": 576, "fs": 512, "P": 16, "t_lengths": [288, 432, 576],
+    "inject": [{"freq_hz": 128.0, "amplitude": 2.0, "phase": 1.5707963}]}, "_note": "cpp=4 CRITICAL"},
+
+  {"generator": "kernelsynth", "seed": 109, "params": {"J": 5, "l_syn": 576, "fs": 512, "jitter": 1e-4, "P": 16,
+    "inject": [{"freq_hz": 48.0, "amplitude": 2.0, "phase": 0.0}]}, "_note": "cpp=1.5 non-critical"},
+  {"generator": "tsmixup", "seed": 110, "params": {"K": 3, "alpha": 1.5, "l_min": 576, "l_max": 576, "fs": 512, "P": 16, "t_lengths": [288, 432, 576],
+    "inject": [{"freq_hz": 48.0, "amplitude": 2.0, "phase": 1.5707963}]}, "_note": "cpp=1.5 non-critical"},
+
+  {"generator": "kernelsynth", "seed": 111, "params": {"J": 5, "l_syn": 576, "fs": 512, "jitter": 1e-4, "P": 16,
+    "inject": [{"freq_hz": 80.0, "amplitude": 2.0, "phase": 0.0}]}, "_note": "cpp=2.5 non-critical"},
+  {"generator": "tsmixup", "seed": 112, "params": {"K": 3, "alpha": 1.5, "l_min": 576, "l_max": 576, "fs": 512, "P": 16, "t_lengths": [288, 432, 576],
+    "inject": [{"freq_hz": 80.0, "amplitude": 2.0, "phase": 1.5707963}]}, "_note": "cpp=2.5 non-critical"},
+
+  {"generator": "kernelsynth", "seed": 113, "params": {"J": 5, "l_syn": 576, "fs": 512, "jitter": 1e-4, "P": 16,
+    "inject": [{"freq_hz": 112.0, "amplitude": 2.0, "phase": 0.0}]}, "_note": "cpp=3.5 non-critical"},
+  {"generator": "tsmixup", "seed": 114, "params": {"K": 3, "alpha": 1.5, "l_min": 576, "l_max": 576, "fs": 512, "P": 16, "t_lengths": [288, 432, 576],
+    "inject": [{"freq_hz": 112.0, "amplitude": 2.0, "phase": 1.5707963}]}, "_note": "cpp=3.5 non-critical"},
+
+  {"generator": "kernelsynth", "seed": 115, "params": {"J": 5, "l_syn": 576, "fs": 512, "jitter": 1e-4, "P": 16,
+    "inject": [{"freq_hz": 64.0, "amplitude": 1.2, "phase": 0.0},
+               {"freq_hz": 80.0, "amplitude": 1.2, "phase": 1.5707963},
+               {"freq_hz": 112.0, "amplitude": 1.2, "phase": 0.0}]},
+    "_note": "MIXED: 64=cpp2 CRITICAL + 80=cpp2.5 + 112=cpp3.5 (contamination candidate)"},
+  {"generator": "tsmixup", "seed": 116, "params": {"K": 3, "alpha": 1.5, "l_min": 576, "l_max": 576, "fs": 512, "P": 16, "t_lengths": [288, 432, 576],
+    "inject": [{"freq_hz": 48.0, "amplitude": 1.2, "phase": 0.0},
+               {"freq_hz": 96.0, "amplitude": 1.2, "phase": 1.5707963},
+               {"freq_hz": 128.0, "amplitude": 1.2, "phase": 0.0}]},
+    "_note": "MIXED: 48=cpp1.5 + 96=cpp3 CRITICAL + 128=cpp4 CRITICAL"}
 ]
