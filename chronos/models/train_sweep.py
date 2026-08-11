@@ -23,9 +23,9 @@ Edit the CONFIG block below (PS_GRID, SEEDS, hyperparameters) to change the expe
 The sweep is resumable: a run that already wrote a DONE marker is skipped.
 For a quick smoke test set MAX_STEPS low (e.g. 20) and SHUFFLE_BUFFER_SIZE low (e.g. 100).
 
-Outputs: one folder per model at chronos/outputs/models/p{P}-s{S}-seed{seed}/, holding
+Outputs: one folder per model at chronos/models/weights/p{P}-s{S}-seed{seed}/, holding
 EVERY artifact tied to that model (run_config.json, loss_history.npy, loss_curve.png,
-checkpoint-{step}/, final model, DONE). An aggregate chronos/outputs/models/manifest.csv
+checkpoint-{step}/, final model, DONE). An aggregate chronos/models/weights/manifest.csv
 is rebuilt from every finished run.
 
 ---------------------------------------------------------------------------------------
@@ -101,9 +101,9 @@ DROP_PROB = 0.2                               # [CHRONOS-REF] drop_prob=0.2 (tra
 LOG_EVERY = 50                               # console logging cadence (our diagnostic; official log_steps=500)
 SAVE_EVERY = 1000                            # checkpoint cadence in steps (our diagnostic; official save_steps=100k)
 
-# All trained models + artifacts go under the shared chronos/outputs tree.
-# This file is chronos/models/train_sweep.py, so parent.parent is chronos/.
-OUTPUT_ROOT = Path(__file__).resolve().parent.parent / "outputs" / "models"
+# All trained models + artifacts live inside chronos/models/weights/.
+# This file is chronos/models/train_sweep.py, so parent is chronos/models/.
+OUTPUT_ROOT = Path(__file__).resolve().parent / "weights"
 
 
 # ============================================================================ #
@@ -462,7 +462,7 @@ def rebuild_manifest(root: Path) -> None:      # aggregate all finished runs int
 #  Sweep                                                                         #
 # ============================================================================ #
 def main():                                    # drive the full (P, S, seed) sweep
-    OUTPUT_ROOT.mkdir(parents=True, exist_ok=True)  # ensure chronos/outputs/models/ exists
+    OUTPUT_ROOT.mkdir(parents=True, exist_ok=True)  # ensure chronos/models/weights/ exists
     runs = [(P, S, seed) for (P, S) in PS_GRID for seed in SEEDS]  # flatten grid x seeds into a run list
     print(f"Sweep: {len(runs)} runs -> {OUTPUT_ROOT}")  # announce the plan
 

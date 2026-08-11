@@ -63,7 +63,7 @@ keep runs comparable.
 
 ## Outputs
 
-One folder per model, under `chronos/outputs/models/p{P}-s{S}-seed{seed}/`, holding every
+One folder per model, under `chronos/models/weights/p{P}-s{S}-seed{seed}/`, holding every
 artifact tied to that model:
 
 - `run_config.json` — all hyperparameters + provenance (git commit, torch/GPU, precision)
@@ -73,7 +73,7 @@ artifact tied to that model:
 - `checkpoint-{step}/` every `SAVE_EVERY`, and the final model at the run-dir root;
 - `DONE` — written only after a successful final save (the resume marker).
 
-Plus an aggregate `chronos/outputs/models/manifest.csv`, rebuilt idempotently from every
+Plus an aggregate `chronos/models/weights/manifest.csv`, rebuilt idempotently from every
 finished run.
 
 ## Design decisions and why

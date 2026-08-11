@@ -11,7 +11,7 @@ from pathlib import Path
 from huggingface_hub import HfApi
 
 REPO = "federicosabbadini/chronos-bolt-patch-sweep"
-ROOT = Path(__file__).resolve().parent.parent / "outputs" / "models"
+ROOT = Path(__file__).resolve().parent / "weights"
 FILES = ["config.json", "model.safetensors", "run_config.json",
          "loss_history.npy", "val_history.npy", "loss_curve.png", "DONE"]
 

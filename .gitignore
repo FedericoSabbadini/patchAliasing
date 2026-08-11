@@ -234,6 +234,6 @@ __marimo__/
 report/main.zip
 
 # Model weights (on HuggingFace, not in git)
-chronos/outputs/models/
+chronos/models/weights/
 # Local training data subset
 chronos/data/corpus/
