@@ -1,0 +1,253 @@
+This investigation formalizes the phenomenon of \textit{structural aliasing} within patch-based time-series foundation models, focusing specifically on Amazon's Chronos-Bolt framework.\cite{ansariChronosLearningLanguage2024, FastAccurateZeroshot2024a} The project focuses on smart-grid load balancing. 
+
+\section{Domain Description}
+To ground this abstract architectural evaluation, the study utilizes a specific physical domain as an empirical reference layer. This reference setting models the solar energy produced by a photovoltaic array attached to an internal load, a local storage battery, and the national electricity grid. The explicit operational objective within this system is to evaluate production variations over short-term future horizons so that the system can dynamically modify the internal load, attach and detach the battery unit, with the aim of maintaining internal grid stability and enabling precise anomaly detection. 
+
+Within this infrastructure, a control AI agent is responsible for executing real-time tasks: dynamic load-balancing, battery dispatch, state-monitoring and active anomaly detection, and internal grid stability maintenance.
+
+This analysis is directly intended for researchers, engineers and practitioners utilizing foundation models within the Chronos family for time-series analysis, representation learning, and forecasting, as well as individuals working in the field of energy management who are interested in characterizing the fundamental limitations, structural boundaries, and latent capabilities of these architectures. 
+
+\section{Purpose and Scope}
+This project formalizes and empirically validates the phenomenon of \textit{structural aliasing} in patch-based time-series foundation models, using Amazon Chronos-Bolt-Tiny as the target architecture.
+
+Chronos-Bolt-Tiny operates with a fixed patch size of $P=16$, stride of $S=16$ and context window of $T=2048$ samples as default settings; its architecture comprises four encoder blocks followed by four decoder blocks terminating in a direct quantile projection head.\cite{AmazonChronosbolttinyHugging2025, ChronosBoltPipelineAmazonscienceChronosforecastinga}
+
+This study aims to provide a comprehensive understanding of the relationships between raw signal characteristics and the latent representations learned by the model, systematically identifying the critical links between sampling frequency ($f_s$), patch size ($P$), and stride ($S$) in order to propose actionable solutions to mitigate the phenomenon.
+
+The core objective is to challenge the baseline assumption that pre-trained temporal foundation models inherently preserve frequency attributes when processing Nyquist-compliant signals.
+
+\section{Mathematical Formulation}
+The project provides a formal domain description through OWL2 ontology representation of: the physical system (photovoltaic array, battery storage, national grid, internal load), the signal (frequency, amplitude, timespan, phase) and its patched representation (patch size, stride, sampling frequency). See \autoref{sec:appendixA} for a formal description of the ontology.
+
+The investigation focuses on the formal definition of the phenomenon of structural aliasing, starting from the tokenization operator and describing phase-locking conditions. The project then formalizes the relationship between the signal frequency, patch size, stride, and sampling frequency, providing a mathematical framework to analyze the conditions under which structural aliasing occurs. 
+
+Let $\mathbf{x} = \{x[n]\}_{n \in \mathbb{Z}}$ be a discrete-time signal representing the input time series. We define the patch-based tokenization operator $\mathcal{T}_{P,S}$ with patch length $P \in \mathbb{N}^{+}$ and stride $S \in \mathbb{N}^{+}$ as a mapping that transforms the signal $\mathbf{x}$ into a sequence of vector-valued tokens $\mathbf{T}=\{\mathbf{t}_k\}_{k\in\mathbb{Z}}$, where each token $\mathbf{t}_k\in\mathbb{R}^{P}$. The $k$-th token is defined as
+
+\begin{equation}
+\label{eq:token_def}
+\mathbf{t}_k
+=
+\mathcal{T}_{P,S}(\mathbf{x})[k]
+=
+\begin{bmatrix}
+x[kS] \\
+x[kS+1] \\
+\vdots \\
+x[kS+P-1]
+\end{bmatrix}.
+\end{equation}
+
+Consider a continuous-time periodic signal sampled uniformly at sampling frequency $f_s$, yielding the discrete-time sequence $x[n]$. We isolate a fundamental harmonic component as
+
+\begin{equation}
+\label{eq:sinusoid}
+x[n]
+=
+\sin\!\left(
+2\pi\frac{f}{f_s}n+\phi
+\right),
+\end{equation}
+
+where $f$ denotes the signal frequency satisfying the Nyquist criterion $f < \frac{f_s}{2}$, and $\phi\in[0,2\pi)$ is an arbitrary phase offset.
+
+Phase-locking occurs when the structural phase profile of the signal repeats exactly under a translational shift equal to the stride $S$. Evaluating a stride translation yields
+
+\begin{equation}
+\label{eq:stride_translation}
+x[n+S]
+=
+\sin\!\left(
+2\pi\frac{f}{f_s}(n+S)+\phi
+\right)
+=
+\sin\!\left(
+2\pi\frac{f}{f_s}n
++
+2\pi\frac{fS}{f_s}
++
+\phi
+\right).
+\end{equation}
+
+For exact alignment between the signal and the tokenization operator, the phase accumulation over one stride must correspond to an integer number of $2\pi$--periods
+
+\begin{equation}
+\label{eq:phase_boundary}
+2\pi\frac{fS}{f_s}
+=
+2\pi c,
+\qquad
+c\in\mathbb{N}^{+}.
+\end{equation}
+
+As a result, the signal exhibits exact stride-period translational invariance
+
+\begin{equation}
+\label{eq:stride_translation_invariance}
+x[n+S]
+=
+\sin\!\left(
+2\pi\frac{f}{f_s}n
++
+2\pi c
++
+\phi
+\right)
+=
+\sin\!\left(
+2\pi\frac{f}{f_s}n
++\phi
+\right)
+=
+x[n].
+\end{equation}
+
+The same derivation can be applied taking into account translational shifts equal to the patch size $P$, yielding a similar phase-locking condition
+
+\begin{equation}
+\label{eq:phase_boundary_2}
+2\pi\frac{fP}{f_s}
+=
+2\pi k
+\Rightarrow
+x[n+P]
+=
+x[n],
+\qquad
+k\in\mathbb{N}^{+}.
+\end{equation}
+
+Solving \autoref{eq:phase_boundary} and \autoref{eq:phase_boundary_2} for $f$ yields the phase-locking frequency class $\mathcal{F}_{lock}$, which is defined as the set of frequencies producing self-repetition over one stride or over one patch.
+
+\begin{equation}
+\label{eq:flock_set}
+\mathcal F_{lock}
+=
+\left\{
+f\in\mathbb{R}^{+}
+\;\middle|\;
+f
+=
+c\frac{f_s}{S}
+\lor
+f
+=
+k\frac{f_s}{P},
+\;
+c, k\in\mathbb{N}^{+},
+\;
+f<\frac{f_s}{2}
+\right\}.
+\end{equation}
+
+The derivation above shows that some translations leave a sinusoid unchanged, this repetition is not evidence that two distinct signals become indistinguishable to the model. 
+
+Structural aliasing is treated as an emergent, falsifiable property of the trained representations: two frequency-matched but distinct signals $x,y$ structurally alias at layer $l$ if:
+
+\begin{equation}
+    \lVert R_l(x)-R_l(y)\rVert_2\le\varepsilon
+\end{equation} 
+
+where $R_l$ is the representation at layer $l$, $\lVert\cdot\rVert_2$ is the Euclidean norm, and $\varepsilon$ is a pre-registered threshold. 
+
+\subsection{Aliasing implications}
+The above derivation reframes $\mathcal F_{lock}$ as the candidate class where such collisions are hypothesised to occur. In particular, the project tests the following hypotheses.
+
+\textbf{H1:} if $f\in[f_k-\varepsilon,f_k+\varepsilon]$, where $f_k\in\mathcal F_{lock}$, the model recovers less information. We expect: higher MDL codelength and lower forecast amplitude recovery than at fixed controls $f_k\pm\delta$, $\delta\gg\varepsilon$. Absent or non-localized loss refutes H1.
+
+\textbf{H2:} the magnitude of degradation at a locked frequency $f_k\in\mathcal F_{lock}$ is a property of the stride/patch alignment, not of the signal's own phase: across the $S_{f_k}$ phase offsets already sampled at $f_k$, the accuracy drop relative to the $f_k\pm\delta$ control is expected to stay approximately constant. A drop whose size varies systematically with phase, rather than only with frequency, refutes H2.
+
+\textbf{H3:} at fixed $P$, degradation sites at $f=c f_s/S \in \mathcal F_{lock}$ move proportionally to $1/S$; at fixed $S$, sites at $f=k f_s/P \in \mathcal F_{lock}$ move proportionally to $1/P$. A site that does not move when the parameter generating it is varied refutes H3.
+
+\section{Data and Evaluation}
+Two sets of synthetic signals are used to evaluate the presence of structural aliasing in the new models. These include:
+\begin{itemize}
+    \item \textbf{Sine Wave Signals:} simple sine waves with known frequency systematically varied between 2 Hz and 250 Hz with 1 Hz increments, to assess the model's ability to capture and represent periodic components across a range of frequencies.
+    \item \textbf{Time Series Mixup Signals:} 100 signals generated by a sinusoidal mixer based on the TSMixup procedure\cite{ansariChronosLearningLanguage2024}, mixing multiple sine waves of different frequencies; to evaluate the model's capacity to disentangle and represent complex frequency interactions.
+\end{itemize}
+
+Optionally, if previous analyses show evidence of aliasing, the project may analyze test signals from a third set, including 100 signals generated using the KernelSynth\cite{ansariChronosLearningLanguage2024} tool, to test whether the phenomenon persists in more complex signals. The project then focuses on the analysis of real-world data, through the use of the \texttt{Dataset-SolarTechLab.csv} dataset, which contains a one-minute-resolution multivariate telemetry stream of a photovoltaic array\cite{levaPhotovoltaicPowerWeather2020}.
+
+All tests are undertaken for the entire set of re-trained models, to evaluate the impact of stride and patch size on the model's ability to capture and represent frequency information in more complex signals. During the analysis a seed is set to ensure reproducibility of the results. All signals considered are sampled at $f_s = 512$\,Hz.
+
+\section{Methodology}
+\input{tables/patchStride.tex}
+\input{tables/trainParams.tex}
+The default \texttt{chronos-bolt-tiny} checkpoint, at $P{=}16,\,S{=}16$, is evaluated first on the sine-wave and mixup sets described above.
+
+Since any change to $P$ or $S$ requires retraining, we retrain a restricted grid around the default $P=16,\,S=16$ baseline (see \autoref{tab:patchStride}): two reduced strides at fixed $P=16$ isolate the effect of patch overlap, while two contiguous patch sizes isolate that of patch width. We exclude $S=4$: its stride-lock class $\{128,256,\dots\}$ has one member inside the valid forecast band ($< 256 \mathrm{Hz}$ according to Nyquist), and therefore yields no informative local $H1$/$H3$ contrast on the integer-Hz grid.
+
+Configurations with $S>P$ are excluded by construction: consecutive patches would be separated by $S-P$ unobserved samples, so any loss of frequency information could be attributed to discarded data rather than to tokenization geometry. The requested symmetry is therefore realised across the zero-overlap configurations, with $P=S\in\{8,16,24\}$ bracketing the default.
+
+\begin{figure}[!b]
+    \centering
+    \includegraphics[width=\linewidth]{figures/multi_frequency_panel.png}
+    \caption{Forecast quality of the retrained models. Per frequency (rows), each $64$-step forecast (dashed) vs.\ ground truth (green); titles give cycles-per-patch at $P=16$ (\emph{cpp}). The real model performances are better than the retrained, due to the larger training budget and more extensive corpora.}
+    \label{fig:multiFreqPanel}
+\end{figure}
+
+Each $(P,S)$ configuration is retrained from scratch: changing $P$ resizes the first patch-embedding block and changing $S$ affects the learned inter-patch dynamics, so weights are not transferable. Loading only the \texttt{chronos-bolt-tiny} architecture, the loop follows the \emph{published Chronos-T5} training recipe (fused AdamW, linear LR $10^{-3}$, \texttt{fp32+TF32}, masked quantile loss) on the two official corpora, TSMixup (10M) and KernelSynth (1M) streamed at the 9:1 ratio\cite{ansariChronosLearningLanguage2024a}; the complete Chronos-Bolt recipe is not publicly released, so this is a budget-matched adaptation of the published hyperparameters rather than an exact reproduction. Every hyperparameter stays at its published value (see \autoref{tab:trainParams}); only $(P,S)$ varies, and a uniform $100$k-step budget (vs.\ $200$k) is applied to \emph{all} configurations, including the $P{=}S{=}16$ baseline, so the comparison is not confounded by training budget. A single seed ($42$) is used for now; multiple seeds remain a planned extension.
+
+Training ran on one Alienware 16 Aurora (NVIDIA RTX 5060 Laptop GPU, 8\,GB VRAM; 32\,GB RAM), ${\approx}11\,\mathrm{h}$ in total. Forecasting quality of the retrained models is shown in \autoref{fig:multiFreqPanel}. If necessary, the project may extend the training budget to the full parameters.
+
+\subsection{Probing Methodology}
+Following MDL probing\cite{voitaInformationTheoreticProbingMinimum2020}, the $256$-dimensional $[\mathrm{REG}]$ representation is captured after each encoder block and each decoder block, plus two points at the output stage: the pre-projection $256$-d $[\mathrm{REG}]$ input, and the projected quantile output (Pagani et al.'s $h_4$\cite{paganiPreliminaryInsightsChronos2026}), where the compression drop reported in the source paper is concentrated. Probing this single per-block vector, rather than the full flattened patch sequence, avoids a dimensionality mismatch across stages and patch/stride variants.
+
+All probe points are compared on the same footing via a prequential-MDL codelength $L(D)$, reported as compression $\mathrm{SV}=1-L(D)/L_{\mathrm{uniform}}(D)$, computed independently per probe point for each of the seven hierarchical band-classification tasks\cite{paganiPreliminaryInsightsChronos2026}. Each value is benchmarked against a shuffled-label control ($\mathrm{SV}\le 0$ confirms the probe is not memorising noise) and a random-initialisation control (identical untrained architecture, isolating learned information from architectural artefacts).
+
+Independently, a dense per-frequency classification-accuracy profile is obtained at the projected output by sweeping the same band-classification probe across the operational spectrum, with non-redundant phase sampling $S_f=\min\{f_s/\gcd(f,f_s)-1,\,N\}$ replacing independently drawn random phases.
+
+\subsection{Bayesian Analysis}
+We employ a two-part Bayesian framework to quantify both relative local degradation and absolute performance losses across hypotheses $H1$--$H3$. The analysis is conducted only in the frequency range over which valid forecasts are observed, which we expect to be a subset of $[2,250]\,\mathrm{Hz}$.
+
+\subsubsection{Local Contrast Analysis:} to test localized recovery drop at stride-lock for each retrained model configuration $(P, S)$ and training seed, signals at exact $f_k\in \mathcal F_{lock}$ are paired with control signals at offset frequencies $f_k \pm 0.25 f_s / S$, keeping phase, baseline amplitude, noise level, and background process parameters identical. Letting $R$ denote the forecast amplitude recovery ratio, we define the paired logarithmic local contrast $d$ as:
+
+\begin{equation}
+d 
+= 
+\log(R_k + 0.01) 
+- 
+\frac{\log(R_- + 0.01) 
++ 
+\log(R_+ + 0.01)}{2}
+\end{equation}
+
+where $R_k$ is the recovery at $f_k$, and $R_{\pm}$ are recoveries at the control frequencies $f_k \pm 0.25 f_s / S$. A contrast value of $d < 0$ directly indicates localized forecast attenuation induced by phase-locking.
+
+Contrasts are modeled using a heavy-tailed $\text{Student-}t_4(\mu_i, \sigma^2)$ likelihood. The population phase-lock effect $\bar{\beta}$ receives a weakly informative prior $\bar{\beta} \sim \text{Student-}t_4(0, 0.5)$, centered at zero due to the absence of prior quantitative estimates in the literature.
+
+\subsubsection{Absolute Performance Analysis:} to evaluate a raw non-negative metric, specifically the prequential MDL codelength $L(D)$, we use a Bayesian Gamma regression model with a log link:
+
+\begin{equation}
+y_i 
+\sim 
+\text{Gamma}(\text{shape} = k, \, \text{mean} = \mu_i),
+\qquad
+\log(\mu_i)
+=
+\alpha_0 
++ 
+\theta_{\text{lock}} 
+\cdot 
+\text{IsLocked}
+\end{equation}
+
+where $\text{IsLocked} \in \{0, 1\}$ flags phase-lock conditions, and $\theta_{\text{lock}} \sim \mathcal{N}(0, 0.5)$ captures the relative codelength expansion. 
+
+The Gamma shape parameter receives a weakly informative prior, $k \sim \text{Gamma}(2, 0.1)$, allowing the model to adaptively capture metric dispersion.
+
+\subsubsection{Inference:} planned posterior inference will evaluate $95\%$ credible intervals and the posterior probability of at least $20\%$ attenuation.
+
+\section{Security Implications and Risk Assessment}
+Finally, the project includes a formal risk assessment grounded in the NIST AI Risk Management Framework (AI RMF)\cite{tabassiArtificialIntelligenceRisk2023} to evaluate structural aliasing as a systematic vulnerability within cyber-physical energy systems. This analysis outlines plausible threat models and attack surfaces, possible mitigation strategies, and an evaluation of whether the proposed mitigation strategies effectively reduce residual exposure for the automated control AI agent. 
+
+Reducing the stride raises the lowest member $f_s/S$ of the stride branch of $\mathcal{F}_{lock}$ and thins its members below Nyquist; the reduced-stride configurations $S=12$ and $S=8$ at fixed $P=16$ test this mitigation against the $S{=}16$ baseline. The \texttt{pv:AliasingEvent} class (see \autoref{sec:appendixA}) lets the control agent act on the residual risk: a forecast frequency in $\mathcal{F}_{lock}$ triggers a reduced-confidence flag.
+
+The risk assessment is structured around the following key points: context and attack surface, threat modeling, impact, mitigation and residual exposure.
+
+\section{Significance and Impact} 
+This subject is relevant because it explores an under-examined systemic vulnerability native to patch-based temporal foundation architectures.\cite{paganiPreliminaryInsightsChronos2026} By systematically characterizing the conditions under which structural aliasing emerges, this work provides critical insights into the fundamental limitations of these models, directly informing the design of more robust architectures and training paradigms. 
+
+For professionals operating within this domain, the analysis could expose how algorithmic data-deletion anomalies can propagate through automated distribution pipelines. By evaluating how hidden token-space representation collapse can deceive a load-balancing AI agent into executing misaligned control choices, this work could provide insights needed for high-reliability, fault-tolerant smart-grid deployments.
+
+The impact of this project could extend beyond theoretical understanding, as it has direct implications for the reliability and safety of real-world applications that depend on accurate time-series forecasting and representation learning, particularly in high-stakes domains such as energy management.
