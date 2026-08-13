@@ -1,18 +1,18 @@
 """
-collect.py — Part 2 of the Bayesian workflow: let Chronos make the observations.
+collect.py, Part 2 of the Bayesian workflow: let Chronos make the observations.
 
 This is the *only* place where a model is run. It turns the five Chronos-Bolt geometries into five
 tidy tables that the Bayesian notebook then treats as plain data, so Parts 1 and 3-5 of the
 notebook need neither a GPU nor the `chronos` package.
 
     table            feeds                                    deliverable clause
-    ---------------  ---------------------------------------  ------------------------------------
+   ,---------,---------------------------------,---------------------------------
     contrasts        Model A (H1 behavioural), Model C (H2)    Local Contrast Analysis, Eq. (8)-(9)
-                                                               Phase-Invariance Analysis, Eq. (11)-(12)
+                                                               Phase-Invariance Analysis, Eq. (11)
     mdl_cells        Model B (H1 representational)             Absolute Performance Analysis, Eq. (10)
     mdl_bandtasks    descriptive cross-check only              Probing Methodology
-    collapse         Model D1 (H3 comb)                        Site-Geometry Analysis, Eq. (13)
-    sites            Model D2 (H3 movement)                    Site-Geometry Analysis, Eq. (14)
+    collapse         Model D1 (H3 location)                    Site-Geometry Analysis, Eq. (12)
+    sites            Model D2 (H3 movement)                    Site-Geometry Analysis, Eq. (13)
 
 Everything is sharded per geometry under `<out>/raw/`, so an interrupted run resumes at model
 granularity: a shard that already exists is not recomputed and its model is never loaded.
@@ -38,9 +38,9 @@ import probe_lib as pl
 TABLES = ("contrasts", "mdl_cells", "mdl_bandtasks", "collapse", "sites")
 
 
-# --------------------------------------------------------------------------------------- #
+# --------------------------------------------------------------------------------- #
 #  Design configuration
-# --------------------------------------------------------------------------------------- #
+# --------------------------------------------------------------------------------- #
 @dataclass
 class Config:
     """Every knob of the experimental design, in one place.
@@ -53,24 +53,26 @@ class Config:
     batch_size: int = 64
     device: str | None = None
 
-    # --- contrasts (H1 behavioural / H2) ---
+    #, contrasts (H1 behavioural / H2),
     n_phase_contrast: int = 10      # phase offsets per lock; the S_f cap of Pagani et al. Eq. 6
-    n_bg: int = 6                   # background realisations per generator = the u_background levels
+    n_bg: int = 100                 # background draws per generator. Deliverable 1 specifies 100
+                                    # TSMixup and 100 KernelSynth signals; these are those signals,
+                                    # and they are also the u_background levels of Eq. (9).
     generators: tuple[str, ...] = pl.GENERATORS
 
-    # --- frequency-local MDL cells (H1 representational) ---
+    #, frequency-local MDL cells (H1 representational),
     mdl_delta_f: float = 1.0        # the +/- offset of the two tones the probe must separate [Hz]
     mdl_n_per_class: int = 40       # examples per class in a cell (so 2 * 40 = 80 rows per probe)
     mdl_n_phase: int = 10
-    mdl_n_bg: int = 4
+    mdl_n_bg: int = 10              # background draws entering an MDL cell
 
-    # --- band tasks (descriptive) ---
+    #, band tasks (descriptive),
     band_tasks: bool = True
     bt_step: float = 2.0            # frequency step of the descriptive sweep [Hz]
     bt_n_phase: int = 4
     bt_random_init: bool = True     # untrained-architecture control, on a 4x coarser grid
 
-    # --- collapse sweep (H3) ---
+    #, collapse sweep (H3),
     collapse_step: float = 1.0      # uniform part of the union grid [Hz]
     collapse_reps: int = 3          # phase (and background) replicates per frequency
     collapse_modes: tuple[str, ...] = ("pure", "tsmixup", "kernelsynth")
@@ -90,20 +92,20 @@ class Config:
         return Config(**base)
 
 
-# --------------------------------------------------------------------------------------- #
-#  1. contrasts — the matched (f_k, f_k - delta, f_k + delta) triplets
-# --------------------------------------------------------------------------------------- #
+# --------------------------------------------------------------------------------- #
+#  1. contrasts, the matched (f_k, f_k - delta, f_k + delta) triplets
+# --------------------------------------------------------------------------------- #
 def collect_contrasts(probe: "pl.Probe", cfg: Config) -> pd.DataFrame:
     """The paired local contrast d of deliverable Eq. (8), with the phase index RETAINED.
 
     Design (deliverable Local Contrast Analysis): each lock frequency f_k in F_lock is paired with
     two controls at f_k +/- 0.25 fs/S. The three signals of a triplet share the SAME background
-    realisation and the SAME phase — that is what makes the contrast paired, and it is the one
+    realisation and the SAME phase, that is what makes the contrast paired, and it is the one
     place where this collection deliberately departs from `hypotheses.py`, which averages over
     phases drawn separately per frequency.
 
-    Keeping the phase index is what makes H2 testable at all: Model C (Eq. 12) regresses the
-    per-phase deficit on cos/sin of that very phase, which is impossible once phases are averaged.
+    Keeping the phase index is what makes H2 testable at all: Model C bins the phase circle and
+    gives each bin its own offset, which is impossible once phases have been averaged away.
     """
     P, S = probe.P, probe.S
     delta = pl.control_offset(S)
@@ -167,9 +169,9 @@ def collect_contrasts(probe: "pl.Probe", cfg: Config) -> pd.DataFrame:
                  "dphase_lock", "d", "y_deficit", "live"]]
 
 
-# --------------------------------------------------------------------------------------- #
-#  2. mdl_cells — the frequency-local prequential codelength
-# --------------------------------------------------------------------------------------- #
+# --------------------------------------------------------------------------------- #
+#  2. mdl_cells, the frequency-local prequential codelength
+# --------------------------------------------------------------------------------- #
 def collect_mdl_cells(probe: "pl.Probe", cfg: Config) -> pd.DataFrame:
     """L(D) per (probe stage, candidate frequency), with the IsLocked flag of deliverable Eq. (10).
 
@@ -177,7 +179,7 @@ def collect_mdl_cells(probe: "pl.Probe", cfg: Config) -> pd.DataFrame:
     codelength summarises hundreds of frequencies and the IsLocked indicator has nothing to attach
     to. Here each cell asks a single, sharply local question: from the 256-d [REG] vector alone,
     can the probe tell a tone at f_c - 1 Hz from a tone at f_c + 1 Hz? The prequential protocol,
-    the probe pipeline and K are unchanged — only the scope narrows.
+    the probe pipeline and K are unchanged, only the scope narrows.
 
     The reading is direct: at a locked frequency whose neighbourhood has become linearly
     indistinguishable in representation space, the labels cost more bits.
@@ -200,7 +202,12 @@ def collect_mdl_cells(probe: "pl.Probe", cfg: Config) -> pd.DataFrame:
                 for bg in pool:
                     for ph in pl.phases_Sf(f, cfg.mdl_n_phase):
                         combos.append((bg, ph))
-            combos = combos[:cfg.mdl_n_per_class]
+            # Spread the selection over the whole combo list rather than taking a prefix. The list
+            # is background-major, so `combos[:n]` would silently restrict every cell to the first
+            # few backgrounds and throw away the corpus variety the design is paying for.
+            if len(combos) > cfg.mdl_n_per_class:
+                idx = np.linspace(0, len(combos) - 1, cfg.mdl_n_per_class).round().astype(int)
+                combos = [combos[i] for i in idx]
             ctx = np.stack([pl.build_context(bg, f, ph, pl.CTX) for bg, ph in combos])
             X_all.append(probe.capture_reg(ctx))
             y_all.append(np.full(len(ctx), label))
@@ -219,13 +226,13 @@ def collect_mdl_cells(probe: "pl.Probe", cfg: Config) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
-# --------------------------------------------------------------------------------------- #
-#  3. mdl_bandtasks — the seven global band tasks (descriptive cross-check)
-# --------------------------------------------------------------------------------------- #
+# --------------------------------------------------------------------------------- #
+#  3. mdl_bandtasks, the seven global band tasks (descriptive cross-check)
+# --------------------------------------------------------------------------------- #
 def collect_band_tasks(probe: "pl.Probe", cfg: Config) -> pd.DataFrame:
     """The probing notebook's seven binary band tasks, per stage, with both controls.
 
-    Not the response of any Bayesian model — it is retained because the deliverable's Probing
+    Not the response of any Bayesian model, it is retained because the deliverable's Probing
     Methodology promises it and because it answers a different question (is the band decodable at
     all, and is that decodability learned?) from the one Eq. (10) asks.
     """
@@ -278,18 +285,18 @@ def collect_band_tasks(probe: "pl.Probe", cfg: Config) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
-# --------------------------------------------------------------------------------------- #
-#  4. collapse — the token-collapse profile on the shared union grid
-# --------------------------------------------------------------------------------------- #
+# --------------------------------------------------------------------------------- #
+#  4. collapse, the token-collapse profile on the shared union grid
+# --------------------------------------------------------------------------------- #
 def collect_collapse(probe: "pl.Probe", cfg: Config) -> pd.DataFrame:
-    """z_g(f): across-patch token dispersion, swept on the union grid of deliverable Eq. (13).
+    """z_g(f): across-patch token dispersion, swept on the union grid of deliverable Eq. (12).
 
     The grid is the union of a uniform sweep with the predicted sites of EVERY geometry, not just
     this one. That is the whole point: a model must dip where its own geometry predicts and stay
     flat where a competing geometry predicts, otherwise the comb comparison M_S vs M_P could not
     distinguish them.
 
-    Three signal modes are collected. On a pure sinusoid the collapse is exactly zero at a lock —
+    Three signal modes are collected. On a pure sinusoid the collapse is exactly zero at a lock,
     the clean statement of the phenomenon. On a TSMixup or KernelSynth background it becomes a deep
     dip instead, because the background breaks patch identity; fitting the comb model to all three
     is what shows the conclusion is not an artefact of noise-free inputs.
@@ -310,7 +317,7 @@ def collect_collapse(probe: "pl.Probe", cfg: Config) -> pd.DataFrame:
                                           rep=rep, f=grid, z=z)))
     out = pd.concat(rows, ignore_index=True)
     # normalise each curve by its own off-lock median so dip DEPTH is comparable across geometries
-    # and modes; Eq. (13) is fitted on log z_norm.
+    # and modes; Eq. (12) is fitted on log z_norm.
     out["z_norm"] = out.groupby(["model", "mode", "rep"])["z"].transform(
         lambda s: s / max(float(np.median(s)), 1e-12))
     return out
@@ -342,9 +349,9 @@ def derive_sites(collapse: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
-# --------------------------------------------------------------------------------------- #
+# --------------------------------------------------------------------------------- #
 #  Driver: shard per model, resume, merge, guard
-# --------------------------------------------------------------------------------------- #
+# --------------------------------------------------------------------------------- #
 def _shard(out: Path, table: str, tag: str) -> Path:
     return out / "raw" / f"{table}__{tag}.parquet"
 
@@ -436,7 +443,7 @@ def check_design(tables: dict[str, pd.DataFrame]) -> None:
         for _, r in s.iterrows():
             print(f"    sites     {r['model']:<9s} mode={r['mode']:<11s} n={int(r['n_sites']):>3d} "
                   f"f1={r['f1']:.2f} delta_hat={r['delta_hat']:.2f}  (fs/S={pl.FS / r['S']:.2f})")
-    print("  design check:", "PASS" if ok else "FAIL — do not sample on this data")
+    print("  design check:", "PASS" if ok else "FAIL, do not sample on this data")
 
 
 def collect_all(out: Path | str, models: list[tuple[int, int]] | None = None,
@@ -448,12 +455,20 @@ def collect_all(out: Path | str, models: list[tuple[int, int]] | None = None,
     models = models or pl.MODELS
     print(f"collecting into {out}  |  {'SMOKE' if cfg.smoke else 'FULL'} design  |  "
           f"{len(models)} geometries")
+
+    # Archive the generated signals themselves. Every number downstream is computed from these
+    # backgrounds, so they are written to disk rather than left in an in-memory cache; a reader
+    # who has only the tables cannot regenerate the inputs, and KernelSynth in particular is a
+    # random GP draw that is only reproducible given its seed.
+    meta = pl.save_signal_pool(out, generators=cfg.generators,
+                               n_bg=max(cfg.n_bg, cfg.mdl_n_bg, cfg.collapse_reps))
+    print(f"  archived {len(meta)} signals -> {out / 'signals'}")
     for (P, S) in models:
         collect_model(P, S, out, cfg, force=force)
     return merge(out, cfg)
 
 
-# --------------------------------------------------------------------------------------- #
+# --------------------------------------------------------------------------------- #
 def main(argv: list[str]) -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)

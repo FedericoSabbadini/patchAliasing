@@ -70,83 +70,99 @@
 \centering
 \small
 \renewcommand{\arraystretch}{1.4}
-\begin{tabular}{@{} m{3.8cm} m{7.4cm} m{3.2cm} @{}}
+\begin{tabular}{@{} m{4.2cm} m{7.6cm} m{2.8cm} @{}}
 \toprule
-\textbf{Feedback point} & \textbf{Change made} & \textbf{Where} \\
+\textbf{Change} & \textbf{What was done} & \textbf{Where} \\
 \midrule
-Domain Description before Purpose and Scope
-  & Section order inverted.
-  & Domain Description \\
+Operational definition of structural aliasing
+  & The representation-distance criterion $\lVert R_l(x)-R_l(y)\rVert_2\le\varepsilon$ was
+    withdrawn and replaced by a readability criterion, since the probing evidence contradicts
+    the near-collision reading.
+  & Mathematical Formulation \\
 \hline
-Intended Audience shortened or integrated
-  & Standalone section removed; content condensed into one paragraph.
-  & Domain Description, final paragraph \\
+Bayesian analysis extended to H2 and H3
+  & One model per hypothesis. The H1 framework is unchanged; a phase model and two
+    site-geometry models were added, with priors and decision rules.
+  & Bayesian Analysis, Eqs.~(11)--(13) \\
 \hline
-Significance and Impact after the project outline
-  & Moved to last body section.
-  & Significance and Impact \\
+Local-contrast hierarchy stated
+  & The grouping implied by $\mu_i$ is written out: configuration, harmonic and background
+    levels, plus an overlap slope $\delta_O$.
+  & Bayesian Analysis, Eq.~(9) \\
 \hline
-Dedicated Data section
-  & Added; signals and datasets consolidated from multiple sections.
-  & Data and Evaluation \\
+Codelength response defined
+  & The Gamma response is specified as a frequency-local codelength, so that the
+    $\text{IsLocked}$ indicator has something to attach to.
+  & Bayesian Analysis, Eq.~(10) \\
 \hline
-State the intended mathematical formulation
-  & New section: tokenisation operator, phase-locking conditions, locked
-    frequency class, operational definition of structural aliasing.
-  & Mathematical Formulation, Eqs.~(1)--(8) \\
-\hline
-Reformulate the hypotheses explicitly
-  & Objectives replaced by H1--H3 with predicted direction, metric and
-    refutation criterion.
-  & Aliasing implications \\
-\hline
-Make the probing experiments precise
-  & New section: probed representations, metric, probe points and controls.
-  & Probing Methodology \\
-\hline
-Simplify the experimental pipeline
-  & Staged: default checkpoint on sinusoids $\to$ retrained $(P,S)$ grid
-    $\to$ complex synthetics $\to$ photovoltaic data.
-  & Data and Evaluation; Methodology \\
-\hline
-Clarify whether stride changes require retraining
-  & Retraining necessity shown for both $P$ and $S$; recipe and departures
-    tabulated.
-  & Methodology, Tables~1--2 \\
-\hline
-Explore strides on both sides of the default
-  & Admissibility constraint $S \le P$ stated; symmetric design built on the
-    $P{=}S$ diagonal: $\{8,16,24\}$.
-  & Methodology \\
-\hline
-Describe the planned priors
-  & Likelihoods, link function and all priors stated with justification.
-  & Bayesian Analysis, Eqs.~(9)--(10) \\
+Inference protocol stated
+  & Sampler settings, acceptance thresholds and the validation sequence replace the former
+    one-line statement.
+  & Bayesian Analysis \\
 \bottomrule
 \end{tabular}
-\caption{Summary of the feedback and corresponding revisions.}
+\caption{Changes from the submitted Deliverable~1 to this revision.}
 \label{tab:changelog}
 \end{table}
 
-This document records the revisions made to Deliverable~1 in response to the feedback received on the first submission (version dated 4~June~2026). Entries are grouped under the headings used in that feedback. The revised document is written under the extended allowance of 2\,000 words granted with the feedback.
- 
-\subsection{Structure and organisation}
-The document now opens with \emph{Domain Description}, followed by \emph{Purpose and Scope}. The standalone \emph{Intended Audience} section was condensed into a closing paragraph of \emph{Domain Description}, and \emph{Significance and Impact} was moved to the end of the body. The single \emph{Project Outline} section was replaced by dedicated sections (formalisation, data, methodology, probing, statistics, risk assessment), and a \emph{Data and Evaluation} section consolidates all signals and datasets previously spread across multiple sections. The ontology was moved to Appendix~A.
- 
-\subsection{Mathematical formulation and hypotheses}
-A \emph{Mathematical Formulation} section was added, where the first submission only announced it as planned work. It defines the tokenisation operator $\mathcal{T}_{P,S}$ (Eq.~1), the signal model with Nyquist constraint (Eq.~2), the full stride-translation derivation (Eqs.~3--5), the analogous patch-length condition (Eq.~6), and the phase-locking frequency class $\mathcal{F}_{\mathrm{lock}}$ as a function of $f_s$, $P$ and $S$ (Eq.~7). It is now stated that patch self-repetition does not by itself imply that two distinct signals become indistinguishable; structural aliasing is given a separate operational definition at the representation level (Eq.~8). The three former objectives were reformulated as hypotheses H1--H3, each with a predicted direction, the relevant metric, and an explicit refutation criterion. The ontology is set out in Appendix~A; the generation-state axioms are given in full, while the remaining axiom families are outlined for feedback before formalisation.
- 
-\subsection{Experimental methodology}
-A Probing Methodology section replaces the single sentence of the first submission, specifying the probed representations, the MDL-based metric with its controls, and the per-frequency accuracy profile. Probing was extended from decoder-only to include the encoder, so that the stage at which frequency information is lost can be localised. The pipeline was simplified and staged: clean sinusoids first, then the retrained $(P,S)$ grid, then the photovoltaic application.
- 
-\subsection{Patch stride experiments}
-It is now stated that changing $P$ or $S$ requires retraining (the former resizes the patch-embedding block, the latter alters inter-patch dynamics). Table~1 reports the five retrained configurations; Table~2 compares all hyperparameters against the published Chronos recipe and isolates the departures. The unpublished Chronos-Bolt recipe is approximated with the published Chronos-T5 one, under a uniform 100k-step budget to avoid confounding. Configurations with $S > P$ are excluded: they discard samples between patches, confounding structural aliasing with data loss. The requested symmetry is realised on the $P=S$ diagonal ($\{8,16,24\}$), the only axis admitting neighbours on both sides under $S\le P$.
- 
-The context window was corrected to $T = 2048$ samples (the first submission reported $T = 512$ tokens). The exclusion of $S = 4$ is now justified. Figure~1 is included as evidence that the configurations train to a usable state; it is not offered as analysis, which belongs to later deliverables.
+This document records the changes made to Deliverable~1 \emph{after} its submitted version. The
+revisions to that submission, made in response to the feedback of 4~June~2026, are recorded in the
+changelog that accompanied it and are not repeated here. Only one file changed: the body section.
+The equation count rises from ten to thirteen, so the contrast is now Eq.~(8) rather than Eq.~(9)
+while the Gamma regression remains Eq.~(10).
 
-A mitigation strategy and its link to agent behaviour were also added: reducing $S$ shrinks $\mathcal{F}_{\mathrm{lock}}$, and the \texttt{pv:AliasingEvent} class lets the control agent flag reduced confidence at locked frequencies.
- 
-\subsection{Bayesian analysis}
-A \emph{Bayesian Analysis} section was added. It splits the analysis into a relative part (logarithmic local contrast $d$ pairing each locked frequency with matched controls, Eq.~9, under a heavy-tailed Student-$t_4$ likelihood with prior $\bar\beta \sim \text{Student-}t_4(0,0.5)$) and an absolute part (Gamma regression with log link on MDL codelength, Eq.~10, with priors on $\theta_{\text{lock}}$ and the shape parameter). Planned inference: 95\% credible intervals and posterior probability of ${\ge}20\%$ attenuation.
+\subsection{Operational definition of structural aliasing}
+The submitted version defined structural aliasing by a representation-distance threshold: two
+frequency-matched signals were said to alias at layer $l$ when
+$\lVert R_l(x)-R_l(y)\rVert_2\le\varepsilon$ for a pre-registered $\varepsilon$. That equation has
+been removed. The project's own probing does not support it, at a lock the token is a geometric
+\emph{outlier} rather than a near-collision, so the criterion would have committed the report to
+a claim the measurements contradict. Structural aliasing is now defined by readability: the
+phenomenon is present when the signal's frequency can no longer be recovered from the model's
+internal state at a locked frequency as well as at neighbouring, non-locked ones. This is the
+criterion the experiments actually test, and it is what the $H1$ metrics already measure.
+
+\subsection{Bayesian analysis: extension to H2 and H3}
+The submitted version applied its two-part framework to $H1$ alone; the lecturers asked for the
+treatment to be extended. Each hypothesis now has its own estimand and model, and the $H1$ models
+are unchanged in substance.
+
+Two additions are new. \emph{Phase-Invariance Analysis} ($H2$) retains the phase of each
+measurement, which the contrast of Eq.~(8) averages away, cuts the phase circle into eight bins and
+gives each bin its own offset (Eq.~11); the spread $\sigma_\phi$ of those offsets is tested against
+a preregistered region of practical equivalence and against the phase-free model by leave-one-out.
+\emph{Site-Geometry Analysis} ($H3$) targets the location of the effect rather than its size: the
+token-collapse profile is regressed on indicators of the two predicted grids (Eq.~12), swept on a
+grid that unions every configuration's predicted sites so no geometry is scored on a grid of its
+own, with the stride-only, patch-only and null variants compared by leave-one-out; a second model
+regresses the measured comb spacing on the predicted spacings $f_s/S$ and $f_s/P$ (Eq.~13), testing
+the slopes $\kappa_S=1$ and $\kappa_P=0$. Because the design varies $P$ only along $P=S$,
+$\kappa_P$ is declared partially confounded and the fixed-$P{=}16$ series carries the
+identification.
+
+Both models were chosen for defensibility as much as for fit: a variance component and a linear
+regression on predicted values assume less, and are easier to state, than the first-harmonic and
+log-log formulations they replaced.
+
+\subsection{Local-contrast hierarchy and codelength response}
+Two specifications that the submitted version left implicit are now written out. The contrast
+likelihood is given in hierarchical form (Eq.~9), with configuration, harmonic and background
+levels and an overlap slope $\delta_O$, and the inference is declared conditional on the single
+available training seed.
+
+The Gamma regression keeps its form and priors, but its response is now defined. The seven band
+tasks span the whole operational band, so a single codelength per probe point summarises hundreds
+of frequencies and leaves the $\text{IsLocked}$ indicator of Eq.~(10) nothing to attach to. The
+response is therefore a \emph{frequency-local} codelength: at each candidate frequency a balanced
+probe separates tones at $f_c\pm1\,\mathrm{Hz}$ from the same $[\mathrm{REG}]$ representation under
+an otherwise unchanged prequential protocol. The band-task values are retained as a descriptive
+cross-check.
+
+\subsection{Inference}
+The former single sentence is replaced by the full protocol: the quantities reported for each
+model, the sampler settings and the acceptance thresholds ($\hat R<1.01$, effective sample sizes
+above $1000$, no divergent transitions), and the validation sequence, prior predictive checks
+before data collection, simulation-based parameter recovery, stratified posterior predictive
+checks, and sensitivity over the prior-scale ladder.
 
 \end{document}

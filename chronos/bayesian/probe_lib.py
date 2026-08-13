@@ -1,5 +1,5 @@
 """
-probe_lib.py — the *light*, notebook-free probing core for the Bayesian analysis.
+probe_lib.py, the *light*, notebook-free probing core for the Bayesian analysis.
 
 Everything the Bayesian notebook needs from Chronos lives here. The two existing testing
 notebooks (`chronosBolt_layer_probing.ipynb`, `contamination.ipynb`) stay untouched: this module
@@ -31,9 +31,9 @@ from pathlib import Path
 
 import numpy as np
 
-# --------------------------------------------------------------------------------------- #
-#  Repo wiring — this file lives in chronos/bayesian/, so parent.parent is the repo's chronos/
-# --------------------------------------------------------------------------------------- #
+# --------------------------------------------------------------------------------- #
+#  Repo wiring, this file lives in chronos/bayesian/, so parent.parent is the repo's chronos/
+# --------------------------------------------------------------------------------- #
 _HERE = Path(__file__).resolve().parent
 _CHRONOS = _HERE.parent
 _TESTING = _CHRONOS / "testing"
@@ -42,9 +42,9 @@ for _p in (_TESTING, _SYNTHETIC):
     if str(_p) not in sys.path:
         sys.path.insert(0, str(_p))
 
-# --------------------------------------------------------------------------------------- #
-#  Fixed experimental setup (deliverable convention — do not change without changing the .tex)
-# --------------------------------------------------------------------------------------- #
+# --------------------------------------------------------------------------------- #
+#  Fixed experimental setup (deliverable convention, do not change without changing the .tex)
+# --------------------------------------------------------------------------------- #
 FS = 512                    # sampling frequency [Hz]; Nyquist = 256 Hz
 CTX = 480                   # context length. Divisible by every stride in the sweep (16/12/8/24)
                             # so the patch grid is exact and no internal padding fakes a collapse.
@@ -71,10 +71,17 @@ def model_tag(P: int, S: int) -> str:
     return f"p{P}-s{S}"
 
 
-# --------------------------------------------------------------------------------------- #
+# --------------------------------------------------------------------------------- #
 #  1. Signals: generator backgrounds + injected tone
-# --------------------------------------------------------------------------------------- #
-_bg_cache: dict[tuple[str, int, int], np.ndarray] = {}
+# --------------------------------------------------------------------------------- #
+_bg_cache: dict[tuple[str, int], np.ndarray] = {}
+
+# Every background is drawn ONCE at this length and sliced to whatever a caller asks for.
+# Drawing separately per length would not give nested signals: length is a generator parameter,
+# not a window. TSMixup lays a fixed number of cycles over the requested length, so a 480-sample
+# draw and a 544-sample draw from the same seed have different spectral content (measured
+# correlation -0.15), and "background 0" would mean a different signal in different tables.
+CANON_LEN = CTX + PRED
 
 
 def make_tone(f: float, phase: float = 0.0, n: int = CTX, amp: float = 1.0) -> np.ndarray:
@@ -84,43 +91,50 @@ def make_tone(f: float, phase: float = 0.0, n: int = CTX, amp: float = 1.0) -> n
 
 
 def background(generator: str, n: int, seed: int) -> np.ndarray:
-    """One unit-variance background realisation of length `n` from a project generator.
+    """The first `n` samples of one unit-variance background realisation.
 
-    `generator` is "tsmixup" or "kernelsynth" — the two corpora named in the deliverable's Data
-    section. Results are cached on (generator, n, seed): KernelSynth draws from a GP prior, which
-    costs an O(n^3) factorisation, and the design reuses a small fixed pool of backgrounds as a
-    grouping factor rather than drawing a fresh one per observation.
+    `generator` is "tsmixup" or "kernelsynth", the two corpora named in the deliverable's Data
+    section. Draw `seed` is generated once at `CANON_LEN` and sliced, so every caller sees the same
+    realisation regardless of the length it needs: the 480 samples an MDL cell uses are the first
+    480 of the 544 a contrast triplet uses. Results are cached on (generator, seed) for the life of
+    the process; KernelSynth draws from a GP prior, which costs an O(n^3) factorisation.
+
+    The design reuses a fixed pool of backgrounds as a grouping factor rather than drawing a fresh
+    one per observation, so this cache is hit far more often than it is missed.
     """
-    key = (generator, int(n), int(seed))
-    if key in _bg_cache:
-        return _bg_cache[key]
+    key = (generator, int(seed))
+    if key not in _bg_cache:
+        import signalGenerator as sg                  # chronos/data/synthetic/signalGenerator.py
 
-    import signalGenerator as sg                      # chronos/data/synthetic/signalGenerator.py
+        m = max(int(n), CANON_LEN)
+        tmp = _HERE / "_gen_tmp"                      # generators want an output dir; nothing is saved
+        tmp.mkdir(parents=True, exist_ok=True)
+        if generator == "kernelsynth":
+            # KernelSynth spec of the deliverable's signal set (J=5 composite GP kernels)
+            params = {"J": 5, "l_syn": m, "fs": FS, "jitter": 1e-4, "P": 16}
+            gen = sg.runKernelSynth(params, seed, tmp)
+        elif generator == "tsmixup":
+            # light-TSMixup spec, identical to the one used by hypotheses.py and the probing notebook
+            params = {"K": 10, "alpha": 1.5, "l_min": m, "l_max": m, "fs": FS, "P": 16,
+                      "t_lengths": [m // 2, m, m]}
+            gen = sg.runTSMixup(params, seed, tmp)
+        else:
+            raise ValueError(f"unknown generator {generator!r}; expected one of {GENERATORS}")
 
-    tmp = _HERE / "_gen_tmp"                          # generators want an output dir; nothing is saved
-    tmp.mkdir(parents=True, exist_ok=True)
-    if generator == "kernelsynth":
-        # KernelSynth spec of the deliverable's signal set (J=5 composite GP kernels)
-        params = {"J": 5, "l_syn": n, "fs": FS, "jitter": 1e-4, "P": 16}
-        gen = sg.runKernelSynth(params, seed, tmp)
-    elif generator == "tsmixup":
-        # light-TSMixup spec, identical to the one used by hypotheses.py and the probing notebook
-        params = {"K": 10, "alpha": 1.5, "l_min": n, "l_max": n, "fs": FS, "P": 16,
-                  "t_lengths": [n // 2, n, n]}
-        gen = sg.runTSMixup(params, seed, tmp)
-    else:
-        raise ValueError(f"unknown generator {generator!r}; expected one of {GENERATORS}")
+        x = np.asarray(gen.generate(), float).ravel()[:m]
+        sd = x.std()
+        x = (x / sd) if sd > 1e-8 else x              # unit variance, so TONE_SNR is a real SNR
+        _bg_cache[key] = x.astype(np.float32)
 
-    x = np.asarray(gen.generate(), float).ravel()[:n]
-    s = x.std()
-    x = (x / s) if s > 1e-8 else x                    # unit variance, so TONE_SNR is a real SNR
-    _bg_cache[key] = x.astype(np.float32)
-    return _bg_cache[key]
+    out = _bg_cache[key]
+    if n > len(out):
+        raise ValueError(f"background of length {n} requested but only {len(out)} drawn")
+    return out[:n]
 
 
 def background_pool(generator: str, n_bg: int, length: int = CTX + PRED,
                     seed0: int = 10_000) -> list[np.ndarray]:
-    """A fixed, reproducible pool of `n_bg` backgrounds — the design's `u_background` levels.
+    """A fixed, reproducible pool of `n_bg` backgrounds, the design's `u_background` levels.
 
     Generated once at the FULL length (context + horizon) so that slicing gives a context and its
     genuine continuation; the forecast target is then the real future of the input, not a
@@ -128,12 +142,43 @@ def background_pool(generator: str, n_bg: int, length: int = CTX + PRED,
     """
     return [background(generator, length, seed0 + i) for i in range(n_bg)]
 
+def save_signal_pool(out_dir, generators=GENERATORS, n_bg: int = 6,
+                     seed0: int = 10_000) -> "object":
+    """Write the generated backgrounds -- and a few complete model inputs -- to disk.
+
+    The backgrounds are the actual signals every posterior in this analysis is computed from, so
+    they are archived rather than left as an in-memory cache: without them a reader can read the
+    method but cannot reproduce a single number. `examples` is a list of (frequency, phase) pairs
+    saved as full contexts (background + injected tone), i.e. exactly what Chronos is fed.
+
+    One file per draw. Because every background is drawn at `CANON_LEN` and sliced, the archived
+    signal is the whole realisation: the shorter versions used by the MDL cells, the band tasks and
+    the collapse sweep are its leading samples, so nothing further needs storing.
+
+    Returns a dataframe of the metadata, and writes `<out_dir>/signals/`.
+    """
+    import pandas as pd
+
+    out = Path(out_dir) / "signals"
+    out.mkdir(parents=True, exist_ok=True)
+    rows = []
+    for gen in generators:
+        for i, x in enumerate(background_pool(gen, n_bg, CANON_LEN, seed0)):
+            name = f"background_{gen}_bg{i}.npy"
+            np.save(out / name, x)
+            rows.append(dict(kind="background", generator=gen, bg_id=i, seed=seed0 + i,
+                             n=len(x), std=float(x.std()), file=name))
+
+    meta = pd.DataFrame(rows)
+    meta.to_parquet(out / "signals_index.parquet", index=False)
+    return meta
+
 
 def build_context(bg: np.ndarray | None, f: float, phase: float, n: int = CTX) -> np.ndarray:
     """One model input: unit-variance background + tone at (f, phase), or the pure tone if bg is None.
 
     `bg is None` reproduces the clean-sinusoid mode of hypotheses.py, where the token collapse at a
-    stride lock is EXACTLY zero. With a background the collapse becomes a deep dip instead — both
+    stride lock is EXACTLY zero. With a background the collapse becomes a deep dip instead, both
     modes are collected, because H3's comb model is fitted on each.
     """
     tone = make_tone(f, phase, n, TONE_SNR if bg is not None else 1.0)
@@ -164,9 +209,9 @@ def fit_amp_phase(y: np.ndarray, t: np.ndarray, f: float) -> tuple[float, float]
     return float(np.hypot(a, b)), float(np.arctan2(b, a))
 
 
-# --------------------------------------------------------------------------------------- #
-#  2. Lock geometry  —  F_lock = {c*fs/S} union {k*fs/P}   (deliverable Eq. 7)
-# --------------------------------------------------------------------------------------- #
+# --------------------------------------------------------------------------------- #
+#  2. Lock geometry ,  F_lock = {c*fs/S} union {k*fs/P}   (deliverable Eq. 7)
+# --------------------------------------------------------------------------------- #
 def patch_nulls(P: int, fmax: float = BAND[1], fmin: float = BAND[0]) -> list[float]:
     """Patch-integration nulls k*fs/P: a tone completing an integer number of cycles inside one patch."""
     out = [k * FS / P for k in range(1, int(fmax * P / FS) + 2)]
@@ -216,7 +261,7 @@ def controls_are_clean(fk: float, delta: float, P: int, S: int, guard: float = 1
 
     The paired contrast is only interpretable when the controls are genuinely non-locked. For
     example at P=16, S=12 the patch null 32 Hz has its upper control at 42.67 Hz, which is the
-    first STRIDE lock — that site is dropped rather than silently compared against a lock.
+    first STRIDE lock, that site is dropped rather than silently compared against a lock.
     """
     others = [x for x in f_lock(P, S) if abs(x - fk) > 1e-6]
     for c in (fk - delta, fk + delta):
@@ -232,9 +277,9 @@ def control_offset(S: int) -> float:
     return 0.25 * FS / S
 
 
-# --------------------------------------------------------------------------------------- #
-#  3. The model wrapper — batched forecast, token collapse, [REG] capture
-# --------------------------------------------------------------------------------------- #
+# --------------------------------------------------------------------------------- #
+#  3. The model wrapper, batched forecast, token collapse, [REG] capture
+# --------------------------------------------------------------------------------- #
 class Probe:
     """A loaded Chronos-Bolt checkpoint, wrapped for batched measurement.
 
@@ -276,15 +321,15 @@ class Probe:
             print(f"WARNING: requested (P={P}, S={S}) but the loaded checkpoint is "
                   f"(P={self.P}, S={self.S})")
 
-    # ---------------------------------------------------------------------------- #
+    # ---------------------------------------------------------------------- #
     def close(self) -> None:
-        """Drop the model and free GPU memory — Colab runtimes are small and we load five in a row."""
+        """Drop the model and free GPU memory, Colab runtimes are small and we load five in a row."""
         del self.pipe
         self.pipe = None
         if self.device == "cuda":
             self.torch.cuda.empty_cache()
 
-    # ---------------------------------------------------------------------------- #
+    # ---------------------------------------------------------------------- #
     def _batches(self, contexts: np.ndarray):
         """Yield (start, tensor) slices of a [N, CTX] stack, sized to `batch_size`."""
         X = np.asarray(contexts, np.float32)
@@ -305,7 +350,7 @@ class Probe:
                 out.append(y.float().cpu().numpy())
         return np.concatenate(out, axis=0)
 
-    # ---------------------------------------------------------------------------- #
+    # ---------------------------------------------------------------------- #
     def recovery(self, contexts: np.ndarray, futures: np.ndarray, freqs: np.ndarray
                  ) -> tuple[np.ndarray, np.ndarray]:
         """Forecast amplitude recovery R = A_pred / A_true, and the phase error in degrees.
@@ -326,7 +371,7 @@ class Probe:
             dphase[i] = np.degrees(abs(np.angle(np.exp(1j * (ph_hat - ph_true)))))
         return R, dphase
 
-    # ---------------------------------------------------------------------------- #
+    # ---------------------------------------------------------------------- #
     def collapse(self, contexts: np.ndarray) -> np.ndarray:
         """Across-patch dispersion of the input-patch-embedding tokens. [N, CTX] -> [N].
 
@@ -355,7 +400,7 @@ class Probe:
                 out.append(tok.std(axis=1).mean(axis=1))       # std over patches, mean over dims
         return np.concatenate(out, axis=0)
 
-    # ---------------------------------------------------------------------------- #
+    # ---------------------------------------------------------------------- #
     @staticmethod
     def _reg(a, which: str) -> np.ndarray:
         """Pull the single [REG] vector out of a block output. [B, T, D] -> [B, D].
@@ -411,7 +456,7 @@ class Probe:
         return {s: np.concatenate(v, axis=0) for s, v in acc.items()}
 
     def random_init_clone(self):
-        """An untrained copy of the same architecture — the deliverable's random-init control.
+        """An untrained copy of the same architecture, the deliverable's random-init control.
 
         A high MDL compression on an untrained network means the band is exposed by the
         architecture (random projections over a patch), not learned; only the gap between the two
@@ -425,9 +470,9 @@ class Probe:
         return clone
 
 
-# --------------------------------------------------------------------------------------- #
+# --------------------------------------------------------------------------------- #
 #  4. Prequential MDL codelength  (Voita & Titov 2020; probing notebook §5)
-# --------------------------------------------------------------------------------------- #
+# --------------------------------------------------------------------------------- #
 def mdl_codelength(Xf: np.ndarray, y: np.ndarray, K: int = 5, n_pca: int = 20,
                    seed: int = SEED) -> float:
     """Online (prequential) description length in BITS of the labels y given the features Xf.
@@ -435,7 +480,7 @@ def mdl_codelength(Xf: np.ndarray, y: np.ndarray, K: int = 5, n_pca: int = 20,
     The data are shuffled once and split into K chunks. The first chunk is charged at the uniform
     rate (1 bit/example, since the tasks are binary); every later chunk is encoded with a probe
     trained ONLY on the chunks before it, and charged -log2 p(true label). Summing gives the cost
-    of transmitting the labels together with the probe that predicts them — a probe that memorises
+    of transmitting the labels together with the probe that predicts them, a probe that memorises
     noise pays for itself and gains nothing, which is precisely why MDL is preferred to accuracy.
 
     The probe pipeline (StandardScaler -> PCA(20) -> LogisticRegression) and K = 5 are kept
@@ -492,18 +537,18 @@ BAND_TASKS = [
 ]
 
 
-# --------------------------------------------------------------------------------------- #
+# --------------------------------------------------------------------------------- #
 #  5. Collapse-site detection and the derived per-geometry summaries used by H3
-# --------------------------------------------------------------------------------------- #
+# --------------------------------------------------------------------------------- #
 def detect_collapse_sites(freqs: np.ndarray, z: np.ndarray, pure: bool,
                           rel_thr: float = 0.02, dip_ratio: float = 0.75,
                           window_hz: float = 6.0) -> list[float]:
     """Frequencies at which the across-patch token dispersion collapses.
 
     Two regimes, exactly as in hypotheses.py:
-      * pure sinusoid  — the degeneracy is EXACT, so a site is any frequency whose dispersion is
+      * pure sinusoid , the degeneracy is EXACT, so a site is any frequency whose dispersion is
         within `rel_thr` of zero relative to the curve's own maximum;
-      * generator background — the background breaks patch identity, so the dispersion never
+      * generator background, the background breaks patch identity, so the dispersion never
         reaches zero; a site is a prominent local minimum dipping to <= `dip_ratio` of its local
         baseline. The baseline window is expressed in Hz (not in samples) because the H3 sweep grid
         is non-uniform.
@@ -529,7 +574,7 @@ def merge_adjacent(sites: list[float], tol: float = 1.5) -> list[float]:
     """Collapse runs of neighbouring detections into one site (their mean).
 
     On the union grid a single dip can straddle two nearby grid points (e.g. 42.5 and 42.67 Hz);
-    counting both would inflate the site count and corrupt the spacing estimate feeding Eq. (14).
+    counting both would inflate the site count and corrupt the spacing estimate feeding Eq. (13).
     """
     if not sites:
         return []
@@ -550,7 +595,7 @@ def site_summary(sites: list[float]) -> dict:
 
     `f1` is the lowest detected site (the comb's fundamental) and `delta_hat` the median successive
     difference (its spacing). Both are read off the data WITHOUT assuming which parameter generates
-    the comb — that is the point: the regression then estimates whether the spacing moves as 1/S.
+    the comb, that is the point: the regression then estimates whether the spacing moves as 1/S.
     """
     sites = sorted(sites)
     if not sites:
@@ -565,8 +610,9 @@ def site_summary(sites: list[float]) -> dict:
 def comb_distance(freqs: np.ndarray, spacing: float, band: tuple[float, float] = BAND) -> np.ndarray:
     """rho_Delta(f): distance from each frequency to the nearest member of a comb of given spacing.
 
-    This is the predictor inside the H3 comb likelihood (Eq. 13). Written here rather than in the
-    notebook so the model comparison M_S / M_P / M_0 uses one definition.
+    Used to label each swept frequency as on- or off-grid for the H3 site model (Eq. 12): a
+    frequency counts as on the grid when this distance is within the tolerance. Written here rather
+    than in the notebook so the comparison M_S / M_P / M_0 uses one definition of membership.
     """
     freqs = np.asarray(freqs, float)
     grid = np.arange(spacing, band[1] + spacing, spacing)

@@ -1,0 +1,22 @@
+\begin{table}[t]
+    \centering
+    \small
+    \begin{tabular}{@{}lllp{5.4cm}@{}}
+        \toprule
+        \textbf{Model} & \textbf{Parameter} & \textbf{Prior} & \textbf{Role} \\
+        \midrule
+        A, C & $\bar\beta$              & $\text{Student-}t_4(0,0.5)$      & population phase-lock effect, on the log-recovery scale \\
+        A    & $\delta_O$               & $\text{Student-}t_4(0,0.5)$      & slope of the effect in patch overlap $O=(P-S)/P$ \\
+        A, C & $\tau,\sigma_k,\sigma_b,\sigma$ & $\text{Half-Student-}t_4(0,0.5)$ & configuration, harmonic, background and residual scales \\
+        C    & $\sigma_\phi$            & $\text{Half-}\mathcal N(0,0.25)$ & spread of the eight per-phase offsets \\
+        B    & $\alpha_0$               & $\mathcal N(\log \bar y, 1)$     & baseline log codelength \\
+        B    & $\theta_{lock}$          & $\mathcal N(0,0.5)$              & log codelength expansion at a lock \\
+        B    & $k$                      & $\text{Gamma}(2,0.1)$            & Gamma shape (dispersion) \\
+        D1   & $\alpha_g,\theta_S,\theta_P$ & $\mathcal N(0,1)$            & per-geometry level and the two grid labels; $H3$ predicts $\theta_S<0$ \\
+        D2   & $\kappa_0$               & $\mathcal N(0,10)$\,Hz           & offset of the spacing regression; $H3$ predicts $0$ \\
+        D2   & $\kappa_S,\kappa_P$      & $\mathcal N(0,1)$                & slopes on $f_s/S$ and $f_s/P$; $H3$ predicts $1$ and $0$ \\
+        \bottomrule
+    \end{tabular}
+    \caption{Priors, as preregistered in Deliverable~1. Every effect prior is centred on \emph{no effect}, zero for the contrast and codelength models, no phase dependence for $\sigma_\phi$, no relationship for $\kappa_S$, so each hypothesis has to be earned from the likelihood rather than assumed. Scale parameters are given half-$t$ priors on the same units as their response.}
+    \label{tab:bayesPriors}
+\end{table}
