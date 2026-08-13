@@ -142,7 +142,7 @@ f<\frac{f_s}{2}
 
 The derivation above shows that some translations leave a sinusoid unchanged, this repetition is not evidence that two distinct signals become indistinguishable to the model. 
 
-Structural aliasing is treated as an emergent, falsifiable property of the trained representations\cite{paganiPreliminaryInsightsChronos2026}. At a phase-lock the patch tokens collapse onto one another ($\mathbf{t}_k=\mathbf{t}_{k+1}$), so two distinct inputs can map to the same token sequence. We therefore diagnose it not by a fixed distance between representations, but by whether the signal's frequency can still be read back from the model's internal representation: structural aliasing is present when this recovery degrades at a locked frequency relative to nearby, non-locked ones.
+Structural aliasing is therefore treated as an emergent, falsifiable property of the trained representations\cite{paganiPreliminaryInsightsChronos2026}. At a phase-lock consecutive patch tokens coincide, $\mathbf{t}_k=\mathbf{t}_{k+1}$, so distinct inputs can share a token sequence. We diagnose the phenomenon by \emph{readability} rather than by a fixed distance between representations: structural aliasing is present when the signal's frequency can no longer be recovered from the model's internal state at a locked frequency as well as it can at neighbouring, non-locked ones.
 
 \subsection{Aliasing implications}
 The above derivation reframes $\mathcal F_{lock}$ as the candidate class where such collisions are hypothesised to occur. In particular, the project tests the following hypotheses.
@@ -185,6 +185,7 @@ Each $(P,S)$ configuration is retrained from scratch: changing $P$ resizes the f
 Training ran on one Alienware 16 Aurora (NVIDIA RTX 5060 Laptop GPU, 8\,GB VRAM; 32\,GB RAM), ${\approx}11\,\mathrm{h}$ in total. Forecasting quality of the retrained models is shown in \autoref{fig:multiFreqPanel}. If necessary, the project may extend the training budget to the full parameters.
 
 \subsection{Probing Methodology}
+\label{subsec:probing}
 Following MDL probing\cite{voitaInformationTheoreticProbingMinimum2020}, the $256$-dimensional $[\mathrm{REG}]$ representation is captured after each encoder block and each decoder block, plus two points at the output stage: the pre-projection $256$-d $[\mathrm{REG}]$ input, and the projected quantile output (Pagani et al.'s $h_4$\cite{paganiPreliminaryInsightsChronos2026}), where the compression drop reported in the source paper is concentrated. Probing this single per-block vector, rather than the full flattened patch sequence, avoids a dimensionality mismatch across stages and patch/stride variants.
 
 All probe points are compared on the same footing via a prequential-MDL codelength $L(D)$, reported as compression $\mathrm{SV}=1-L(D)/L_{\mathrm{uniform}}(D)$, computed independently per probe point for each of the seven hierarchical band-classification tasks\cite{paganiPreliminaryInsightsChronos2026}. Each value is benchmarked against a shuffled-label control ($\mathrm{SV}\le 0$ confirms the probe is not memorising noise) and a random-initialisation control (identical untrained architecture, isolating learned information from architectural artefacts).
@@ -192,45 +193,117 @@ All probe points are compared on the same footing via a prequential-MDL codeleng
 Independently, a dense per-frequency classification-accuracy profile is obtained at the projected output by sweeping the same band-classification probe across the operational spectrum, with non-redundant phase sampling $S_f=\min\{f_s/\gcd(f,f_s)-1,\,N\}$ replacing independently drawn random phases.
 
 \subsection{Bayesian Analysis}
-We employ a two-part Bayesian framework to quantify both relative local degradation and absolute performance losses across hypotheses $H1$--$H3$. The analysis is conducted only in the frequency range over which valid forecasts are observed, which we expect to be a subset of $[2,250]\,\mathrm{Hz}$.
+Each hypothesis receives its own estimand and model: two for the \emph{size} of the phase-lock effect, behavioural and representational ($H1$), one for its dependence on phase ($H2$), one for its \emph{location} in frequency ($H3$). All are restricted to the range over which valid forecasts are observed, expected to be a subset of $[2,250]\,\mathrm{Hz}$.
 
-\subsubsection{Local Contrast Analysis:} to test localized recovery drop at stride-lock for each retrained model configuration $(P, S)$ and training seed, signals at exact $f_k\in \mathcal F_{lock}$ are paired with control signals at offset frequencies $f_k \pm 0.25 f_s / S$, keeping phase, baseline amplitude, noise level, and background process parameters identical. Letting $R$ denote the forecast amplitude recovery ratio, we define the paired logarithmic local contrast $d$ as:
+\subsubsection{Local Contrast Analysis (H1, behavioural):} to test localized recovery drop at stride-lock, signals at exact $f_k\in \mathcal F_{lock}$ are paired with controls at $f_k \pm 0.25 f_s / S$ sharing phase, amplitude, noise level and background. Letting $R$ denote the forecast amplitude recovery ratio, the paired logarithmic local contrast is:
 
 \begin{equation}
-d 
-= 
-\log(R_k + 0.01) 
-- 
-\frac{\log(R_- + 0.01) 
-+ 
+\label{eq:contrast}
+d
+=
+\log(R_k + 0.01)
+-
+\frac{\log(R_- + 0.01)
++
 \log(R_+ + 0.01)}{2}
 \end{equation}
 
-where $R_k$ is the recovery at $f_k$, and $R_{\pm}$ are recoveries at the control frequencies $f_k \pm 0.25 f_s / S$. A contrast value of $d < 0$ directly indicates localized forecast attenuation induced by phase-locking.
-
-Contrasts are modeled using a heavy-tailed $\text{Student-}t_4(\mu_i, \sigma^2)$ likelihood. The population phase-lock effect $\bar{\beta}$ receives a weakly informative prior $\bar{\beta} \sim \text{Student-}t_4(0, 0.5)$, centered at zero due to the absence of prior quantitative estimates in the literature.
-
-\subsubsection{Absolute Performance Analysis:} to evaluate a raw non-negative metric, specifically the prequential MDL codelength $L(D)$, we use a Bayesian Gamma regression model with a log link:
+with $d < 0$ indicating localized attenuation at the lock. Contrasts are modeled using a heavy-tailed $\text{Student-}t_4(\mu_i, \sigma^2)$ likelihood over a three-level hierarchy,
 
 \begin{equation}
-y_i 
-\sim 
+\label{eq:contrast_hier}
+\mu_i
+=
+\beta_{c[i]}
++
+u_{k[i]}
++
+u_{b[i]},
+\qquad
+\beta_c
+\sim
+\mathcal{N}\!\left(\bar\beta + \delta_O \widetilde O_c,\ \tau\right),
+\qquad
+O_c
+=
+\frac{P_c - S_c}{P_c},
+\end{equation}
+
+where $c$ indexes configurations, $k$ the lock harmonic, $b$ the background realisation, and $\widetilde O_c$ the centred patch overlap. The population effect $\bar\beta$ and the overlap slope $\delta_O$ receive $\text{Student-}t_4(0,0.5)$ priors, centered at zero due to the absence of prior quantitative estimates in the literature; on this log-ratio scale $0.5$ admits a factor $e^{0.5}\approx1.65$. All scales receive $\text{Half-Student-}t_4(0,0.5)$ priors, and with one training seed inference is conditional on that checkpoint.
+
+\subsubsection{Absolute Performance Analysis (H1, representational):} to evaluate a raw non-negative metric, specifically the prequential MDL codelength $L(D)$, we use a Bayesian Gamma regression model with a log link:
+
+\begin{equation}
+\label{eq:gamma_reg}
+y_i
+\sim
 \text{Gamma}(\text{shape} = k, \, \text{mean} = \mu_i),
 \qquad
 \log(\mu_i)
 =
-\alpha_0 
-+ 
-\theta_{\text{lock}} 
-\cdot 
+\alpha_0
++
+\theta_{\text{lock}}
+\cdot
 \text{IsLocked}
 \end{equation}
 
-where $\text{IsLocked} \in \{0, 1\}$ flags phase-lock conditions, and $\theta_{\text{lock}} \sim \mathcal{N}(0, 0.5)$ captures the relative codelength expansion. 
+where $\text{IsLocked} \in \{0, 1\}$ flags phase-lock conditions, and $\theta_{\text{lock}} \sim \mathcal{N}(0, 0.5)$ captures the relative codelength expansion. The Gamma shape parameter receives a weakly informative prior, $k \sim \text{Gamma}(2, 0.1)$, allowing the model to adaptively capture metric dispersion.
 
-The Gamma shape parameter receives a weakly informative prior, $k \sim \text{Gamma}(2, 0.1)$, allowing the model to adaptively capture metric dispersion.
+The seven band tasks of \autoref{subsec:probing} span the whole band, so one $L(D)$ per probe point leaves $\text{IsLocked}$ nothing to attach to. We therefore compute $L(D)$ \emph{per frequency}: at each candidate $f_c$ a balanced probe separates tones at $f_c \pm 1\,\mathrm{Hz}$ from the same $[\mathrm{REG}]$ vector, under an unchanged prequential protocol. Band-task values remain a descriptive cross-check.
 
-\subsubsection{Inference:} planned posterior inference will evaluate $95\%$ credible intervals and the posterior probability of at least $20\%$ attenuation.
+\subsubsection{Phase-Invariance Analysis (H2):} \autoref{eq:contrast} averages the $S_{f_k}$ phase offsets sampled at $f_k$ and therefore cannot falsify a claim that is specifically about phase. Retaining the phase index, we cut the phase circle into eight equal bins, give each bin its own offset $u_{p}$, and model the per-phase deficit $y_i = \log(R_{\text{ctrl},i}+0.01) - \log(R_{\text{lock},i}+0.01)$ as
+
+\begin{equation}
+\label{eq:h2_phase}
+\mathbb{E}[y_i]
+=
+\beta_{c[i]}
++
+u_{k[i]}
++
+u_{p[i]},
+\qquad
+u_p \sim \mathcal{N}(0, \sigma_\phi),
+\end{equation}
+
+under the same likelihood, with $\sigma_\phi \sim \text{Half-}\mathcal{N}(0,0.25)$. The estimand $\sigma_\phi$ is the spread of those offsets: how much the deficit moves as the signal slides through its cycle. $H2$ states the deficit is set by the stride/patch alignment rather than the signal's own phase, i.e.\ $\sigma_\phi \approx 0$; we report $\Pr(\sigma_\phi < \log 1.1 \mid D)$ and a leave-one-out comparison against the phase-free model. A variance component assumes nothing about the \emph{shape} of the dependence: any systematic variation with phase inflates $\sigma_\phi$.
+
+\subsubsection{Site-Geometry Analysis (H3):} $H3$ concerns \emph{where} the degradation sits, so it is tested on the token-collapse profile $z_g(f)$, the across-patch dispersion of the input-patch embeddings. All geometries $g=(P,S)$ share one sweep grid, a uniform $1\,\mathrm{Hz}$ grid unioned with the predicted sites of \emph{every} configuration, so none is scored on a grid privileging its own prediction. Labelling each frequency by the grid it belongs to,
+
+\begin{equation}
+\label{eq:h3_sites}
+\log z_g(f)
+\sim
+\mathcal{N}\!\left(
+\alpha_g
++
+\theta_S \mathbb{1}[f \in \{c f_s/S\}]
++
+\theta_P \mathbb{1}[f \in \{k f_s/P\}],
+\ \sigma
+\right),
+\end{equation}
+
+with $\alpha_g,\theta_S,\theta_P \sim \mathcal{N}(0,1)$; $H3$ predicts $\theta_S < 0$. A leave-one-out comparison of each indicator alone against a null identifies which parameter generates the sites, the $S<P$ configurations being what separates the two families. Movement is then estimated as a plain regression of the \emph{measured} comb spacing $\hat\Delta_g$ (median successive difference between detected sites) on the two \emph{predicted} spacings,
+
+\begin{equation}
+\label{eq:h3_move}
+\hat\Delta_g
+\sim
+\mathcal{N}\!\left(
+\kappa_0
++
+\kappa_S \frac{f_s}{S_g}
++
+\kappa_P \frac{f_s}{P_g},
+\ \sigma
+\right),
+\end{equation}
+
+with $\kappa_S, \kappa_P \sim \mathcal{N}(0,1)$ and $\kappa_0 \sim \mathcal{N}(0,10)\,\mathrm{Hz}$. $H3$ predicts $\kappa_S = 1$ and $\kappa_P = 0$: the spacing tracks the stride prediction one-for-one and ignores the patch one, assessed against the ROPE $|\kappa_S - 1| < 0.1$. Since $\hat\Delta_g$ is read off a discrete sweep, the residual scale enters as $\sqrt{\sigma^2 + \Delta f^2}$; without that floor, sites landing exactly on the predicted comb would drive $\sigma$ to zero and degenerate the posterior. Because the design varies $P$ only along $P = S$ (\autoref{tab:patchStride}), $\kappa_P$ stays partially confounded and the fixed-$P{=}16$ series carries the identification.
+
+\subsubsection{Inference:} each model reports its effect on the natural scale with a $95\%$ credible interval, the probability of at least $20\%$ attenuation $\Pr(\bar\beta < \log 0.8 \mid D)$, and the practical-equivalence probability $\Pr(|\bar\beta| < \log 1.1 \mid D)$; competing formulations are compared by leave-one-out cross-validation rather than by null-hypothesis testing. Fitting uses NUTS ($4$ chains, $2000$ warm-up and $2000$ draws), accepted only at $\hat R < 1.01$, effective sample sizes above $1000$ and no divergences. The workflow runs prior predictive checks before data collection, a simulation-based parameter-recovery check, posterior predictive checks stratified by frequency, phase, $P$, $S$ and generator, and prior sensitivity over the scales $\{0.25, 0.5, 1.0\}$.
 
 \section{Security Implications and Risk Assessment}
 Finally, the project includes a formal risk assessment grounded in the NIST AI Risk Management Framework (AI RMF)\cite{tabassiArtificialIntelligenceRisk2023} to evaluate structural aliasing as a systematic vulnerability within cyber-physical energy systems. This analysis outlines plausible threat models and attack surfaces, possible mitigation strategies, and an evaluation of whether the proposed mitigation strategies effectively reduce residual exposure for the automated control AI agent. 

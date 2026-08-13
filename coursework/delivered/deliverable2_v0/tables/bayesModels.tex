@@ -1,0 +1,17 @@
+\begin{table}[t]
+    \centering
+    \small
+    \begin{tabular}{@{}llll@{}}
+        \toprule
+        \textbf{Model} & \textbf{Hypothesis} & \textbf{Estimand} & \textbf{Input} \\
+        \midrule
+        A & $H1$ behavioural     & $e^{\bar\beta}$: recovery at a lock / at its controls & \texttt{contrasts} \\
+        B & $H1$ representational & $e^{\theta_{lock}}$: codelength at a lock / elsewhere & \texttt{mdl\_cells} \\
+        C & $H2$                 & $\sigma_\phi$: spread of the deficit across phase & \texttt{contrasts} \\
+        D1 & $H3$ location       & which grid the sites lie on (LOO) & \texttt{collapse} \\
+        D2 & $H3$ movement       & $\kappa_S$: slope of measured on predicted spacing & \texttt{sites} \\
+        \bottomrule
+    \end{tabular}
+    \caption{The five Bayesian models, the hypothesis each addresses, the quantity it estimates and the collected table it is fitted to. Models A and C share an input but not a response: A uses the phase-averaged contrast $d$ of Deliverable~1, C the per-phase deficit with the phase index retained.}
+    \label{tab:bayesModels}
+\end{table}

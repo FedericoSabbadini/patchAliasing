@@ -1,0 +1,31 @@
+\begin{table}[!b]
+    \centering
+    \footnotesize
+    \begin{tabular}{@{}llll@{}}
+        \toprule
+        \textbf{Parameter} & \textbf{Adopted} & \textbf{Chronos official} & \textbf{Max / constraint} \\
+        \midrule
+        \multicolumn{4}{@{}l}{\textit{Architecture (fixed, from Bolt-tiny)}}\\
+        \texttt{context\_length}    & 2048 & 2048 & Bolt-tiny \\
+        \texttt{prediction\_length} & 64   & 64   & Bolt-tiny \\
+        quantile levels             & 9    & 9    & Bolt-tiny \\
+        \midrule
+        \multicolumn{4}{@{}l}{\textit{Optimisation}}\\
+        \texttt{batch\_size}     & 32        & 32        & VRAM 8\,GB \\
+        \texttt{max\_steps}      & 100\,000  & 200\,000  & compute budget \\
+        \texttt{learning\_rate}  & $10^{-3}$ & $10^{-3}$ & --- \\
+        scheduler / warmup       & linear / 0 & linear / 0 & --- \\
+        \texttt{weight\_decay}   & 0.0       & 0.0       & --- \\
+        \texttt{grad\_clip\_norm}& 1.0       & 1.0       & --- \\
+        optimiser / precision    & AdamW (fused) / fp32+TF32 & --- \\
+        \midrule
+        \multicolumn{4}{@{}l}{\textit{Data pipeline}}\\
+        corpora (streaming)      & \multicolumn{2}{l}{TSMixup 10M + KernelSynth 1M} & official \\
+        mixing ratio             & 9:1       & 9:1       & --- \\
+        \texttt{shuffle\_buffer} & 10\,000   & 100\,000  & streaming timeout \\
+        \texttt{min\_past} / \texttt{max\_missing} / \texttt{drop\_prob} & 60 / 0.9 / 0.2 & --- \\
+        \bottomrule
+    \end{tabular}
+    \caption{Training hyperparameters: adopted value, official Chronos recipe (\texttt{chronos-t5-tiny}), and usable maximum / constraint. Only $(P,S)$, the step budget ($100$k vs.\ $200$k) and the shuffle buffer ($10$k vs.\ $100$k) depart from the official values, to fit the single-GPU budget.}
+    \label{tab:trainParams}
+\end{table}
