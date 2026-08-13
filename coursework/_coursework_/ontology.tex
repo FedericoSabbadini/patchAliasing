@@ -1,0 +1,436 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Standalone ontology proposal
+% Simplified PV array closed-loop control
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[
+	letterpaper,
+	10pt,
+	unnumberedsections,
+	twoside,
+]{LTJournalArticle}
+
+\usepackage{float}
+
+\runninghead{Proposed Simplified PV Array Ontology}
+
+\setcounter{page}{1}
+
+\title{Proposed Simplified Ontology\\for PV Array Closed-Loop Control}
+
+\author{Matteo Boniotti, Gianluca Brignoli and Federico Sabbadini}
+\date{August 13, 2026}
+
+\hypersetup{
+	pdftitle={Proposed Simplified Ontology for PV Array Closed-Loop Control},
+	pdfauthor={Matteo Boniotti, Gianluca Brignoli and Federico Sabbadini},
+}
+
+\renewcommand{\maketitlehookd}{%
+	\begin{abstract}
+		This document proposes a compact semantic model for a photovoltaic system governed by one control agent. The model preserves environmental context, signal and patch metadata, anomaly detection, and structural-aliasing awareness, while reducing the physical system to a photovoltaic array, a battery, and an external grid. A single closed-loop decision model selects directional power transfers and an operating mode from validated observations, battery constraints, and model-observability evidence. The proposal is standalone: it is intended for review before any change is made to the coursework ontology, its OWL/JSON artifacts, or the experimental notebooks.
+	\end{abstract}
+}
+
+\newcommand{\pv}[1]{\texttt{pv:#1}}
+\newcommand{\valueof}[1]{\textsf{#1}}
+\newcommand{\policygate}[2]{%
+	\fbox{\parbox[t]{0.17\textwidth}{\centering\scriptsize
+		\textbf{#1}\par\smallskip #2}}}
+\newcommand{\policyaction}[1]{%
+	\fbox{\parbox[t]{0.17\textwidth}{\centering\scriptsize #1}}}
+\newcommand{\policywide}[1]{%
+	\fbox{\parbox[t]{0.92\textwidth}{\centering\scriptsize #1}}}
+
+\begin{document}
+
+\maketitle
+
+\section{Design Objective and System Boundary}
+
+The ontology represents a small photovoltaic energy system whose power flow is coordinated by exactly one autonomous control agent. The objective is not to reproduce a complete micro-grid. It is to expose the minimum domain semantics needed to connect physical observations, environmental context, structural-aliasing risk, and an explainable control decision.
+
+The modeled boundary contains three energy assets: a photovoltaic array, a battery, and an external grid. The external grid is assumed to be an available bidirectional bus that absorbs residual production and provides reserve recovery when required. Downstream demand, market prices, and individual consumer loads remain outside the ontology. Consequently,
+\pv{InternalLoad} is deliberately removed and an import from the grid is modeled only when it charges the battery.
+
+The four admissible transfer directions are
+\begin{equation}
+\begin{aligned}
+\mathrm{PV} &\longrightarrow \mathrm{Battery}, &
+\mathrm{PV} &\longrightarrow \mathrm{ExternalGrid},\\
+\mathrm{Battery} &\longrightarrow \mathrm{ExternalGrid}, &
+\mathrm{ExternalGrid} &\longrightarrow \mathrm{Battery}.
+\end{aligned}
+\label{eq:routes}
+\end{equation}
+No peer-to-peer negotiation is introduced. The photovoltaic array, battery, and external grid are passive assets; only \pv{ControlAgent} observes, assesses, explains, and selects decisions.
+
+\section{Core Ontology}
+
+\subsection{Entity taxonomy}
+
+Table~\ref{tab:classes} defines the compact class interface. The three listed asset subclasses form a disjoint union; each \pv{PVSystem} contains exactly one asset of each type and is managed by exactly one control agent. Closed operational vocabularies are represented as named individuals rather than as additional class hierarchies.
+
+\begin{table}[H]
+\centering
+\caption{Core classes in the proposed ontology.}
+\label{tab:classes}
+\small
+\begin{tabular}{@{}L{0.29\linewidth}L{0.64\linewidth}@{}}
+\toprule
+\textbf{Class} & \textbf{Role} \\
+\midrule
+\pv{PVSystem} & Aggregate system and scope of each control cycle. \\
+\pv{EnergyAsset} & Parent of the three physical assets. \\
+\pv{PhotovoltaicArray} & Intermittent renewable source measured through PV telemetry. \\
+\pv{BatteryStorage} & Bounded storage asset that can charge, discharge, or hold. \\
+\pv{ExternalGrid} & Reliable bidirectional boundary bus for residual balancing. \\
+\pv{ControlAgent} & The single decision-making entity. \\
+\pv{SystemObservation} & Time-stamped snapshot of PV, environmental, and battery values. \\
+\pv{TimeSeriesSignal} & Physical signal and its temporal descriptors. \\
+\pv{PatchedRepresentation} & A model input representation defined by patch and stride. \\
+\pv{ObservabilityAssessment} & Evidence linking a signal-representation pair to an observability state. \\
+\pv{GenerationContext} & Operational proxy for expected solar generation. \\
+\pv{AnomalyState} & Detected physical or sensing abnormality. \\
+\pv{ObservabilityState} & Semantic assessment of information retained after patching. \\
+\pv{ControlMode} & Normal, conservative, or safe operating policy. \\
+\pv{PowerRoutingDecision} & One directional transfer or hold decision with an optional bounded setpoint. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The closed vocabularies are:
+\begin{description}
+	\item[Generation context:] \valueof{ClearSky}, \valueof{PartialCloud}, \valueof{Overcast}, and \valueof{Nighttime}.
+	\item[Anomaly:] \valueof{InverterTrip}, \valueof{RampEvent}, and \valueof{SensorMalfunction}.
+	\item[Observability:] \valueof{Observable}, \valueof{PartiallyObservable}, and \valueof{StructurallyAliased}.
+	\item[Control mode:] \valueof{NormalMode}, \valueof{ConservativeMode}, and \valueof{SafeMode}.
+\end{description}
+Formally, each vocabulary class is an OWL-style enumeration of the listed named individuals (\texttt{oneOf}). The four vocabulary classes are pairwise disjoint, and all listed values are declared globally different (\texttt{AllDifferent}). This prevents a value such as \valueof{SafeMode} from being silently identified with \valueof{ClearSky} or \valueof{NormalMode} under open-world semantics.
+Each valid time-stamped observation has exactly one generation context. Each completed observability assessment has exactly one observability state, and each routing decision records exactly one control mode. Co-issued decisions based on the same synchronized observation must record the same mode. Anomalies are not declared mutually exclusive because, for example, an abrupt inverter trip also creates a large power change. Deterministic control is obtained through the priority rules in the closed-loop section.
+
+\subsection{Object properties}
+
+The semantic relations in Table~\ref{tab:objects} replace the broad and directionless links used by the current ontology. A \pv{PowerRoutingDecision} may omit source and destination only for a hold decision. Each active transfer has exactly one source and one distinct destination; its non-negative setpoint magnitude is optional because \valueof{Balance} may denote passive residual exchange. If a cycle needs both battery charging and residual export, the agent creates two instances of the same decision class rather than two action subclasses.
+
+\begin{table}[H]
+\centering
+\caption{Object-property signatures.}
+\label{tab:objects}
+\small
+\begin{tabular}{@{}L{0.25\linewidth}L{0.29\linewidth}L{0.37\linewidth}@{}}
+\toprule
+\textbf{Property} & \textbf{Domain} & \textbf{Range or meaning} \\
+\midrule
+\pv{hasAsset} & \pv{PVSystem} & \pv{EnergyAsset} \\
+\pv{managedBy} & \pv{PVSystem} & exactly one \pv{ControlAgent} \\
+\pv{hasObservation} & \pv{PVSystem} & \pv{SystemObservation} \\
+\pv{hasSignal} & \pv{PhotovoltaicArray} & \pv{TimeSeriesSignal} \\
+\pv{hasRepresentation} & \pv{TimeSeriesSignal} & \pv{PatchedRepresentation} \\
+\pv{assessesRepresentation} & \pv{ObservabilityAssessment} & exactly one \pv{PatchedRepresentation} \\
+\pv{hasGenerationContext} & \pv{SystemObservation} & zero or one \pv{GenerationContext} value \\
+\pv{hasAnomaly} & \pv{SystemObservation} & zero or more \pv{AnomalyState} values \\
+\pv{hasObservabilityState} & \pv{ObservabilityAssessment} & one \pv{ObservabilityState} value \\
+\pv{selectsMode} & \pv{PowerRoutingDecision} & exactly one \pv{ControlMode} value \\
+\pv{makesDecision} & \pv{ControlAgent} & \pv{PowerRoutingDecision} \\
+\pv{basedOn} & \pv{PowerRoutingDecision} & observation, assessment, or inferred state \\
+\pv{hasSourceAsset} & \pv{PowerRoutingDecision} & zero or one \pv{EnergyAsset} \\
+\pv{hasDestinationAsset} & \pv{PowerRoutingDecision} & zero or one \pv{EnergyAsset} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\pv{hasRepresentation} is intentionally non-functional because one signal can be evaluated under several $(P,S)$ configurations. Each assessment identifies exactly which representation it evaluates. Each decision is based on exactly one current observation and its completed assessment; its own \pv{selectsMode} value therefore scopes the mode without accumulating incompatible modes on the persistent agent. The range of \pv{basedOn} is the union of observation and inferred-assessment entities, rather than the intersection that multiple RDFS range declarations would imply.
+
+OWL's open-world semantics do not by themselves close the route set. A cycle validator (for example, SHACL or equivalent application validation) therefore admits only the four ordered pairs in Eq.~\eqref{eq:routes}, rejects identical endpoints, and requires exactly one source and destination for an active transfer. A hold decision has no endpoints and has a zero or absent setpoint.
+
+\subsection{Data properties and units}
+
+The current observation records the measured variables available in the photovoltaic dataset and the asserted battery state. The control-critical values are PV power $P_{\mathrm{pv}}$, tilted irradiance $G_{\mathrm{tilt}}$, and normalized battery state of charge $s\in[0,1]$. Each has a separate validity flag derived from presence, finiteness, freshness, and a configured physical range. Horizontal irradiance, air temperature, wind speed, and wind direction remain environmental evidence but do not independently block the controller.
+
+Missing or stale data cannot be inferred safely from OWL's open-world assumption alone. An operational validation layer therefore compares the observation time stamp with a configurable staleness limit, validates numeric ranges, and asserts the three Boolean flags consumed by the ontology. This keeps data-quality validation distinct from semantic classification.
+
+\begin{table}[htbp]
+\centering
+\caption{Quantitative property groups.}
+\label{tab:data}
+\small
+\begin{tabular}{@{}L{0.29\linewidth}L{0.63\linewidth}@{}}
+\toprule
+\textbf{Owner} & \textbf{Data properties} \\
+\midrule
+\pv{SystemObservation} & \pv{pvPowerW}, \pv{powerRampRateWPerS}, \pv{tiltedIrradianceWm2}, \pv{horizontalIrradianceWm2}, \pv{airTemperatureC}, \pv{windSpeedMs}, \pv{windDirectionDeg}, \pv{batterySoC}, \pv{observationTimestamp}, \pv{pvPowerValid}, \pv{tiltedIrradianceValid}, and \pv{batterySoCValid}. \\
+\pv{BatteryStorage} & \pv{capacityWh}, \pv{reserveSoC}, \pv{targetSoC}, \pv{maximumSoC}, \pv{maximumChargePowerW}, and \pv{maximumDischargePowerW}. \\
+\pv{TimeSeriesSignal} & \pv{signalFrequencyHz}, \pv{samplingFrequencyHz}, \pv{periodSamples}, \pv{amplitudeW}, \pv{timeSpanSeconds}, and \pv{phaseOffsetSamples}. \\
+\pv{PatchedRepresentation} & \pv{patchSize}, \pv{stride}, and derived \pv{overlapRatio}. \\
+\pv{ObservabilityAssessment} & analysis status, method and metric, stride- and patch-locking ratios, locking tolerance, effect estimate, posterior aliasing probability, $95\%$ credible interval, and assessment time stamp. \\
+\pv{PowerRoutingDecision} & optional non-negative \pv{powerSetpointW}, \pv{decisionConfidence}, residual-risk note, battery command \{Charge, Discharge, Hold\}, PV command \{Connect, Isolate\}, and grid command \{Import, Export, Balance\}. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The proposal assumes an admissible patch configuration $P\geq1$ and $1\leq S\leq P$. Overlap is descriptive metadata:
+\begin{equation}
+\gamma=\frac{P-S}{P}.
+\label{eq:overlap}
+\end{equation}
+It is not used as a standalone rule for declaring aliasing.
+
+\section{Inference Model}
+
+\subsection{Environmental generation context}
+
+Let $g_0<g_1<g_2$ be site-configurable tilted-irradiance thresholds and let $G_t$ denote the validated value of $G_{\mathrm{tilt}}$ at time $t$. The active generation context is
+\begin{equation}
+C_G(G_t)=
+\begin{cases}
+\valueof{Nighttime}, & G_t\leq g_0,\\
+\valueof{Overcast}, & g_0<G_t<g_1,\\
+\valueof{PartialCloud}, & g_1\leq G_t<g_2,\\
+\valueof{ClearSky}, & G_t\geq g_2.
+\end{cases}
+\label{eq:generation-context}
+\end{equation}
+Values $g_0=0$, $g_1=150$, and $g_2=800\ \mathrm{W\,m^{-2}}$ are retained only as an illustrative configuration compatible with the current coursework. They are not universal meteorological boundaries. In particular, low irradiance can also be caused by solar position; the four values must therefore be read as generation-context proxies rather than certain weather diagnoses.
+
+\subsection{Anomaly detection and precedence}
+
+Let $v_P(t)$, $v_G(t)$, and $v_s(t)$ denote the validity of PV power, tilted irradiance, and battery SoC. The control-critical validity predicate is
+\begin{equation}
+V_t=v_P(t)\wedge v_G(t)\wedge v_s(t).
+\label{eq:validity}
+\end{equation}
+If $V_t$ is false, no generation context or physical anomaly is inferred from that observation. The operational validator asserts \valueof{SensorMalfunction}, and the cycle proceeds directly to safe-mode selection. Within a validated cycle, absence of the three listed anomaly values is interpreted locally as ``none detected''; this is a scoped closed-world policy, not a global OWL assumption.
+The signed ramp rate, measured in watts per second when $\Delta t$ is expressed in seconds, is
+\begin{equation}
+r_t=\frac{P_t-P_{t-1}}{\Delta t}.
+\label{eq:signed-ramp}
+\end{equation}
+The anomaly rules are expressed with configurable thresholds: $g_{\mathrm{trip}}$ for sufficient irradiance, $p_0$ for near-zero power, and $r_{\max}$ for maximum admissible ramp magnitude.
+\begin{align}
+\neg V_t
+&\longrightarrow \valueof{SensorMalfunction},
+\label{eq:sensor-malfunction}\\
+V_t\wedge G_t\geq g_{\mathrm{trip}}
+\wedge |P_t|\leq p_0
+&\longrightarrow \valueof{InverterTrip},
+\label{eq:inverter-trip}\\
+V_t\wedge V_{t-1}\wedge |r_t|>r_{\max}
+&\longrightarrow \valueof{RampEvent}.
+\label{eq:ramp-event}
+\end{align}
+No numerical value is inherited for $r_{\max}$ because it must be calibrated after invalid values and outliers have been excluded. The controller evaluates sensor validity first. A sensor malfunction therefore cannot be reinterpreted as a physical ramp or inverter trip. If a valid inverter trip also satisfies the ramp predicate, the safe response to the trip takes precedence over ramp smoothing.
+
+\subsection{Signal observability and structural aliasing}
+
+For a signal frequency $f$, sampling frequency $f_s$, patch size $P$, and stride $S$, define a stride-lock ratio and a patch-periodicity ratio
+\begin{equation}
+\rho_S=\frac{fS}{f_s},
+\qquad
+\rho_P=\frac{fP}{f_s}.
+\label{eq:locking-ratio}
+\end{equation}
+A stride phase-lock candidate $L_S$ and a within-patch repetition candidate $L_P$ are
+\begin{equation}
+\begin{aligned}
+L_S&=\big[\exists m\in\mathbb{Z}^{+}:|\rho_S-m|\leq\varepsilon_S\big],\\
+L_P&=\big[\exists k\in\mathbb{Z}^{+}:|\rho_P-k|\leq\varepsilon_P\big],\\
+C&=(L_S\vee L_P)\wedge\left(0<f<\frac{f_s}{2}\right),
+\end{aligned}
+\label{eq:locking-candidate}
+\end{equation}
+where $\varepsilon_S$ and $\varepsilon_P$ are tied to frequency resolution and are never hardcoded frequency bands. Only $L_S$ expresses equality of consecutive patch phases; $L_P$ records whole-cycle repetition inside a patch and is retained as an H3 experimental factor. Their union $C$ is a candidate geometry class, not proof that two domain concepts are indistinguishable.
+
+Let $q$ denote the task-relevant information being tested, for example frequency or amplitude. Let $\Delta_{\mathrm{loss}}(q)$ be its predeclared behavioral or representational loss relative to matched controls, $\delta$ the maximum practically negligible loss, $D$ the experimental evidence, and $\tau>1/2$ the posterior confidence threshold. Define confirmed information loss $B$ and confirmed preservation $R$ as
+\begin{equation}
+B=\left[\Pr\!\left(\Delta_{\mathrm{loss}}(q)>\delta\mid D\right)\geq\tau\right],
+\qquad
+R=\left[\Pr\!\left(\Delta_{\mathrm{loss}}(q)\leq\delta\mid D\right)\geq\tau\right].
+\label{eq:bayesian-evidence}
+\end{equation}
+Because $\tau>1/2$, $B$ and $R$ cannot both hold for the same assessment. The assessment interface is designed to receive the planned offline evidence already specified in Deliverable~1: a local amplitude-recovery contrast with a heavy-tailed Student-$t_4$ likelihood and a Gamma regression with log link for non-negative prequential-MDL codelength. The population contrast uses the weakly informative prior $\bar\beta\sim\text{Student-}t_4(0,0.5)$; the Gamma model uses $\theta_{\mathrm{lock}}\sim\mathcal N(0,0.5)$ and shape $k\sim\mathrm{Gamma}(2,0.1)$. The stored record identifies the tested $(P,S)$ configuration, matched controls, method and metric, effect estimate, $95\%$ credible interval, and posterior probability of at least $20\%$ attenuation. These are evidence fields, not universal ontology thresholds. Until that planned inference has completed and satisfies the predeclared criterion, no instance may be asserted as \valueof{StructurallyAliased}.
+
+The three observability values are assigned as follows:
+\begin{equation}
+C_O=
+\begin{cases}
+\valueof{StructurallyAliased}, & A,\\
+\valueof{Observable}, & \neg A\wedge R,\\
+\valueof{PartiallyObservable}, & \neg A\wedge\neg R,
+\end{cases}
+\qquad A=C\wedge B.
+\label{eq:observability-state}
+\end{equation}
+\valueof{Observable} therefore means that positive evidence shows the tested representation preserves the task-relevant information within tolerance $\delta$. It does not mean global observability of the physical system, nor does it merely mean that aliasing was not found. Candidate geometry may still be \valueof{Observable} when the experiment demonstrates preservation. \valueof{PartiallyObservable} is the epistemic fallback: preservation has not been certified, while structural aliasing has not been confirmed. It includes a candidate with inconclusive evidence, an unfinished test, a credible interval crossing the decision threshold, conflicting metrics, or no preservation evidence. The term means \emph{partially trusted}, not that a fixed fraction of samples or sensors is visible.
+
+H1 compares each candidate frequency with matched nearby non-candidate controls and predicts higher MDL codelength or lower amplitude recovery; absent or non-localized loss refutes H1. H2 tests whether the loss at a candidate frequency remains approximately stable across sampled phase offsets; systematic phase dependence refutes that hypothesis. H3 tests whether candidate degradation sites move proportionally to $1/S$ or $1/P$ when the corresponding parameter varies. These hypotheses contribute controlled evidence to $D$, but remain falsifiable experimental factors rather than ontology subclasses or automatic action rules. Sensor validity is modeled separately as an anomaly and never relabels a model representation as structurally aliased.
+
+When an experimental generator provides a phase $\phi$ in radians, the corresponding temporal offset is converted before storage:
+\begin{equation}
+o_{\mathrm{samples}}=\frac{\phi f_s}{2\pi f}.
+\label{eq:phase-conversion}
+\end{equation}
+Neither $\phi$ nor $o_{\mathrm{samples}}$ is compared directly with stride to infer an anomaly.
+
+The semantic propagation path is explicit:
+\begin{equation}
+\begin{aligned}
+\pv{TimeSeriesSignal}
+&\longrightarrow \pv{PatchedRepresentation}\\
+&\longrightarrow \pv{ObservabilityAssessment}\\
+&\longrightarrow \pv{ControlMode}
+\longrightarrow \pv{PowerRoutingDecision}.
+\end{aligned}
+\label{eq:semantic-path}
+\end{equation}
+Aliasing can therefore reduce confidence in forecast-derived production, ramp expectations, forecast-driven anomaly recognition, and routing. It does not alter the directly measured values of $G_{\mathrm{tilt}}$, $P_{\mathrm{pv}}$, or SoC; those values are governed by the separate validity path.
+
+\section{Single-Agent Closed-Loop Control}
+
+\subsection{Mode selection}
+
+The agent evaluates each synchronized control cycle using the strict priority
+\begin{equation}
+\valueof{SafeMode}\succ
+\valueof{ConservativeMode}\succ
+\mathrm{RampOverride}\succ
+\mathrm{NormalRouting}.
+\label{eq:priority}
+\end{equation}
+Let $A_{\mathrm{safe}}$ mean that \valueof{SensorMalfunction} or \valueof{InverterTrip} is present. The selected mode is
+\begin{equation}
+M_t=
+\begin{cases}
+\valueof{SafeMode}, & A_{\mathrm{safe}}\vee
+(C_O=\valueof{StructurallyAliased}),\\
+\valueof{ConservativeMode}, & C_O=\valueof{PartiallyObservable},\\
+\valueof{NormalMode}, & \text{otherwise}.
+\end{cases}
+\label{eq:mode-selection}
+\end{equation}
+In \valueof{SafeMode}, the battery command is Hold and the grid command is Balance. The PV command is Isolate only for an inverter trip. For sensor malfunction or confirmed structural aliasing, forecast-driven changes are suspended and the already certified PV-to-grid path remains a passive residual outlet. In \valueof{ConservativeMode}, the same physical routes remain available with a configurable reduced battery-power cap and a low-confidence decision flag. A concurrent ramp may inform transfer direction, but it cannot bypass that cap or authorize charging above target SoC or discharging below reserve; this implements the precedence in Eq.~\eqref{eq:priority}.
+
+\subsection{Routing policy}
+
+Normal policy charges the battery before exporting energy. A valid ramp event overrides that preference only long enough to smooth a rapid change, without violating battery limits. Positive and negative ramps are distinguished by the sign of $r_t$ in Eq.~\eqref{eq:signed-ramp}. Here \emph{daylight} abbreviates the disjunction \{\valueof{ClearSky}, \valueof{PartialCloud}, \valueof{Overcast}\}. Table~\ref{tab:routing} is the complete routing matrix.
+
+Figure~\ref{fig:routing-policy} visualizes the same policy as a left-to-right priority scan. A downward branch terminates the scan, except that \valueof{ConservativeMode} bypasses the normal ramp override and re-enters the context/SoC router under its reduced power cap.
+
+\begin{figure}[H]
+\centering
+\begingroup
+\setlength{\tabcolsep}{2pt}
+\renewcommand{\arraystretch}{1.05}
+\policywide{\textbf{Validated control cycle:}
+critical anomalies $\rightarrow$ representation observability
+$\rightarrow$ valid ramp $\rightarrow$ generation context and SoC.}
+\par\smallskip
+\begin{tabular}{@{}c@{\hspace{3pt}}c@{\hspace{3pt}}c@{\hspace{3pt}}c@{\hspace{3pt}}c@{\hspace{3pt}}c@{\hspace{3pt}}c@{}}
+\policygate{1. Safe guard}{Sensor malfunction, inverter trip, or confirmed structural aliasing?}
+& \shortstack{\scriptsize no\\[-3pt]$\longrightarrow$} &
+\policygate{2. Uncertain representation}{$C_O=$ PartiallyObservable?}
+& \shortstack{\scriptsize no\\[-3pt]$\longrightarrow$} &
+\policygate{3. Ramp override}{NormalMode and a valid RampEvent?}
+& \shortstack{\scriptsize no\\[-3pt]$\longrightarrow$} &
+\policygate{4. Ordinary router}{Daylight or night? Which SoC interval?}
+\\[2pt]
+\shortstack{\scriptsize yes\\[-3pt]$\Downarrow$} &&
+\shortstack{\scriptsize yes\\[-3pt]$\Downarrow$} &&
+\shortstack{\scriptsize yes\\[-3pt]$\Downarrow$} &&
+$\Downarrow$
+\\[2pt]
+\policyaction{\textbf{SafeMode}\\Battery Hold; grid Balance. Trip: isolate PV. Otherwise use only passive $\mathrm{PV}\to\mathrm{ExternalGrid}$ residual export.}
+&&
+\policyaction{\textbf{ConservativeMode}\\Mark low confidence and reduce the battery-power cap. Skip ramp override; apply ordinary SoC bounds.}
+&&
+\policyaction{\textbf{Ramp route}\\Positive: $\mathrm{PV}\to\mathrm{Battery}$ up to $s_{\max}$; export surplus. Negative: $\mathrm{Battery}\to\mathrm{ExternalGrid}$ down to reserve.}
+&&
+\policyaction{\textbf{Context/SoC route}\\Night below reserve: $\mathrm{ExternalGrid}\to\mathrm{Battery}$; otherwise Hold. Daylight below target: $\mathrm{PV}\to\mathrm{Battery}$; otherwise export.}
+\end{tabular}
+\par\smallskip
+\policywide{\textbf{Residual-grid rule.} Clip every setpoint to asset limits. The external grid accepts PV surplus and any ramp remainder; when no local transfer is authorized its command is Balance.}
+\endgroup
+\caption{Routing-policy flowchart. Gates are evaluated from left to right according to the strict precedence in Eq.~\eqref{eq:priority}.}
+\label{fig:routing-policy}
+\end{figure}
+
+\begin{table}[htbp]
+\centering
+\caption{Decision matrix for the allowed power routes.}
+\label{tab:routing}
+\small
+\begin{tabular}{@{}L{0.26\linewidth}L{0.24\linewidth}L{0.40\linewidth}@{}}
+\toprule
+\textbf{Condition} & \textbf{Route} & \textbf{Constraint and rationale} \\
+\midrule
+Normal, daylight, $s<s_{\mathrm{target}}$ & $\mathrm{PV}\rightarrow\mathrm{Battery}$ & Charge to target within the power limit; issue a second PV-to-grid decision for residual power. \\
+Normal, daylight, target reached or charge limited & $\mathrm{PV}\rightarrow\mathrm{ExternalGrid}$ & Export production not accepted by the battery. \\
+Normal, valid positive ramp & $\mathrm{PV}\rightarrow\mathrm{Battery}$ & Ramp override may charge above target, but never above maximum SoC or charge power. \\
+Normal, valid negative ramp, $s>s_{\mathrm{reserve}}$ & $\mathrm{Battery}\rightarrow\mathrm{ExternalGrid}$ & Smooth the export reduction down to reserve SoC and the discharge-power limit. \\
+Conservative mode & one route from Eq.~\eqref{eq:routes} & Apply normal SoC bounds and the reduced power cap; a ramp cannot activate the normal-mode override. \\
+Nighttime, $s<s_{\mathrm{reserve}}$ & $\mathrm{ExternalGrid}\rightarrow\mathrm{Battery}$ & Restore reserve only, then return the battery to Hold. \\
+Nighttime, $s\geq s_{\mathrm{reserve}}$ & Hold & No import or discharge; grid command is Balance. \\
+Safe, no inverter trip & $\mathrm{PV}\rightarrow\mathrm{ExternalGrid}$ & Passive residual export only; battery Hold and no forecast-driven setpoint. \\
+Safe, inverter trip & Hold & Isolate PV; battery Hold; external grid balances the boundary. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+All routing setpoints are clipped to asset limits. The external grid receives the residual when the battery cannot fully absorb a positive ramp. It also absorbs the uncompensated reduction when the battery cannot fully offset a negative ramp. The ontology does not claim that local demand has been supplied because such demand is outside the selected system boundary.
+
+\subsection{Decision trace and explanation}
+
+Every \pv{PowerRoutingDecision} links through \pv{basedOn} to the synchronized observation, the active generation context, all detected anomalies, and the observability assessment. Its source, destination, commands, setpoint, and confidence form a machine-readable explanation trace. A human-facing explanation can therefore use the stable template:
+\begin{quote}
+Mode selected because of the validated operating and observability states; transfer selected from source to destination subject to the stated SoC and power limits; residual balancing assigned to the external grid.
+\end{quote}
+This trace separates four agent responsibilities: represent the current state, monitor validity and observability, explain the selected mode, and act through a bounded routing decision. Bayesian evidence influences the mode through Eq.~\eqref{eq:bayesian-evidence}, while the physical safety rules retain higher priority.
+
+The selected mode is operational containment, not an aliasing cure. Reducing or varying stride and testing a different $(P,S)$ configuration are architectural mitigations that can move candidate locking sites. \valueof{ConservativeMode} and \valueof{SafeMode} instead limit the consequences of uncertain or lost information and leave residual exposure explicitly recorded for later risk assessment.
+
+\section{Reduction from the Current Ontology}
+
+Table~\ref{tab:migration} records the intended simplification. It is a proposal map, not an instruction to modify the existing OWL, JSON, or report artifacts.
+
+\begin{table}[htbp]
+\centering
+\caption{Compact current-to-proposed mapping.}
+\label{tab:migration}
+\small
+\begin{tabular}{@{}L{0.27\linewidth}L{0.27\linewidth}L{0.36\linewidth}@{}}
+\toprule
+\textbf{Current concept} & \textbf{Proposed concept} & \textbf{Treatment} \\
+\midrule
+Physical system and component & \pv{PVSystem}, \pv{EnergyAsset} & Retained with a smaller, explicit boundary. \\
+Photovoltaic array and battery & same asset concepts & Retained. \\
+\pv{NationalGrid} & \pv{ExternalGrid} & Renamed to state its boundary role. \\
+\pv{InternalLoad} & none & Removed; downstream demand is out of scope. \\
+Weather observation & \pv{SystemObservation} & Retained and consolidated with time-aligned telemetry. \\
+Four generation states & four named context values & Retained as operational proxies, not weather diagnoses. \\
+Six anomaly types & three named anomaly values & Reduced to trip, bidirectional ramp, and critical sensor malfunction. \\
+Four action subclasses & \pv{PowerRoutingDecision} & Replaced by one class plus route and command values. \\
+Directionless supply and buffer links & source and destination assets & Replaced by explicit directional decisions. \\
+H1/H2/H3 aliasing classes & observability assessment and state & Retained as experimental evidence, not automatic ontology rules. \\
+Hardcoded aliasing frequencies & dimensionless locking ratios & Removed in favor of $\rho_S=fS/f_s$, $\rho_P=fP/f_s$, and calibrated evidence. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The following concepts are intentionally absent: clipping, soiling, overheating, generic hardware malfunction, load adjustment, curtailment, and ramp alert as separate ontology actions. They can be reintroduced later only if a validated use case requires a distinct observation, decision, and response.
+
+\section{Assumptions and Integration Boundary}
+
+The proposal relies on the following explicit assumptions:
+\begin{itemize}
+	\item the external grid is available and can balance residual power at the modeled boundary;
+	\item PV power and environmental variables are measured, whereas battery SoC, asset limits, and grid-flow values are asserted or simulated;
+	\item all thresholds, validity ranges, Bayesian decision levels, and conservative power caps are configuration parameters rather than universal ontology constants;
+	\item candidate-lock experiments on synthetic signals use their own sampling scale (for example, $512\ \mathrm{Hz}$), while the PV telemetry is sampled once per minute; no synthetic frequency threshold is transferred directly to the physical dataset;
+	\item the routing loop is a conceptual control policy, not evidence of a validated real-time deployment over the available PV dataset;
+	\item the proposed file is a review artifact and does not claim synchronization with the current Turtle, JSON, notebooks, domain chapter, or delivered report;
+	\item future integration must update those artifacts together so that names, units, rules, and decision semantics remain aligned.
+\end{itemize}
+
+This boundary leaves a small but complete semantic loop: observation leads to context, anomaly, and observability assessment; those states select a control mode; the single agent emits bounded directional decisions; and every decision retains the evidence required for later explanation and audit.
+
+\end{document}
