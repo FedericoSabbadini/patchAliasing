@@ -1,53 +1,43 @@
 %------------------------------------------------------------------------------------
 % Marker for results that can only be written once the Bayesian notebook has finished.
-% Budget for the Results section: approximately 1000 words.
+% Budget for the Results section: approximately 500 words, introductory only.
 % Delete the macro (and every call) before submission.
 %------------------------------------------------------------------------------------
 \newcommand{\tofill}[1]{{\color{red}\small[\textsc{to fill}, #1]}}
 
-This deliverable reports the execution of the programme set out in Deliverable~1: how evidence about structural aliasing was collected from the retrained Chronos-Bolt sweep, how it was turned into a Bayesian analysis, and what that analysis found.
+This deliverable reports how the plan set out in Deliverable~1 was carried out: how the evidence on structural aliasing was collected from the retrained Chronos-Bolt sweep, how it was turned into a Bayesian analysis, and what the analysis found.
 
 \section{Data Collection and Probing}
 \label{sec:collection}
 
 \subsection{Models and signals}
-The five geometries of Deliverable 1 are analysed: $P{=}S{=}16$, the reduced strides $S{=}12,8$ at fixed $P{=}16$, and $P{=}S{=}8$ and $P{=}S{=}24$. The retrained variants share the uniform $100$k-step budget and are comparable with one another.
+We analyse the five geometries of Deliverable~1: $P{=}S{=}16$, the shorter strides $S{=}12$ and $S{=}8$ at $P{=}16$, and $P{=}S{=}8$ and $P{=}S{=}24$. Four of them were trained with the same $100$k-step budget, so they can be compared directly. The $P{=}S{=}16$ run did not complete correctly and is being repeated. We show it for continuity but leave it out of every comparison between geometries.
 
-Each context is $480$ samples at $f_s{=}512$\,Hz with a $64$-step horizon, over $[2,250]\,\mathrm{Hz}$. We select $480$ since it is divisible by every stride in the sweep, so the patch grid closes exactly, whereas the $512$ of the probing convention would leave $S{=}12$ and $S{=}24$ with a padded final patch whose artefact is indistinguishable from the effect under test.
+Each context is $480$ samples at $f_s{=}512$\,Hz, with a $64$-step horizon, over $[2,250]\,\mathrm{Hz}$. We use $480$ because it is divisible by every stride in the sweep, so the patch grid closes exactly. The $512$ of the probing convention would leave $S{=}12$ and $S{=}24$ with a padded last patch, whose artefact cannot be told apart from the effect we are testing.
 
-As described in Deliverable 1, $100$ TSMixup and $100$ KernelSynth signals are used. A generated signal has no single known frequency, so it admits neither a recovery ratio nor a matched control and \autoref{eq:d2contrast} could not be formed from it. Each is normalised to unit variance and used as a realistic background carrying an injected tone of known frequency and phase: the corpus supplies realism, the tone the known quantity. 
+As described in Deliverable~1, we use $100$ TSMixup and $100$ KernelSynth signals. Each is normalised to unit variance and carries an injected tone with a known frequency and phase: the corpus gives realism, the tone gives the known quantity. The sine set is kept as the pure-sinusoid mode of the collapse sweep.
 
-[The $200$ draws are also the $u_b$ levels of \autoref{eq:d2hier}, so a conclusion holding for only one corpus shows up as a large $\sigma_b$. The sine set is retained as the pure-sinusoid mode of the collapse sweep.]
+\subsection{What enters the inference}
+Two filters sit between the collected measurements and the models, and both cost data. The first drops a lock whose control would fall on another member of $\mathcal F_{lock}$, since that would compare a lock against a lock. This happens only at $P{=}16,S{=}12$, where the patch grid at $32$\,Hz and the stride grid at $42.\overline{6}$\,Hz interleave, and it leaves $3$ usable sites out of $11$. The second drops a contrast whose recovery is near zero at the lock \emph{and} at both controls, because that is a ratio of two noise floors and says nothing about $H1$. It removes $57\%$ of the $49{,}000$ collected contrasts, and not evenly: $35\%$ are kept at $P{=}16,S{=}8$ against $59\%$ at $P{=}S{=}8$. Both filters are limits of the present design rather than choices, and they are why some geometries weigh less than others in $\bar\beta$. As a check on the design itself, the collection stops if either level of the lock indicator is empty, because the effect would then not be identified and the posterior would only repeat the prior.
 
-\subsection{Measurements}
-\textbf{Forecast recovery} is $R = A_{\text{pred}}/A_{\text{true}}$, both amplitudes fitted at the known frequency over the same horizon, and collected in matched triplets: each lock $f_k$ paired with controls at $f_k \pm 0.25 f_s/S$ sharing background and phase.
+\subsection{The sine sweep}
+\autoref{fig:sweepP16} and \autoref{fig:sweepEqual} show the sine sweep of Deliverable~1, grouped by patch length. In each row, the left panel gives the frequency the model generates against the frequency it was given, and the right panel gives whether that frequency can still be read from the representation. Both views get worse towards the top of the band, and they do not agree with each other: a tone can still be readable and yet be rebuilt as the wrong frequency.
 
-\textbf{Frequency-local codelength} is computed on the $256$-d $[\mathrm{REG}]$ vector at ten probe points, one per encoder and decoder block plus the pre-projection vector and the quantile head. The estimator is prequential, so a probe that memorises noise pays for itself and gains nothing. The task is deliberately local: at each candidate $f_c$ the probe separates tones at $f_c \pm 1$\,Hz. The seven band tasks of Deliverable~1 span the whole band, so one codelength summarises hundreds of frequencies and leaves the lock indicator nothing to attach to; narrowing the scope, with the estimator untouched, gives one codelength per frequency with a lock flag.
-
-\textbf{Token collapse}, the across-patch dispersion of the input-patch embeddings, is zero exactly when consecutive patches coincide. It is swept on one shared grid, a uniform $1$\,Hz sweep unioned with the predicted sites of \emph{every} configuration, so that no geometry is scored only where its own theory predicts a dip, and non-integer sites such as $42.\overline{6}$\,Hz for $S{=}12$ are on the grid.
-
-\subsection{Safeguards}
-A lock whose control would land on another member of $\mathcal F_{lock}$ is dropped rather than compared against a lock; at $P{=}16,S{=}12$ this leaves only $64$, $128$ and $192$\,Hz. A contrast with near-zero recovery at the lock \emph{and} both controls is a ratio of two noise floors and is excluded. The collection also refuses to emit a design with either level of the lock indicator empty, which would leave the effect unidentified and the posterior merely reprinting the prior.
-
-\begin{figure*}[t]
+\begin{figure*}[p]
     \centering
-    \includegraphics[width=\textwidth]{figures/FIG_ALL_spectral_recovery.png}
-    \caption{}
-    \label{fig:spectralRecovery}
+    \includegraphics[width=0.97\textwidth]{figures/FIG_p16-s8.png}\\[10pt]
+    \includegraphics[width=0.97\textwidth]{figures/FIG_p16-s12.png}\\[10pt]
+    \includegraphics[width=0.97\textwidth]{figures/FIG_p16-s16.png}
+    \caption{The three $P{=}16$ geometries under a pure-sinusoid sweep at $1$\,Hz over $[2,250]$\,Hz. The stride gets shorter from top to bottom, while the patch grid stays the same. Each row shows the same sweep in two ways. The left panel plots the frequency the model generates against the frequency it was given: a point on the diagonal is a tone rebuilt correctly, and a flat stretch means that several inputs give the same output. The right panel asks instead whether the input frequency can still be read back from the model's representation, with one row per probing task. Green means the frequency is recovered, red means it is lost, and grey means that the task does not cover it. The dashed lines mark the geometry's own phase-lock set $\mathcal F_{lock}$. Both panels get worse towards the top of the band, but they do not fail at the same frequencies.}
+    \label{fig:sweepP16}
 \end{figure*}
 
-\subsection{What the sine set already shows}
-\autoref{fig:spectralRecovery} and \autoref{fig:reconstruction} are the first analysis of Deliverable~1 carried out: pure sinusoids swept at $1$\,Hz, the grid the Bayesian codelength cells also use.
-
-Two things are visible before any model. Loss is not uniform across the band but concentrates in the upper half, where the reconstruction has already left the diagonal, which points at a ceiling on what the model rebuilds at all rather than at damage localised on the predicted sites. This is why $H1$ is tested by a \emph{local} contrast against neighbouring frequencies and not by an absolute recovery level. Among the four comparable variants the differences are modest, between $38\%$ and $70\%$ of the band recovered, with no ordering that follows the stride; the published baseline sits apart at $34\%$, but that is the one model trained to a different budget and its retraining, not this figure, will say what the comparison means.
-
-The two views also disagree by construction. \autoref{fig:reconstruction} asks what the model \emph{produces}, and all five geometries track the diagonal only in the lowest part of the band before flattening onto single output frequencies. A tone can therefore be readable in the representation and still be rebuilt as the wrong frequency. Which of the two matters is what the two $H1$ models separate.
-
-\begin{figure*}[t]
+\begin{figure*}[p]
     \centering
-    \includegraphics[width=\textwidth]{figures/FIG_ALL_reconstruction.png}
-    \caption{}
-    \label{fig:reconstruction}
+    \includegraphics[width=0.97\textwidth]{figures/FIG_p8-s8.png}\\[10pt]
+    \includegraphics[width=0.97\textwidth]{figures/FIG_p24-s24.png}
+    \caption{The two geometries where the patch and the stride are equal, $P{=}S{=}8$ and $P{=}S{=}24$, drawn and read as in \autoref{fig:sweepP16}. When $P{=}S$, the patch grid $k f_s/P$ and the stride grid $c f_s/S$ fall on the same frequencies, so one set of dashed lines covers both. These two geometries therefore cannot tell which of the two grids a dip belongs to. Only the $S<P$ rows of \autoref{fig:sweepP16} can do that, and this is why the location model of $H3$ depends on them.}
+    \label{fig:sweepEqual}
 \end{figure*}
 
 \section{Bayesian Analysis Design}
@@ -56,29 +46,52 @@ The two views also disagree by construction. \autoref{fig:reconstruction} asks w
 \input{tables/bayesModels.tex}
 \input{tables/bayesPriors.tex}
 
-Deliverable~1 applied a two-part framework to $H1$ alone. The lecturers asked for the treatment to be extended, so each hypothesis now has its own model, listed in \autoref{tab:bayesModels}. All five are ordinary regressions: what changes between them is the quantity on the left and the question the coefficient answers. Priors (\autoref{tab:bayesPriors}) are unchanged from Deliverable~1 and every effect prior is centred on \emph{no effect}, so a finding cannot be a prior artefact.
+Deliverable~1 applied a two-part framework to $H1$ only. Here each hypothesis gets its own model, and the five models are listed in \autoref{tab:bayesModels}. All five are ordinary regressions. What changes between them is the quantity on the left and the question the coefficient answers. The priors in \autoref{tab:bayesPriors} are unchanged from Deliverable~1, and every effect prior is centred on \emph{no effect}, so a finding cannot come from the prior.
 
-\subsection{$H1$: how large is the effect (recap)}
-Unchanged from Deliverable~1. For each lock $f_k$, the contrast between its recovery and that of its two controls,
+\subsection{Reading the models}
+Every model below has the same two parts. A \emph{linear predictor} $\mu_i$ says what value we expect the measurement to take, and it is built by adding one offset for each group the observation belongs to. A \emph{likelihood} says how far a single observation is allowed to fall from that expected value. The quantity that decides a hypothesis is always one coefficient of the predictor. The other terms are there so that this coefficient is not confounded by the design.
+
+\subsection{$H1$: how large is the effect}
+The measurement is the forecast amplitude recovery $R=A_{\text{pred}}/A_{\text{true}}$. Both amplitudes are fitted by least squares at the known frequency, over the same $64$-step horizon, from the median forecast. We collect it in matched triplets: each lock $f_k$ with controls at $f_k \pm 0.25 f_s/S$, all three sharing the same background and phase. This is what makes the contrast paired. The contrast is unchanged from Deliverable~1:
 
 \begin{equation}
 \label{eq:d2contrast}
 d = \log(R_k + 0.01) - \tfrac{1}{2}\left[\log(R_- + 0.01) + \log(R_+ + 0.01)\right],
 \end{equation}
 
-is negative when the lock recovers \emph{less} than its neighbours. Model~A fits it with a Student-$t_4$ likelihood and one offset per configuration, harmonic and background,
+one number per measured triplet, negative when the lock recovers \emph{less} than its neighbours. It can be formed only because the injected tone has a known frequency: \autoref{eq:d2contrast} cannot be built from a generated signal on its own. Model~A fits it as
 
 \begin{equation}
 \label{eq:d2hier}
+d_i \sim \text{Student-}t_4(\mu_i,\ \sigma),
+\qquad
 \mu_i = \beta_{c[i]} + u_{k[i]} + u_{b[i]},
 \qquad
-\beta_c \sim \mathcal{N}\!\left(\bar\beta + \delta_O \widetilde O_c,\ \tau\right),
+\beta_c \sim \mathcal{N}\!\left(\bar\beta + \delta_O \widetilde O_c,\ \tau\right).
 \end{equation}
 
-with $\bar\beta$ the average effect and $\delta_O$ its dependence on patch overlap $O_c=(P_c-S_c)/P_c$, the mitigation Deliverable~1 proposes. Model~B asks the same of the representation rather than the forecast, through a Gamma regression on the codelength whose coefficient $e^{\theta_{lock}}$ reads as ``how many times more bits a locked frequency costs''.
+\begin{itemize}\itemsep2pt
+  \item $\beta_c$: the typical contrast for configuration $c$, one value per geometry.
+  \item $u_k$: one offset per lock harmonic, so that an unusual frequency does not distort the geometry it belongs to.
+  \item $u_b$: one offset per background draw, one level for each of the $200$ TSMixup and KernelSynth signals. If a result holds for only one of the two corpora, $\sigma_b$ comes out large.
+  \item $\bar\beta$: the average contrast across configurations. \textbf{This is the estimand for $H1$}, and $e^{\bar\beta}$ reads as how much recovery changes at a lock compared with its controls.
+  \item $\delta_O$: the slope of $\beta_c$ in the patch overlap $\widetilde O_c$, with $O_c=(P_c-S_c)/P_c$. It tests the mitigation proposed in Deliverable~1: if overlapping the patches reduces the effect, it shows up here.
+  \item $\tau$: how much the configurations scatter around $\bar\beta$.
+  \item $\sigma$ and the Student-$t_4$: the residual scale and the shape of the noise. The heavy tails matter because recovery falls to near zero where the model rebuilds nothing, and the logarithm then gives very large contrasts. Under a Gaussian, a few of those would set $\bar\beta$; under $t_4$ they are tolerated.
+\end{itemize}
+
+Writing $\beta_c$ as a draw around $\bar\beta$ makes each geometry count as one unit. The number of observations per geometry varies several times over with how many lock sites fall inside the band, so a plain average over all rows would measure the design instead of the effect.
+
+Model~B asks the same question of the representation rather than of the forecast. Its measurement is a \emph{frequency-local} codelength. At each candidate frequency $f_c$, a probe reads the $256$-d $[\mathrm{REG}]$ vector at ten points, one per encoder and decoder block plus the pre-projection vector and the quantile head, and must separate tones at $f_c \pm 1$\,Hz. The estimator is prequential: each chunk of labels is encoded by a probe trained only on the chunks before it, so a probe that memorises noise pays for itself and gains nothing. The seven band tasks of Deliverable~1 span the whole band, so a single codelength would summarise hundreds of frequencies at once, leaving the lock indicator nothing to attach to. The regression is Gamma with a log link on the codelength $y_i$:
+
+\begin{itemize}\itemsep2pt
+  \item $\alpha_0$: the baseline log codelength away from a lock.
+  \item $\theta_{lock}$: the log expansion at a locked frequency, so that $e^{\theta_{lock}}$ reads as how many times more bits a locked frequency costs. \textbf{This is the estimand.}
+  \item $k$: the Gamma shape, which absorbs the dispersion of a quantity that is positive and right-skewed.
+\end{itemize}
 
 \subsection{$H2$: does the phase matter}
-This is the first of the two extensions. \autoref{eq:d2contrast} has already averaged over phase, so it cannot answer a question about phase. We keep the phase of each measurement, cut the phase circle into eight slices and give each slice its own offset:
+This is the first of the two extensions, on the same triplets as $H1$. \autoref{eq:d2contrast} has already averaged over phase, so it cannot answer a question about phase. Here we keep the phase of each measurement, cut the phase circle into eight slices, and give each slice its own offset:
 
 \begin{equation}
 \label{eq:d2phase}
@@ -87,12 +100,19 @@ This is the first of the two extensions. \autoref{eq:d2contrast} has already ave
 u_p \sim \mathcal{N}(0, \sigma_\phi).
 \end{equation}
 
-If the deficit depends on where in its cycle the signal starts, the eight offsets differ and $\sigma_\phi$ is large; if it is set by the geometry alone, they are about equal and $\sigma_\phi$ is near zero. $H2$ predicts the second, so we report $\Pr(\sigma_\phi<\log1.1\mid D)$ and check whether dropping the phase term predicts the data equally well. Using slices rather than a fitted curve assumes nothing about the \emph{shape} of a possible dependence: any systematic variation with phase makes the offsets differ.
+\begin{itemize}\itemsep2pt
+  \item $y_i$: the per-phase deficit. It is the same measurement as $d$, but with the phase index kept instead of averaged away.
+  \item $u_p$: one offset per phase slice, eight in total.
+  \item $\sigma_\phi$: the spread of those eight offsets. \textbf{This is the estimand for $H2$}, and it answers the question with a single number. If the deficit depends on where in its cycle the signal starts, the offsets differ and $\sigma_\phi$ is large. If the geometry alone decides it, the offsets are about equal and $\sigma_\phi$ is close to zero.
+  \item $\beta_c$, $u_k$: as in Model~A, so that the phase term does not absorb differences between geometries or harmonics.
+\end{itemize}
+
+$H2$ predicts $\sigma_\phi \approx 0$. We use slices rather than a fitted curve because slices assume nothing about the \emph{shape} of a possible dependence: any systematic variation with phase makes the offsets differ.
 
 \subsection{$H3$: where the dips are, and whether they move}
-The second extension, and it needs two models because $H3$ makes two claims. Both are fitted to the token-collapse profile rather than to the forecast.
+This is the second extension. It needs two models because $H3$ makes two claims. Both are fitted to the token collapse $z_g(f)$, the dispersion of the input-patch embeddings across patches, which is zero exactly when consecutive patches are identical. We sweep it on one shared grid: a uniform $1$\,Hz sweep joined with the predicted sites of \emph{every} configuration. In this way no geometry is scored only where its own theory predicts a dip, and non-integer sites such as $42.\overline{6}$\,Hz for $S{=}12$ are covered.
 
-\emph{Which grid are the dips on?} Every swept frequency carries two yes/no labels, whether it lies on the stride grid $\{c f_s/S\}$ and whether it lies on the patch grid $\{k f_s/P\}$, and the collapse level is regressed on them:
+\emph{Which grid are the dips on?} Every swept frequency carries two yes/no labels: whether it lies on the stride grid $\{c f_s/S\}$, and whether it lies on the patch grid $\{k f_s/P\}$:
 
 \begin{equation}
 \label{eq:d2sites}
@@ -101,9 +121,16 @@ The second extension, and it needs two models because $H3$ makes two claims. Bot
 \right).
 \end{equation}
 
-$\theta_S$ is how much lower the dispersion is on the stride grid, so $H3$ predicts $\theta_S<0$. Fitting each label alone, and once with neither, shows which grid explains the dips. Only the $S<P$ geometries can answer this: when $P{=}S$ the two grids are the same frequencies.
+\begin{itemize}\itemsep2pt
+  \item $z_g(f)$: the dispersion of the patch embeddings across patches, at frequency $f$ for geometry $g$. We take the logarithm so that the two labels act multiplicatively.
+  \item $\alpha_g$: the off-grid level for that geometry, which differs between models and is not of interest here.
+  \item $\theta_S$: how much lower the dispersion is on the stride grid than off it. \textbf{This is the estimand}, and $H3$ predicts $\theta_S<0$.
+  \item $\theta_P$: the same for the patch grid, so that the two families compete instead of one being assumed.
+\end{itemize}
 
-\emph{Do the dips move with the geometry?} A good fit above is still consistent with dips that merely happen to coincide, so the measured spacing between dips is regressed on the two predicted spacings:
+We also fit each label on its own, and once with neither, which shows which grid explains the dips. Only the $S<P$ geometries can settle this, because at $P{=}S$ the two grids fall on the same frequencies.
+
+\emph{Do the dips move with the geometry?} A good fit above is still compatible with dips that only happen to coincide with a fixed grid. We therefore regress the measured spacing on the two predicted spacings:
 
 \begin{equation}
 \label{eq:d2move}
@@ -112,37 +139,36 @@ $\theta_S$ is how much lower the dispersion is on the stride grid, so $H3$ predi
 \right).
 \end{equation}
 
-$H3$ predicts a slope of $1$ on $f_s/S$ and $0$ on $f_s/P$: it is the scatter of measured against predicted spacing, fitted. Two caveats. $P$ varies only along $P{=}S$, so $\kappa_P$ is confounded and the fixed-$P{=}16$ series carries the answer; and the spacing is measured both as the lowest dip and as the median gap, with both fitted, since one spurious detection halves the median while the lowest dip is unaffected.
+\begin{itemize}\itemsep2pt
+  \item $\hat\Delta_g$: the spacing read off the detected dips, without assuming what produced them.
+  \item $\kappa_S$: the slope on the spacing predicted by the stride. \textbf{This is the estimand}, and $H3$ predicts exactly $1$.
+  \item $\kappa_P$: the slope on the spacing predicted by the patch, which $H3$ predicts to be $0$.
+  \item $\kappa_0$: an offset, predicted to be $0$.
+\end{itemize}
+
+There are two caveats. First, $P$ varies only along $P{=}S$, so $\kappa_P$ is confounded and the series at fixed $P{=}16$ carries the answer. Second, we measure the spacing in two ways, as the lowest dip and as the median gap, and fit both, because one spurious detection halves the median while the lowest dip is unaffected.
 
 \subsection{Decisions and validation}
-Thresholds are fixed before the posterior is seen: the probability of at least $20\%$ attenuation, $\Pr(\bar\beta<\log0.8\mid D)$, and the equivalence regions $|\bar\beta|<\log1.1$, $\sigma_\phi<\log1.1$ and $|\kappa_S-1|<0.1$. A hypothesis is supported at probability ${\ge}0.95$, refuted at ${\le}0.05$, and \emph{inconclusive} in between, a third outcome a pass/fail test cannot give and often the honest answer here. Competing formulations are compared by leave-one-out cross-validation.
+The thresholds are fixed before we see the posterior: the probability of at least $20\%$ attenuation, $\Pr(\bar\beta<\log0.8\mid D)$, and the equivalence regions $|\bar\beta|<\log1.1$, $\sigma_\phi<\log1.1$ and $|\kappa_S-1|<0.1$. A hypothesis is supported at probability ${\ge}0.95$, refuted at ${\le}0.05$, and \emph{inconclusive} in between. A pass/fail test cannot give that third outcome, which is often the honest answer here. Competing formulations are compared by leave-one-out cross-validation.
 
-Validation precedes interpretation: prior predictive checks before collection, then a recovery check that simulates data with a known effect and confirms the model finds it, which separates ``no effect'' from ``a design that cannot see one''. Sampling uses NUTS and a fit is reported only at $\hat R<1.01$, effective sample sizes above $1000$ and no divergences.
+We validate before we interpret. Prior predictive checks come before collection. A recovery check then simulates data with a known effect and confirms that the model finds it, which separates ``no effect'' from ``a design that cannot see one''. Sampling uses NUTS, and we report a fit only when $\hat R<1.01$, the effective sample sizes are above $1000$, and there are no divergences.
 
 \section{Results}
 \label{sec:results}
 
-\tofill{Written once the notebook completes; target approximately 1000 words. Each marker below names the numbers it needs.}
+\tofill{Written once the notebook completes. Introductory summary, approximately $500$ words, one short paragraph per marker.}
 
 \subsection{Collected evidence}
-\tofill{Table sizes and balance: contrast observations per geometry and how many are live, MDL cells split by lock indicator, swept frequencies and replicates, and how many lock sites survived the control filter per geometry. Then the descriptive picture before any model, the contrast $d$ against cycles-per-patch, and one collapse profile with both candidate grids overlaid, so that a posterior disagreeing with the picture is questioned rather than believed.}
+\tofill{Size and balance of the collected design: contrast observations per geometry and how many are live, MDL cells split by lock indicator, swept frequencies and replicates. State that the prior probability of each decision threshold is reported next to the posterior, since a posterior probability that has not moved from its prior is not evidence, and that the parameter-recovery check was passed, which is what separates ``no effect'' from ``a design that cannot see one''.}
 
-\tofill{Prior predictive and parameter recovery: the prior probability of ${\ge}20\%$ attenuation and of $\sigma_\phi$, $\kappa_S$ falling in their equivalence regions, since a posterior probability that has not moved from its prior is not evidence; then whether every simulated effect was recovered inside its interval.}
+\subsection{$H1$}
+\tofill{Model~A: $e^{\bar\beta}$ with its interval and $\Pr(\bar\beta<\log0.8\mid D)$, the sign of the effect, and whether the overlap slope $\delta_O$ supports the mitigation. Model~B: $e^{\theta_{lock}}$ and whether the representational reading agrees with the behavioural one. One sentence on the comparison with the earlier frequentist result, which refuted $H1$ in its strong form.}
 
-\subsection{H1: is there a local loss at a lock?}
-\tofill{Model~A: $e^{\bar\beta}$ with its interval, $\Pr(\bar\beta<\log0.8\mid D)$ against the prior value, and the overlap slope $\delta_O$, does the effect weaken as patches overlap, which is the mitigation Deliverable~1 proposes? Note whether the effect is uniform across geometries or concentrated in a few, and compare with the earlier frequentist result, which refuted $H1$ in its strong form and left $\mathrm{cpp}{=}3$ (96\,Hz) as the single clean localized loss.}
+\subsection{$H2$}
+\tofill{Model~C: $\sigma_\phi$ with its interval, $\Pr(\sigma_\phi<\log1.1\mid D)$, and the leave-one-out comparison against the phase-free model. If the magnitude and the evidential readings disagree, report both rather than collapsing them into one verdict.}
 
-\tofill{Model~B: $e^{\theta_{lock}}$ with its interval and the probability of ${\ge}20\%$ expansion, plus the LOO comparison against the unblocked form. State whether the representational and behavioural readings agree, a tone rebuilt by the forecast but no longer separable from its neighbours in the representation is a different phenomenon from one the forecast fails to rebuild.}
+\subsection{$H3$}
+\tofill{Model~D1: which grid wins by leave-one-out, in each signal mode, and the size of $\theta_S$. Model~D2: the slope $\kappa_S$ against the equivalence region around $1$, with the fixed-$P{=}16$ series as the identifying fit and $\kappa_P$ reported as confounded.}
 
-\subsection{H2: is the deficit set by geometry or by phase?}
-\tofill{Model~C: $\sigma_\phi$ with its interval, $\Pr(\sigma_\phi<\log1.1\mid D)$ against the prior value, and the LOO comparison against the phase-free model. If the two readings disagree, a low equivalence probability together with a LOO preference for the phase model would mean a small but consistently detected phase dependence, report that combination rather than collapsing it into one verdict.}
-
-\subsection{H3: where the sites are, and whether they move}
-\tofill{Model~D1: the LOO comparison of stride-grid, patch-grid and null models per signal mode, with \texttt{elpd\_diff} and its standard error, plus $\theta_S$ itself. Agreement across the pure-sinusoid and both generator modes is what shows the result is not an artefact of noise-free inputs.}
-
-\tofill{Model~D2: the slope $\kappa_S$ against the equivalence region around $1$, and $\kappa_P$ against $0$, for the full design and for the fixed-$P{=}16$ series where the stride branch is cleanly identified; plus the scatter of measured $\hat\Delta_g$ against predicted $f_s/S$ per geometry. Be explicit that $\kappa_P$ stays confounded because the design varies $P$ only along $P{=}S$.}
-
-\subsection{Diagnostics and verdicts}
-\tofill{Convergence against the preregistered thresholds for every fit, reporting any failure rather than dropping it; stratified posterior predictive checks, noting that residual structure against phase in Model~A would be the $H2$ signal appearing where it was not modelled; and the prior-sensitivity spread of the decision probability across the scale ladder and the Gaussian likelihood.}
-
-\tofill{Closing table, hypothesis, estimand, posterior summary, decision rule, probability, verdict, and the frequentist pass/fail from the earlier suite, followed by the disagreements, which are the informative cases, and the limitations: one training seed per geometry, a reduced training budget behind the dead frequencies, and the confounded patch branch of $H3$.}
+\subsection{Verdicts and limitations}
+\tofill{One table: hypothesis, estimand, posterior summary, decision rule, probability, verdict. Then the limitations in two or three sentences: convergence against the preregistered thresholds, one training seed per geometry, the $P{=}S{=}16$ training still to be repeated, and the reduced budget behind the frequencies where nothing is recovered.}

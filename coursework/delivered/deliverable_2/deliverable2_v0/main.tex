@@ -31,6 +31,11 @@
 
 \usepackage{float} % enables the [H] float specifier to pin figures/tables in place
 
+% the sine sweep figures each take a page of their own; the default requires a float
+% page to be at least half full, which would send the shorter of the two to the end
+\renewcommand{\floatpagefraction}{0.4}
+\renewcommand{\dblfloatpagefraction}{0.4}
+
 \runninghead{Deliverable 2} % A shortened article title to appear in the running head, leave this command empty for no running head
 
 % \footertext{\textit{Journal of ...}} % Text to appear in the footer, leave this command empty for no footer text
