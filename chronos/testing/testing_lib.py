@@ -1,16 +1,8 @@
 """
-testing_lib.py — shared helpers for the structural-aliasing testing notebooks.
+testing_lib.py — model loader and shared helpers for the testing workflow.
 
-Its ONE job is to let both notebooks (`chronosBolt_layer_probing.ipynb`,
-`contamination.ipynb`) select and load a model in a single, explicit place, plus a couple of
-small forecast/fit helpers the contamination notebook reuses. The notebooks keep producing
-their own figures — this module never plots anything.
-
-Model selection is by patch/stride geometry (P, S):
-    (16, 16)         -> the official amazon/chronos-bolt-tiny
-    any other (P, S) -> the retrained variant, loaded PREFERABLY from the local checkpoint
-                        (../models/weights/p{P}-s{S}-seed42, latest) and otherwise pulled from
-                        the Hugging Face sweep repo.
+(16,16) loads the official amazon/chronos-bolt-tiny; any other (P,S) loads the
+retrained variant from the local checkpoint or Hugging Face.
 """
 from __future__ import annotations
 
@@ -18,25 +10,16 @@ from pathlib import Path
 
 import numpy as np
 
-# ---------------------------------------------------------------------------- #
-#  Model registry + loader (local checkpoint preferred, else Hugging Face)
-# ---------------------------------------------------------------------------- #
-ALL_MODELS: list[tuple[int, int]] = [   # every (P, S) in the sweep, in a fixed display order
-    (16, 16),   # official chronos-bolt-tiny (the p16-s16 data point)
-    (16, 12),   # stride axis  (overlap 0.25)
-    (16, 8),    # stride axis  (overlap 0.50)
-    (16, 4),    # stride axis  (overlap 0.75)
-    (8, 8),     # patch axis   (contiguous)
-    (24, 24),   # patch axis   (contiguous)
+ALL_MODELS: list[tuple[int, int]] = [
+    (16, 16), (16, 12), (16, 8), (8, 8), (24, 24),
 ]
 
 OFFICIAL_MODEL = "amazon/chronos-bolt-tiny"
 SWEEP_REPO = "federicosabbadini/chronos-bolt-patch-sweep"
 _SUBFOLDER = {
-    (16, 12): "p16-s12-seed42", (16, 8): "p16-s8-seed42", (16, 4): "p16-s4-seed42",
+    (16, 12): "p16-s12-seed42", (16, 8): "p16-s8-seed42",
     (8, 8): "p8-s8-seed42", (24, 24): "p24-s24-seed42",
 }
-# this file lives in chronos/testing/, so parent.parent is chronos/
 _WEIGHTS_DIR = Path(__file__).resolve().parent.parent / "models" / "weights"
 
 
@@ -76,17 +59,6 @@ def load_pipeline(P: int, S: int, device: str = "cpu", pipeline_cls=None):
                      f"Supported: (16,16) + {sorted(_SUBFOLDER)}")
 
 
-def geometry(pipe) -> tuple[int, int, int, int]:
-    """(P, S, prediction_length, median-quantile-index) read from the loaded model config."""
-    cfg = pipe.model.config.chronos_config
-    qs = list(cfg["quantiles"])
-    qi = qs.index(0.5) if 0.5 in qs else len(qs) // 2
-    return cfg["input_patch_size"], cfg["input_patch_stride"], cfg["prediction_length"], qi
-
-
-# ---------------------------------------------------------------------------- #
-#  Small forecast + sinusoid-fitting helpers (reused by the contamination notebook)
-# ---------------------------------------------------------------------------- #
 def forecast_median(pipe, context, pred_len: int, qi: int, device: str = "cpu") -> np.ndarray:
     """Median (q0.5) point forecast for one context window."""
     import torch
