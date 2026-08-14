@@ -48,16 +48,18 @@ Two-axis design (`S ≤ P` everywhere, so no unobserved gaps):
 | p16-s16 | 16 | 16 | 0.00 | 128 | baseline (contiguous) |
 | p16-s12 | 16 | 12 | 0.25 | 170 | stride/overlap (P fixed) |
 | p16-s8  | 16 | 8  | 0.50 | 255 | stride/overlap (P fixed) |
-| p16-s4  | 16 | 4  | 0.75 | 509 | stride/overlap (P fixed) |
 | p8-s8   | 8  | 8  | 0.00 | 256 | patch-size (overlap fixed) |
 | p24-s24 | 24 | 24 | 0.00 | 86  | patch-size (overlap fixed) |
+
+> `S=4` is intentionally excluded: with `fs/S = 128 Hz` its stride-lock class `{128, 256, …}`
+> has a single member below Nyquist, so it yields no informative H1/H3 contrast.
 
 - The **P=16 row** varies only `S` → probes the overlap mechanics (H3) and the blind-spot
   set `F_lock = c·f_s/S`, which depends on `S`.
 - The **contiguous row** (p8-s8 / p16-s16 / p24-s24) varies only `P` at overlap 0 → probes
   within-patch redundancy (`T_0 | P`).
 
-Patch count spans ~6× across the grid (86 → 509), so p16-s4 is the memory/time-heavy
+Patch count spans ~3× across the grid (86 → 255), so p16-s8 is the memory/time-heavy
 config. If it OOMs, lower `BATCH_SIZE` **globally** (the same value for every config) to
 keep runs comparable.
 

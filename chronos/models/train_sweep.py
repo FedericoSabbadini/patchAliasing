@@ -37,7 +37,7 @@ Provenance markers on code lines:
   plain "# ..." -> scaffolding written for this project (sweep loop, resume, provenance,
                NaN-loss guard, manifest, progress bar).
 Deliberate deviations from the official regime (uniform across all runs, documented in
-README_retraining.md): MAX_STEPS 10k vs 200k (compute budget; variants are compared only
+README_train_sweep.md): MAX_STEPS 100k vs 200k (compute budget; variants are compared only
 against each other), LOG/SAVE cadence, num_workers=0 (single-stream equivalence),
 torch_compile off (startup overhead across 6 short runs; no math change).
 ---------------------------------------------------------------------------------------
