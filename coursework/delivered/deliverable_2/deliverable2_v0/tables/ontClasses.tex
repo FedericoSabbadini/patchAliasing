@@ -1,0 +1,29 @@
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{@{}L{0.29\linewidth}L{0.64\linewidth}@{}}
+\toprule
+\textbf{Class} & \textbf{Role} \\
+\midrule
+\pv{PVSystem} & Aggregate system and scope of each control cycle. \\
+\pv{EnergyAsset} & Parent of the four passive physical assets. \\
+\pv{PhotovoltaicArray} & Intermittent renewable source measured through PV telemetry. \\
+\pv{BatteryStorage} & Bounded storage asset that can charge, discharge, or hold. \\
+\pv{InternalLoad} & Aggregate passive demand of a factory or machine fleet. \\
+\pv{ExternalGrid} & Reliable bidirectional boundary bus for residual balancing. \\
+\pv{ControlAgent} & The single decision-making entity. \\
+\pv{SystemObservation} & Time-stamped snapshot of PV, environment, battery, load, and grid reference. \\
+\pv{TimeSeriesSignal} & Physical signal and its temporal descriptors. \\
+\pv{PatchedRepresentation} & A model input representation defined by patch and stride. \\
+\pv{ObservabilityAssessment} & Evidence linking a signal-representation pair to an observability state. \\
+\pv{GenerationContext} & Operational proxy for expected solar generation. \\
+\pv{AnomalyState} & Detected physical or sensing abnormality. \\
+\pv{ObservabilityState} & Semantic assessment of information retained after patching. \\
+\pv{ControlMode} & Normal, conservative, or safe operating policy. \\
+\pv{PowerRoute} & Closed vocabulary of the seven admissible source--destination pairs. \\
+\pv{PowerRoutingDecision} & One directional transfer or hold decision with an optional bounded setpoint. \\
+\bottomrule
+\end{tabular}
+\caption{Core classes in the simplified ontology.}
+\label{tab:classes}
+\end{table}

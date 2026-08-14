@@ -1,44 +1,3 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Standalone ontology proposal
-% Simplified PV array closed-loop control
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\documentclass[
-	letterpaper,
-	10pt,
-	unnumberedsections,
-	twoside,
-]{LTJournalArticle}
-
-\addbibresource{patchAliasing.bib}
-
-\usepackage{float}
-\usepackage{tikz}
-\usetikzlibrary{arrows.meta,positioning,shapes.geometric}
-\setlength{\thanksmarkwidth}{5pt}
-
-\runninghead{PV Array Ontology}
-
-\setcounter{page}{1}
-
-\title{Proposed Simplified Ontology\\for PV Array Closed-Loop Control}
-
-\author{
-	Matteo Boniotti, Gianluca Brignoli and Federico Sabbadini\thanks{This work is licensed under the Creative Commons Attribution 4.0 International License. Concurrently, all associated source code, probing scripts, and software artifacts generated throughout the project lifecycle are released under the open-source MIT license. \newline Copyright for any third-party material included in this work remains with its respective owners and must be respected accordingly. \newline \newline During the preparation of this work, the authors used AI-based tools, including GPT-5.5, Gemini 3.6 Flash, Sonnet 5, and Opus 4.6, to support language refinement and improve clarity. All generated or suggested content was carefully reviewed, revised where necessary, and validated by the authors, who assume full responsibility for the final content of this work.}
-}
-
-\hypersetup{
-	pdftitle={Proposed Simplified Ontology for PV Array Closed-Loop Control},
-	pdfauthor={Matteo Boniotti, Gianluca Brignoli and Federico Sabbadini},
-}
-
-\newcommand{\pv}[1]{\texttt{pv:#1}}
-\newcommand{\valueof}[1]{\texttt{pv:#1}}
-
-\begin{document}
-
-\maketitle
-
 This document defines a compact ontology for a photovoltaic system governed by one control agent. It connects environmental and electrical observations to anomaly recognition, Chronos-style patched representations, structural-aliasing evidence, and bounded power-routing decisions~\cite{ansariChronosLearningLanguage2024}. Routing is included only as the operational endpoint of the semantic model; the principal concern remains whether the representation preserves the information on which the agent relies.
 
 \section{Domain Description}
@@ -80,35 +39,7 @@ The environmental states are operational generation proxies, not meteorological 
 
 \autoref{tab:classes} defines the compact class interface. The four asset subclasses form a disjoint union; each \pv{PVSystem} contains exactly one asset of each type and is managed by exactly one control agent. Closed operational vocabularies are represented as named individuals rather than deeper class hierarchies.
 
-\begin{table}[H]
-\centering
-\small
-\begin{tabular}{@{}L{0.29\linewidth}L{0.64\linewidth}@{}}
-\toprule
-\textbf{Class} & \textbf{Role} \\
-\midrule
-\pv{PVSystem} & Aggregate system and scope of each control cycle. \\
-\pv{EnergyAsset} & Parent of the four passive physical assets. \\
-\pv{PhotovoltaicArray} & Intermittent renewable source measured through PV telemetry. \\
-\pv{BatteryStorage} & Bounded storage asset that can charge, discharge, or hold. \\
-\pv{InternalLoad} & Aggregate passive demand of a factory or machine fleet. \\
-\pv{ExternalGrid} & Reliable bidirectional boundary bus for residual balancing. \\
-\pv{ControlAgent} & The single decision-making entity. \\
-\pv{SystemObservation} & Time-stamped snapshot of PV, environment, battery, load, and grid reference. \\
-\pv{TimeSeriesSignal} & Physical signal and its temporal descriptors. \\
-\pv{PatchedRepresentation} & A model input representation defined by patch and stride. \\
-\pv{ObservabilityAssessment} & Evidence linking a signal-representation pair to an observability state. \\
-\pv{GenerationContext} & Operational proxy for expected solar generation. \\
-\pv{AnomalyState} & Detected physical or sensing abnormality. \\
-\pv{ObservabilityState} & Semantic assessment of information retained after patching. \\
-\pv{ControlMode} & Normal, conservative, or safe operating policy. \\
-\pv{PowerRoute} & Closed vocabulary of the seven admissible source--destination pairs. \\
-\pv{PowerRoutingDecision} & One directional transfer or hold decision with an optional bounded setpoint. \\
-\bottomrule
-\end{tabular}
-\caption{Core classes in the simplified ontology.}
-\label{tab:classes}
-\end{table}
+\input{tables/ontClasses.tex}
 
 The closed vocabularies are:
 \begin{description}
@@ -127,33 +58,7 @@ Each valid time-stamped observation has exactly one generation context. Each com
 
 The semantic relations in \autoref{tab:objects} connect the physical boundary to the inference and control layers. Each active \pv{PowerRoutingDecision} has exactly one route value, one source, and one distinct destination. Its non-negative setpoint magnitude is optional because \texttt{Balance} may denote passive residual exchange. A cycle that simultaneously serves the load, charges the battery, and exports a residual uses three instances of the same decision class, all based on the same observation and mode.
 
-\begin{table}[H]
-\centering
-\small
-\begin{tabular}{@{}L{0.25\linewidth}L{0.29\linewidth}L{0.37\linewidth}@{}}
-\toprule
-\textbf{Property} & \textbf{Domain} & \textbf{Range or meaning} \\
-\midrule
-\pv{hasAsset} & \pv{PVSystem} & \pv{EnergyAsset} \\
-\pv{managedBy} & \pv{PVSystem} & exactly one \pv{ControlAgent} \\
-\pv{hasObservation} & \pv{PVSystem} & \pv{SystemObservation} \\
-\pv{hasSignal} & \pv{PhotovoltaicArray} & \pv{TimeSeriesSignal} \\
-\pv{hasRepresentation} & \pv{TimeSeriesSignal} & \pv{PatchedRepresentation} \\
-\pv{assessesRepresentation} & \pv{ObservabilityAssessment} & exactly one \pv{PatchedRepresentation} \\
-\pv{hasGenerationContext} & \pv{SystemObservation} & zero or one \pv{GenerationContext} value \\
-\pv{hasAnomaly} & \pv{SystemObservation} & zero or more \pv{AnomalyState} values \\
-\pv{hasObservabilityState} & \pv{ObservabilityAssessment} & one \pv{ObservabilityState} value \\
-\pv{selectsMode} & \pv{PowerRoutingDecision} & exactly one \pv{ControlMode} value \\
-\pv{makesDecision} & \pv{ControlAgent} & \pv{PowerRoutingDecision} \\
-\pv{basedOn} & \pv{PowerRoutingDecision} & observation, assessment, or inferred state \\
-\pv{hasRoute} & \pv{PowerRoutingDecision} & zero or one \pv{PowerRoute} value \\
-\pv{hasSourceAsset} & \pv{PowerRoutingDecision} & zero or one \pv{EnergyAsset} \\
-\pv{hasDestinationAsset} & \pv{PowerRoutingDecision} & zero or one \pv{EnergyAsset} \\
-\bottomrule
-\end{tabular}
-\caption{Object-property signatures.}
-\label{tab:objects}
-\end{table}
+\input{tables/ontObjects.tex}
 
 \pv{hasRepresentation} is intentionally non-functional because one signal can be evaluated under several $(P,S)$ configurations. Each assessment identifies exactly which representation it evaluates. Each decision is based on exactly one current observation and its completed assessment; its own \pv{selectsMode} value therefore scopes the mode without accumulating incompatible modes on the persistent agent. The range of \pv{basedOn} is the union of observation and inferred-assessment entities, rather than the intersection that multiple RDFS range declarations would imply.
 
@@ -165,24 +70,7 @@ The synchronized observation combines the measured photovoltaic and environmenta
 
 Missing or stale data cannot be inferred safely from OWL's open-world assumption alone. An operational validation layer therefore compares the observation time stamp with a configurable staleness limit, validates numeric ranges, and asserts the four critical Boolean flags consumed by the ontology. This keeps data-quality validation distinct from semantic classification.
 
-\begin{table}[H]
-\centering
-\small
-\begin{tabular}{@{}L{0.29\linewidth}L{0.63\linewidth}@{}}
-\toprule
-\textbf{Owner} & \textbf{Data properties} \\
-\midrule
-\pv{SystemObservation} & \pv{pvPowerW}, \pv{powerRampRateWPerS}, \pv{loadDemandW}, optional \pv{gridExchangeReferenceW}, \pv{tiltedIrradianceWm2}, \pv{horizontalIrradianceWm2}, \pv{airTemperatureC}, \pv{windSpeedMs}, \pv{windDirectionDeg}, \pv{batterySoC}, \pv{observationTimestamp}, \pv{pvPowerValid}, \pv{tiltedIrradianceValid}, \pv{batterySoCValid}, and \pv{loadDemandValid}. \\
-\pv{BatteryStorage} & \pv{capacityWh}, \pv{reserveSoC}, \pv{targetSoC}, \pv{maximumSoC}, \pv{maximumChargePowerW}, and \pv{maximumDischargePowerW}. \\
-\pv{TimeSeriesSignal} & \pv{signalFrequencyHz}, \pv{samplingFrequencyHz}, \pv{periodSamples}, \pv{amplitudeW}, \pv{timeSpanSeconds}, and \pv{phaseOffsetSamples}. \\
-\pv{PatchedRepresentation} & \pv{patchSize}, \pv{stride}, and derived \pv{overlapRatio}. \\
-\pv{ObservabilityAssessment} & \pv{analysisStatus}, \pv{assessmentMethod}, \pv{assessmentMetric}, \pv{strideLockingRatio}, \pv{patchLockingRatio}, \pv{lockingTolerance}, \pv{effectEstimate}, \pv{posteriorLossProbability}, \pv{credibleIntervalLower}, \pv{credibleIntervalUpper}, and \pv{assessmentTimestamp}. \\
-\pv{PowerRoutingDecision} & optional non-negative \pv{powerSetpointW}, \pv{decisionConfidence}, \pv{batteryCommand} in \{Charge, Discharge, Hold\}, \pv{pvCommand} in \{Connect, Isolate\}, and \pv{gridCommand} in \{Import, Export, Balance\}. \\
-\bottomrule
-\end{tabular}
-\caption{Quantitative property groups and units encoded by their names.}
-\label{tab:data}
-\end{table}
+\input{tables/ontData.tex}
 
 A valid patched representation satisfies $P\geq1$ and $1\leq S\leq P$. Overlap is descriptive metadata:
 \begin{equation}
@@ -255,6 +143,8 @@ C&=(L_S\vee L_P)\wedge\left(0<f<\frac{f_s}{2}\right),
 \label{eq:locking-candidate}
 \end{equation}
 where $\varepsilon_S$ and $\varepsilon_P$ are tied to frequency resolution and are never hardcoded frequency bands. Only $L_S$ expresses equality of consecutive patch phases; $L_P$ records whole-cycle repetition inside a patch and is retained as an H3 experimental factor. Their union $C$ is a candidate geometry class, not proof that two domain concepts are indistinguishable.
+
+This is a division of labour, and it bounds what the ontology can conclude on its own. Phase-locking is \emph{derivable}: $L_S$, $L_P$ and $C$ follow by rule from \pv{signalFrequencyHz}, \pv{samplingFrequencyHz}, \pv{patchSize} and \pv{stride}, all of which the knowledge base already holds, so a reasoner can enumerate the candidate set for any configuration without observing a model. Structural aliasing is \emph{not} derivable and is only recorded: it enters through $B$ below, which is posterior evidence from an experiment external to the ontology, and no rule here can produce it. An agent using this ontology therefore detects phase-locking and reports structural aliasing.
 
 Let $q$ denote the task-relevant information being tested, for example frequency or amplitude. Let $\Delta_{\mathrm{loss}}(q)$ be its predeclared behavioral or representational loss relative to matched controls, $\delta$ the maximum practically negligible loss, $D$ the experimental evidence, and $\tau>1/2$ the posterior confidence threshold. Define confirmed information loss $B$ and confirmed preservation $R$ as
 \begin{equation}
@@ -386,30 +276,6 @@ Here \emph{daylight} abbreviates \{\valueof{ClearSky}, \valueof{PartialCloud}, \
 \label{fig:routing-policy}
 \end{figure}
 
-\begin{table}[H]
-\centering
-\footnotesize
-\begin{tabular}{@{}L{0.23\linewidth}L{0.29\linewidth}L{0.39\linewidth}@{}}
-\toprule
-\textbf{Condition} & \textbf{Ordered route set} & \textbf{Constraint} \\
-\midrule
-Daylight surplus & PV$\to$Load; PV$\to$Battery; PV$\to$Grid & Serve demand, charge to target, then export the residual. \\
-Daylight deficit & PV$\to$Load; Battery$\to$Load; Grid$\to$Load & Discharge only to reserve; the grid covers the remaining deficit. \\
-Night, $s>s_{\mathrm{reserve}}$ & Battery$\to$Load; Grid$\to$Load & Battery serves demand to reserve; the grid supplies the residual. \\
-Night, $s\leq s_{\mathrm{reserve}}$ & Grid$\to$Load; if $s<s_{\mathrm{reserve}}$, Grid$\to$Battery & Supply the load first; charge only below reserve and stop at reserve. \\
-Positive ramp with surplus & PV$\to$Load; PV$\to$Battery; PV$\to$Grid & NormalMode may charge beyond target, never beyond maximum SoC. \\
-Negative ramp with valid positive reference & load-serving routes; Battery$\to$Grid & Export only after serving the load, within residual discharge capacity and above reserve. \\
-Negative ramp without usable reference & ordinary surplus/deficit routes & Missing, stale, non-finite, zero, or negative reference disables export catch-up. \\
-ConservativeMode & ordinary load-first routes & Reduced battery cap; target/reserve bounds; no ramp extensions. \\
-SafeMode & Grid$\to$Load when observed & Battery Hold; grid Balance; isolate PV only for inverter trip. \\
-\bottomrule
-\end{tabular}
-\caption{Routing matrix for the seven admissible transfer directions.}
-\label{tab:routing}
-\end{table}
+\input{tables/ontRouting.tex}
 
 For a negative ramp, Battery$\to$Grid is admissible only after the internal load has been fully served, the export reference is present, fresh, finite, and positive, measured export is below that reference, the battery remains above reserve, and discharge capacity remains after load support. If any condition fails, the ordinary load-first route applies. At night, Grid$\to$Battery begins only after Grid$\to$Load has been satisfied and stops when reserve is restored. These rules preserve \autoref{eq:power-balance} without turning the routing policy into a separate optimisation problem.
-
-\printbibliography
-
-\end{document}

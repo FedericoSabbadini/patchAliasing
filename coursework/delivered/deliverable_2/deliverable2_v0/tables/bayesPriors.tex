@@ -1,22 +1,29 @@
 \begin{table}[t]
     \centering
     \small
-    \begin{tabular}{@{}lllp{5.4cm}@{}}
+    \begin{tabular}{@{}lllp{4.9cm}@{}}
         \toprule
         \textbf{Model} & \textbf{Parameter} & \textbf{Prior} & \textbf{Role} \\
         \midrule
-        A, C & $\bar\beta$              & $\text{Student-}t_4(0,0.5)$      & population phase-lock effect, on the log-recovery scale \\
-        A    & $\delta_O$               & $\text{Student-}t_4(0,0.5)$      & slope of the effect in patch overlap $O=(P-S)/P$ \\
-        A, C & $\tau,\sigma_k,\sigma_b,\sigma$ & $\text{Half-Student-}t_4(0,0.5)$ & configuration, harmonic, background and residual scales \\
-        C    & $\sigma_\phi$            & $\text{Half-}\mathcal N(0,0.25)$ & spread of the eight per-phase offsets \\
-        B    & $\alpha_0$               & $\mathcal N(\log \bar y, 1)$     & baseline log codelength \\
-        B    & $\theta_{lock}$          & $\mathcal N(0,0.5)$              & log codelength expansion at a lock \\
-        B    & $k$                      & $\text{Gamma}(2,0.1)$            & Gamma shape (dispersion) \\
-        D1   & $\alpha_g,\theta_S,\theta_P$ & $\mathcal N(0,1)$            & per-geometry level and the two grid labels; $H3$ predicts $\theta_S<0$ \\
-        D2   & $\kappa_0$               & $\mathcal N(0,10)$\,Hz           & offset of the spacing regression; $H3$ predicts $0$ \\
-        D2   & $\kappa_S,\kappa_P$      & $\mathcal N(0,1)$                & slopes on $f_s/S$ and $f_s/P$; $H3$ predicts $1$ and $0$ \\
+        A, C & $\bar\beta$                     & $\text{Student-}t_4(0,0.5)$      & population phase-lock effect, on the log-recovery scale \\
+        A    & $\delta_O$                      & $\text{Student-}t_4(0,0.5)$      & slope in the centred overlap $\widetilde O_c$; one unit $=0.5$ of $O$ \\
+        A    & $\delta_P$                      & $\text{Student-}t_4(0,0.5)$      & slope in the centred $\log P_c$ \\
+        A, C & $\tau,\sigma_k,\sigma_b,\sigma$  & $\text{Half-Student-}t_4(0,0.5)$ & configuration, harmonic, background and residual scales \\
+        C    & $\sigma_\phi$                   & $\text{Half-}\mathcal N(0,0.25)$ & spread of the eight per-phase offsets \\
+        B    & $\alpha_0$                      & $\mathcal N(\log \bar y, 1)$     & baseline log codelength \\
+        B    & $\theta_{lock}$                 & $\mathcal N(0,0.5)$              & log codelength expansion at a lock \\
+        B    & $k$                             & $\text{Gamma}(2,0.1)$            & Gamma shape (dispersion) \\
+        B    & $\sigma_{st},\sigma_{geo}$      & $\text{Half-}\mathcal N(0,1)$    & spread of the probe-stage and geometry offsets \\
+        D1   & $\alpha_g,\theta_S,\theta_P$    & $\mathcal N(0,1)$                & per-geometry off-grid level and the two grid labels \\
+        D1   & $\sigma$                        & $\text{Half-}\mathcal N(0,1)$    & residual scale of $\log z_g(f)$ \\
+        D2   & $\kappa_S,\kappa_P$             & $\mathcal N(0,1)$                & measured spacing per unit of predicted spacing \\
+        D2   & $\sigma_F$                      & $\text{Half-}\mathcal N(0,5)$\,Hz & scatter beyond the sweep-resolution floor $\Delta f$ \\
         \bottomrule
     \end{tabular}
-    \caption{The prior on every parameter of the five models, unchanged from Deliverable~1, together with the role each parameter plays in its regression. Every effect prior is centred on \emph{no effect}: zero for the contrast and codelength coefficients, no dependence on phase for $\sigma_\phi$, and no relationship between measured and predicted spacing for $\kappa_S$. Each hypothesis therefore has to come from the data rather than from the prior, and a posterior that stays where its prior was is itself a report of an absent effect. Scale parameters are given half-$t$ priors on the same units as the response they disperse. The two $H3$ rows also give the values the hypothesis predicts, which is what the posteriors will be compared against.}
+    \caption{Every parameter with its prior and its role. The effect priors are those of
+    Deliverable~1, extended by $\delta_P$, which the nine-geometry design makes estimable. All are
+    centred on no effect, so a posterior that has not moved from its prior is itself a
+    report of an absent effect. Prior scales are varied over $\{0.25,0.5,1.0\}$ as a sensitivity
+    check.}
     \label{tab:bayesPriors}
 \end{table}

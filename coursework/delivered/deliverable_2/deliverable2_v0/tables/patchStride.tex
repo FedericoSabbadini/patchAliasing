@@ -1,17 +1,25 @@
-\begin{table}[t]
+\begin{table*}[t]
     \centering
     \small
-    \begin{tabular}{ccccccc}
+    \begin{tabular}{@{}cccccccc@{}}
         \toprule
-        \textbf{Run} & \textbf{Patch ($P$)} & \textbf{Stride ($S$)} & \textbf{overlap} & \textbf{\#patch @2048} & \textbf{steps} & \textbf{time} \\
+        \textbf{Run} & \textbf{$P$} & \textbf{$S$} & \textbf{$O$} & \textbf{tokens} & $S \mid P$ & \textbf{stride-only sites} & \textbf{identifies} \\
         \midrule
-        1 & 16 & 8  & 0.50 & 255 & 100k & 2.6\,h \\
-        2 & 16 & 12 & 0.25 & 170 & 100k & 2.8\,h \\
-        3 & 16 & 16 & 0.00 & 128 & 100k & pending \\
-        4 & 8  & 8  & 0.00 & 256 & 100k & 2.7\,h \\
-        5 & 24 & 24 & 0.00 & 86  & 100k & 2.8\,h \\
+        1 & 16 & 8  & 0.500 & 255 & yes & 0 & $\delta_O$, $\kappa_P$ \\
+        2 & 16 & 12 & 0.250 & 170 & \textbf{no}  & \textbf{4} & $\theta_S$, $\kappa_S$, $\delta_O$ \\
+        3 & 8  & 8  & 0.000 & 256 & yes & 0 & $\delta_P$, $\kappa_P$ \\
+        4 & 24 & 24 & 0.000 & 85  & yes & 0 & $\delta_P$ \\
+        5 & 16 & 16 & 0.000 & 128 & yes & 0 & baseline \\
+        6 & 24 & 16 & 0.333 & 127 & \textbf{no}  & \textbf{4} & $\theta_S$, $\kappa_S$, $\kappa_P$ \\
+        7 & 24 & 20 & 0.167 & 102 & \textbf{no}  & \textbf{8} & $\theta_S$, $\kappa_S$ \\
+        8 & 24 & 12 & 0.500 & 169 & yes & 0 & $\delta_O$ vs.\ $\delta_P$, $\kappa_P$ \\
+        9 & 24 & 8  & 0.667 & 254 & yes & 0 & $\delta_O$, $\kappa_P$ \\
         \bottomrule
     \end{tabular}
-    \caption{Patch/stride configurations retrained from scratch (seed 42) under a uniform $100$k-step budget; \emph{time} is the wall-clock on the RTX 5060 Laptop GPU. The $P{=}16,\,S{=}16$ baseline is retrained under the \emph{same} budget as the variants, so the stride comparison is not confounded by training budget. The official Amazon checkpoint ($200$k steps, full corpus) is used separately, only as an external forecast-quality reference (\autoref{fig:multiFreqPanel}).}
+    \caption{The nine geometries, all trained from scratch (seed $42$) under the same $100$k-step
+    budget. $O=(P-S)/P$, and the token count is the number of patch tokens at the $2048$-sample
+    training context, which is what the overlap costs. The stride-only column counts the in-band
+    frequencies that are stride locks and not patch nulls; they exist only when $S \nmid P$. The
+    last column names the estimands each run identifies.}
     \label{tab:patchStride}
-\end{table}
+\end{table*}

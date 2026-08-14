@@ -1,0 +1,27 @@
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{@{}L{0.25\linewidth}L{0.29\linewidth}L{0.37\linewidth}@{}}
+\toprule
+\textbf{Property} & \textbf{Domain} & \textbf{Range or meaning} \\
+\midrule
+\pv{hasAsset} & \pv{PVSystem} & \pv{EnergyAsset} \\
+\pv{managedBy} & \pv{PVSystem} & exactly one \pv{ControlAgent} \\
+\pv{hasObservation} & \pv{PVSystem} & \pv{SystemObservation} \\
+\pv{hasSignal} & \pv{PhotovoltaicArray} & \pv{TimeSeriesSignal} \\
+\pv{hasRepresentation} & \pv{TimeSeriesSignal} & \pv{PatchedRepresentation} \\
+\pv{assessesRepresentation} & \pv{ObservabilityAssessment} & exactly one \pv{PatchedRepresentation} \\
+\pv{hasGenerationContext} & \pv{SystemObservation} & zero or one \pv{GenerationContext} value \\
+\pv{hasAnomaly} & \pv{SystemObservation} & zero or more \pv{AnomalyState} values \\
+\pv{hasObservabilityState} & \pv{ObservabilityAssessment} & one \pv{ObservabilityState} value \\
+\pv{selectsMode} & \pv{PowerRoutingDecision} & exactly one \pv{ControlMode} value \\
+\pv{makesDecision} & \pv{ControlAgent} & \pv{PowerRoutingDecision} \\
+\pv{basedOn} & \pv{PowerRoutingDecision} & observation, assessment, or inferred state \\
+\pv{hasRoute} & \pv{PowerRoutingDecision} & zero or one \pv{PowerRoute} value \\
+\pv{hasSourceAsset} & \pv{PowerRoutingDecision} & zero or one \pv{EnergyAsset} \\
+\pv{hasDestinationAsset} & \pv{PowerRoutingDecision} & zero or one \pv{EnergyAsset} \\
+\bottomrule
+\end{tabular}
+\caption{Object-property signatures.}
+\label{tab:objects}
+\end{table}
