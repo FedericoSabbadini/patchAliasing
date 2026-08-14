@@ -10,11 +10,15 @@ Single source of truth for two things:
 2. The cycles-per-patch aliasing coordinate:
        cpp = freq_hz * P / fs        # cycles of the tone inside one patch of P samples
 
-Why cpp is the natural axis for patch aliasing: a patch embedding is a linear map over P
-consecutive samples, so a tone completing an INTEGER number of cycles within a patch
-(cpp = 1, 2, 3, ...) integrates to ~0 and is invisible to the projection. Recovery nulls
-are therefore expected at integer cpp, i.e. freq_hz = k * fs / P. Sweeping in cpp makes the
-nulls of every model — whatever its P — line up at the same integer ticks.
+Why cpp is a useful axis: it expresses a tone's frequency in units of one patch, so
+patch-relative structure lines up at the same integer ticks whatever the model's P.
+
+NOTE (empirical): the original hypothesis — that integer cpp (freq_hz = k*fs/P) produces
+forecast-recovery NULLS because a whole number of cycles integrates to ~0 inside a patch —
+was tested and REFUTED. Integer-cpp tones are in fact among the BEST recovered (see
+testing/README.md, H1). What is real and geometric is a token-level collapse on the STRIDE
+grid freq_hz = c*fs/S (H3), and that collapse does NOT null the forecast. cpp remains a
+convenient patch-relative coordinate; it is not, on its own, evidence of an aliasing null.
 """
 from __future__ import annotations
 

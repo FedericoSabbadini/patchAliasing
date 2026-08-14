@@ -1,47 +1,4402 @@
 [
-  {"generator": "kernelsynth", "seed": 101, "params": {"J": 5, "l_syn": 576, "fs": 512, "jitter": 1e-4, "P": 16,
-    "inject": [{"freq_hz": 32.0, "amplitude": 2.0, "phase": 0.0}]}, "_note": "cpp=1 CRITICAL (patch lock fs/P)"},
-  {"generator": "tsmixup", "seed": 102, "params": {"K": 3, "alpha": 1.5, "l_min": 576, "l_max": 576, "fs": 512, "P": 16, "t_lengths": [288, 432, 576],
-    "inject": [{"freq_hz": 32.0, "amplitude": 2.0, "phase": 1.5707963}]}, "_note": "cpp=1 CRITICAL"},
-
-  {"generator": "kernelsynth", "seed": 103, "params": {"J": 5, "l_syn": 576, "fs": 512, "jitter": 1e-4, "P": 16,
-    "inject": [{"freq_hz": 64.0, "amplitude": 2.0, "phase": 0.0}]}, "_note": "cpp=2 CRITICAL"},
-  {"generator": "tsmixup", "seed": 104, "params": {"K": 3, "alpha": 1.5, "l_min": 576, "l_max": 576, "fs": 512, "P": 16, "t_lengths": [288, 432, 576],
-    "inject": [{"freq_hz": 64.0, "amplitude": 2.0, "phase": 1.5707963}]}, "_note": "cpp=2 CRITICAL"},
-
-  {"generator": "kernelsynth", "seed": 105, "params": {"J": 5, "l_syn": 576, "fs": 512, "jitter": 1e-4, "P": 16,
-    "inject": [{"freq_hz": 96.0, "amplitude": 2.0, "phase": 0.0}]}, "_note": "cpp=3 CRITICAL"},
-  {"generator": "tsmixup", "seed": 106, "params": {"K": 3, "alpha": 1.5, "l_min": 576, "l_max": 576, "fs": 512, "P": 16, "t_lengths": [288, 432, 576],
-    "inject": [{"freq_hz": 96.0, "amplitude": 2.0, "phase": 1.5707963}]}, "_note": "cpp=3 CRITICAL"},
-
-  {"generator": "kernelsynth", "seed": 107, "params": {"J": 5, "l_syn": 576, "fs": 512, "jitter": 1e-4, "P": 16,
-    "inject": [{"freq_hz": 128.0, "amplitude": 2.0, "phase": 0.0}]}, "_note": "cpp=4 CRITICAL"},
-  {"generator": "tsmixup", "seed": 108, "params": {"K": 3, "alpha": 1.5, "l_min": 576, "l_max": 576, "fs": 512, "P": 16, "t_lengths": [288, 432, 576],
-    "inject": [{"freq_hz": 128.0, "amplitude": 2.0, "phase": 1.5707963}]}, "_note": "cpp=4 CRITICAL"},
-
-  {"generator": "kernelsynth", "seed": 109, "params": {"J": 5, "l_syn": 576, "fs": 512, "jitter": 1e-4, "P": 16,
-    "inject": [{"freq_hz": 48.0, "amplitude": 2.0, "phase": 0.0}]}, "_note": "cpp=1.5 non-critical"},
-  {"generator": "tsmixup", "seed": 110, "params": {"K": 3, "alpha": 1.5, "l_min": 576, "l_max": 576, "fs": 512, "P": 16, "t_lengths": [288, 432, 576],
-    "inject": [{"freq_hz": 48.0, "amplitude": 2.0, "phase": 1.5707963}]}, "_note": "cpp=1.5 non-critical"},
-
-  {"generator": "kernelsynth", "seed": 111, "params": {"J": 5, "l_syn": 576, "fs": 512, "jitter": 1e-4, "P": 16,
-    "inject": [{"freq_hz": 80.0, "amplitude": 2.0, "phase": 0.0}]}, "_note": "cpp=2.5 non-critical"},
-  {"generator": "tsmixup", "seed": 112, "params": {"K": 3, "alpha": 1.5, "l_min": 576, "l_max": 576, "fs": 512, "P": 16, "t_lengths": [288, 432, 576],
-    "inject": [{"freq_hz": 80.0, "amplitude": 2.0, "phase": 1.5707963}]}, "_note": "cpp=2.5 non-critical"},
-
-  {"generator": "kernelsynth", "seed": 113, "params": {"J": 5, "l_syn": 576, "fs": 512, "jitter": 1e-4, "P": 16,
-    "inject": [{"freq_hz": 112.0, "amplitude": 2.0, "phase": 0.0}]}, "_note": "cpp=3.5 non-critical"},
-  {"generator": "tsmixup", "seed": 114, "params": {"K": 3, "alpha": 1.5, "l_min": 576, "l_max": 576, "fs": 512, "P": 16, "t_lengths": [288, 432, 576],
-    "inject": [{"freq_hz": 112.0, "amplitude": 2.0, "phase": 1.5707963}]}, "_note": "cpp=3.5 non-critical"},
-
-  {"generator": "kernelsynth", "seed": 115, "params": {"J": 5, "l_syn": 576, "fs": 512, "jitter": 1e-4, "P": 16,
-    "inject": [{"freq_hz": 64.0, "amplitude": 1.2, "phase": 0.0},
-               {"freq_hz": 80.0, "amplitude": 1.2, "phase": 1.5707963},
-               {"freq_hz": 112.0, "amplitude": 1.2, "phase": 0.0}]},
-    "_note": "MIXED: 64=cpp2 CRITICAL + 80=cpp2.5 + 112=cpp3.5 (contamination candidate)"},
-  {"generator": "tsmixup", "seed": 116, "params": {"K": 3, "alpha": 1.5, "l_min": 576, "l_max": 576, "fs": 512, "P": 16, "t_lengths": [288, 432, 576],
-    "inject": [{"freq_hz": 48.0, "amplitude": 1.2, "phase": 0.0},
-               {"freq_hz": 96.0, "amplitude": 1.2, "phase": 1.5707963},
-               {"freq_hz": 128.0, "amplitude": 1.2, "phase": 0.0}]},
-    "_note": "MIXED: 48=cpp1.5 + 96=cpp3 CRITICAL + 128=cpp4 CRITICAL"}
+  {
+    "_note": "cpp=1.0 INTEGER",
+    "generator": "kernelsynth",
+    "seed": 1000,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 32.0,
+          "amplitude": 2.0,
+          "phase": 0.0
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=1.0 INTEGER",
+    "generator": "kernelsynth",
+    "seed": 1001,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 32.0,
+          "amplitude": 2.0,
+          "phase": 1.2566370614
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=1.0 INTEGER",
+    "generator": "kernelsynth",
+    "seed": 1002,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 32.0,
+          "amplitude": 2.0,
+          "phase": 2.5132741229
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=1.0 INTEGER",
+    "generator": "kernelsynth",
+    "seed": 1003,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 32.0,
+          "amplitude": 2.0,
+          "phase": 3.7699111843
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=1.0 INTEGER",
+    "generator": "kernelsynth",
+    "seed": 1004,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 32.0,
+          "amplitude": 2.0,
+          "phase": 5.0265482457
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=2.0 INTEGER",
+    "generator": "kernelsynth",
+    "seed": 1005,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 64.0,
+          "amplitude": 2.0,
+          "phase": 0.0
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=2.0 INTEGER",
+    "generator": "kernelsynth",
+    "seed": 1006,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 64.0,
+          "amplitude": 2.0,
+          "phase": 1.2566370614
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=2.0 INTEGER",
+    "generator": "kernelsynth",
+    "seed": 1007,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 64.0,
+          "amplitude": 2.0,
+          "phase": 2.5132741229
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=2.0 INTEGER",
+    "generator": "kernelsynth",
+    "seed": 1008,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 64.0,
+          "amplitude": 2.0,
+          "phase": 3.7699111843
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=2.0 INTEGER",
+    "generator": "kernelsynth",
+    "seed": 1009,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 64.0,
+          "amplitude": 2.0,
+          "phase": 5.0265482457
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=3.0 INTEGER",
+    "generator": "kernelsynth",
+    "seed": 1010,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 96.0,
+          "amplitude": 2.0,
+          "phase": 0.0
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=3.0 INTEGER",
+    "generator": "kernelsynth",
+    "seed": 1011,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 96.0,
+          "amplitude": 2.0,
+          "phase": 1.2566370614
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=3.0 INTEGER",
+    "generator": "kernelsynth",
+    "seed": 1012,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 96.0,
+          "amplitude": 2.0,
+          "phase": 2.5132741229
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=3.0 INTEGER",
+    "generator": "kernelsynth",
+    "seed": 1013,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 96.0,
+          "amplitude": 2.0,
+          "phase": 3.7699111843
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=3.0 INTEGER",
+    "generator": "kernelsynth",
+    "seed": 1014,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 96.0,
+          "amplitude": 2.0,
+          "phase": 5.0265482457
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=4.0 INTEGER",
+    "generator": "kernelsynth",
+    "seed": 1015,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 128.0,
+          "amplitude": 2.0,
+          "phase": 0.0
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=4.0 INTEGER",
+    "generator": "kernelsynth",
+    "seed": 1016,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 128.0,
+          "amplitude": 2.0,
+          "phase": 1.2566370614
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=4.0 INTEGER",
+    "generator": "kernelsynth",
+    "seed": 1017,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 128.0,
+          "amplitude": 2.0,
+          "phase": 2.5132741229
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=4.0 INTEGER",
+    "generator": "kernelsynth",
+    "seed": 1018,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 128.0,
+          "amplitude": 2.0,
+          "phase": 3.7699111843
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=4.0 INTEGER",
+    "generator": "kernelsynth",
+    "seed": 1019,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 128.0,
+          "amplitude": 2.0,
+          "phase": 5.0265482457
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=5.0 INTEGER",
+    "generator": "kernelsynth",
+    "seed": 1020,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 160.0,
+          "amplitude": 2.0,
+          "phase": 0.0
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=5.0 INTEGER",
+    "generator": "kernelsynth",
+    "seed": 1021,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 160.0,
+          "amplitude": 2.0,
+          "phase": 1.2566370614
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=5.0 INTEGER",
+    "generator": "kernelsynth",
+    "seed": 1022,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 160.0,
+          "amplitude": 2.0,
+          "phase": 2.5132741229
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=5.0 INTEGER",
+    "generator": "kernelsynth",
+    "seed": 1023,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 160.0,
+          "amplitude": 2.0,
+          "phase": 3.7699111843
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=5.0 INTEGER",
+    "generator": "kernelsynth",
+    "seed": 1024,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 160.0,
+          "amplitude": 2.0,
+          "phase": 5.0265482457
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=6.0 INTEGER",
+    "generator": "kernelsynth",
+    "seed": 1025,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 192.0,
+          "amplitude": 2.0,
+          "phase": 0.0
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=6.0 INTEGER",
+    "generator": "kernelsynth",
+    "seed": 1026,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 192.0,
+          "amplitude": 2.0,
+          "phase": 1.2566370614
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=6.0 INTEGER",
+    "generator": "kernelsynth",
+    "seed": 1027,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 192.0,
+          "amplitude": 2.0,
+          "phase": 2.5132741229
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=6.0 INTEGER",
+    "generator": "kernelsynth",
+    "seed": 1028,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 192.0,
+          "amplitude": 2.0,
+          "phase": 3.7699111843
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=6.0 INTEGER",
+    "generator": "kernelsynth",
+    "seed": 1029,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 192.0,
+          "amplitude": 2.0,
+          "phase": 5.0265482457
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=7.0 INTEGER",
+    "generator": "kernelsynth",
+    "seed": 1030,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 224.0,
+          "amplitude": 2.0,
+          "phase": 0.0
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=7.0 INTEGER",
+    "generator": "kernelsynth",
+    "seed": 1031,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 224.0,
+          "amplitude": 2.0,
+          "phase": 1.2566370614
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=7.0 INTEGER",
+    "generator": "kernelsynth",
+    "seed": 1032,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 224.0,
+          "amplitude": 2.0,
+          "phase": 2.5132741229
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=7.0 INTEGER",
+    "generator": "kernelsynth",
+    "seed": 1033,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 224.0,
+          "amplitude": 2.0,
+          "phase": 3.7699111843
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=7.0 INTEGER",
+    "generator": "kernelsynth",
+    "seed": 1034,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 224.0,
+          "amplitude": 2.0,
+          "phase": 5.0265482457
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=1.50 half",
+    "generator": "kernelsynth",
+    "seed": 1035,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 48.0,
+          "amplitude": 2.0,
+          "phase": 0.0
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=1.50 half",
+    "generator": "kernelsynth",
+    "seed": 1036,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 48.0,
+          "amplitude": 2.0,
+          "phase": 2.0943951024
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=1.50 half",
+    "generator": "kernelsynth",
+    "seed": 1037,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 48.0,
+          "amplitude": 2.0,
+          "phase": 4.1887902048
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=2.50 half",
+    "generator": "kernelsynth",
+    "seed": 1038,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 80.0,
+          "amplitude": 2.0,
+          "phase": 0.0
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=2.50 half",
+    "generator": "kernelsynth",
+    "seed": 1039,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 80.0,
+          "amplitude": 2.0,
+          "phase": 2.0943951024
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=2.50 half",
+    "generator": "kernelsynth",
+    "seed": 1040,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 80.0,
+          "amplitude": 2.0,
+          "phase": 4.1887902048
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=3.50 half",
+    "generator": "kernelsynth",
+    "seed": 1041,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 112.0,
+          "amplitude": 2.0,
+          "phase": 0.0
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=3.50 half",
+    "generator": "kernelsynth",
+    "seed": 1042,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 112.0,
+          "amplitude": 2.0,
+          "phase": 2.0943951024
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=3.50 half",
+    "generator": "kernelsynth",
+    "seed": 1043,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 112.0,
+          "amplitude": 2.0,
+          "phase": 4.1887902048
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=4.50 half",
+    "generator": "kernelsynth",
+    "seed": 1044,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 144.0,
+          "amplitude": 2.0,
+          "phase": 0.0
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=4.50 half",
+    "generator": "kernelsynth",
+    "seed": 1045,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 144.0,
+          "amplitude": 2.0,
+          "phase": 2.0943951024
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=4.50 half",
+    "generator": "kernelsynth",
+    "seed": 1046,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 144.0,
+          "amplitude": 2.0,
+          "phase": 4.1887902048
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=5.50 half",
+    "generator": "kernelsynth",
+    "seed": 1047,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 176.0,
+          "amplitude": 2.0,
+          "phase": 0.0
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=5.50 half",
+    "generator": "kernelsynth",
+    "seed": 1048,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 176.0,
+          "amplitude": 2.0,
+          "phase": 2.0943951024
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=5.50 half",
+    "generator": "kernelsynth",
+    "seed": 1049,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 176.0,
+          "amplitude": 2.0,
+          "phase": 4.1887902048
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=6.50 half",
+    "generator": "kernelsynth",
+    "seed": 1050,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 208.0,
+          "amplitude": 2.0,
+          "phase": 0.0
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=6.50 half",
+    "generator": "kernelsynth",
+    "seed": 1051,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 208.0,
+          "amplitude": 2.0,
+          "phase": 2.0943951024
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=6.50 half",
+    "generator": "kernelsynth",
+    "seed": 1052,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 208.0,
+          "amplitude": 2.0,
+          "phase": 4.1887902048
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=7.50 half",
+    "generator": "kernelsynth",
+    "seed": 1053,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 240.0,
+          "amplitude": 2.0,
+          "phase": 0.0
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=7.50 half",
+    "generator": "kernelsynth",
+    "seed": 1054,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 240.0,
+          "amplitude": 2.0,
+          "phase": 2.0943951024
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=7.50 half",
+    "generator": "kernelsynth",
+    "seed": 1055,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 240.0,
+          "amplitude": 2.0,
+          "phase": 4.1887902048
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=7.78 fill",
+    "generator": "kernelsynth",
+    "seed": 1056,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 249.0,
+          "amplitude": 2.0,
+          "phase": 0.057872271
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=3.43 fill",
+    "generator": "kernelsynth",
+    "seed": 1057,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 109.6413,
+          "amplitude": 2.0,
+          "phase": 3.3511772607
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=1.15 fill",
+    "generator": "kernelsynth",
+    "seed": 1058,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 36.7836,
+          "amplitude": 2.0,
+          "phase": 1.1910845381
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=3.56 fill",
+    "generator": "kernelsynth",
+    "seed": 1059,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 114.0421,
+          "amplitude": 2.0,
+          "phase": 2.0113730764
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=6.56 fill",
+    "generator": "kernelsynth",
+    "seed": 1060,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 209.8818,
+          "amplitude": 2.0,
+          "phase": 3.559104896
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=1.88 fill",
+    "generator": "kernelsynth",
+    "seed": 1061,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 60.2545,
+          "amplitude": 2.0,
+          "phase": 2.4619591745
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=0.78 fill",
+    "generator": "kernelsynth",
+    "seed": 1062,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 25.0481,
+          "amplitude": 2.0,
+          "phase": 2.8839923374
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=1.36 fill",
+    "generator": "kernelsynth",
+    "seed": 1063,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 43.6293,
+          "amplitude": 2.0,
+          "phase": 0.3170429245
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=1.67 fill",
+    "generator": "kernelsynth",
+    "seed": 1064,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 53.4088,
+          "amplitude": 2.0,
+          "phase": 1.1499197655
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=5.58 fill",
+    "generator": "kernelsynth",
+    "seed": 1065,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 178.5872,
+          "amplitude": 2.0,
+          "phase": 5.289785962
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=3.41 fill",
+    "generator": "kernelsynth",
+    "seed": 1066,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 109.1523,
+          "amplitude": 2.0,
+          "phase": 3.2162458634
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=0.69 fill",
+    "generator": "kernelsynth",
+    "seed": 1067,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 22.1142,
+          "amplitude": 2.0,
+          "phase": 5.5613585656
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=2.56 fill",
+    "generator": "kernelsynth",
+    "seed": 1068,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 81.7695,
+          "amplitude": 2.0,
+          "phase": 5.3865810526
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=7.66 fill",
+    "generator": "kernelsynth",
+    "seed": 1069,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 245.0882,
+          "amplitude": 2.0,
+          "phase": 1.2137227531
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=6.65 fill",
+    "generator": "kernelsynth",
+    "seed": 1070,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 212.8156,
+          "amplitude": 2.0,
+          "phase": 2.510740989
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=1.58 fill",
+    "generator": "kernelsynth",
+    "seed": 1071,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 50.4749,
+          "amplitude": 2.0,
+          "phase": 3.3035624899
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=4.63 fill",
+    "generator": "kernelsynth",
+    "seed": 1072,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 148.2705,
+          "amplitude": 2.0,
+          "phase": 0.6127057554
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=7.35 fill",
+    "generator": "kernelsynth",
+    "seed": 1073,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 235.3086,
+          "amplitude": 2.0,
+          "phase": 0.5363085812
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=6.62 fill",
+    "generator": "kernelsynth",
+    "seed": 1074,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 211.8377,
+          "amplitude": 2.0,
+          "phase": 5.28721598
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=0.63 fill",
+    "generator": "kernelsynth",
+    "seed": 1075,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 20.1583,
+          "amplitude": 2.0,
+          "phase": 5.1943948714
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=2.13 fill",
+    "generator": "kernelsynth",
+    "seed": 1076,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 68.0782,
+          "amplitude": 2.0,
+          "phase": 2.4082780945
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=1.41 fill",
+    "generator": "kernelsynth",
+    "seed": 1077,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 45.0962,
+          "amplitude": 2.0,
+          "phase": 4.4396024936
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=1.64 fill",
+    "generator": "kernelsynth",
+    "seed": 1078,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 52.4309,
+          "amplitude": 2.0,
+          "phase": 3.2542697064
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=3.84 fill",
+    "generator": "kernelsynth",
+    "seed": 1079,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 122.8437,
+          "amplitude": 2.0,
+          "phase": 4.6976456102
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=0.75 fill",
+    "generator": "kernelsynth",
+    "seed": 1080,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 24.0701,
+          "amplitude": 2.0,
+          "phase": 1.9803664108
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=5.17 fill",
+    "generator": "kernelsynth",
+    "seed": 1081,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 165.3848,
+          "amplitude": 2.0,
+          "phase": 2.9784574268
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=6.10 fill",
+    "generator": "kernelsynth",
+    "seed": 1082,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 195.2124,
+          "amplitude": 2.0,
+          "phase": 5.6106100971
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=0.20 fill",
+    "generator": "kernelsynth",
+    "seed": 1083,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 6.4669,
+          "amplitude": 2.0,
+          "phase": 5.1311260251
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=4.82 fill",
+    "generator": "kernelsynth",
+    "seed": 1084,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 154.1383,
+          "amplitude": 2.0,
+          "phase": 1.9475597122
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=3.27 fill",
+    "generator": "kernelsynth",
+    "seed": 1085,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 104.7515,
+          "amplitude": 2.0,
+          "phase": 5.5403310995
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=4.39 fill",
+    "generator": "kernelsynth",
+    "seed": 1086,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 140.4469,
+          "amplitude": 2.0,
+          "phase": 2.5052249631
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=5.84 fill",
+    "generator": "kernelsynth",
+    "seed": 1087,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 186.8998,
+          "amplitude": 2.0,
+          "phase": 4.2875196434
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=0.58 fill",
+    "generator": "kernelsynth",
+    "seed": 1088,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 18.6914,
+          "amplitude": 2.0,
+          "phase": 4.4705526388
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=4.60 fill",
+    "generator": "kernelsynth",
+    "seed": 1089,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 147.2926,
+          "amplitude": 2.0,
+          "phase": 2.5238610949
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=1.29 fill",
+    "generator": "kernelsynth",
+    "seed": 1090,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 41.1844,
+          "amplitude": 2.0,
+          "phase": 5.1967836559
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=0.71 fill",
+    "generator": "kernelsynth",
+    "seed": 1091,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 22.6032,
+          "amplitude": 2.0,
+          "phase": 2.9238910714
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=1.59 fill",
+    "generator": "kernelsynth",
+    "seed": 1092,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 50.9639,
+          "amplitude": 2.0,
+          "phase": 6.0361851374
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=5.26 fill",
+    "generator": "kernelsynth",
+    "seed": 1093,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 168.3186,
+          "amplitude": 2.0,
+          "phase": 5.8854529841
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=1.07 fill",
+    "generator": "kernelsynth",
+    "seed": 1094,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 34.3387,
+          "amplitude": 2.0,
+          "phase": 5.6565344416
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=7.41 fill",
+    "generator": "kernelsynth",
+    "seed": 1095,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 237.2645,
+          "amplitude": 2.0,
+          "phase": 5.7073531202
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=0.28 fill",
+    "generator": "kernelsynth",
+    "seed": 1096,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 8.9118,
+          "amplitude": 2.0,
+          "phase": 0.9239206969
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=2.77 fill",
+    "generator": "kernelsynth",
+    "seed": 1097,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 88.6152,
+          "amplitude": 2.0,
+          "phase": 4.0736032982
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=5.12 fill",
+    "generator": "kernelsynth",
+    "seed": 1098,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 163.9178,
+          "amplitude": 2.0,
+          "phase": 4.6565599892
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=3.92 fill",
+    "generator": "kernelsynth",
+    "seed": 1099,
+    "params": {
+      "J": 5,
+      "l_syn": 576,
+      "fs": 512,
+      "jitter": 0.0001,
+      "P": 16,
+      "inject": [
+        {
+          "freq_hz": 125.2886,
+          "amplitude": 2.0,
+          "phase": 3.3222918307
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=1.0 INTEGER",
+    "generator": "tsmixup",
+    "seed": 2000,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 32.0,
+          "amplitude": 2.0,
+          "phase": 0.0
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=1.0 INTEGER",
+    "generator": "tsmixup",
+    "seed": 2001,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 32.0,
+          "amplitude": 2.0,
+          "phase": 1.2566370614
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=1.0 INTEGER",
+    "generator": "tsmixup",
+    "seed": 2002,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 32.0,
+          "amplitude": 2.0,
+          "phase": 2.5132741229
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=1.0 INTEGER",
+    "generator": "tsmixup",
+    "seed": 2003,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 32.0,
+          "amplitude": 2.0,
+          "phase": 3.7699111843
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=1.0 INTEGER",
+    "generator": "tsmixup",
+    "seed": 2004,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 32.0,
+          "amplitude": 2.0,
+          "phase": 5.0265482457
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=2.0 INTEGER",
+    "generator": "tsmixup",
+    "seed": 2005,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 64.0,
+          "amplitude": 2.0,
+          "phase": 0.0
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=2.0 INTEGER",
+    "generator": "tsmixup",
+    "seed": 2006,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 64.0,
+          "amplitude": 2.0,
+          "phase": 1.2566370614
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=2.0 INTEGER",
+    "generator": "tsmixup",
+    "seed": 2007,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 64.0,
+          "amplitude": 2.0,
+          "phase": 2.5132741229
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=2.0 INTEGER",
+    "generator": "tsmixup",
+    "seed": 2008,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 64.0,
+          "amplitude": 2.0,
+          "phase": 3.7699111843
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=2.0 INTEGER",
+    "generator": "tsmixup",
+    "seed": 2009,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 64.0,
+          "amplitude": 2.0,
+          "phase": 5.0265482457
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=3.0 INTEGER",
+    "generator": "tsmixup",
+    "seed": 2010,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 96.0,
+          "amplitude": 2.0,
+          "phase": 0.0
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=3.0 INTEGER",
+    "generator": "tsmixup",
+    "seed": 2011,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 96.0,
+          "amplitude": 2.0,
+          "phase": 1.2566370614
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=3.0 INTEGER",
+    "generator": "tsmixup",
+    "seed": 2012,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 96.0,
+          "amplitude": 2.0,
+          "phase": 2.5132741229
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=3.0 INTEGER",
+    "generator": "tsmixup",
+    "seed": 2013,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 96.0,
+          "amplitude": 2.0,
+          "phase": 3.7699111843
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=3.0 INTEGER",
+    "generator": "tsmixup",
+    "seed": 2014,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 96.0,
+          "amplitude": 2.0,
+          "phase": 5.0265482457
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=4.0 INTEGER",
+    "generator": "tsmixup",
+    "seed": 2015,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 128.0,
+          "amplitude": 2.0,
+          "phase": 0.0
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=4.0 INTEGER",
+    "generator": "tsmixup",
+    "seed": 2016,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 128.0,
+          "amplitude": 2.0,
+          "phase": 1.2566370614
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=4.0 INTEGER",
+    "generator": "tsmixup",
+    "seed": 2017,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 128.0,
+          "amplitude": 2.0,
+          "phase": 2.5132741229
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=4.0 INTEGER",
+    "generator": "tsmixup",
+    "seed": 2018,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 128.0,
+          "amplitude": 2.0,
+          "phase": 3.7699111843
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=4.0 INTEGER",
+    "generator": "tsmixup",
+    "seed": 2019,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 128.0,
+          "amplitude": 2.0,
+          "phase": 5.0265482457
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=5.0 INTEGER",
+    "generator": "tsmixup",
+    "seed": 2020,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 160.0,
+          "amplitude": 2.0,
+          "phase": 0.0
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=5.0 INTEGER",
+    "generator": "tsmixup",
+    "seed": 2021,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 160.0,
+          "amplitude": 2.0,
+          "phase": 1.2566370614
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=5.0 INTEGER",
+    "generator": "tsmixup",
+    "seed": 2022,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 160.0,
+          "amplitude": 2.0,
+          "phase": 2.5132741229
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=5.0 INTEGER",
+    "generator": "tsmixup",
+    "seed": 2023,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 160.0,
+          "amplitude": 2.0,
+          "phase": 3.7699111843
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=5.0 INTEGER",
+    "generator": "tsmixup",
+    "seed": 2024,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 160.0,
+          "amplitude": 2.0,
+          "phase": 5.0265482457
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=6.0 INTEGER",
+    "generator": "tsmixup",
+    "seed": 2025,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 192.0,
+          "amplitude": 2.0,
+          "phase": 0.0
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=6.0 INTEGER",
+    "generator": "tsmixup",
+    "seed": 2026,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 192.0,
+          "amplitude": 2.0,
+          "phase": 1.2566370614
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=6.0 INTEGER",
+    "generator": "tsmixup",
+    "seed": 2027,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 192.0,
+          "amplitude": 2.0,
+          "phase": 2.5132741229
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=6.0 INTEGER",
+    "generator": "tsmixup",
+    "seed": 2028,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 192.0,
+          "amplitude": 2.0,
+          "phase": 3.7699111843
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=6.0 INTEGER",
+    "generator": "tsmixup",
+    "seed": 2029,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 192.0,
+          "amplitude": 2.0,
+          "phase": 5.0265482457
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=7.0 INTEGER",
+    "generator": "tsmixup",
+    "seed": 2030,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 224.0,
+          "amplitude": 2.0,
+          "phase": 0.0
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=7.0 INTEGER",
+    "generator": "tsmixup",
+    "seed": 2031,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 224.0,
+          "amplitude": 2.0,
+          "phase": 1.2566370614
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=7.0 INTEGER",
+    "generator": "tsmixup",
+    "seed": 2032,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 224.0,
+          "amplitude": 2.0,
+          "phase": 2.5132741229
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=7.0 INTEGER",
+    "generator": "tsmixup",
+    "seed": 2033,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 224.0,
+          "amplitude": 2.0,
+          "phase": 3.7699111843
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=7.0 INTEGER",
+    "generator": "tsmixup",
+    "seed": 2034,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 224.0,
+          "amplitude": 2.0,
+          "phase": 5.0265482457
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=1.50 half",
+    "generator": "tsmixup",
+    "seed": 2035,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 48.0,
+          "amplitude": 2.0,
+          "phase": 0.0
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=1.50 half",
+    "generator": "tsmixup",
+    "seed": 2036,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 48.0,
+          "amplitude": 2.0,
+          "phase": 2.0943951024
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=1.50 half",
+    "generator": "tsmixup",
+    "seed": 2037,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 48.0,
+          "amplitude": 2.0,
+          "phase": 4.1887902048
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=2.50 half",
+    "generator": "tsmixup",
+    "seed": 2038,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 80.0,
+          "amplitude": 2.0,
+          "phase": 0.0
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=2.50 half",
+    "generator": "tsmixup",
+    "seed": 2039,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 80.0,
+          "amplitude": 2.0,
+          "phase": 2.0943951024
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=2.50 half",
+    "generator": "tsmixup",
+    "seed": 2040,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 80.0,
+          "amplitude": 2.0,
+          "phase": 4.1887902048
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=3.50 half",
+    "generator": "tsmixup",
+    "seed": 2041,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 112.0,
+          "amplitude": 2.0,
+          "phase": 0.0
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=3.50 half",
+    "generator": "tsmixup",
+    "seed": 2042,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 112.0,
+          "amplitude": 2.0,
+          "phase": 2.0943951024
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=3.50 half",
+    "generator": "tsmixup",
+    "seed": 2043,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 112.0,
+          "amplitude": 2.0,
+          "phase": 4.1887902048
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=4.50 half",
+    "generator": "tsmixup",
+    "seed": 2044,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 144.0,
+          "amplitude": 2.0,
+          "phase": 0.0
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=4.50 half",
+    "generator": "tsmixup",
+    "seed": 2045,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 144.0,
+          "amplitude": 2.0,
+          "phase": 2.0943951024
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=4.50 half",
+    "generator": "tsmixup",
+    "seed": 2046,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 144.0,
+          "amplitude": 2.0,
+          "phase": 4.1887902048
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=5.50 half",
+    "generator": "tsmixup",
+    "seed": 2047,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 176.0,
+          "amplitude": 2.0,
+          "phase": 0.0
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=5.50 half",
+    "generator": "tsmixup",
+    "seed": 2048,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 176.0,
+          "amplitude": 2.0,
+          "phase": 2.0943951024
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=5.50 half",
+    "generator": "tsmixup",
+    "seed": 2049,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 176.0,
+          "amplitude": 2.0,
+          "phase": 4.1887902048
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=6.50 half",
+    "generator": "tsmixup",
+    "seed": 2050,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 208.0,
+          "amplitude": 2.0,
+          "phase": 0.0
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=6.50 half",
+    "generator": "tsmixup",
+    "seed": 2051,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 208.0,
+          "amplitude": 2.0,
+          "phase": 2.0943951024
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=6.50 half",
+    "generator": "tsmixup",
+    "seed": 2052,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 208.0,
+          "amplitude": 2.0,
+          "phase": 4.1887902048
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=7.50 half",
+    "generator": "tsmixup",
+    "seed": 2053,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 240.0,
+          "amplitude": 2.0,
+          "phase": 0.0
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=7.50 half",
+    "generator": "tsmixup",
+    "seed": 2054,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 240.0,
+          "amplitude": 2.0,
+          "phase": 2.0943951024
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=7.50 half",
+    "generator": "tsmixup",
+    "seed": 2055,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 240.0,
+          "amplitude": 2.0,
+          "phase": 4.1887902048
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=7.78 fill",
+    "generator": "tsmixup",
+    "seed": 2056,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 249.0,
+          "amplitude": 2.0,
+          "phase": 0.057872271
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=3.43 fill",
+    "generator": "tsmixup",
+    "seed": 2057,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 109.6413,
+          "amplitude": 2.0,
+          "phase": 3.3511772607
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=1.15 fill",
+    "generator": "tsmixup",
+    "seed": 2058,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 36.7836,
+          "amplitude": 2.0,
+          "phase": 1.1910845381
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=3.56 fill",
+    "generator": "tsmixup",
+    "seed": 2059,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 114.0421,
+          "amplitude": 2.0,
+          "phase": 2.0113730764
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=6.56 fill",
+    "generator": "tsmixup",
+    "seed": 2060,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 209.8818,
+          "amplitude": 2.0,
+          "phase": 3.559104896
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=1.88 fill",
+    "generator": "tsmixup",
+    "seed": 2061,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 60.2545,
+          "amplitude": 2.0,
+          "phase": 2.4619591745
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=0.78 fill",
+    "generator": "tsmixup",
+    "seed": 2062,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 25.0481,
+          "amplitude": 2.0,
+          "phase": 2.8839923374
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=1.36 fill",
+    "generator": "tsmixup",
+    "seed": 2063,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 43.6293,
+          "amplitude": 2.0,
+          "phase": 0.3170429245
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=1.67 fill",
+    "generator": "tsmixup",
+    "seed": 2064,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 53.4088,
+          "amplitude": 2.0,
+          "phase": 1.1499197655
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=5.58 fill",
+    "generator": "tsmixup",
+    "seed": 2065,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 178.5872,
+          "amplitude": 2.0,
+          "phase": 5.289785962
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=3.41 fill",
+    "generator": "tsmixup",
+    "seed": 2066,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 109.1523,
+          "amplitude": 2.0,
+          "phase": 3.2162458634
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=0.69 fill",
+    "generator": "tsmixup",
+    "seed": 2067,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 22.1142,
+          "amplitude": 2.0,
+          "phase": 5.5613585656
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=2.56 fill",
+    "generator": "tsmixup",
+    "seed": 2068,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 81.7695,
+          "amplitude": 2.0,
+          "phase": 5.3865810526
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=7.66 fill",
+    "generator": "tsmixup",
+    "seed": 2069,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 245.0882,
+          "amplitude": 2.0,
+          "phase": 1.2137227531
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=6.65 fill",
+    "generator": "tsmixup",
+    "seed": 2070,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 212.8156,
+          "amplitude": 2.0,
+          "phase": 2.510740989
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=1.58 fill",
+    "generator": "tsmixup",
+    "seed": 2071,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 50.4749,
+          "amplitude": 2.0,
+          "phase": 3.3035624899
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=4.63 fill",
+    "generator": "tsmixup",
+    "seed": 2072,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 148.2705,
+          "amplitude": 2.0,
+          "phase": 0.6127057554
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=7.35 fill",
+    "generator": "tsmixup",
+    "seed": 2073,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 235.3086,
+          "amplitude": 2.0,
+          "phase": 0.5363085812
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=6.62 fill",
+    "generator": "tsmixup",
+    "seed": 2074,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 211.8377,
+          "amplitude": 2.0,
+          "phase": 5.28721598
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=0.63 fill",
+    "generator": "tsmixup",
+    "seed": 2075,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 20.1583,
+          "amplitude": 2.0,
+          "phase": 5.1943948714
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=2.13 fill",
+    "generator": "tsmixup",
+    "seed": 2076,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 68.0782,
+          "amplitude": 2.0,
+          "phase": 2.4082780945
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=1.41 fill",
+    "generator": "tsmixup",
+    "seed": 2077,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 45.0962,
+          "amplitude": 2.0,
+          "phase": 4.4396024936
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=1.64 fill",
+    "generator": "tsmixup",
+    "seed": 2078,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 52.4309,
+          "amplitude": 2.0,
+          "phase": 3.2542697064
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=3.84 fill",
+    "generator": "tsmixup",
+    "seed": 2079,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 122.8437,
+          "amplitude": 2.0,
+          "phase": 4.6976456102
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=0.75 fill",
+    "generator": "tsmixup",
+    "seed": 2080,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 24.0701,
+          "amplitude": 2.0,
+          "phase": 1.9803664108
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=5.17 fill",
+    "generator": "tsmixup",
+    "seed": 2081,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 165.3848,
+          "amplitude": 2.0,
+          "phase": 2.9784574268
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=6.10 fill",
+    "generator": "tsmixup",
+    "seed": 2082,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 195.2124,
+          "amplitude": 2.0,
+          "phase": 5.6106100971
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=0.20 fill",
+    "generator": "tsmixup",
+    "seed": 2083,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 6.4669,
+          "amplitude": 2.0,
+          "phase": 5.1311260251
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=4.82 fill",
+    "generator": "tsmixup",
+    "seed": 2084,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 154.1383,
+          "amplitude": 2.0,
+          "phase": 1.9475597122
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=3.27 fill",
+    "generator": "tsmixup",
+    "seed": 2085,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 104.7515,
+          "amplitude": 2.0,
+          "phase": 5.5403310995
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=4.39 fill",
+    "generator": "tsmixup",
+    "seed": 2086,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 140.4469,
+          "amplitude": 2.0,
+          "phase": 2.5052249631
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=5.84 fill",
+    "generator": "tsmixup",
+    "seed": 2087,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 186.8998,
+          "amplitude": 2.0,
+          "phase": 4.2875196434
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=0.58 fill",
+    "generator": "tsmixup",
+    "seed": 2088,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 18.6914,
+          "amplitude": 2.0,
+          "phase": 4.4705526388
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=4.60 fill",
+    "generator": "tsmixup",
+    "seed": 2089,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 147.2926,
+          "amplitude": 2.0,
+          "phase": 2.5238610949
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=1.29 fill",
+    "generator": "tsmixup",
+    "seed": 2090,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 41.1844,
+          "amplitude": 2.0,
+          "phase": 5.1967836559
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=0.71 fill",
+    "generator": "tsmixup",
+    "seed": 2091,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 22.6032,
+          "amplitude": 2.0,
+          "phase": 2.9238910714
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=1.59 fill",
+    "generator": "tsmixup",
+    "seed": 2092,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 50.9639,
+          "amplitude": 2.0,
+          "phase": 6.0361851374
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=5.26 fill",
+    "generator": "tsmixup",
+    "seed": 2093,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 168.3186,
+          "amplitude": 2.0,
+          "phase": 5.8854529841
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=1.07 fill",
+    "generator": "tsmixup",
+    "seed": 2094,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 34.3387,
+          "amplitude": 2.0,
+          "phase": 5.6565344416
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=7.41 fill",
+    "generator": "tsmixup",
+    "seed": 2095,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 237.2645,
+          "amplitude": 2.0,
+          "phase": 5.7073531202
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=0.28 fill",
+    "generator": "tsmixup",
+    "seed": 2096,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 8.9118,
+          "amplitude": 2.0,
+          "phase": 0.9239206969
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=2.77 fill",
+    "generator": "tsmixup",
+    "seed": 2097,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 88.6152,
+          "amplitude": 2.0,
+          "phase": 4.0736032982
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=5.12 fill",
+    "generator": "tsmixup",
+    "seed": 2098,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 163.9178,
+          "amplitude": 2.0,
+          "phase": 4.6565599892
+        }
+      ]
+    }
+  },
+  {
+    "_note": "cpp=3.92 fill",
+    "generator": "tsmixup",
+    "seed": 2099,
+    "params": {
+      "K": 10,
+      "alpha": 1.5,
+      "l_min": 576,
+      "l_max": 576,
+      "fs": 512,
+      "P": 16,
+      "t_lengths": [
+        288,
+        432,
+        576
+      ],
+      "inject": [
+        {
+          "freq_hz": 125.2886,
+          "amplitude": 2.0,
+          "phase": 3.3222918307
+        }
+      ]
+    }
+  }
 ]
