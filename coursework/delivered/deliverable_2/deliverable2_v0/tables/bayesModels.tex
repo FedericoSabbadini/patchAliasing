@@ -1,17 +1,23 @@
-\begin{table}[t]
+\begin{table*}[t]
     \centering
     \small
-    \begin{tabular}{@{}llll@{}}
+    \begin{tabular}{@{}lllll@{}}
         \toprule
-        \textbf{Model} & \textbf{Hypothesis} & \textbf{Estimand} & \textbf{Input} \\
+        \textbf{Model} & \textbf{Claim} & \textbf{Estimand} & \textbf{Predicts} & \textbf{Input} \\
         \midrule
-        A & $H1$ behavioural     & $e^{\bar\beta}$: recovery at a lock / at its controls & \texttt{contrasts} \\
-        B & $H1$ representational & $e^{\theta_{lock}}$: codelength at a lock / elsewhere & \texttt{mdl\_cells} \\
-        C & $H2$                 & $\sigma_\phi$: spread of the deficit across phase & \texttt{contrasts} \\
-        D1 & $H3$ location       & which grid the sites lie on (LOO) & \texttt{collapse} \\
-        D2 & $H3$ movement       & $\kappa_S$: slope of measured on predicted spacing & \texttt{sites} \\
+        A  & $H1$ behavioural      & $e^{\bar\beta}$: recovery at a lock / at its controls   & $<1$        & \texttt{contrasts} \\
+        B  & $H1$ representational & $e^{\theta_{lock}}$: codelength at a lock / elsewhere   & $>1$        & \texttt{mdl\_cells} \\
+        C  & $H2$                  & $\sigma_\phi$: spread of the deficit across phase       & $\approx 0$ & \texttt{contrasts} \\
+        D1 & $H3$ location         & $\theta_S,\theta_P$: dip depth on each grid, by LOO     & both $<0$   & \texttt{collapse} \\
+        D2 & $H3a$ stride branch   & $\kappa_S$: measured / stride-predicted spacing         & $=1$        & \texttt{sites} \\
+        D2 & $H3b$ patch branch    & $\kappa_P$: measured / patch-predicted spacing          & $=1$        & \texttt{sites} \\
+        A$'$ & $M1$ mitigation     & $\delta_O$: change in the deficit per unit of overlap   & $<0$        & \texttt{contrasts} \\
         \bottomrule
     \end{tabular}
-    \caption{The five regressions that make up the analysis. For each one the table gives the hypothesis it addresses, the quantity whose posterior decides that hypothesis, and the table from the probing stage it is fitted to. They are not five views of the same measurement: $H1$ is tested twice, once on what the model forecasts (A) and once on what its representation encodes (B), while $H3$ is split into a question of location, decided by model comparison rather than by a single coefficient (D1), and a question of movement (D2). Models A and C do share an input, but not a response: A uses the phase-averaged contrast $d$ of Deliverable~1, and C uses the same measurement with the phase index kept.}
+    \caption{The models, the quantity whose posterior decides each claim, the value the claim
+    predicts, and the probing table each is fitted to. $H1$ is tested twice, on the forecast (A)
+    and on the representation (B), so that a discrepancy between them stays visible. $H3$ is split
+    into its two branches, since $\mathcal F_{lock}$ is a union and a frequency may belong to either. $M1$ is not
+    a separate model but the configuration level of A, promoted to a named estimand.}
     \label{tab:bayesModels}
-\end{table}
+\end{table*}

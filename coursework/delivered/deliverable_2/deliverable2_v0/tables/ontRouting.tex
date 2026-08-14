@@ -1,0 +1,21 @@
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{@{}L{0.23\linewidth}L{0.29\linewidth}L{0.39\linewidth}@{}}
+\toprule
+\textbf{Condition} & \textbf{Ordered route set} & \textbf{Constraint} \\
+\midrule
+Daylight surplus & PV$\to$Load; PV$\to$Battery; PV$\to$Grid & Serve demand, charge to target, then export the residual. \\
+Daylight deficit & PV$\to$Load; Battery$\to$Load; Grid$\to$Load & Discharge only to reserve; the grid covers the remaining deficit. \\
+Night, $s>s_{\mathrm{reserve}}$ & Battery$\to$Load; Grid$\to$Load & Battery serves demand to reserve; the grid supplies the residual. \\
+Night, $s\leq s_{\mathrm{reserve}}$ & Grid$\to$Load; if $s<s_{\mathrm{reserve}}$, Grid$\to$Battery & Supply the load first; charge only below reserve and stop at reserve. \\
+Positive ramp with surplus & PV$\to$Load; PV$\to$Battery; PV$\to$Grid & NormalMode may charge beyond target, never beyond maximum SoC. \\
+Negative ramp with valid positive reference & load-serving routes; Battery$\to$Grid & Export only after serving the load, within residual discharge capacity and above reserve. \\
+Negative ramp without usable reference & ordinary surplus/deficit routes & Missing, stale, non-finite, zero, or negative reference disables export catch-up. \\
+ConservativeMode & ordinary load-first routes & Reduced battery cap; target/reserve bounds; no ramp extensions. \\
+SafeMode & Grid$\to$Load when observed & Battery Hold; grid Balance; isolate PV only for inverter trip. \\
+\bottomrule
+\end{tabular}
+\caption{Routing matrix for the seven admissible transfer directions.}
+\label{tab:routing}
+\end{table}

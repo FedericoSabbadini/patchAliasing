@@ -1,0 +1,18 @@
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{@{}L{0.29\linewidth}L{0.63\linewidth}@{}}
+\toprule
+\textbf{Owner} & \textbf{Data properties} \\
+\midrule
+\pv{SystemObservation} & \pv{pvPowerW}, \pv{powerRampRateWPerS}, \pv{loadDemandW}, optional \pv{gridExchangeReferenceW}, \pv{tiltedIrradianceWm2}, \pv{horizontalIrradianceWm2}, \pv{airTemperatureC}, \pv{windSpeedMs}, \pv{windDirectionDeg}, \pv{batterySoC}, \pv{observationTimestamp}, \pv{pvPowerValid}, \pv{tiltedIrradianceValid}, \pv{batterySoCValid}, and \pv{loadDemandValid}. \\
+\pv{BatteryStorage} & \pv{capacityWh}, \pv{reserveSoC}, \pv{targetSoC}, \pv{maximumSoC}, \pv{maximumChargePowerW}, and \pv{maximumDischargePowerW}. \\
+\pv{TimeSeriesSignal} & \pv{signalFrequencyHz}, \pv{samplingFrequencyHz}, \pv{periodSamples}, \pv{amplitudeW}, \pv{timeSpanSeconds}, and \pv{phaseOffsetSamples}. \\
+\pv{PatchedRepresentation} & \pv{patchSize}, \pv{stride}, and derived \pv{overlapRatio}. \\
+\pv{ObservabilityAssessment} & \pv{analysisStatus}, \pv{assessmentMethod}, \pv{assessmentMetric}, \pv{strideLockingRatio}, \pv{patchLockingRatio}, \pv{lockingTolerance}, \pv{effectEstimate}, \pv{posteriorLossProbability}, \pv{credibleIntervalLower}, \pv{credibleIntervalUpper}, and \pv{assessmentTimestamp}. \\
+\pv{PowerRoutingDecision} & optional non-negative \pv{powerSetpointW}, \pv{decisionConfidence}, \pv{batteryCommand} in \{Charge, Discharge, Hold\}, \pv{pvCommand} in \{Connect, Isolate\}, and \pv{gridCommand} in \{Import, Export, Balance\}. \\
+\bottomrule
+\end{tabular}
+\caption{Quantitative property groups and units encoded by their names.}
+\label{tab:data}
+\end{table}
