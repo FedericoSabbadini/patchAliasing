@@ -46,22 +46,68 @@ for _p in (_TESTING, _SYNTHETIC):
 #  Fixed experimental setup (deliverable convention, do not change without changing the .tex)
 # --------------------------------------------------------------------------------- #
 FS = 512                    # sampling frequency [Hz]; Nyquist = 256 Hz
-CTX = 480                   # context length. Divisible by every stride in the sweep (16/12/8/24)
+CTX = 480                   # context length. Divisible by every stride in the sweep (8/12/16/20/24)
                             # so the patch grid is exact and no internal padding fakes a collapse.
 PRED = 64                   # forecast horizon (Chronos-Bolt's native prediction_length)
 BAND = (2.0, 250.0)         # analysis band, strictly inside Nyquist
 TONE_SNR = 4.0              # tone amplitude over a unit-variance background (probing convention)
 SEED = 42
 
-# The five geometries analysed. (16, 4) is deliberately absent: deliverable1.tex excludes S=4
-# because its stride-lock class has a single in-band member, so it carries no local H1 contrast.
-MODELS: list[tuple[int, int]] = [
-    (16, 16),   # official amazon/chronos-bolt-tiny
-    (16, 12),   # stride axis, overlap 0.25
-    (16, 8),    # stride axis, overlap 0.50
-    (8, 8),     # patch axis, contiguous
-    (24, 24),   # patch axis, contiguous
+# The nine geometries of tab:patchStride. All are retrained from scratch under the same budget;
+# the published amazon/chronos-bolt-tiny checkpoint is NOT part of the design (deliverable2.tex,
+# "Models and signals"). (16, 4) is deliberately absent: deliverable1.tex excludes S=4 because its
+# stride-lock class has a single in-band member, so it carries no local H1 contrast.
+#
+# S | P  decides whether a geometry can separate the two branches at all: when the stride divides
+# the patch, every stride lock c*fs/S is also a patch null k*fs/P with k = c*P/S, so the geometry
+# yields no stride-only site. Runs 2, 6 and 7 are the three that do.
+MODELS_ALL: list[tuple[int, int]] = [
+    (16, 8),    # run 1  O=0.500   S|P    identifies delta_O, kappa_P
+    (16, 12),   # run 2  O=0.250   S∤P    identifies theta_S, kappa_S, delta_O   (4 stride-only)
+    (8, 8),     # run 3  O=0.000   S|P    identifies delta_P, kappa_P
+    (24, 24),   # run 4  O=0.000   S|P    identifies delta_P
+    (16, 16),   # run 5  O=0.000   S|P    budget-matched baseline
+    (24, 16),   # run 6  O=0.333   S∤P    identifies theta_S, kappa_S, kappa_P   (4 stride-only)
+    (24, 20),   # run 7  O=0.167   S∤P    identifies theta_S, kappa_S            (8 stride-only)
+    (24, 12),   # run 8  O=0.500   S|P    identifies delta_O vs delta_P, kappa_P
+    (24, 8),    # run 9  O=0.667   S|P    identifies delta_O, kappa_P
 ]
+
+# The subset that is actually trained. Runs 6 to 9, the P=24 stride series, are uploaded after the
+# first five, so until they are on the hub the design runs on runs 1 to 5. Move a tag from PENDING
+# to MODELS as it lands; nothing else in this module or in collect.py needs changing.
+PENDING: list[tuple[int, int]] = [(24, 16), (24, 20), (24, 12), (24, 8)]
+MODELS: list[tuple[int, int]] = [m for m in MODELS_ALL if m not in PENDING]
+
+
+def design_gaps(models: list[tuple[int, int]] | None = None) -> list[str]:
+    """What the current subset of MODELS cannot identify, as plain sentences.
+
+    Worth printing rather than discovering from a degenerate posterior. A geometry supplies
+    stride-only sites only when S does not divide P; without them theta_S and kappa_S have no
+    frequency at which a loss is attributable to the stride branch alone, and the H3a estimand is
+    fitted on whatever happens to be left.
+    """
+    models = models or MODELS
+    out = []
+    so = [(P, S) for (P, S) in models if P % S != 0]
+    if not so:
+        out.append("no geometry has S not dividing P: no stride-only site exists, so theta_S and "
+                   "kappa_S (H3a) are not identified at all.")
+    elif len(so) == 1:
+        P, S = so[0]
+        out.append(f"only p{P}-s{S} supplies stride-only sites, so kappa_S (H3a) is fitted at a "
+                   f"single value of fs/S and its slope rests on one geometry.")
+    n_P = len({P for P, _ in models})
+    if n_P < 2:
+        out.append("the patch size does not vary: delta_P and kappa_P (H3b) are not identified.")
+    ov = {round((P - S) / P, 3) for P, S in models}
+    if len(ov) < 3:
+        out.append(f"only {len(ov)} distinct overlap values: delta_O (M1) rests on a short axis.")
+    pend = [m for m in MODELS_ALL if m not in models]
+    if pend:
+        out.append("not yet trained: " + ", ".join(model_tag(P, S) for P, S in pend))
+    return out
 
 GENERATORS = ("tsmixup", "kernelsynth")   # the deliverable's two synthetic corpora
 
@@ -272,32 +318,85 @@ def controls_are_clean(fk: float, delta: float, P: int, S: int, guard: float = 1
     return True
 
 
-def control_offset(S: int) -> float:
-    """The deliverable's control distance delta = 0.25 * fs / S (a quarter of the stride-lock spacing)."""
-    return 0.25 * FS / S
+def control_offset(P: int, S: int, fk: float | None = None, guard: float = 1.0,
+                   step: float = 0.05) -> float:
+    """Control distance for a lock site, per deliverable2.tex, "What enters the inference".
+
+    Deliverable 1 fixed delta = 0.25 * fs / S, a quarter of the stride-lock spacing. That rule is
+    defined from the stride alone and therefore cannot see the patch grid, and at P=16, S=12 it is
+    exactly one third of the patch-null spacing fs/P: every stride-only site then has one control
+    sitting on a patch null, and the site is discarded. All four of them are, which is the whole of
+    the stride-only evidence that geometry can supply.
+
+    The rule adopted here is the largest offset not exceeding 0.25 * fs / S that keeps BOTH
+    controls at least `guard` away from every member of F_lock. It changes nothing anywhere else in
+    the design (at every other geometry the default offset is already clean) and recovers the four
+    sites at p16-s12.
+
+    `fk=None` returns the Deliverable 1 default, for the sensitivity comparison.
+    """
+    d0 = 0.25 * FS / S
+    if fk is None:
+        return d0
+    d = d0
+    while d >= 1.0:
+        if controls_are_clean(fk, d, P, S, guard=guard):
+            return round(d, 6)
+        d -= step
+    return float("nan")          # no clean offset exists: the caller drops the site
 
 
 # --------------------------------------------------------------------------------- #
 #  3. The model wrapper, batched forecast, token collapse, [REG] capture
 # --------------------------------------------------------------------------------- #
+def load_checkpoint(P: int, S: int, device: str = "cpu", pipeline_cls=None):
+    """Resolve (P, S) to a retrained checkpoint. Returns (pipeline, label).
+
+    `chronos/testing/testing_lib.py` is the repo-wide loader, but it belongs to the Deliverable 1
+    workflow and carries two conventions this analysis does not share: it maps (16, 16) to the
+    published `amazon/chronos-bolt-tiny`, and it knows only the first five geometries of the sweep.
+    deliverable2.tex is explicit on the first, "The published chronos-bolt-tiny checkpoint is not
+    used at any point, so the P=S=16 baseline is budget-matched like the rest of the design", and
+    tab:patchStride adds four runs on the second.
+
+    Rather than change a module the Deliverable 1 notebooks still import, checkpoints are resolved
+    here: every geometry is `p{P}-s{S}-seed42`, taken from testing_lib's local weights directory
+    when there is one and otherwise from the Hugging Face sweep repo, which is what happens on
+    Colab. Local discovery is reused from testing_lib so the search path stays in one place.
+    """
+    import testing_lib as tl
+
+    if pipeline_cls is None:
+        from chronos import BaseChronosPipeline as pipeline_cls
+    ck = tl._resolve_local_ckpt(P, S)
+    if ck is not None:
+        return pipeline_cls.from_pretrained(str(ck), device_map=device), f"p{P}-s{S} (local {ck.name})"
+    sub = f"p{P}-s{S}-seed42"
+    try:
+        pipe = pipeline_cls.from_pretrained(tl.SWEEP_REPO, subfolder=sub, device_map=device)
+    except Exception as e:
+        pend = " It is one of the runs still listed in probe_lib.PENDING." if (P, S) in PENDING else ""
+        raise RuntimeError(
+            f"No checkpoint for (P={P}, S={S}). Expected subfolder '{sub}' in {tl.SWEEP_REPO}, or a "
+            f"local copy under {tl._WEIGHTS_DIR}.{pend}\n  original error: {e}") from e
+    return pipe, f"p{P}-s{S} (HF {sub})"
+
+
 class Probe:
     """A loaded Chronos-Bolt checkpoint, wrapped for batched measurement.
 
-    Model selection is delegated to `chronos/testing/testing_lib.py` so there is exactly one place
-    in the repo that maps (P, S) to a checkpoint: (16, 16) is the official
-    `amazon/chronos-bolt-tiny`, every other geometry is the retrained variant, taken from a local
-    checkpoint if one exists and otherwise pulled from the Hugging Face sweep repo (which is what
-    happens on Colab).
+    Selection goes through `load_checkpoint` above: every geometry in MODELS is a retrained variant
+    under the uniform 100k-step budget, including (16, 16), and the published
+    `amazon/chronos-bolt-tiny` is not used by this analysis.
     """
 
     def __init__(self, P: int, S: int, device: str | None = None, batch_size: int = 64):
         import torch
-        import testing_lib as tl
 
         self.torch = torch
         self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
         self.batch_size = batch_size
-        self.pipe, self.label = tl.load_pipeline(P, S, device=self.device)
+        self.pipe, self.label = load_checkpoint(P, S, device=self.device)
 
         cfg = self.pipe.model.config.chronos_config
         self.P = int(cfg["input_patch_size"])

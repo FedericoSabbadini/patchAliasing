@@ -172,7 +172,7 @@ d_i \sim \text{Student-}t_4(\mu_i,\ \sigma),
 \quad
 \mu_i = \beta_{c[i]} + u_{k[i]} + u_{b[i]},
 \quad
-\beta_c \sim \mathcal{N}\!\left(\bar\beta + \delta_O \widetilde O_c + \delta_P \widetilde{\log P_c},\ \tau\right).
+\beta_c \sim \mathcal{N}\!\left(\bar\beta + \delta_O \widetilde O_c + \delta_P \widetilde{\log P}_c,\ \tau\right).
 \end{equation}
 
 Three offsets build $\mu_i$, one per configuration, lock harmonic and background draw, so that an
@@ -187,9 +187,10 @@ parameter: $H1$ is a claim about patch-based tokenisation, not about one checkpo
 coefficient standing for the typical effect and carrying its own uncertainty. Second, each geometry weighs one unit. The number of usable triplets varies several times over
 with how many lock sites fall in band, so pooling every row into one coefficient would let the
 largest design, not the largest effect, decide the answer. Nine configurations make that level worth fitting,
-and let $\delta_O$ and $\delta_P$ be estimated together instead of confounded. The overlap enters
-as a ratio and the patch size as $\log P$, because the patch grid has spacing $f_s/P$: equal steps
-in $\log P$ are then equal ratios of spacing.
+and let $\delta_O$ and $\delta_P$ be estimated together instead of confounded. The overlap enters as a ratio and the patch size as $\log P$, because the patch grid has spacing
+$f_s/P$, so equal steps in $\log P$ are equal ratios of spacing. A tilde marks a covariate centred on the design, $\widetilde O_c=(O_c-\bar O)/0.5$ and
+$\widetilde{\log P}_c=\log P_c-\overline{\log P}$, which is what leaves $\bar\beta$ the effect at
+the average configuration instead of an extrapolation to $O=0$ and $P=1$.
 
 Model~B asks the same question of the representation, on a frequency-local prequential
 codelength: at each candidate $f_c$ a probe must separate tones at $f_c \pm 1$\,Hz from a captured

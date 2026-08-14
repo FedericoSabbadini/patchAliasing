@@ -108,12 +108,14 @@ def collect_contrasts(probe: "pl.Probe", cfg: Config) -> pd.DataFrame:
     gives each bin its own offset, which is impossible once phases have been averaged away.
     """
     P, S = probe.P, probe.S
-    delta = pl.control_offset(S)
 
-    # Only sites whose controls are themselves non-locked: at P=16,S=12 the patch null 32 Hz has
-    # its upper control sitting exactly on the first stride lock, so it is dropped rather than
-    # compared against another lock.
-    sites = [f for f in pl.f_lock(P, S) if pl.controls_are_clean(f, delta, P, S)]
+    # Per-site control offset (deliverable2.tex, "What enters the inference"): the largest offset
+    # not exceeding 0.25*fs/S that keeps BOTH controls clear of BOTH grids. A site is dropped only
+    # if no such offset exists. The Deliverable 1 rule fixed the offset at 0.25*fs/S; being defined
+    # from the stride alone it cannot see the patch grid, and at P=16,S=12 it lands one control of
+    # every stride-only site on a patch null, discarding all four.
+    offsets = {f: pl.control_offset(P, S, f) for f in pl.f_lock(P, S)}
+    sites = [f for f, d in offsets.items() if np.isfinite(d)]
 
     contexts, futures, freqs, meta = [], [], [], []
     for gen in cfg.generators:
@@ -122,14 +124,15 @@ def collect_contrasts(probe: "pl.Probe", cfg: Config) -> pd.DataFrame:
             phases = pl.phases_Sf(fk, cfg.n_phase_contrast)
             for bg_id, bg in enumerate(pool):
                 for ph_idx, ph in enumerate(phases):
-                    for role, f in (("lock", fk), ("lo", fk - delta), ("hi", fk + delta)):
+                    d_fk = offsets[fk]
+                    for role, f in (("lock", fk), ("lo", fk - d_fk), ("hi", fk + d_fk)):
                         # context and its TRUE continuation are slices of one long realisation,
                         # so the forecast target is the real future rather than a fresh draw
                         full = pl.build_context(bg, f, ph, pl.CTX + pl.PRED)
                         contexts.append(full[:pl.CTX])
                         futures.append(full[pl.CTX:])
                         freqs.append(f)
-                        meta.append(dict(generator=gen, bg_id=bg_id, f_lock=fk,
+                        meta.append(dict(generator=gen, bg_id=bg_id, f_lock=fk, delta=d_fk,
                                          phase_idx=ph_idx, phase=float(ph), role=role))
 
     if not contexts:
@@ -141,7 +144,7 @@ def collect_contrasts(probe: "pl.Probe", cfg: Config) -> pd.DataFrame:
     long = pd.DataFrame(meta)
     long["R"] = R
     long["dphase"] = dphase
-    key = ["generator", "bg_id", "f_lock", "phase_idx"]
+    key = ["generator", "bg_id", "f_lock", "delta", "phase_idx"]
     wide = long.pivot_table(index=key + ["phase"], columns="role",
                             values="R", aggfunc="first").reset_index()
     ph_lock = (long[long.role == "lock"].set_index(key)["dphase"])
@@ -157,7 +160,6 @@ def collect_contrasts(probe: "pl.Probe", cfg: Config) -> pd.DataFrame:
 
     wide["model"] = probe.tag
     wide["P"], wide["S"] = P, S
-    wide["delta"] = delta
     wide["overlap"] = (P - S) / P                # O_c of Eq. (9)
     wide["cpp"] = wide["f_lock"] * P / pl.FS     # cycles per patch
     wide["family"] = [pl.lock_family(f, P, S) for f in wide["f_lock"]]
@@ -185,11 +187,12 @@ def collect_mdl_cells(probe: "pl.Probe", cfg: Config) -> pd.DataFrame:
     indistinguishable in representation space, the labels cost more bits.
     """
     P, S = probe.P, probe.S
-    delta = pl.control_offset(S)
-    sites = [f for f in pl.f_lock(P, S) if pl.controls_are_clean(f, delta, P, S)]
+    offsets = {f: pl.control_offset(P, S, f) for f in pl.f_lock(P, S)}
+    sites = [f for f, d in offsets.items() if np.isfinite(d)]
     # exactly the frequencies the contrast design visits: every lock and both of its controls,
     # which makes the locked / non-locked split balanced 1:2 by construction
-    centers = sorted({round(f, 6) for fk in sites for f in (fk, fk - delta, fk + delta)})
+    centers = sorted({round(f, 6) for fk in sites
+                      for f in (fk, fk - offsets[fk], fk + offsets[fk])})
     locks = pl.f_lock(P, S)
 
     rows = []
@@ -323,12 +326,32 @@ def collect_collapse(probe: "pl.Probe", cfg: Config) -> pd.DataFrame:
     return out
 
 
-def derive_sites(collapse: pd.DataFrame) -> pd.DataFrame:
-    """Detected collapse sites and the two summaries the H3 movement model regresses on (Eq. 14).
+def derive_sites(collapse: pd.DataFrame, grid_step: float = 1.0) -> pd.DataFrame:
+    """Detected collapse sites, split by branch, for the H3 movement models.
 
-    Sites are detected per replicate (giving Eq. 14 its residual variance) and once more on the
+    deliverable2.tex, H3: "Every detected dip is assigned to the branch that predicts it, and sites
+    belonging to both are set aside. The fundamental of branch F is then compared with the spacing
+    that branch predicts." A row is therefore (geometry, signal mode, replicate, BRANCH) and it
+    carries the fundamental of that branch only. A single pooled spacing would be meaningless:
+    F_lock is a union, and the union of two combs has two interlaced spacings rather than one.
+
+    Sites are detected per replicate (giving the model its residual variance) and once more on the
     replicate-averaged curve, recorded as rep = -1.
+
+    **Branch assignment is a measurement, so it carries the sweep resolution.** `lock_family`
+    defaults to an exact match, which is right for a PREDICTED frequency but not guaranteed for a
+    DETECTED one: a dip read off a `grid_step`-Hz sweep, after `merge_adjacent` has averaged
+    neighbouring minima, need not land on 42.6666... exactly. Half a sweep step is the largest
+    error the grid can introduce, the same resolution argument that puts the floor into the D2
+    likelihood.
+
+    It is a guard, not a correction: on the collection to date it changes nothing, because
+    `union_grid` puts the exact predicted sites on the sweep and 252 of 255 detections landed on
+    one of them to within 1e-6. The three that did not are genuinely off-grid, dips at 32 and
+    224 Hz in p8-s8 whose nearest prediction is 32 Hz away, and excluding them from both branches
+    is the correct behaviour rather than a loss.
     """
+    tol = grid_step / 2
     rows = []
     for (model, mode), g in collapse.groupby(["model", "mode"]):
         P, S = int(g["P"].iloc[0]), int(g["S"].iloc[0])
@@ -340,12 +363,23 @@ def derive_sites(collapse: pd.DataFrame) -> pd.DataFrame:
             sites = pl.detect_collapse_sites(sub["f"].to_numpy(), sub["z"].to_numpy(),
                                              pure=(mode == "pure"))
             sites = pl.merge_adjacent(sites)
-            summary = pl.site_summary(sites)
-            rows.append(dict(model=model, P=P, S=S, mode=mode, rep=int(rep),
-                             sites=" ".join(f"{s:.3f}" for s in sites),
-                             predicted_stride=" ".join(f"{s:.3f}" for s in pl.stride_locks(S)),
-                             predicted_patch=" ".join(f"{s:.3f}" for s in pl.patch_nulls(P)),
-                             **summary))
+
+            # assign every detected site to the branch that predicts it; "both" is set aside
+            by_branch: dict[str, list[float]] = {"stride": [], "patch": []}
+            n_both = 0
+            for s in sites:
+                fam = pl.lock_family(s, P, S, tol=tol)
+                if fam == "both":
+                    n_both += 1
+                elif fam in by_branch:
+                    by_branch[fam].append(s)
+
+            for branch, members in by_branch.items():
+                rows.append(dict(model=model, P=P, S=S, mode=mode, rep=int(rep),
+                                 branch=branch,
+                                 predicted_spacing=pl.FS / (S if branch == "stride" else P),
+                                 sites=" ".join(f"{s:.3f}" for s in members),
+                                 n_ambiguous=n_both, **pl.site_summary(members)))
     return pd.DataFrame(rows)
 
 
@@ -401,7 +435,7 @@ def merge(out: Path, cfg: Config) -> dict[str, pd.DataFrame]:
         df.to_parquet(out / f"02_{table}.parquet", index=False)
 
     if "collapse" in merged:
-        sites = derive_sites(merged["collapse"])
+        sites = derive_sites(merged["collapse"], grid_step=cfg.collapse_step)
         merged["sites"] = sites
         sites.to_parquet(out / "02_sites.parquet", index=False)
 
