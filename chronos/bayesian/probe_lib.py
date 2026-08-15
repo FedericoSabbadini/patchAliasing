@@ -79,6 +79,16 @@ MODELS_ALL: list[tuple[int, int]] = [
 PENDING: list[tuple[int, int]] = [(24, 16), (24, 20), (24, 12), (24, 8)]
 MODELS: list[tuple[int, int]] = [m for m in MODELS_ALL if m not in PENDING]
 
+# Optional runtime override, so a local-only subset can be run without editing this file or the
+# notebook: PATCHALIASING_MODELS="p16-s12,p16-s8,p8-s8,p24-s24" restricts MODELS to those tags.
+# Combined with HF_HUB_OFFLINE=1 (which testing_lib.load_pipeline honours) this drives a fully
+# offline run on the local checkpoints alone.
+import os as _os
+_only = _os.environ.get("PATCHALIASING_MODELS", "").strip()
+if _only:
+    _tags = {t.strip() for t in _only.split(",") if t.strip()}
+    MODELS = [(P, S) for (P, S) in MODELS_ALL if f"p{P}-s{S}" in _tags]
+
 
 def design_gaps(models: list[tuple[int, int]] | None = None) -> list[str]:
     """What the current subset of MODELS cannot identify, as plain sentences.

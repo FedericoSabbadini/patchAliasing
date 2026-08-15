@@ -39,22 +39,35 @@ def _resolve_local_ckpt(P: int, S: int) -> Path | None:
     return cks[-1] if cks else None                              # else the highest checkpoint
 
 
-def load_pipeline(P: int, S: int, device: str = "cpu", pipeline_cls=None):
+def load_pipeline(P: int, S: int, device: str = "cpu", pipeline_cls=None,
+                   offline: bool = False):
     """Load the frozen Chronos-Bolt pipeline for geometry (P, S).
 
     Returns (pipeline, label). (16, 16) -> official; otherwise the local checkpoint if present,
     else the Hugging Face sweep variant. `pipeline_cls` defaults to chronos.BaseChronosPipeline.
+
+    When *offline* is True (or the HF_HUB_OFFLINE env var is set), every ``from_pretrained``
+    call uses ``local_files_only=True`` so no network request is attempted — the model must
+    already be in the HuggingFace cache or at a local path.
     """
+    import os
     if pipeline_cls is None:
         from chronos import BaseChronosPipeline as pipeline_cls
+    local_only = offline or os.environ.get("HF_HUB_OFFLINE", "") == "1"
     if (P, S) == (16, 16):
-        return pipeline_cls.from_pretrained(OFFICIAL_MODEL, device_map=device), "p16-s16 (official)"
+        ck = _resolve_local_ckpt(P, S)
+        if ck is not None:
+            return pipeline_cls.from_pretrained(str(ck), device_map=device), "p16-s16 (local)"
+        return (pipeline_cls.from_pretrained(OFFICIAL_MODEL, device_map=device,
+                                             local_files_only=local_only),
+                f"p16-s16 (official{', offline' if local_only else ''})")
     ck = _resolve_local_ckpt(P, S)
     if ck is not None:
         return pipeline_cls.from_pretrained(str(ck), device_map=device), f"p{P}-s{S} (local {ck.name})"
     if (P, S) in _SUBFOLDER:
-        return (pipeline_cls.from_pretrained(SWEEP_REPO, subfolder=_SUBFOLDER[(P, S)], device_map=device),
-                f"p{P}-s{S} (HF {_SUBFOLDER[(P, S)]})")
+        return (pipeline_cls.from_pretrained(SWEEP_REPO, subfolder=_SUBFOLDER[(P, S)],
+                                             device_map=device, local_files_only=local_only),
+                f"p{P}-s{S} (HF {_SUBFOLDER[(P, S)]}{', offline' if local_only else ''})")
     raise ValueError(f"No model available for (P={P}, S={S}). "
                      f"Supported: (16,16) + {sorted(_SUBFOLDER)}")
 
