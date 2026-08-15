@@ -12,7 +12,7 @@
   "p_attenuation20_prior": 0.33585,
   "p_sigma_phase_in_rope_prior": 0.2987,
   "p_kappaS_in_rope_prior": 0.0479,
-  "planned_contrast_rows": 3216,
+  "planned_contrast_rows": 6708,
   "smoke": false,
   "seed": 42
 }
