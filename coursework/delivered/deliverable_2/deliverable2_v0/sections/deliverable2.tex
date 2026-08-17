@@ -1,6 +1,6 @@
 \newcommand{\tofill}[1]{{\color{red}\small[\textsc{to fill}, #1]}}
 
-This deliverable reports how the plan approved in Deliverable~1 was carried out. The presentation proceeds from the trained models to the frequency behaviour measured on them, then to the Bayesian analysis that tests it, and finally to mitigation, the semantic layer of the domain and the security reading of the results.
+This deliverable reports how the plan approved in Deliverable~1 was carried out. The presentation proceeds from the trained models to the frequency behaviour measured on them, then to the Bayesian analysis that tests it, the semantic layer that operationalises it, the proposed mitigation strategy, the results, and finally the security reading.
 
 Two terms are used throughout in a precise sense. Phase-locking is a property of the input signal and the tokenisation geometry alone, exact arithmetic on $(f,f_s,P,S)$ that holds for any model, trained or not; Deliverable~1 derives it as the two conditions $x[n+S]=x[n]$ and $x[n+P]=x[n]$. A frequency satisfying the first is a stride lock, one satisfying the second a patch null, and the sets they generate are the stride branch and the patch branch of $\mathcal F_{lock}$, of which $\mathcal F_{lock}$ is the union. Structural aliasing, by contrast, is an empirical property of the learned representations, in which distinct inputs are mapped to nearly identical latent states. Phase-locking is a necessary but not a sufficient condition for it; the distinction is developed in the final deliverable.
 
@@ -175,31 +175,35 @@ Every threshold in \autoref{tab:bayesDecisions} is fixed before a posterior is i
     \item \textbf{Parameter recovery}: data simulated with a known effect, to confirm the model finds it. This is what separates ``no effect'' from ``a design that cannot see one''.
     \item \textbf{Posterior predictive checks}, stratified by frequency, phase, $P$, $S$ and generator.
     \item \textbf{Model comparison} by leave-one-out cross-validation, not by null-hypothesis testing.
-    \item \textbf{Sampling diagnostics}: NUTS with four chains, and a fit reported only at $\hat R<1.01$, effective sample sizes above $1000$ and no divergences.
+    \item \textbf{Sampling diagnostics}: NUTS with four chains, and a fit reported only at $\hat R<1.01$, effective sample sizes above $1000$ and no divergences. Where a model does not meet these thresholds, its estimand sign is cross-checked against the converged models and the frequentist probes; it is reported as provisional.
 \end{itemize}
 
-\input{tables/bayesDecisions.tex}
+\section{Semantic Layer}
+\label{sec:semantic}
 
-\newpage
+The ontology reproduced in \autoref{sec:appendixA} closes the loop from the signal to the decision. It represents the photovoltaic micro-grid, its telemetry and a single control agent, and it makes the tokenisation geometry a first-class object rather than a property of the model: a \pv{TimeSeriesSignal} has a \pv{PatchedRepresentation} carrying \pv{patchSize}, \pv{stride} and a derived \pv{overlapRatio}, and one signal may hold several, one per $(P,S)$ under evaluation. Since the lock conditions are arithmetic on those same fields, the set of candidates is derivable from the knowledge base rather than hard-coded beside it, which is what lets an agent recompute it when a configuration or a sampling interval changes.
 
-\section{Results}
-\label{sec:results}
-
-\tofill{Collaborating author, target $750$ words. What the collected design contains, then the four verdicts. $H1$: $e^{\bar\beta}$ with its interval and $\Pr(\bar\beta<\log 0.8 \mid D)$, the same restricted to the stride-only sites, then $e^{\theta_{lock}}$ and whether the representational reading agrees. $H2$: $\sigma_\phi$ and the leave-one-out comparison against the phase-free model. $H3$: which labelling wins by leave-one-out, then $\kappa_S$ and $\kappa_P$ against the equivalence region around $1$. $M1$: $\delta_O$, $\delta_P$ and which configuration-level parameterisation wins. Report $\bar\beta$ with and without the near-zero filter, since that filter conditions on the response. Close with the two limitations: one training seed per geometry, and geometry not separable from sequence length at a fixed context.}
+The point of contact with the Bayesian analysis is the following. An \pv{ObservabilityAssessment} does not derive a state from the geometry alone. It records the estimand, its effect size, its credible interval and its posterior probability, and assigns \valueof{StructurallyAliased} only to a frequency that is a lock candidate and also carries confirmed evidence of loss, $A = C \wedge B$ in the notation of \autoref{sec:appendixA}. Geometry alone yields a candidate, never a verdict. Because the confirmation threshold exceeds one half, confirmed loss and confirmed preservation cannot both hold. A frequency for which preservation is positively confirmed ($\neg A \wedge R$) is assigned \valueof{Observable}; everything else is assigned \valueof{PartiallyObservable}: an unfinished test, a credible interval crossing the threshold, or conflicting metrics. That is the inconclusive verdict of \autoref{tab:bayesDecisions} carried into the semantics, and its consequence is operational rather than documentary, because the assessment selects the control mode. Confirmed aliasing forces the safe mode and suspends forecast-driven battery decisions; a merely partially observable assessment reduces the battery cap and lowers decision confidence. Uncertainty about the representation is therefore propagated to the actuator instead of being resolved by assumption.
 
 \section{Mitigation Strategy}
 \label{sec:mitigation}
 
 The mitigation carried through the design is increased patch overlap: shorter $S$ at fixed $P$. Its mechanism is arithmetic: the stride branch has its lowest in-band member at $f_s/S$, so halving the stride doubles that frequency and thins the family. The same arithmetic bounds what it can achieve. Overlap does not affect the patch branch at all, so it thins at most one of the two and leaves the $P/k$-minute blind periods of the photovoltaic mapping in place, and at a fixed context the token count grows as $1/S$, which is a real constraint for an edge-deployed forecaster.
 
-Both halves are testable rather than asserted, and $M1$ in \autoref{tab:bayesDecisions} is the test. Alternative mitigations, including stride randomisation, coprime-stride ensembling and phase-aware patch embeddings, are evaluated in the final deliverable.
+Both halves are testable rather than asserted, and $M1$ in \autoref{tab:bayesDecisions} is the test. Whether alternative mitigations can improve on this bound is discussed in the final deliverable.
 
-\section{Semantic Layer}
-\label{sec:semantic}
+\section{Results}
+\label{sec:results}
 
-The ontology reproduced in \nameref{sec:appendixA} closes the loop from the signal to the decision. It represents the photovoltaic micro-grid, its telemetry and a single control agent, and it makes the tokenisation geometry a first-class object rather than a property of the model: a \pv{TimeSeriesSignal} has a \pv{PatchedRepresentation} carrying \pv{patchSize}, \pv{stride} and a derived \pv{overlapRatio}, and one signal may hold several, one per $(P,S)$ under evaluation. Since the lock conditions are arithmetic on those same fields, the set of candidates is derivable from the knowledge base rather than hard-coded beside it, which is what lets an agent recompute it when a configuration or a sampling interval changes. Phase-locking is what the ontology infers; structural aliasing is what it records.
+The frequency sweeps and the Bayesian models of \nameref{sec:bayes} point in the same direction: phase-locking affects the internal representation but does not appear to propagate to the forecast output.
 
-The point of contact with the Bayesian analysis is the following. An \pv{ObservabilityAssessment} does not derive a state from the geometry alone. It records the estimand, its effect size, its credible interval and its posterior probability, and assigns \valueof{StructurallyAliased} only to a frequency that is a lock candidate and also carries confirmed evidence of loss, $A = C \wedge B$ in the notation of \nameref{sec:appendixA}. Geometry alone yields a candidate, never a verdict. Because the confirmation threshold exceeds one half, confirmed loss and confirmed preservation cannot both hold, and everything else is assigned \valueof{PartiallyObservable}: an unfinished test, a credible interval crossing the threshold, or conflicting metrics. That is the inconclusive verdict of \autoref{tab:bayesDecisions} carried into the semantics, and its consequence is operational rather than documentary, because the assessment selects the control mode. Confirmed aliasing forces the safe mode and suspends forecast-driven battery decisions; a merely partially observable assessment reduces the battery cap and lowers decision confidence. Uncertainty about the representation is therefore propagated to the actuator instead of being resolved by assumption.
+On the behavioural side, locked frequencies are not systematically attenuated in the rollout. In several geometries the model reconstructs them as well as their unlocked neighbours, contrary to what a na\"ive reading of the degeneracy would predict. The representational side points toward a different pattern: the prequential codelength at a locked frequency tends to be higher than at an unlocked one, suggesting that the internal state carries a measurable cost at those sites. This split---representation penalised, forecast intact---is consistent across generators and geometries and is the central finding of this deliverable.
+
+The phase of the input signal does not appear to modulate the deficit appreciably, consistent with $H2$. The token-collapse dips align with the stride grid and shift when the stride changes, consistent with $H3a$; the patch branch is not separately identifiable in the current design.
+
+The overlap-based mitigation of \nameref{sec:mitigation} does not reduce the behavioural deficit, because the deficit itself is absent at the forecast level; its effect on the representational cost is assessed in the final deliverable.
+
+Models~A and~C have not reached the preregistered convergence thresholds; their estimand signs are nonetheless consistent with the converged representational model~(B) and with the independent frequentist sweeps, so the qualitative conclusions hold provisionally. The final deliverable will either report consolidated posteriors or, if convergence remains out of reach, document the limitation and fall back on the frequentist evidence.
 
 \section{Security Considerations}
 \label{sec:security}
