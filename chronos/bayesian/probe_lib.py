@@ -64,7 +64,10 @@ SEED = 42
 # the patch, every stride lock c*fs/S is also a patch null k*fs/P with k = c*P/S, so the geometry
 # yields no stride-only site. Ten of the nineteen have S ∤ P; between them they carry 68 sites.
 MODELS_ALL: list[tuple[int, int]] = [
+    (8, 4),     # O=0.500   S|P    included on user request (S=4; deliverable excludes it by design)
+    (8, 5),     # O=0.375   S∤P    included on user request (S=5; deliverable excludes it by design)
     (8, 8),     # O=0.000   S|P
+    (16, 4),    # O=0.750   S|P    included on user request (S=4; deliverable excludes it by design)
     (16, 8),    # O=0.500   S|P
     (16, 12),   # O=0.250   S∤P    ( 4 stride-only)
     (16, 15),   # O=0.062   S∤P    ( 7 stride-only)
