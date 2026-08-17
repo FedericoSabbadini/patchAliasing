@@ -1,12 +1,13 @@
 % \tofill marks the red placeholders. Delete the macro and every call before submission.
 \newcommand{\tofill}[1]{{\color{red}\small[\textsc{to fill}, #1]}}
 
-This deliverable reports how the plan approved in Deliverable~1 was carried out. Its thesis is that
-patch-based tokenisation makes certain frequencies poorly observable; that the affected set is
-fixed by the patch and the stride and splits into two branches the design keeps apart; and that the
-effect is measurable, partly mitigable by design, and representable in the semantics a control
-agent acts on. What follows runs from the observations that motivated the investigation, to the
-Bayesian analysis that tests them, to mitigation and the semantic layer.
+This deliverable reports how the plan approved in Deliverable~1 was carried out, and it is written
+as a record of what was tested and how. Its thesis is that patch-based tokenisation makes certain
+frequencies poorly observable; that the affected set is fixed by the patch and the stride and
+splits into two branches the design keeps apart; and that the effect is measurable, partly
+mitigable by design, and representable in the semantics a control agent acts on. What follows runs
+from the trained models, to the frequency behaviour measured on them, to the Bayesian analysis that
+tests it, and then to the semantic layer and the security reading of the result.
 
 \section{Phase-Locking and Structural Aliasing}
 \label{sec:terminology}
@@ -23,113 +24,159 @@ empirical property of the learned representations, in which distinct inputs are 
 identical latent states and discriminative information is lost. Phase-locking makes it possible; it
 does not make it happen.
 
-The split into two branches has a sharp experimental consequence. $H3$ makes a separate claim
-about each branch, so evidence has to be attributable to one of them, and that requires
-frequencies where only one condition holds. When $S$ divides $P$ the stride branch is contained in
-the patch branch. Every locked frequency then satisfies both, and no observation in that geometry
-can say which one produced a dip. Only $S \nmid P$ yields stride-only sites, and supplying
-them is what \autoref{tab:patchStride} is built for. The ontology of
-\autoref{sec:appendixA} encodes the same separation and refuses to assert
-\valueof{StructurallyAliased} from geometry alone.
+The split into two branches has a sharp experimental consequence. $H3$ makes a separate claim about
+each branch, so evidence has to be attributable to one of them, and that requires frequencies where
+only one condition holds. When $S$ divides $P$ the stride branch is contained in the patch branch:
+every locked frequency then satisfies both, and no observation in that geometry can say which one
+produced a dip. Only $S \nmid P$ yields stride-only sites, and supplying them is what the design of
+\autoref{tab:patchStride} is built for.
+
+\section{Models}
+\label{sec:models}
+
+\input{tables/patchStride.tex}
+
+\autoref{tab:patchStride} lists the nineteen geometries the analysis runs on. All are trained from
+scratch under the same $100$k-step budget and from the same seed, so that no comparison is
+confounded by training length, and all are published as one repository with a subfolder per
+geometry~\autocite{sabbadiniChronosBoltPatchSweep2026}. The repository also carries runs at the
+shortest strides; those are excluded here, matching Deliverable~1, because their stride-lock class
+has too few in-band members to carry a local $H1$ contrast. The published
+\texttt{chronos-bolt-tiny} checkpoint is not used at any
+point~\autocite{AmazonChronosbolttinyHugging2025}, so the $P{=}S{=}16$ baseline is budget-matched
+like the rest of the design.
+
+The design is not symmetric for its own sake; each axis identifies something. Ten runs have a
+stride grid that is not contained in their patch grid, and between them they supply the $68$
+stride-only sites, the only frequencies at which a behavioural loss is attributable to the stride
+branch alone. Six strides appear at more than one patch size, which is what identifies the patch
+branch of $H3$ and makes $\delta_P$ estimable. The overlap ratio spans $0$ to $0.75$, and three
+runs share $O=0.5$ at three different patch sizes, which is what separates an effect of the
+overlap ratio from an effect of the absolute stride. The token count in the fourth column is the
+price of that overlap: at a fixed context it grows as $1/S$, so the widest-overlap run carries
+four times the sequence length of the $P{=}S{=}32$ baseline.
+
+One run is treated differently. The probing context has to close on a whole number of strides, or
+the last patch is internally padded and the padding, not the geometry, produces the collapse. That
+holds for every stride but the one marked with a dagger, whose smallest admissible context is far
+outside the probing convention: it is swept and reported descriptively, not fitted.
+
+\input{tables/flockDomains.tex}
+
+\autoref{tab:flock} writes the two branches out geometry by geometry: the spacings, the size of
+their union, and every in-band member of each. Bold marks a frequency both branches carry, which
+makes the identifiability argument readable by eye. A row whose stride column is entirely bold has
+no frequency belonging to the stride alone; the unbolded stride entries are the sites counted in
+\autoref{tab:patchStride}.
 
 \section{Observed Frequency Behaviour}
 \label{sec:observations}
 
-\tofill{Collaborating author, target $1100$ words, ceiling $1200$. The observations that motivated
-the investigation, written before any modelling so that the hypotheses read as responses to them.
-Cover, in this order: (i) where the recovery curves lose the input frequency across
-$[2,250]\,\mathrm{Hz}$ and how the loss is distributed over the band; (ii) that the dips are not
-isolated accidents but fall on a regular comb; (iii) that the comb position changes when the
-geometry changes; (iv) that dips appear deeper where a stride lock coincides with a patch null
-than where only one of the two applies, which is the observation that suggested two distinct
-mechanisms rather than one; (v) which of these are visible in the pure-sinusoid sweep and which
-survive on TSMixup and KernelSynth backgrounds. State each as an observation with its figure, and
-do not anticipate the verdicts: the Bayesian analysis that follows exists to test them.}
+Every geometry is swept one hertz at a time over $[2,250]\,\mathrm{Hz}$ at $f_s=512$\,Hz, on a
+context of $480$ samples with a $64$-step horizon. The sweep grid is the uniform $1$\,Hz grid
+unioned with the exact predicted sites of every geometry, so no model is scored only where its own
+arithmetic predicts a dip and the non-integer sites are covered. Each swept frequency is measured
+three ways: the frequency the model regenerates, the amplitude it recovers relative to the injected
+one, and whether the input frequency can still be read back from the internal state by a probe.
+Locks are compared against two controls sharing the same background realisation and the same phase,
+placed at the largest offset not exceeding $0.25 f_s/S$ that keeps both clear of either branch. As
+in Deliverable~1 the tone rides on $100$ TSMixup and $100$ KernelSynth signals normalised to unit
+variance, and the pure-sinusoid sweep is kept as the exact-degeneracy reference.
 
-\autoref{fig:sweepP16} and \autoref{fig:sweepEqual} are the sweep those observations are read
-from, grouped by patch length. Each row shows the same sweep twice. The left panel is behavioural,
-plotting the frequency the model generates against the frequency it was given, so a point on the
-diagonal is a tone rebuilt correctly and a flat stretch is a set of distinct inputs collapsing onto
-one output. The right panel is representational, asking whether the input frequency can still be read back
-from the internal state. The two disagree, and the disagreement is informative. A tone can remain
-readable in the representation and still be regenerated at the wrong frequency, which is a failure
-of the decoder and not of the tokenisation.
+Lorem ipsum incididunt aliqua tenetur nostrud fuga labore saepe culpa do veniam quo optio. Est
+quis maiores cumque et doloribus ea deserunt et libero. Officia tempor alias duis deleniti optio
+irure sapiente ex. Dolores perferendis pariatur ullamco repellat sint quidem nostrud reiciendis
+dolore doloribus et proident rerum hic nihil molestias assumenda. Possimus dolorum corrupti at
+pariatur laborum ad corrupti itaque debitis officia placeat voluptatum aliqua ex voluptates
+optio cillum. Reprehenderit officiis optio eiusmod enim alias repellat molestias officia
+mollitia rerum possimus magna quis. Temporibus dolore et quas placeat praesentium expedita
+deserunt consectetur voluptas animi eu aliquip. Et qui voluptatum consequat at libero nam rerum
+ad cillum placeat tempore reiciendis blanditiis aute impedit. Blanditiis eligendi laborum
+facilis anim reprehenderit minim nulla reprehenderit anim anim sit aut pariatur iusto
+praesentium ipsum. Optio hic harum doloribus excepturi commodo voluptates ut possimus
+perferendis nam. Tempore nam ullamco quibusdam tempore et sint magna sunt minus esse nisi
+officia ut ullamco. Asperiores reprehenderit tenetur exercitation fuga adipiscing aliqua sunt
+rerum. Vero deserunt fuga temporibus ea aliquip aut assumenda autem quibusdam quas. Irure
+ullamco officia iusto autem esse repudiandae consectetur proident earum. In delectus adipiscing
+earum corrupti quis accusamus repudiandae fuga cillum laborum deserunt hic sapiente. Provident
+deserunt occaecat est tempore mollit non repudiandae debitis laborum elit elit blanditiis
+repellendus accusamus occaecat deserunt. Mollitia fuga ad officia ullamco mollit repellendus
+cupidatat culpa proident quibusdam lorem autem deserunt minim ex. Non autem nulla quo similique
+veniam libero voluptas tempore minim velit eu commodo elit reprehenderit. Assumenda in
+temporibus mollitia voluptate reiciendis reiciendis consequat consectetur sit ullamco itaque
+aute quo occaecat culpa elit vero. Deleniti necessitatibus est cupiditate accusamus delectus
+optio consequat et animi omnis repudiandae. Necessitatibus consequat hic reprehenderit itaque
+eveniet amet minus pariatur ipsum reprehenderit.
 
-\begin{figure*}[p]
-    \centering
-    \includegraphics[width=0.97\textwidth]{figures/FIG_p16-s8.png}\\[10pt]
-    \includegraphics[width=0.97\textwidth]{figures/FIG_p16-s12.png}\\[10pt]
-    \includegraphics[width=0.97\textwidth]{figures/FIG_p16-s16.png}
-    \caption{The three $P{=}16$ geometries under a pure-sinusoid sweep at $1$\,Hz. The stride lengthens
-    from $S{=}8$ at the top to $S{=}16$ at the bottom while the patch grid stays fixed, so a
-    feature that moves between rows belongs to the stride branch. Left: generated against given frequency, a point on the
-    diagonal being a tone rebuilt correctly. Right: whether that frequency is still recoverable
-    from the representation, one row per probing task; green recovered, red lost, grey not covered.
-    Dashed lines mark $\mathcal F_{lock}$.}
-    \label{fig:sweepP16}
-\end{figure*}
+Lorem ipsum ex alias et cupiditate repudiandae earum alias quibusdam laboris. Labore at sint
+ducimus eiusmod exercitation saepe facere perferendis elit dolore maxime cupiditate saepe
+voluptates non ducimus. Eveniet hic autem saepe at recusandae accusamus perferendis non placeat
+aute eligendi ea nam maxime molestias. Est nihil aliqua culpa quos ea voluptate fuga irure vero.
+Assumenda officia nostrud libero aut esse deserunt esse impedit voluptates cum. Optio cupidatat
+laborum excepturi quis fuga amet culpa maiores omnis minus amet expedita provident. Atque
+voluptates dolore nisi mollit ullamco minim iusto dignissimos eiusmod pariatur dignissimos
+consequat cumque accusamus cum reprehenderit. Voluptates repellat debitis cupiditate veniam
+blanditiis labore pariatur cumque aliqua odio amet veniam accusamus minim officia magna. Ea
+possimus dolor culpa maiores eligendi odio consequat tempor itaque est nisi esse. Incididunt
+pariatur non quas dolores earum proident deleniti placeat necessitatibus nulla dignissimos
+deserunt. Vero do sit amet saepe maiores sint voluptates temporibus. Placeat laboris impedit
+debitis delectus nam saepe dolores qui mollit officia cupidatat. Aute cum deserunt ut consequat
+sit aliqua eos impedit esse labore minim facilis saepe praesentium laborum atque tempor omnis
+excepteur. Odio placeat lorem iusto fuga provident reiciendis occaecati laborum sed quas.
+Laborum pariatur lorem similique facilis minim temporibus blanditiis necessitatibus non at
+saepe. Quis iusto veniam irure tempore eiusmod nam consectetur corrupti. Anim minim earum
+voluptate distinctio cupiditate debitis reprehenderit praesentium in tempor voluptates nihil.
+Saepe aute itaque saepe asperiores amet mollit minim elit eiusmod duis dolorum ullamco rerum
+facere alias incididunt amet hic laborum. Iusto lorem possimus magna necessitatibus tenetur quis
+itaque dolore temporibus vero enim iusto id proident anim. Omnis debitis facilis enim autem
+voluptatum tempor.
 
-\begin{figure*}[p]
-    \centering
-    \includegraphics[width=0.97\textwidth]{figures/FIG_p8-s8.png}\\[10pt]
-    \includegraphics[width=0.97\textwidth]{figures/FIG_p24-s24.png}
-    \caption{The two geometries with $P{=}S$, drawn and read as in \autoref{fig:sweepP16}. Here
-    the two branches coincide, so one set of dashed lines covers both and neither geometry can
-    attribute a dip to one of them. They vary the patch length at zero overlap, which anchors the
-    patch-size axis of the configuration-level regression.}
-    \label{fig:sweepEqual}
-\end{figure*}
+Lorem ipsum in provident eos quos asperiores duis sit quibusdam et aut odio exercitation qui
+officiis deleniti repudiandae. Voluptas assumenda assumenda ex reiciendis non quas minim
+temporibus amet deleniti omnis enim. Facere odio distinctio sunt sunt enim quis irure itaque
+iusto dolorum consequat eveniet blanditiis nisi fuga anim. Aut nam adipiscing velit lorem
+officiis facere cum quos irure eligendi deserunt rerum molestias ex provident. Cupiditate culpa
+libero ex cupidatat sit deleniti vero quidem. Nam distinctio enim dolorum nihil ducimus
+incididunt blanditiis ullamco ut. Voluptatum reprehenderit at odio quo eveniet molestias sint
+quidem nihil elit tempore maiores reiciendis proident ad incididunt nobis facere. Aute
+voluptatum aut incididunt reiciendis commodo eu repellendus eligendi officia praesentium
+corrupti eos accusamus cum est quos quibusdam. Nam ex cillum esse enim sunt necessitatibus rerum
+reiciendis officia facere similique facere nihil aute reiciendis occaecat. Quis fugiat officia
+alias quis excepturi est harum accusamus asperiores non consectetur. Nobis expedita nobis itaque
+sunt rerum dignissimos culpa et rerum blanditiis dolorum commodo necessitatibus earum qui quis
+dignissimos at expedita. Placeat impedit quas consectetur commodo sed cumque temporibus officiis
+lorem aliqua nam earum assumenda placeat. Laboris deserunt voluptate reprehenderit recusandae
+laboris omnis minim maiores eiusmod lorem commodo. Asperiores do quos commodo vero earum quo
+nisi exercitation aliqua corrupti itaque. Occaecat distinctio accusamus deserunt lorem dolor
+tenetur quos omnis blanditiis molestias laborum temporibus itaque id reiciendis at elit. Dolores
+labore consectetur occaecat rerum optio ad eos mollit cumque harum mollit debitis sed culpa.
+Optio dolorum libero cupidatat ipsum deleniti.
 
-\subsection{Measured summary}
-The empirical core, computed from the trained models by \texttt{make\_tables.py}: \autoref{tab:flock} gives the phase-lock frequency families and the stride mitigation, \autoref{tab:recon} the tone-by-tone reconstruction of the baseline (octave-aligned cpp are rebuilt while $cpp{=}3$ is aliased onto $128$\,Hz), and \autoref{tab:verdicts} the per-geometry $H1$/$H2$/$H3$ readings.
+Lorem ipsum proident debitis non quas occaecat anim assumenda officia iusto atque laboris
+debitis excepteur deserunt aut eligendi labore in. Ut culpa adipiscing irure eligendi ut et
+excepteur nam facere molestias nisi ad cillum provident. Excepteur itaque assumenda sed quas
+rerum quidem provident maxime eu laboris lorem. Blanditiis ad mollitia optio ea perferendis sunt
+facilis laborum quas. Veniam incididunt temporibus cupidatat quidem sapiente placeat occaecat
+occaecati fuga temporibus elit nobis at cum. Rerum sed voluptas dolore et eos occaecat dolore
+culpa. Dignissimos similique tempor iusto excepturi ducimus corrupti lorem dolore adipiscing
+anim laboris temporibus assumenda. Vero impedit debitis consequat rerum pariatur dolor quos
+reprehenderit id cupiditate excepturi omnis dolorum ad. Cupidatat nam velit at soluta dolore sed
+quibusdam maiores delectus cupiditate esse nihil ullamco aliqua iusto minim. Nostrud optio rerum
+placeat fugiat anim duis eligendi omnis id tenetur ea. Atque blanditiis asperiores odio quidem
+eos accusamus cupidatat minus at excepteur laborum id. Praesentium sint cupiditate dolore libero
+vero laborum saepe itaque anim exercitation. Voluptas do ullamco ipsum temporibus anim placeat
+quidem eiusmod atque anim ex incididunt sint occaecat enim quidem voluptates nulla. Accusamus
+ipsum laboris mollitia qui do harum officia irure tempor proident eos do proident dolor
+cupiditate. Quidem excepteur quas enim proident sed debitis reiciendis quibusdam dolore soluta
+exercitation libero reiciendis voluptate. Hic quis esse libero dignissimos soluta praesentium
+dolores eligendi ut quas asperiores laborum eligendi.
 
-\input{tables.tex}
-
-\section{Data Collection and Probing}
-\label{sec:collection}
-
-\input{tables/patchStride.tex}
-
-\subsection{Models and signals}
-\autoref{tab:patchStride} lists the nine geometries, all trained from scratch under the same
-$100$k-step budget so that no comparison is confounded by training length. The design is not
-symmetric for its own sake. Three runs have a stride grid that is not contained in their patch grid: $P{=}16,S{=}12$ and
-$P{=}24$ with $S{=}16$ and $S{=}20$. Between them they supply the sixteen stride-only sites, the
-only frequencies at which a behavioural loss is attributable to the stride branch alone.
-The rest make the patch size vary at fixed stride, which identifies $H3b$, and extend the overlap
-range to $0.667$ with two different patch sizes at the same overlap, which separates an effect of
-the overlap ratio from an effect of the absolute stride. Every result reported here comes from
-these nine runs. The published \texttt{chronos-bolt-tiny} checkpoint is not used at any point, so
-the $P{=}S{=}16$ baseline is budget-matched like the rest of the design.
-
-Each context is $480$ samples at $f_s{=}512$\,Hz with a $64$-step horizon over
-$[2,250]\,\mathrm{Hz}$. We use $480$ because every stride in the design divides it, so the patch grid closes exactly. The
-$512$ of the probing convention would leave $S{=}12$, $S{=}20$ and $S{=}24$ with a padded last
-patch, and that artefact could not be told apart from the effect under test. As in Deliverable~1 we use $100$ TSMixup and $100$ KernelSynth signals, each normalised to
-unit variance and carrying an injected tone of known frequency and phase: the corpus supplies
-realism, the tone supplies the known quantity.
-
-\subsection{Frequency in dimensionless units}
-Both lock conditions depend on frequency only through the cycles per stride and the cycles per
-patch, $\rho_S=fS/f_s$ and $\rho_P=fP/f_s$, and read exactly $\rho_S\in\mathbb{N}$ and
-$\rho_P\in\mathbb{N}$. Results are reported in these units so that they carry to any sampling
-rate, and \autoref{sec:appendixA} uses the same two ratios. The mapping to the one-minute
-photovoltaic telemetry is then immediate: a patch of $P$ samples spans $P$ minutes, and the blind
-periods are $P/k$ and $S/c$ minutes, so no synthetic frequency in hertz is carried across.
-
-\subsection{What enters the inference}
-Two rules sit between the collected measurements and the models. The first protects the controls. A control on a member of $\mathcal F_{lock}$ compares a lock
-against a lock and biases the contrast towards zero. Deliverable~1 fixed the offset at $0.25
-f_s/S$; we take instead the largest offset not exceeding it that keeps both controls one sweep
-step clear of either branch. The change matters. At $P{=}16,S{=}12$ the fixed offset is exactly
-one third of the patch-null spacing, so every stride-only site there has one control on a patch
-null and the fixed rule discards all four; any offset below $9.7$\,Hz keeps them. An offset defined from the stride alone cannot
-see the patch grid.
-
-The second rule drops a contrast whose recovery is near zero at the lock and at both of its
-controls, since a ratio of two noise floors says nothing about $H1$. It conditions on the response, which is not innocent. It removes the ties and keeps the asymmetric
-cases, so it can only push $\bar\beta$ away from zero, towards $H1$. We therefore report the fit with and without it, and
-report what it removes per geometry as a result rather than as a design parameter.
+\tofill{Collaborating author: the figure pages, from the current run of
+\texttt{reconstruction\_figures.ipynb}. One full-width page per patch size, grouping that size's
+strides so that a feature moving between rows belongs to the stride branch; then the two
+cross-geometry summaries the notebook writes last. Each caption should state what the two panels
+plot, what changes between rows, and that the dashed lines are $\mathcal F_{lock}$ and the colour
+scale is probe accuracy from chance to one.}
 
 \section{Bayesian Analysis Design}
 \label{sec:bayes}
@@ -186,8 +233,7 @@ phenomenon rather than unrelated experiments, and two things follow. First, $\ba
 parameter: $H1$ is a claim about patch-based tokenisation, not about one checkpoint, so it needs a
 coefficient standing for the typical effect and carrying its own uncertainty. Second, each geometry weighs one unit. The number of usable triplets varies several times over
 with how many lock sites fall in band, so pooling every row into one coefficient would let the
-largest design, not the largest effect, decide the answer. Nine configurations make that level worth fitting,
-and let $\delta_O$ and $\delta_P$ be estimated together instead of confounded. The overlap enters as a ratio and the patch size as $\log P$, because the patch grid has spacing
+largest design, not the largest effect, decide the answer. Nineteen configurations make that level worth fitting, and let $\delta_O$ and $\delta_P$ be estimated together instead of confounded. The overlap enters as a ratio and the patch size as $\log P$, because the patch grid has spacing
 $f_s/P$, so equal steps in $\log P$ are equal ratios of spacing. A tilde marks a covariate centred on the design, $\widetilde O_c=(O_c-\bar O)/0.5$ and
 $\widetilde{\log P}_c=\log P_c-\overline{\log P}$, which is what leaves $\bar\beta$ the effect at
 the average configuration instead of an extrapolation to $O=0$ and $P=1$.
@@ -231,7 +277,7 @@ by leave-one-out separates the size of the phase effect from the evidence that i
 $H3$ was stated in Deliverable~1 as two claims, one per branch. Both are tested on the token
 collapse $z_g(f)$, the dispersion of the input-patch embeddings across patches, which is zero when
 consecutive patches are identical. All geometries share one sweep grid: a uniform $1$\,Hz sweep
-unioned with the predicted sites of all nine configurations. No geometry is therefore scored only
+unioned with the predicted sites of every configuration. No geometry is therefore scored only
 where its own theory predicts a dip, and non-integer sites such as $42.\overline{6}$\,Hz for
 $S{=}12$ are covered.
 
@@ -248,7 +294,7 @@ The logarithm makes the labels multiplicative on the per-geometry off-grid level
 predicts both $\theta_S$ and $\theta_P$ negative, so the two-label fit should win the leave-one-out
 comparison against each label alone and against neither. The labels are not rivals for the same
 dips, since a frequency may carry either or both. But the two coefficients separate only where
-exactly one label applies, which for $\theta_S$ means the three $S \nmid P$ geometries.
+exactly one label applies, which for $\theta_S$ means the ten $S \nmid P$ geometries.
 
 The second question is whether the dips move. A good fit above is still compatible with dips that
 happen to sit on a fixed grid, so each branch is checked against its own scaling law. Every detected dip is assigned to the branch that predicts it, and sites belonging to both are set
@@ -269,11 +315,11 @@ posterior degenerates.
 \subsubsection{$H3a$}
 The stride branch. $H3a$ predicts $\kappa_S=1$: the stride sites track $f_s/S$ one for one, so a
 site that stays put while $S$ changes refutes it. It is identified by the series at fixed $P$,
-which the design supplies at $P{=}16$ and at $P{=}24$.
+which the design supplies at every patch size in the table.
 
 \subsubsection{$H3b$}
 The patch branch. $H3b$ predicts $\kappa_P=1$ in the same way. It is identified by the pairs that
-share a stride and differ in patch size, which the design supplies at $S{=}8$, $12$ and $16$.
+share a stride and differ in patch size, which the design supplies at six distinct strides.
 
 \subsection{Decisions and validation}
 Every threshold in \autoref{tab:bayesDecisions} was fixed before a posterior was inspected, and
@@ -289,31 +335,99 @@ $1000$, and no divergences.
 \label{sec:mitigation}
 
 The mitigation carried through the design is increased patch overlap, that is a shorter $S$ at
-fixed $P$. Its mechanism is arithmetic rather than empirical: the stride branch has its lowest
-in-band member at $f_s/S$, so halving the stride doubles that frequency and thins the family, from
-seven in-band stride locks at $S{=}16$ to five at $S{=}12$ and three at $S{=}8$.
+fixed $P$. Its mechanism is arithmetic: the stride branch has its lowest in-band member at $f_s/S$,
+so halving the stride doubles that frequency and thins the family. The same arithmetic bounds what
+it can achieve. Overlap does not touch the patch branch at all, so it thins at best one of the two
+and leaves the $P/k$-minute blind periods of the photovoltaic mapping in place, and at a fixed
+context the token count grows as $1/S$, which is a real constraint for an edge-deployed forecaster.
+Both halves are testable rather than asserted, and $M1$ in \autoref{tab:bayesDecisions} is how.
+Alternative mitigations, including stride randomisation, coprime-stride ensembling and phase-aware
+patch embeddings, are evaluated in the final deliverable.
 
-The same arithmetic bounds what the mitigation can achieve, and a claim of robustness has to say
-so. Overlap does not touch the patch branch at all. The nulls at $\rho_P\in\mathbb{N}$ depend on $P$
-alone and are unchanged in number and position, so overlap thins at best one of the two branches
-and leaves the $P/k$-minute blind periods of the photovoltaic mapping in place. It is also not
-free. At a fixed context the token count grows as $1/S$, so $S{=}8$ at $P{=}16$ doubles the
-sequence length and roughly quadruples the attention cost against the $P{=}S{=}16$ baseline, which
-is a real constraint for an edge-deployed forecaster.
+\section{Results}
+\label{sec:results}
 
-Both halves of that argument are testable rather than asserted, and $M1$ in
-\autoref{tab:bayesDecisions} is how. A negative $\delta_O$ says the deficit falls as overlap rises;
-the leave-one-out half asks whether what varies between geometries is the overlap ratio, the
-absolute stride, or the patch size, three descriptions that the two runs sharing $O=0.5$ at
-different patch sizes make distinguishable. Alternative and complementary mitigations, including stride
-randomisation, coprime-stride ensembling and phase-aware patch embeddings, are evaluated in the
-final deliverable.
+Lorem ipsum cupidatat nam cum proident ipsum quo velit cumque aliquip quis cum fuga omnis.
+Consequat sit ut maiores irure libero veniam repellat harum saepe eu. Mollitia praesentium esse
+recusandae eu magna laboris expedita officiis cupidatat quos. Tempor quibusdam molestias ut
+distinctio veniam esse officia cum cupidatat temporibus. Doloribus qui eiusmod tempore
+repudiandae velit expedita laborum ea reprehenderit at. Occaecat eiusmod perferendis do
+occaecati ex distinctio possimus reiciendis dolores optio dolores at cumque distinctio harum
+placeat necessitatibus minus nulla. Lorem officiis assumenda id placeat omnis nulla temporibus
+tempore. Magna commodo laborum impedit fuga quis maxime saepe eveniet eiusmod. Consequat minim
+molestias eveniet ad ut saepe rerum duis. Dolore nisi occaecat consequat officiis voluptatum
+cillum officia dolore. Vero velit occaecati ducimus possimus irure eos necessitatibus autem sunt
+iusto saepe id excepturi. Do cupidatat pariatur cum esse blanditiis cupiditate rerum eu iusto
+aliquip earum incididunt dolorum. Alias recusandae ullamco vero tenetur nam quidem iusto rerum
+harum in dolorum provident ad maxime mollit. Incididunt atque repudiandae vero quas molestias
+lorem sed officia reprehenderit deleniti. Impedit eligendi voluptates fuga incididunt consequat
+officiis mollit tempor consectetur ut lorem asperiores animi quos laboris recusandae laborum.
+Deserunt nobis quos duis proident fuga temporibus velit duis sit laborum reprehenderit facere
+nostrud dolore in dignissimos. Iusto dolor labore perferendis mollitia maxime repudiandae
+debitis at cillum lorem tempor et hic adipiscing. Excepteur id velit labore ullamco sit maiores
+cupidatat irure nobis non repudiandae saepe eligendi fugiat. Quas dolore corrupti incididunt
+autem tenetur ipsum rerum quo assumenda ad facere fugiat deserunt ullamco accusamus anim. Do ea
+similique iusto ut odio maiores quo recusandae iusto atque qui minim saepe sit eu accusamus.
+
+Lorem ipsum cupiditate occaecat distinctio provident est facilis tenetur repellendus repellendus
+earum. Ipsum adipiscing quo anim repellat dolores culpa nam enim doloribus eu in sed adipiscing
+nisi laboris esse deserunt irure elit. Eiusmod aute eiusmod magna tempor dolore fuga non hic.
+Dolore expedita laboris at proident proident nisi sed sed veniam voluptatum autem exercitation
+consequat exercitation proident atque excepturi culpa. Accusamus consectetur mollitia eos
+praesentium incididunt harum occaecati necessitatibus temporibus voluptatum elit nobis elit quo.
+Exercitation deserunt repellendus incididunt tenetur doloribus qui quis voluptatum eu quo lorem
+itaque non voluptatum ut ipsum. Officiis nostrud officiis excepteur debitis deserunt voluptates
+accusamus velit praesentium culpa anim rerum cillum. Ad officiis perferendis ullamco cupiditate
+laborum nostrud tempore libero veniam. Adipiscing quidem proident quos iusto nihil delectus
+necessitatibus eu facilis anim omnis commodo hic sed. Cupiditate recusandae voluptate facere
+maiores occaecati eu voluptas minus eos anim commodo similique voluptas. Id saepe occaecat odio
+quos voluptate voluptate at cupiditate recusandae mollitia esse id cupiditate sint accusamus
+ullamco cillum ullamco. Expedita reprehenderit in quos corrupti quo ducimus cupidatat laboris
+laboris blanditiis proident. Voluptas sed sit tempore quo officia necessitatibus atque voluptas
+consectetur irure eos cum ipsum laborum. Repellat optio mollit mollit pariatur ea possimus
+impedit molestias accusamus exercitation optio laborum tempore velit. Cumque quibusdam possimus
+consectetur soluta repudiandae pariatur cupiditate dolor distinctio officiis laboris do.
+Delectus qui esse non repudiandae mollitia.
+
+Lorem ipsum proident temporibus voluptates amet harum recusandae officia nobis. Possimus sunt
+excepteur nam voluptates ea laborum labore vero ducimus facilis tempore et sit enim optio optio
+animi iusto laboris. Quos tempore itaque officia nam voluptas culpa cillum consequat magna
+occaecat repellendus. Perferendis deserunt in animi nobis assumenda atque reiciendis commodo
+repellendus animi mollit odio rerum vero nihil excepteur quibusdam lorem. Blanditiis laborum
+laborum quos occaecati autem aut nihil minim dolorum voluptate quos expedita labore minim
+doloribus cupiditate aute earum deserunt. Sit dolor sunt aliqua atque vero exercitation irure
+anim excepteur facere deserunt voluptate sunt cum hic cillum quis reiciendis. Corrupti cupidatat
+debitis culpa earum ad minus aliquip alias ex iusto optio anim aute temporibus debitis alias
+labore quibusdam. Irure officiis at rerum cillum sapiente ipsum esse occaecati assumenda
+doloribus rerum atque assumenda quidem nihil. Enim pariatur dolorum elit consectetur tempor
+provident nostrud eveniet quibusdam aut irure sed culpa eligendi. Commodo culpa nostrud fuga
+officia temporibus itaque maiores sunt praesentium quo officia cumque vero maiores ut deleniti
+deleniti animi. Cum similique necessitatibus dignissimos saepe deserunt proident debitis ex
+provident occaecat excepturi corrupti commodo veniam eiusmod. Maiores cum delectus repellat
+incididunt tempore corrupti laboris ipsum tempor sint temporibus et necessitatibus delectus.
+Rerum in minim culpa eiusmod omnis fugiat exercitation pariatur do optio exercitation sit harum
+aute quas perferendis accusamus. Excepteur optio sed excepturi consectetur impedit doloribus.
+
+Lorem ipsum asperiores recusandae eiusmod ex optio cum placeat magna sit distinctio voluptate
+temporibus nobis reiciendis ullamco minim repellendus. Reprehenderit sit nihil ipsum dolor ea
+veniam qui ea consequat repellendus amet. Asperiores laborum facere excepteur incididunt fuga in
+minim atque alias rerum omnis eos. Sed dolor et sit ad distinctio quas quas cillum. Et molestias
+harum minus repellendus cillum in aliquip dolorum esse eligendi autem expedita facere
+dignissimos asperiores. Deleniti blanditiis et similique sit reprehenderit quas nihil at rerum
+distinctio rerum anim facere. Lorem occaecati iusto odio cumque velit eiusmod voluptatum irure
+repellat in ducimus reiciendis. Rerum deserunt hic minim sapiente maiores aut facilis non anim
+quas labore libero assumenda proident eos dolor expedita omnis. Veniam tenetur animi dolore anim
+libero recusandae accusamus recusandae occaecati autem saepe non sint culpa occaecat quis.
+Deleniti dolorum doloribus laborum cum repudiandae reprehenderit at tempor debitis quidem.
+Quidem voluptas ad voluptate molestias elit deserunt blanditiis repudiandae consectetur. Sed
+proident doloribus aut asperiores culpa accusamus blanditiis nihil nostrud. Consequat eos do
+culpa non pariatur rerum minim elit ut sed alias harum omnis aut dolore. Libero.
 
 \section{Semantic Layer}
 \label{sec:semantic}
 
 The ontology reproduced in \autoref{sec:appendixA} closes the loop from the signal to the decision.
-It represents the photovoltaic micro-grid, its telemetry and a single control agent. It also makes
+It represents the photovoltaic micro-grid, its telemetry and a single control agent, and it makes
 the tokenisation geometry a first-class object rather than a property of the model: a
 \pv{TimeSeriesSignal} has a \pv{PatchedRepresentation} carrying \pv{patchSize}, \pv{stride} and a
 derived \pv{overlapRatio}, and one signal may hold several, one per $(P,S)$ under evaluation. Since
@@ -322,48 +436,63 @@ the knowledge base rather than hard-coded beside it, which is what lets an agent
 a configuration or a sampling interval changes. Phase-locking is what the ontology infers;
 structural aliasing is what it records.
 
-What matters for this deliverable is where the Bayesian analysis enters. An
-\pv{ObservabilityAssessment} does not read a state off the geometry. It records the estimand, its
-effect size, its credible interval and its posterior probability, and assigns
-\valueof{StructurallyAliased} only to a frequency that is a lock candidate and also carries
-confirmed evidence of loss, $A = C \wedge B$ in the notation of \autoref{sec:appendixA}. Geometry
-alone yields a candidate, never a verdict, which is the distinction of
-\nameref{sec:terminology} expressed as a constraint the reasoner enforces.
+Where the Bayesian analysis enters is the point that matters here. An \pv{ObservabilityAssessment}
+does not read a state off the geometry. It records the estimand, its effect size, its credible
+interval and its posterior probability, and assigns \valueof{StructurallyAliased} only to a
+frequency that is a lock candidate and also carries confirmed evidence of loss, $A = C \wedge B$ in
+the notation of \autoref{sec:appendixA}. Geometry alone yields a candidate, never a verdict. Because
+the confirmation threshold exceeds one half, confirmed loss and confirmed preservation cannot both
+hold, and everything else falls to \valueof{PartiallyObservable}: an unfinished test, a credible
+interval crossing the threshold, or conflicting metrics. That is the inconclusive verdict of
+\autoref{tab:bayesDecisions} carried into the semantics, and its consequence is operational rather
+than documentary, because the assessment selects the control mode. Confirmed aliasing forces the
+safe mode and suspends forecast-driven battery decisions; a merely partially observable assessment
+reduces the battery cap and lowers decision confidence. Uncertainty about the representation is
+therefore propagated to the actuator instead of being resolved by assumption.
 
-The third value is the one worth noting. Because the confirmation threshold exceeds one half,
-confirmed loss and confirmed preservation cannot both hold, and everything else falls to
-\valueof{PartiallyObservable}: an unfinished test, a credible interval crossing the threshold, or
-conflicting metrics. That is the inconclusive verdict of \autoref{tab:bayesDecisions}
-carried into the semantics, and it is what a pass/fail test could not have supplied. The consequence is operational, not documentary, because the assessment selects the control mode.
-Confirmed aliasing forces the safe mode and suspends forecast-driven battery decisions; a merely
-partially observable assessment reduces the battery cap and lowers decision confidence.
-Uncertainty about the representation is therefore propagated to the actuator instead of being
-resolved by assumption, which is the property the risk assessment of the final deliverable relies
-on.
+\section{Security Considerations}
+\label{sec:security}
 
-\section{Results}
-\label{sec:results}
+The forecaster is not a standalone artefact. It sits inside a control loop in which its output
+drives battery dispatch and curtailment on a photovoltaic micro-grid, so a forecasting failure is a
+control failure, and the property under test in this deliverable has to be read as a security
+property and not only as an accuracy one. The NIST AI Risk Management
+Framework~\autocite{tabassiArtificialIntelligenceRisk2023} is the reference we adopt for that
+reading, because it separates the characteristics we can evidence here, validity and reliability,
+security and resilience, from the governance functions that turn evidence into a control, and
+because it asks for known limitations to be mapped and measured rather than merely disclosed.
 
-\tofill{Introductory only, approximately $250$ words in total across this section: what the
-collected design contains, the four verdicts, and the two limitations that condition them. Full
-posterior summaries and the diagnostic tables belong to Deliverable~3.}
+The limitation itself is unusual, and naming its shape correctly is what makes the rest follow.
+Structural aliasing is deterministic, attacker-independent and present at deployment time. It is
+not introduced by an adversary and it is not a defect in the training data; it is a consequence of
+the tokenisation geometry, and it is closed-form. The set of affected frequencies follows from
+$(f_s,P,S)$ alone, and those three numbers are configuration, not weights. An adversary therefore
+needs no model access, no gradients, no query budget and no knowledge of the training corpus to
+know exactly where the model is blind. In the taxonomy of adversarial machine
+learning~\autocite{vassilevAdversarialMachineLearning2024} this places the weakness with the
+availability violations rather than with integrity or privacy, and it places the attack in the
+white-box-free category, which is the part a conventional threat model tends to miss because it
+reasons about perturbations of the input tensor rather than of the physical process.
 
-\subsection{Collected evidence}
-\tofill{Contrast observations per geometry and how many are live; usable stride-only sites per
-geometry and the control offset adopted; MDL cells split by lock indicator. State that the prior
-probability of each decision threshold is reported next to the posterior, that
-$\bar\beta$ is reported with and without the near-zero filter since that filter conditions on the
-response, and that the parameter-recovery check was passed.}
+The attack surface follows directly. The perturbation an adversary needs is physical and small: a
+periodic component injected at, or dithered onto, a locked frequency by any controllable load,
+inverter switching pattern or curtailment schedule is present in the plant and absent from the
+forecast, because the tokenisation maps it to the same latent state as its absence. Two consequences
+matter operationally. The signal is invisible rather than misread, so residual-based anomaly
+detection downstream of the forecaster does not see it either; and the same arithmetic that makes
+the exploit cheap makes it stealthy, since the injected component is legitimate plant behaviour at
+a frequency the operator has no reason to treat as special. Detection has to be placed before
+tokenisation, on the raw telemetry, or it is placed inside the blind spot it is meant to guard.
 
-\subsection{Verdicts}
-\tofill{One line each. $H1$: $e^{\bar\beta}$ with its interval and
-$\Pr(\bar\beta<\log0.8\mid D)$, and the same restricted to the stride-only sites, which is the
-structural reading; then $e^{\theta_{lock}}$ and whether the representational reading agrees.
-$H2$: $\sigma_\phi$ and the LOO comparison against the phase-free model. $H3$: which labelling
-wins by LOO, then $\kappa_S$ and $\kappa_P$ against the equivalence region around $1$. $M1$:
-$\delta_O$, $\delta_P$, and which configuration-level parameterisation wins.}
-
-\subsection{Limitations}
-\tofill{Two or three sentences: one training seed per geometry, so every statement is conditional
-on that checkpoint; and the fact that changing $P$ or $S$ at a fixed context also changes the token
-count, so a geometry effect and a sequence-length effect are not separable in this design.}
+What the framework then requires is that this be mapped, measured and managed rather than noted.
+Mapping is \autoref{tab:patchStride} together with the lock arithmetic, which enumerates the
+affected set for every deployed configuration. Measurement is the Bayesian analysis of
+\nameref{sec:bayes}: the estimand and its credible interval are the evidence artefact, and the
+prior probability recorded beside each threshold is what makes the verdict auditable rather than
+asserted. Management has two halves, one in the model and one in the system. In the model it is the
+overlap mitigation, whose bound is stated with it, since overlap thins one branch and leaves the
+other untouched, so residual risk survives by construction and has to be reported as such. In the
+system it is the semantic layer, where a \valueof{PartiallyObservable} assessment degrades actuation
+instead of failing silently, which is the resilience property the framework asks for. The full risk
+assessment, with the threat model, the residual-risk register and the operational controls, is
+carried in the final deliverable.

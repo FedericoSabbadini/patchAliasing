@@ -304,7 +304,7 @@ def collect_collapse(probe: "pl.Probe", cfg: Config) -> pd.DataFrame:
     dip instead, because the background breaks patch identity; fitting the comb model to all three
     is what shows the conclusion is not an artefact of noise-free inputs.
     """
-    grid = pl.union_grid(pl.MODELS, cfg.collapse_step)
+    grid = pl.union_grid(pl.MODELS, cfg.collapse_step)  # union over ALL geometries, not just the fitted ones
     rows = []
     for mode in cfg.collapse_modes:
         for rep in range(cfg.collapse_reps):
@@ -326,7 +326,7 @@ def collect_collapse(probe: "pl.Probe", cfg: Config) -> pd.DataFrame:
     return out
 
 
-def derive_sites(collapse: pd.DataFrame, grid_step: float = 1.0) -> pd.DataFrame:
+def derive_sites(collapse: pd.DataFrame) -> pd.DataFrame:
     """Detected collapse sites, split by branch, for the H3 movement models.
 
     deliverable2.tex, H3: "Every detected dip is assigned to the branch that predicts it, and sites
@@ -337,21 +337,7 @@ def derive_sites(collapse: pd.DataFrame, grid_step: float = 1.0) -> pd.DataFrame
 
     Sites are detected per replicate (giving the model its residual variance) and once more on the
     replicate-averaged curve, recorded as rep = -1.
-
-    **Branch assignment is a measurement, so it carries the sweep resolution.** `lock_family`
-    defaults to an exact match, which is right for a PREDICTED frequency but not guaranteed for a
-    DETECTED one: a dip read off a `grid_step`-Hz sweep, after `merge_adjacent` has averaged
-    neighbouring minima, need not land on 42.6666... exactly. Half a sweep step is the largest
-    error the grid can introduce, the same resolution argument that puts the floor into the D2
-    likelihood.
-
-    It is a guard, not a correction: on the collection to date it changes nothing, because
-    `union_grid` puts the exact predicted sites on the sweep and 252 of 255 detections landed on
-    one of them to within 1e-6. The three that did not are genuinely off-grid, dips at 32 and
-    224 Hz in p8-s8 whose nearest prediction is 32 Hz away, and excluding them from both branches
-    is the correct behaviour rather than a loss.
     """
-    tol = grid_step / 2
     rows = []
     for (model, mode), g in collapse.groupby(["model", "mode"]):
         P, S = int(g["P"].iloc[0]), int(g["S"].iloc[0])
@@ -368,7 +354,7 @@ def derive_sites(collapse: pd.DataFrame, grid_step: float = 1.0) -> pd.DataFrame
             by_branch: dict[str, list[float]] = {"stride": [], "patch": []}
             n_both = 0
             for s in sites:
-                fam = pl.lock_family(s, P, S, tol=tol)
+                fam = pl.lock_family(s, P, S)
                 if fam == "both":
                     n_both += 1
                 elif fam in by_branch:
@@ -435,7 +421,7 @@ def merge(out: Path, cfg: Config) -> dict[str, pd.DataFrame]:
         df.to_parquet(out / f"02_{table}.parquet", index=False)
 
     if "collapse" in merged:
-        sites = derive_sites(merged["collapse"], grid_step=cfg.collapse_step)
+        sites = derive_sites(merged["collapse"])
         merged["sites"] = sites
         sites.to_parquet(out / "02_sites.parquet", index=False)
 
@@ -486,7 +472,7 @@ def collect_all(out: Path | str, models: list[tuple[int, int]] | None = None,
     out = Path(out)
     out.mkdir(parents=True, exist_ok=True)
     cfg = cfg or Config()
-    models = models or pl.MODELS
+    models = models or pl.BAYES_MODELS
     print(f"collecting into {out}  |  {'SMOKE' if cfg.smoke else 'FULL'} design  |  "
           f"{len(models)} geometries")
 
@@ -525,10 +511,10 @@ def main(argv: list[str]) -> int:
         cfg.batch_size = args.batch_size
 
     wanted = set(args.models) if args.models else None
-    models = [(P, S) for (P, S) in pl.MODELS if wanted is None or pl.model_tag(P, S) in wanted]
+    models = [(P, S) for (P, S) in pl.BAYES_MODELS if wanted is None or pl.model_tag(P, S) in wanted]
     if not models:
         print(f"no geometry matched {args.models}; available: "
-              f"{[pl.model_tag(P, S) for P, S in pl.MODELS]}")
+              f"{[pl.model_tag(P, S) for P, S in pl.BAYES_MODELS]}")
         return 1
 
     out = Path(args.out)

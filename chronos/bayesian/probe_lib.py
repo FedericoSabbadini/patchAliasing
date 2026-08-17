@@ -46,38 +46,53 @@ for _p in (_TESTING, _SYNTHETIC):
 #  Fixed experimental setup (deliverable convention, do not change without changing the .tex)
 # --------------------------------------------------------------------------------- #
 FS = 512                    # sampling frequency [Hz]; Nyquist = 256 Hz
-CTX = 480                   # context length. Divisible by every stride in the sweep (8/12/16/20/24)
-                            # so the patch grid is exact and no internal padding fakes a collapse.
+CTX = 480                   # context length. Divisible by every stride used by the Bayesian design
+                            # (8/12/15/16/20/24/32) so the patch grid is exact and no internal
+                            # padding fakes a collapse. S=28 is the one exception: see BAYES_MODELS.
 PRED = 64                   # forecast horizon (Chronos-Bolt's native prediction_length)
 BAND = (2.0, 250.0)         # analysis band, strictly inside Nyquist
 TONE_SNR = 4.0              # tone amplitude over a unit-variance background (probing convention)
 SEED = 42
 
-# The nine geometries of tab:patchStride. All are retrained from scratch under the same budget;
-# the published amazon/chronos-bolt-tiny checkpoint is NOT part of the design (deliverable2.tex,
-# "Models and signals"). (16, 4) is deliberately absent: deliverable1.tex excludes S=4 because its
-# stride-lock class has a single in-band member, so it carries no local H1 contrast.
+# The geometries of tab:patchStride: every (P, S) on the sweep repository with S >= 8. All are
+# retrained from scratch under the same budget; the published amazon/chronos-bolt-tiny checkpoint
+# is NOT part of the design (deliverable2.tex, "Models and signals"). The S <= 5 runs are excluded,
+# matching deliverable1.tex: their stride-lock class has too few in-band members to carry a local
+# H1 contrast.
 #
 # S | P  decides whether a geometry can separate the two branches at all: when the stride divides
 # the patch, every stride lock c*fs/S is also a patch null k*fs/P with k = c*P/S, so the geometry
-# yields no stride-only site. Runs 2, 6 and 7 are the three that do.
+# yields no stride-only site. Ten of the nineteen have S ∤ P; between them they carry 68 sites.
 MODELS_ALL: list[tuple[int, int]] = [
-    (16, 8),    # run 1  O=0.500   S|P    identifies delta_O, kappa_P
-    (16, 12),   # run 2  O=0.250   S∤P    identifies theta_S, kappa_S, delta_O   (4 stride-only)
-    (8, 8),     # run 3  O=0.000   S|P    identifies delta_P, kappa_P
-    (24, 24),   # run 4  O=0.000   S|P    identifies delta_P
-    (16, 16),   # run 5  O=0.000   S|P    budget-matched baseline
-    (24, 16),   # run 6  O=0.333   S∤P    identifies theta_S, kappa_S, kappa_P   (4 stride-only)
-    (24, 20),   # run 7  O=0.167   S∤P    identifies theta_S, kappa_S            (8 stride-only)
-    (24, 12),   # run 8  O=0.500   S|P    identifies delta_O vs delta_P, kappa_P
-    (24, 8),    # run 9  O=0.667   S|P    identifies delta_O, kappa_P
+    (8, 8),     # O=0.000   S|P
+    (16, 8),    # O=0.500   S|P
+    (16, 12),   # O=0.250   S∤P    ( 4 stride-only)
+    (16, 15),   # O=0.062   S∤P    ( 7 stride-only)
+    (16, 16),   # O=0.000   S|P    budget-matched baseline
+    (24, 8),    # O=0.667   S|P
+    (24, 12),   # O=0.500   S|P
+    (24, 15),   # O=0.375   S∤P    ( 6 stride-only)
+    (24, 16),   # O=0.333   S∤P    ( 4 stride-only)
+    (24, 20),   # O=0.167   S∤P    ( 8 stride-only)
+    (24, 24),   # O=0.000   S|P
+    (32, 8),    # O=0.750   S|P
+    (32, 12),   # O=0.625   S∤P    ( 4 stride-only)
+    (32, 15),   # O=0.531   S∤P    ( 7 stride-only)
+    (32, 16),   # O=0.500   S|P
+    (32, 20),   # O=0.375   S∤P    ( 8 stride-only)
+    (32, 24),   # O=0.250   S∤P    ( 8 stride-only)
+    (32, 28),   # O=0.125   S∤P    (12 stride-only)  -- CTX % 28 != 0, see BAYES_MODELS
+    (32, 32),   # O=0.000   S|P
 ]
 
-# The subset that is actually trained. Runs 6 to 9, the P=24 stride series, are uploaded after the
-# first five, so until they are on the hub the design runs on runs 1 to 5. Move a tag from PENDING
-# to MODELS as it lands; nothing else in this module or in collect.py needs changing.
-PENDING: list[tuple[int, int]] = [(24, 16), (24, 20), (24, 12), (24, 8)]
-MODELS: list[tuple[int, int]] = [m for m in MODELS_ALL if m not in PENDING]
+MODELS: list[tuple[int, int]] = list(MODELS_ALL)
+
+# The subset the Bayesian analysis fits. The context has to close on a whole number of strides,
+# otherwise the last patch is internally padded and the padding, not the geometry, produces the
+# collapse. CTX = 480 satisfies this for every stride except 28 (480 = 17*28 + 4); the smallest
+# context divisible by 28 as well is 1680, which no longer fits the probing convention. p32-s28 is
+# therefore collected descriptively but not fitted, and the deliverable records the exclusion.
+BAYES_MODELS: list[tuple[int, int]] = [(P, S) for (P, S) in MODELS if CTX % S == 0]
 
 # Optional runtime override, so a local-only subset can be run without editing this file or the
 # notebook: PATCHALIASING_MODELS="p16-s12,p16-s8,p8-s8,p24-s24" restricts MODELS to those tags.
@@ -88,6 +103,7 @@ _only = _os.environ.get("PATCHALIASING_MODELS", "").strip()
 if _only:
     _tags = {t.strip() for t in _only.split(",") if t.strip()}
     MODELS = [(P, S) for (P, S) in MODELS_ALL if f"p{P}-s{S}" in _tags]
+    BAYES_MODELS = [(P, S) for (P, S) in MODELS if CTX % S == 0]
 
 
 def design_gaps(models: list[tuple[int, int]] | None = None) -> list[str]:
@@ -385,7 +401,7 @@ def load_checkpoint(P: int, S: int, device: str = "cpu", pipeline_cls=None):
     try:
         pipe = pipeline_cls.from_pretrained(tl.SWEEP_REPO, subfolder=sub, device_map=device)
     except Exception as e:
-        pend = " It is one of the runs still listed in probe_lib.PENDING." if (P, S) in PENDING else ""
+        pend = "" if (P, S) in MODELS_ALL else " It is not one of probe_lib.MODELS_ALL."
         raise RuntimeError(
             f"No checkpoint for (P={P}, S={S}). Expected subfolder '{sub}' in {tl.SWEEP_REPO}, or a "
             f"local copy under {tl._WEIGHTS_DIR}.{pend}\n  original error: {e}") from e

@@ -32,33 +32,43 @@ parameterisations (`config_level` in `model_A_contrast`): overlap, patch size, b
 
 ## Geometries
 
-The nine runs of `tab:patchStride`, all retrained from scratch under the same 100k-step budget:
-`p16-s8`, `p16-s12`, `p8-s8`, `p24-s24`, `p16-s16`, `p24-s16`, `p24-s20`, `p24-s12`, `p24-s8`.
+The nineteen runs of `tab:patchStride`, all retrained from scratch under the same 100k-step budget
+and the same seed: `p8-s8`; `p16-s8`, `p16-s12`, `p16-s15`, `p16-s16`; `p24-s8`, `p24-s12`,
+`p24-s15`, `p24-s16`, `p24-s20`, `p24-s24`; `p32-s8`, `p32-s12`, `p32-s15`, `p32-s16`, `p32-s20`,
+`p32-s24`, `p32-s28`, `p32-s32`.
 
 The published `amazon/chronos-bolt-tiny` checkpoint is **not** used: `p16-s16` is the
-budget-matched retrained baseline. `p16-s4` is excluded, matching `deliverable1.tex`: its
-stride-lock class has a single in-band member, so it carries no local H1 contrast.
+budget-matched retrained baseline. The shortest strides on the sweep repository are excluded,
+matching `deliverable1.tex`: their stride-lock class has too few in-band members to carry a local
+H1 contrast.
 
 Checkpoints are resolved by `probe_lib.load_checkpoint`, not by `testing_lib.load_pipeline`: the
 latter belongs to the Deliverable 1 workflow, where `(16,16)` means the published checkpoint and
 only the first five geometries exist. Here every geometry is `p{P}-s{S}-seed42`, taken from the
-local weights directory if there is one and otherwise from the Hugging Face sweep repo.
+local weights directory if there is one and otherwise from the Hugging Face sweep repo. If a run is
+missing from the hub, `load_checkpoint` raises rather than silently substituting another geometry.
 
-**Not all nine are trained yet.** `probe_lib.MODELS_ALL` is the design; `MODELS` is the subset that
-exists, and `PENDING` holds the rest. The P=24 stride series (`p24-s16`, `p24-s20`, `p24-s12`,
-`p24-s8`) is uploaded after the first five, so until then the analysis runs on runs 1 to 5. Move a
-tag out of `PENDING` as it lands: nothing else changes, `collect_all` reads `MODELS` directly.
-Part 0.4 calls `probe_lib.design_gaps()` and prints what the active subset cannot identify, which
-today is that only `p16-s12` supplies stride-only sites, so $\kappa_S$ (H3a) rests on one
-geometry. An estimand named there must be reported as **not identified** rather than as a null
-result, and the notebook's verdict table does exactly that for a branch with no usable rows.
+**`MODELS` and `BAYES_MODELS` are not the same list.** `MODELS` is the full design and is what the
+sweeps and the descriptive figures run on. `BAYES_MODELS` is the subset the Bayesian models are
+fitted on, and it drops any geometry whose stride does not divide the probing context `CTX = 480`,
+because the last patch would then be internally padded and the padding, not the geometry, would
+produce the collapse. Today that excludes `p32-s28` alone: 480 = 17*28 + 4, and the smallest
+context divisible by 28 as well is 1680, far outside the probing convention. `p32-s28` is therefore
+collected and plotted but not fitted, and `deliverable2.tex` records the exclusion.
 
-**Why nine and not five.** When $S$ divides $P$, every stride lock $c f_s/S$ is also a patch null
-$k f_s/P$ with $k = cP/S$, so the two branches coincide over the whole grid and no frequency in
-that geometry can be attributed to one of them. Only $S \nmid P$ yields **stride-only** sites, and
-the design has exactly three such runs: `p16-s12` (4 sites), `p24-s16` (4) and `p24-s20` (8). The
-rest make $P$ vary at fixed $S$, which is what identifies H3b and separates $\delta_O$ from
-$\delta_P$.
+`probe_lib.design_gaps()` prints what the active set cannot identify. An estimand named there must
+be reported as **not identified** rather than as a null result, and the notebook's verdict table
+does exactly that for a branch with no usable rows.
+
+**Why nineteen and not five.** When $S$ divides $P$, every stride lock $c f_s/S$ is also a patch
+null $k f_s/P$ with $k = cP/S$, so the two branches coincide over the whole grid and no frequency in
+that geometry can be attributed to one of them. Only $S \nmid P$ yields **stride-only** sites. Ten
+of the nineteen satisfy it and between them they carry **68** such sites: `p16-s12` (4),
+`p16-s15` (7), `p24-s15` (6), `p24-s16` (4), `p24-s20` (8), `p32-s12` (4), `p32-s15` (7),
+`p32-s20` (8), `p32-s24` (8), `p32-s28` (12). The rest make $P$ vary at fixed $S$ — six strides
+appear at more than one patch size — which is what identifies H3b and separates $\delta_O$ from
+$\delta_P$; three runs share $O = 0.5$ at three different patch sizes, which is what separates an
+effect of the overlap ratio from an effect of the absolute stride.
 
 ## Running it
 
