@@ -63,11 +63,11 @@ outside the probing convention: it is swept and reported descriptively, not fitt
 
 \input{tables/flockDomains.tex}
 
-\autoref{tab:flock} writes the two branches out geometry by geometry: the spacings, the size of
-their union, and every in-band member of each. Bold marks a frequency both branches carry, which
-makes the identifiability argument readable by eye. A row whose stride column is entirely bold has
-no frequency belonging to the stride alone; the unbolded stride entries are the sites counted in
-\autoref{tab:patchStride}.
+\autoref{tab:flock} states the same design arithmetically. Each branch is the harmonics of a
+single spacing, so the spacing is the branch, and the only question left is where the two combs
+meet: on a third comb, spaced $f_s/g$ with $g=\gcd(P,S)$. What survives once those shared members
+are removed is the stride-only column, zero exactly when $S \mid P$, and its total over the design
+is the $68$ sites above.
 
 \section{Observed Frequency Behaviour}
 \label{sec:observations}
