@@ -1,87 +1,24 @@
-% Hand-written: the lock arithmetic is exact and closed-form, so this table is not generated.
-\begin{table*}[!tp]
+\begin{table*}[!b]
     \centering
     \small
-    \begin{tabular}{@{}lrrrrrr@{}}
+    \setlength{\tabcolsep}{5pt}
+    \begin{tabular}{@{}lrr>{\raggedright\arraybackslash}p{3.9cm}>{\raggedright\arraybackslash}p{3.1cm}>{\raggedright\arraybackslash}p{3.1cm}@{}}
         \toprule
-        \multicolumn{4}{@{}l}{\textbf{$P = 8$}} & \multicolumn{3}{r@{}}{$f_s/P = 64$\,Hz}\\[3pt]
-        \cmidrule{1-7}
-        \textbf{Model} & $f_s/S$ [Hz] & in band & $f_s/g$ [Hz] & shared & \textbf{stride-only} & $|\mathcal F_{lock}|$ \\
-        \cmidrule{1-7}
+        \textbf{Model} & $f_s/S$ [Hz] & $f_s/P$ [Hz] & \textbf{stride only} & \textbf{both} & \textbf{patch only} \\
+        \midrule
         \addlinespace[2pt]
-        \texttt{p8-s8} & $64$ & $3$ & $64$ & $3$ & $0$ & $3$ \\
-        \addlinespace[2pt]
-        \specialrule{\heavyrulewidth}{0pt}{0pt}
-        \addlinespace[13pt]
-        \specialrule{\heavyrulewidth}{0pt}{3pt}
-        \multicolumn{4}{@{}l}{\textbf{$P = 16$}} & \multicolumn{3}{r@{}}{$f_s/P = 32$\,Hz}\\[3pt]
-        \cmidrule{1-7}
-        \textbf{Model} & $f_s/S$ [Hz] & in band & $f_s/g$ [Hz] & shared & \textbf{stride-only} & $|\mathcal F_{lock}|$ \\
-        \cmidrule{1-7}
-        \addlinespace[2pt]
-        \texttt{p16-s8} & $64$ & $3$ & $64$ & $3$ & $0$ & $7$ \\
+        \texttt{p8-s8} & $64$ & $64$ & --- & 64 128 192 & --- \\
         \specialrule{\cmidrulewidth}{4pt}{4pt}
-        \texttt{p16-s12} & $42.67$ & $5$ & $128$ & $1$ & $\mathbf{4}$ & $11$ \\
+        \texttt{p16-s8} & $64$ & $32$ & --- & 64 128 192 & 32 96 160 224 \\
         \specialrule{\cmidrulewidth}{4pt}{4pt}
-        \texttt{p16-s15} & $34.13$ & $7$ & $512$ & $0$ & $\mathbf{7}$ & $14$ \\
+        \texttt{p16-s12} & $42.67$ & $32$ & 42.67 85.33 170.67 213.33 & 128 & 32 64 96 160 192 224 \\
         \specialrule{\cmidrulewidth}{4pt}{4pt}
-        \texttt{p16-s16} & $32$ & $7$ & $32$ & $7$ & $0$ & $7$ \\
-        \addlinespace[2pt]
-        \specialrule{\heavyrulewidth}{0pt}{0pt}
-        \addlinespace[13pt]
-        \specialrule{\heavyrulewidth}{0pt}{3pt}
-        \multicolumn{4}{@{}l}{\textbf{$P = 24$}} & \multicolumn{3}{r@{}}{$f_s/P = 21.33$\,Hz}\\[3pt]
-        \cmidrule{1-7}
-        \textbf{Model} & $f_s/S$ [Hz] & in band & $f_s/g$ [Hz] & shared & \textbf{stride-only} & $|\mathcal F_{lock}|$ \\
-        \cmidrule{1-7}
-        \addlinespace[2pt]
-        \texttt{p24-s8} & $64$ & $3$ & $64$ & $3$ & $0$ & $11$ \\
+        \texttt{p16-s16} & $32$ & $32$ & --- & 32 64 96 128 160 192 224 & --- \\
         \specialrule{\cmidrulewidth}{4pt}{4pt}
-        \texttt{p24-s12} & $42.67$ & $5$ & $42.67$ & $5$ & $0$ & $11$ \\
-        \specialrule{\cmidrulewidth}{4pt}{4pt}
-        \texttt{p24-s15} & $34.13$ & $7$ & $170.67$ & $1$ & $\mathbf{6}$ & $17$ \\
-        \specialrule{\cmidrulewidth}{4pt}{4pt}
-        \texttt{p24-s16} & $32$ & $7$ & $64$ & $3$ & $\mathbf{4}$ & $15$ \\
-        \specialrule{\cmidrulewidth}{4pt}{4pt}
-        \texttt{p24-s20} & $25.6$ & $9$ & $128$ & $1$ & $\mathbf{8}$ & $19$ \\
-        \specialrule{\cmidrulewidth}{4pt}{4pt}
-        \texttt{p24-s24} & $21.33$ & $11$ & $21.33$ & $11$ & $0$ & $11$ \\
-        \addlinespace[2pt]
-        \specialrule{\heavyrulewidth}{0pt}{0pt}
-        \addlinespace[13pt]
-        \specialrule{\heavyrulewidth}{0pt}{3pt}
-        \multicolumn{4}{@{}l}{\textbf{$P = 32$}} & \multicolumn{3}{r@{}}{$f_s/P = 16$\,Hz}\\[3pt]
-        \cmidrule{1-7}
-        \textbf{Model} & $f_s/S$ [Hz] & in band & $f_s/g$ [Hz] & shared & \textbf{stride-only} & $|\mathcal F_{lock}|$ \\
-        \cmidrule{1-7}
-        \addlinespace[2pt]
-        \texttt{p32-s8} & $64$ & $3$ & $64$ & $3$ & $0$ & $15$ \\
-        \specialrule{\cmidrulewidth}{4pt}{4pt}
-        \texttt{p32-s12} & $42.67$ & $5$ & $128$ & $1$ & $\mathbf{4}$ & $19$ \\
-        \specialrule{\cmidrulewidth}{4pt}{4pt}
-        \texttt{p32-s15} & $34.13$ & $7$ & $512$ & $0$ & $\mathbf{7}$ & $22$ \\
-        \specialrule{\cmidrulewidth}{4pt}{4pt}
-        \texttt{p32-s16} & $32$ & $7$ & $32$ & $7$ & $0$ & $15$ \\
-        \specialrule{\cmidrulewidth}{4pt}{4pt}
-        \texttt{p32-s20} & $25.6$ & $9$ & $128$ & $1$ & $\mathbf{8}$ & $23$ \\
-        \specialrule{\cmidrulewidth}{4pt}{4pt}
-        \texttt{p32-s24} & $21.33$ & $11$ & $64$ & $3$ & $\mathbf{8}$ & $23$ \\
-        \specialrule{\cmidrulewidth}{4pt}{4pt}
-        \texttt{p32-s28}$^{\dagger}$ & $18.29$ & $13$ & $128$ & $1$ & $\mathbf{12}$ & $27$ \\
-        \specialrule{\cmidrulewidth}{4pt}{4pt}
-        \texttt{p32-s32} & $16$ & $15$ & $16$ & $15$ & $0$ & $15$ \\
+        \texttt{p24-s24} & $21.33$ & $21.33$ & --- & 21.33 42.67 64 85.33 106.67 128 149.33 170.67 192 213.33 234.67 & --- \\
         \addlinespace[2pt]
         \bottomrule
     \end{tabular}
-    \caption{Where each geometry's locked frequencies sit, in band $[2,250]$\,Hz at
-    $f_s=512$\,Hz. Each branch is the harmonics of one spacing, so the spacing is the whole branch:
-    the stride branch is the multiples of $f_s/S$, the patch branch the multiples of $f_s/P$, given
-    once per group; \emph{in band} counts the stride branch's members. The two combs meet on a
-    third, spaced $f_s/g$ with $g=\gcd(P,S)$, which is what the shared column counts; a spacing
-    above the band means they never meet inside it and nothing is shared. \textbf{Stride-only} is
-    what is left of the stride branch once the shared members are removed, and it is zero exactly
-    when $S \mid P$: those are the only frequencies at which a loss is attributable to the stride
-    alone. $|\mathcal F_{lock}|$ is the union of the two branches, not the sum.
-    $^{\dagger}$\,This stride does not divide the probing context: the run is swept but not fitted.}
+    \caption{The locked frequencies of the five geometries carried over from Deliverable~1, with each frequency placed under the branch that produces it. A geometry with empty outer columns is one where $S \mid P$: the two branches coincide everywhere and no frequency is attributable to either alone.}
     \label{tab:flock}
 \end{table*}

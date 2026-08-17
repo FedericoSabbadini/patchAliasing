@@ -30,6 +30,7 @@
 \addbibresource{patchAliasing.bib} % BibLaTeX bibliography file
 
 \usepackage{float} % enables the [H] float specifier to pin figures/tables in place
+\usepackage{stfloats} % a table* may only be [t] or [p] by default; this adds [b]
 
 %----------------------------------------------------------------------------------------
 %	ONTOLOGY APPENDIX SUPPORT
@@ -43,10 +44,19 @@
 \newcommand{\pv}[1]{\texttt{pv:#1}}
 \newcommand{\valueof}[1]{\textsf{#1}}
 
-% the sine sweep figures each take a page of their own; the default requires a float
-% page to be at least half full, which would send the shorter of the two to the end
-\renewcommand{\floatpagefraction}{0.4}
-\renewcommand{\dblfloatpagefraction}{0.4}
+% The document is table-heavy and has no full-page figures, so the defaults are too strict:
+% a float LaTeX cannot place is deferred, and because float order is preserved every later
+% float queues behind it, which is what sends all the tables to the end.
+\renewcommand{\topfraction}{0.9}          % a page may be 90% float at the top
+\renewcommand{\bottomfraction}{0.6}       % and 60% at the bottom
+\renewcommand{\dbltopfraction}{0.9}       % same, for full-width floats
+\renewcommand{\textfraction}{0.07}        % a page needs only 7% text to count as a text page
+\renewcommand{\floatpagefraction}{0.75}   % a float page has to be 75% full to be made
+\renewcommand{\dblfloatpagefraction}{0.75}
+\setcounter{topnumber}{3}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{5}
+\setcounter{dbltopnumber}{3}
 
 \runninghead{Deliverable 2} % A shortened article title to appear in the running head, leave this command empty for no running head
 

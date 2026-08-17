@@ -1,0 +1,35 @@
+\begin{table*}[!tp]
+    \centering
+    \small
+    \begin{tabular}{@{}ccccccc@{}}
+        \toprule
+        \textbf{Run} & \textbf{Patch ($P$)} & \textbf{Stride ($S$)} & \textbf{overlap} &
+        \textbf{\#patch @2048} & \textbf{steps} & \textbf{time} \\
+        \midrule
+        $1$ & $8$ & $8$ & $0.00$ & $256$ & $100$k & $2.7$\,h \\
+        \midrule
+        $2$ & $16$ & $8$ & $0.50$ & $255$ & $100$k & $2.6$\,h \\
+        $3$ & $16$ & $12$ & $0.25$ & $170$ & $100$k & $2.8$\,h \\
+        $4$ & $16$ & $15$ & $0.06$ & $136$ & $100$k & \\
+        $5$ & $16$ & $16$ & $0.00$ & $128$ & $100$k & \\
+        \midrule
+        $6$ & $24$ & $8$ & $0.67$ & $254$ & $100$k & \\
+        $7$ & $24$ & $12$ & $0.50$ & $169$ & $100$k & \\
+        $8$ & $24$ & $15$ & $0.38$ & $135$ & $100$k & \\
+        $9$ & $24$ & $16$ & $0.33$ & $127$ & $100$k & \\
+        $10$ & $24$ & $20$ & $0.17$ & $102$ & $100$k & \\
+        $11$ & $24$ & $24$ & $0.00$ & $85$ & $100$k & $2.8$\,h \\
+        \midrule
+        $12$ & $32$ & $8$ & $0.75$ & $253$ & $100$k & \\
+        $13$ & $32$ & $12$ & $0.62$ & $169$ & $100$k & \\
+        $14$ & $32$ & $15$ & $0.53$ & $135$ & $100$k & \\
+        $15$ & $32$ & $16$ & $0.50$ & $127$ & $100$k & \\
+        $16$ & $32$ & $20$ & $0.38$ & $101$ & $100$k & \\
+        $17$ & $32$ & $24$ & $0.25$ & $85$ & $100$k & \\
+        $18$ & $32$ & $28^{\dagger}$ & $0.12$ & $73$ & $100$k & \\
+        $19$ & $32$ & $32$ & $0.00$ & $64$ & $100$k & \\
+        \bottomrule
+    \end{tabular}
+    \caption{Every configuration published on the sweep repository, listed as in Deliverable~1: overlap, patch-token count at the $2048$-sample training context, step budget and wall-clock training time. All are retrained from scratch under the same budget and from the same seed, on the same RTX~5060 Laptop GPU used for the runs of Deliverable~1, so the times are comparable across the whole sweep. $^{\dagger}$\,This stride does not divide the probing context, so the run can be swept but not fitted at it.}
+    \label{tab:hfModels}
+\end{table*}

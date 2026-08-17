@@ -1,4 +1,4 @@
-\begin{table}[t]
+\begin{table}[!ht]
     \centering
     \small
     \begin{tabular}{@{}ccccc@{}}
@@ -9,30 +9,11 @@
         \midrule
         $16$ & $8$ & $0.500$ & $255$ & yes \\
         $16$ & $12$ & $0.250$ & $170$ & \textbf{no} \\
-        $16$ & $15$ & $0.062$ & $136$ & \textbf{no} \\
         $16$ & $16$ & $0.000$ & $128$ & yes \\
         \midrule
-        $24$ & $8$ & $0.667$ & $254$ & yes \\
-        $24$ & $12$ & $0.500$ & $169$ & yes \\
-        $24$ & $15$ & $0.375$ & $135$ & \textbf{no} \\
-        $24$ & $16$ & $0.333$ & $127$ & \textbf{no} \\
-        $24$ & $20$ & $0.167$ & $102$ & \textbf{no} \\
         $24$ & $24$ & $0.000$ & $85$ & yes \\
-        \midrule
-        $32$ & $8$ & $0.750$ & $253$ & yes \\
-        $32$ & $12$ & $0.625$ & $169$ & \textbf{no} \\
-        $32$ & $15$ & $0.531$ & $135$ & \textbf{no} \\
-        $32$ & $16$ & $0.500$ & $127$ & yes \\
-        $32$ & $20$ & $0.375$ & $101$ & \textbf{no} \\
-        $32$ & $24$ & $0.250$ & $85$ & \textbf{no} \\
-        $32$ & $28^{\dagger}$ & $0.125$ & $73$ & \textbf{no} \\
-        $32$ & $32$ & $0.000$ & $64$ & yes \\
         \bottomrule
     \end{tabular}
-    \caption{The nineteen geometries, all trained from scratch (seed $42$) under the same
-    $100$k-step budget. $O=(P-S)/P$; the token count is at the $2048$-sample training context and
-    is what the overlap costs. $S \mid P$ decides whether the geometry can separate the two lock
-    branches at all; \autoref{tab:flock} counts what each one supplies.
-    $^{\dagger}$\,This stride does not divide the probing context: the run is swept but not fitted.}
+    \caption{The five geometries analysed here, carried over from Deliverable~1. The token count is the number of patch tokens at the $2048$-sample training context.}
     \label{tab:patchStride}
 \end{table}
