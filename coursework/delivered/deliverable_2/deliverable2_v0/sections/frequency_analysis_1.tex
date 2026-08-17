@@ -1,0 +1,24 @@
+\section{Frequency Analysis and Observations}
+\label{sec:analysis}
+
+The first analysis sweeps pure sinusoids from $2$ to $250$\,Hz in one-hertz steps, at a sampling frequency of $f_s=512$\,Hz. For each tone, the frequency produced by Chronos is compared with the known input frequency. Pure sinusoids keep the test easy to interpret: no background spectral content can explain a loss at a predicted lock frequency.
+
+\input{tables/patchStride.tex}
+
+\autoref{tab:patchStride} summarises the patch size $P$, stride $S$, overlap $O=(P-S)/P$, and token count of each configuration. All models, including the $P{=}S{=}16$ baseline, are trained from scratch with the same $100$k-step budget and seed; the published \texttt{chronos-bolt-tiny} checkpoint is not used. This keeps training length fixed across configurations, while the token count shows the computational cost of overlap.
+
+A locked frequency can satisfy the stride condition, the patch condition, or both. The notation $S\mid P$ means that $P$ is an integer multiple of $S$. In that case every stride-lock site is also a patch-null site, so there are no stride-only sites, although patch-only sites may remain. Conversely, $P\mid S$ means that every patch-null site is also a stride-lock site, so there are no patch-only sites. If neither relation holds, both types of exclusive site are possible; if $P=S$, the two sets coincide.
+
+\autoref{tab:flock} applies this rule to the sweep by sorting each candidate frequency into \emph{stride only}, \emph{both}, or \emph{patch only}. Its main purpose is attribution: a dip at an exclusive site can be associated with one branch, whereas a dip in the \emph{both} category cannot separate their contributions.
+
+Each configuration is swept over the same band at several non-redundant starting phases. The nominal $512$-sample context is shortened, when necessary, to a whole number of strides so that the final patch is not padded; otherwise padding could create an artificial collapse. When the stride divides $512$, integer-frequency tones also complete whole cycles in the window. For other strides, the context differs by fewer than $S$ samples. Each model is loaded, measured, and released in turn.
+
+\input{tables/flockDomains.tex}
+
+\subsection{Output Frequency}
+
+The left panel is behavioural and records what the model outputs. The sinusoid is given as context, the median forecast is appended and fed back, and the rollout continues to $512$ generated samples. After removing the mean and skipping the zero-frequency bin, the dominant output frequency is taken from the discrete Fourier transform bin with the largest magnitude. It is then averaged over phases and plotted against the input frequency. A point on the diagonal is a tone rebuilt correctly, a flat segment is a set of distinct inputs collapsing onto one output, and the shaded band is one standard deviation over phases.
+
+\subsection{Spectral Analysis}
+
+The right panel is representational and records what the model still represents. The internal state is captured at the projected quantile head and evaluated with a linear probe. The pipeline standardises the features, applies principal-component reduction, and fits logistic regression; its accuracy is measured by cross-validation. Two task families are run. The seven band tasks are those of Deliverable~1, each asking whether a tone falls in the lower or upper half of its band; their folds are grouped by frequency, so every phase of a held-out frequency is excluded from training and the probe has to generalise the boundary instead of memorising individual frequencies. An ungrouped split inflates those rows, so the earlier reading of them was optimistic. The local task poses one question of constant difficulty at every frequency, whether $f-1$\,Hz can be separated from $f+1$\,Hz, and holds out phases rather than frequencies; having no boundary artefact, it is the row the cross-geometry comparison uses. Cell colour is that cross-validated accuracy on a continuous scale from chance to one, so a partial loss is rendered as such rather than rounded into a bin; grey marks a frequency no task covers, which is a statement about the design and not about the model. Dashed markers on both panels are $\mathcal F_{lock}$ for that geometry.
