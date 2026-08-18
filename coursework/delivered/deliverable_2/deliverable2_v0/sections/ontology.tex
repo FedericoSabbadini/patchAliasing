@@ -202,12 +202,12 @@ The agent evaluates each synchronized control cycle using the strict priority
 \mathrm{RampOverride}\succ
 \mathrm{NormalRouting}.
 \end{equation}
-Let $A_{\mathrm{safe}}$ mean that \valueof{SensorMalfunction} or \valueof{InverterTrip} is present. The selected mode is
+Let $N_{\mathrm{safe}}$ mean that \valueof{SensorMalfunction} or \valueof{InverterTrip} is present. The selected mode is
 \begin{equation}
 \label{eq:mode-selection}
 M_t=
 \begin{cases}
-\valueof{SafeMode}, & A_{\mathrm{safe}}\vee
+\valueof{SafeMode}, & N_{\mathrm{safe}}\vee
 (C_O=\valueof{StructurallyAliased}),\\
 \valueof{ConservativeMode}, & C_O=\valueof{PartiallyObservable},\\
 \valueof{NormalMode}, & \text{otherwise}.
