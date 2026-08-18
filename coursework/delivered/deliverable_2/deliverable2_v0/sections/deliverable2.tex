@@ -9,7 +9,7 @@ Two terms are used throughout in a precise sense. Phase-locking is a property of
 
 \input{tables/patchStride.tex}
 
-The first analysis sweeps pure sinusoids from $2$ to $250$\,Hz in one-hertz steps, at a sampling frequency of $f_s=512$\,Hz. For each tone, the frequency produced by Chronos is compared with the known input frequency. Pure sinusoids keep the test easy to interpret: no background spectral content can explain a loss at a predicted lock frequency.
+The first analysis sweeps pure sinusoids from $2$ to $250$\,Hz in one-hertz steps, at a sampling frequency of $f_s=512$\,Hz. For each tone, the frequency produced by Chronos is compared with the known input frequency. Pure sinusoids keep the test easy to interpret: no background spectral content can explain a loss at a predicted lock frequency. The band stops below the Nyquist limit $f_s/2=256$\,Hz, so every tone swept is fully representable under the Nyquist--Shannon theorem, as Deliverable~1 sets out, and a loss observed here cannot be attributed to undersampling.
 
 \autoref{tab:patchStride} summarises the patch size $P$, stride $S$, overlap $O=(P-S)/P$, and token count of each configuration. All models, including the $P{=}S{=}16$ baseline, are trained from scratch with the same $100$k-step budget and seed; the published \texttt{chronos-bolt-tiny} checkpoint is not used. This keeps training length fixed across configurations, while the token count shows the computational cost of overlap.
 
@@ -77,7 +77,7 @@ These observations do not establish structural aliasing either, but they do show
 \input{tables/hfModels.tex}
 
 \subsection{Limits of this design}
-The five runs were chosen for Deliverable~1 and they bound what can be concluded from the sweep above. Three of them have $P=S$, so their two branches coincide at every locked frequency and no observation in those geometries can be attributed to one branch. Stride-only sites exist in one geometry, $P{=}16,\,S{=}12$, and patch-only sites in two, so a claim about the stride branch rests on a single configuration and a claim about the patch branch on two. The configuration axes are equally short: the overlap ratio takes three values, and exactly one pair shares a stride while differing in patch size, which is the only place an effect of the patch can be separated from an effect of the stride. Every statement is therefore conditional on a narrow design.
+The five runs were chosen for Deliverable~1 and they bound what can be concluded from the sweep above. Three of them have $P=S$, so their two branches coincide at every locked frequency and no observation in those geometries can be attributed to one branch. Stride-only sites exist in one geometry, $P{=}16,\,S{=}12$, and patch-only sites in two, so a claim about the stride branch rests on a single configuration and a claim about the patch branch on two. The configuration axes are equally short: the overlap ratio takes three values, and exactly one pair shares a stride while differing in patch size, which is the only place an effect of the patch can be separated from an effect of the stride. Every statement is therefore conditional on a narrow design. Attributing an effect to one branch, and testing whether either branch moves with the spacing it predicts, is beyond what these five runs can support: they can show that some frequencies are lost, not which of the two grids accounts for them. Both properties require the extended set.
 
 To address this the models trained for the analysis are extended to the ones listed in \autoref{tab:hfModels}. All the models are retrained from scratch under the same $100$k-step budget and the same seed as the runs of Deliverable~1.
 
@@ -137,7 +137,7 @@ u_p \sim \mathcal{N}(0, \sigma_\phi).
 The estimand $\sigma_\phi$ is the spread of those eight offsets, and it answers the question with one number. If the deficit depends on where in its cycle the signal starts, the offsets differ and $\sigma_\phi$ is large. If the geometry alone determines it, they are equal and $\sigma_\phi$ is near zero, as $H2$ predicts. Slices are used rather than a fitted curve because they assume nothing about the form a dependence might take. Dropping $u_p$ gives a nested null, and comparing the two by leave-one-out cross-validation (LOO) separates the size of the phase effect from the evidence that it exists.
 
 \subsection{H3}
-$H3$ was stated in Deliverable~1 as two claims, one per branch. Both are tested on the token collapse $z_g(f)$, the dispersion of the input-patch embeddings across patches, which is zero when consecutive patches are identical. All geometries share one sweep grid: a uniform $1$\,Hz sweep unioned with the predicted sites of every configuration. No geometry is therefore scored only where its own theory predicts a dip, and non-integer sites such as $42.\overline{6}$\,Hz for $S{=}12$ are covered.
+$H3$ was stated in Deliverable~1 as two claims, one per branch. Both are tested on the token collapse $z_g(f)$, the dispersion of the input-patch embeddings across patches, which is zero when consecutive patches are identical. All geometries share one sweep grid: a uniform $1$\,Hz sweep unioned with the predicted sites of every configuration swept. No geometry is therefore scored only where its own theory predicts a dip, and non-integer sites such as $42.\overline{6}$\,Hz for $S{=}12$ are covered.
 
 The first question is where the dips are located. Each swept frequency carries two labels, one per branch:
 
@@ -165,7 +165,7 @@ The slope $\kappa_F$ is the estimand, measured spacing per unit of predicted spa
 $H3a$ concerns the stride branch and predicts $\kappa_S=1$: the stride sites track $f_s/S$ one for one, so a site that remains fixed while $S$ changes refutes it. It is identified by a series at fixed $P$, which the design supplies at $P{=}16$.
 
 \subsubsection{$H3b$}
-$H3b$ concerns the patch branch and predicts $\kappa_P=1$ in the same way. It is identified by pairs that share a stride and differ in patch size, which the design supplies at $S{=}8$.
+$H3b$ concerns the patch branch and predicts $\kappa_P=1$ in the same way. It is identified by pairs that share a stride and differ in patch size, which the extended set supplies at $S{=}8$.
 
 \subsection{Decisions and validation}
 Every threshold in \autoref{tab:bayesDecisions} is fixed before a posterior is inspected, and validation comes before interpretation.
@@ -175,7 +175,7 @@ Every threshold in \autoref{tab:bayesDecisions} is fixed before a posterior is i
     \item \textbf{Parameter recovery}: data simulated with a known effect, to confirm the model finds it. This is what separates ``no effect'' from ``a design that cannot see one''.
     \item \textbf{Posterior predictive checks}, stratified by frequency, phase, $P$, $S$ and generator.
     \item \textbf{Model comparison} by LOO cross-validation, not by null-hypothesis testing.
-    \item \textbf{Sampling diagnostics}: NUTS (No-U-Turn Sampler) with four chains, and a fit reported only at $\hat R<1.01$, effective sample sizes (ESS) above $1000$ and no divergences. Where a model does not meet these thresholds, its estimand sign is cross-checked against the converged models and the frequentist probes; it is reported as provisional.
+    \item \textbf{Sampling diagnostics}: NUTS (No-U-Turn Sampler) with four chains, and a fit reported only at $\hat R<1.01$, effective sample sizes (ESS) above $1000$ and no divergences. Where a model does not meet these thresholds, its estimand is cross-checked against the converged models and the frequentist probes, and a scale parameter such as $\sigma_\phi$, whose sign carries no information, against the observed spread of the per-phase deficits; it is reported as provisional.
 \end{itemize}
 
 \input{tables/bayesDecisions.tex}
@@ -199,17 +199,17 @@ Both halves are testable rather than asserted, and $M1$ in \autoref{tab:bayesDec
 
 The frequency sweeps and the models of \nameref{sec:bayes} point in the same direction: phase-locking affects the internal representation but does not appear to propagate to the forecast output.
 
-On the behavioural side, locked frequencies are not systematically attenuated in the rollout. In several geometries the model reconstructs them as well as their unlocked neighbours, contrary to what the degeneracy alone would predict. The representational side points toward a different pattern: the prequential codelength at a locked frequency tends to be higher than at an unlocked one, suggesting that the internal state carries a measurable cost at those sites. This split, representation penalised and forecast intact, is consistent across generators and geometries and is the pattern the evidence points to.
+On the behavioural side, locked frequencies are not systematically attenuated in the rollout. In several geometries the model reconstructs them as well as their unlocked neighbours, contrary to what the degeneracy alone would predict. The representational side points toward a different pattern: the prequential codelength at a locked frequency tends to be higher than at an unlocked one, suggesting that the internal state carries a measurable cost at those sites. This split, representation penalised and forecast intact, is the pattern the evidence points to, and the final deliverable provides the per-generator and per-geometry evidence for it.
 
 The phase of the input signal does not appear to modulate the deficit appreciably, consistent with $H2$: the posterior for $\sigma_\phi$ in \autoref{fig:phasePosterior} lies inside the region of practical equivalence (ROPE). It concentrates well below the threshold and is far tighter than the prior it started from, so the data and not the prior place it there, and the eight per-phase offsets $u_p$ are not separable from one another. The size of the deficit therefore follows from the geometry and from the frequency, and not from where in its cycle the signal begins, which is what licenses the remaining models to average over phase and which also removes phase randomisation from the mitigations available to an operator.
 
-The token-collapse dips align with the stride grid and shift when the stride changes, consistent with $H3a$, and \autoref{fig:combs} shows the pattern holding across configurations and generators; the patch branch is not separately identifiable in the current design.
+The token-collapse dips align with the stride grid and shift when the stride changes, consistent with $H3a$, and \autoref{fig:combs} shows the pattern holding across configurations and generators; the scaling law of the patch branch is not identified in the runs fitted for this deliverable.
 
 
 \begin{figure*}[!tp]
     \centering
     \includegraphics[width=0.92\textwidth]{figures/FIG_H2_phase.png}
-    \caption{Posterior for the phase term of $H2$. On the left the observed deficit against the signal phase $\phi$, with the per-phase offset $u_p$ and its $95\%$ credible interval; on the right the posterior for $\sigma_\phi$ against its prior, the dashed line marking the ROPE edge at $\log 1.1$. Both panels pool every configuration fitted, so the estimate is not conditioned on a single geometry.}
+    \caption{Posterior for the phase term of $H2$. On the left the observed deficit against the signal phase $\phi$, with the per-phase offset $u_p$ and its $95\%$ credible interval; on the right the posterior for $\sigma_\phi$ against its prior, the dashed line marking the ROPE edge at $\log 1.1$. Both panels pool every configuration fitted, so the estimate is not conditioned on a single geometry. Model~C has not met the convergence thresholds of \nameref{sec:bayes}, so the posterior is shown as provisional.}
     \label{fig:phasePosterior}
 \end{figure*}
 
@@ -217,11 +217,13 @@ The token-collapse dips align with the stride grid and shift when the stride cha
 \begin{figure*}[p]
     \centering
     \includegraphics[height=0.88\textheight]{figures/FIG_H3_combs.png}
-    \caption{Collapse profiles against the two candidate grids. Rows are the fitted configurations and columns the three generators; each panel plots the profile over the sweep band, with the stride grid $cf_s/S$ dashed and the patch grid $kf_s/P$ dotted. A dip that sits on the dashed grid and follows it as the stride changes belongs to the stride branch.}
+    \caption{Collapse profiles against the two candidate grids. Rows are the fitted configurations and columns the three generators; each panel plots the profile over the sweep band, with the stride grid $cf_s/S$ dashed and the patch grid $kf_s/P$ dotted. A dip that sits on the dashed grid and follows it as the stride changes belongs to the stride branch. The run shown is provisional: it does not cover every configuration of \autoref{tab:hfModels} and it includes runs the final analysis excludes.}
     \label{fig:combs}
 \end{figure*}
 
 The overlap-based mitigation of \nameref{sec:mitigation} is left to the final deliverable, where the representational cost is what it will be measured against.
+
+The data behind these figures and posteriors come from an initial training run and are not final. The analysis of the final deliverable is restricted to the configurations of \autoref{tab:hfModels}, so the short-stride runs at $S\le5$, the runs at $S{=}15$ and any configuration absent from that table are excluded from it.
 
 Models~A and~C have not reached the preregistered convergence thresholds; their estimand signs are nonetheless consistent with the converged representational model~(B) and with the independent frequentist sweeps, so the qualitative conclusions hold provisionally. The final deliverable will either report consolidated posteriors or, if convergence remains out of reach, document the limitation and fall back on the frequentist evidence.
 
@@ -245,3 +247,6 @@ A weakness becomes a vulnerability only when someone can reach it, and the final
     \item \textbf{Operational consequence.} The component is present in the plant and absent from the forecast, so battery dispatch and curtailment are decided on a signal the plant is not producing, and no residual-based detector downstream flags the discrepancy.
     \item \textbf{Residual risk.} Overlap thins the stride branch alone, so the patch branch stays exploitable at every deployed configuration and cannot be closed by the mitigation carried here.
 \end{itemize}
+
+
+The final deliverable develops this section further.
