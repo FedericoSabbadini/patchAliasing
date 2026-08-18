@@ -88,7 +88,9 @@ MODELS_ALL: list[tuple[int, int]] = [
     (32, 32),   # O=0.000   S|P
 ]
 
-MODELS: list[tuple[int, int]] = list(MODELS_ALL)
+# Exclude certain stride values: S5, S15, S28 are not used
+EXCLUDE_S: set[int] = {5, 15, 28}
+MODELS: list[tuple[int, int]] = [(P, S) for P, S in MODELS_ALL if S not in EXCLUDE_S]
 
 # The subset the Bayesian analysis fits. The context has to close on a whole number of strides,
 # otherwise the last patch is internally padded and the padding, not the geometry, produces the
@@ -105,8 +107,8 @@ import os as _os
 _only = _os.environ.get("PATCHALIASING_MODELS", "").strip()
 if _only:
     _tags = {t.strip() for t in _only.split(",") if t.strip()}
-    MODELS = [(P, S) for (P, S) in MODELS_ALL if f"p{P}-s{S}" in _tags]
-    BAYES_MODELS = [(P, S) for (P, S) in MODELS if CTX % S == 0]
+    MODELS = [(P, S) for (P, S) in MODELS_ALL if f"p{P}-s{S}" in _tags and S not in EXCLUDE_S]
+BAYES_MODELS = [(P, S) for (P, S) in MODELS if CTX % S == 0]
 
 
 def design_gaps(models: list[tuple[int, int]] | None = None) -> list[str]:
