@@ -1,5 +1,3 @@
-\newcommand{\tofill}[1]{{\color{red}\small[\textsc{to fill}, #1]}}
-
 This deliverable reports how the plan approved in Deliverable~1 was carried out. The presentation proceeds from the trained models to the frequency behaviour measured on them, then to the Bayesian analysis that tests it, the semantic layer that operationalises it, the proposed mitigation strategy, the results, and finally the security reading.
 
 Two terms are used throughout in a precise sense. Phase-locking is a property of the input signal and the tokenisation geometry alone, exact arithmetic on $(f,f_s,P,S)$ that holds for any model, trained or not; Deliverable~1 derives it as the two conditions $x[n+S]=x[n]$ and $x[n+P]=x[n]$. A frequency satisfying the first is a stride lock, one satisfying the second a patch null, and the sets they generate are the stride branch and the patch branch of $\mathcal F_{lock}$, of which $\mathcal F_{lock}$ is the union. Structural aliasing, by contrast, is an empirical property of the learned representations, in which distinct inputs are mapped to nearly identical latent states. Phase-locking is a necessary but not a sufficient condition for it; the distinction is developed in the final deliverable.
@@ -206,7 +204,7 @@ The phase of the input signal does not appear to modulate the deficit appreciabl
 The token-collapse dips align with the stride grid and shift when the stride changes, consistent with $H3a$, and \autoref{fig:combs} shows the pattern holding across configurations and generators; the scaling law of the patch branch is not identified in the runs fitted for this deliverable.
 
 
-\begin{figure*}[!tp]
+\begin{figure*}[!b]
     \centering
     \includegraphics[width=0.92\textwidth]{figures/FIG_H2_phase.png}
     \caption{Posterior for the phase term of $H2$. On the left the observed deficit against the signal phase $\phi$, with the per-phase offset $u_p$ and its $95\%$ credible interval; on the right the posterior for $\sigma_\phi$ against its prior, the dashed line marking the ROPE edge at $\log 1.1$. Both panels pool every configuration fitted, so the estimate is not conditioned on a single geometry. Model~C has not met the convergence thresholds of \nameref{sec:bayes}, so the posterior is shown as provisional.}
