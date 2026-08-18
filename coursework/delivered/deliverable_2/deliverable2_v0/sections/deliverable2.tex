@@ -199,11 +199,11 @@ Both halves are testable rather than asserted, and $M1$ in \autoref{tab:bayesDec
 
 The frequency sweeps and the Bayesian models of \nameref{sec:bayes} point in the same direction: phase-locking affects the internal representation but does not appear to propagate to the forecast output.
 
-On the behavioural side, locked frequencies are not systematically attenuated in the rollout. In several geometries the model reconstructs them as well as their unlocked neighbours, contrary to what the degeneracy alone would predict. The representational side points toward a different pattern: the prequential codelength at a locked frequency tends to be higher than at an unlocked one, suggesting that the internal state carries a measurable cost at those sites. This split, representation penalised and forecast intact, is consistent across generators and geometries and is the central finding of this deliverable.
+On the behavioural side, locked frequencies are not systematically attenuated in the rollout. In several geometries the model reconstructs them as well as their unlocked neighbours, contrary to what the degeneracy alone would predict. The representational side points toward a different pattern: the prequential codelength at a locked frequency tends to be higher than at an unlocked one, suggesting that the internal state carries a measurable cost at those sites. This split, representation penalised and forecast intact, is consistent across generators and geometries and is the pattern the evidence points to.
 
 The phase of the input signal does not appear to modulate the deficit appreciably, consistent with $H2$: the posterior for $\sigma_\phi$ in \autoref{fig:phasePosterior} lies inside the region of practical equivalence (ROPE). It concentrates well below the threshold and is far tighter than the prior it started from, so the data and not the prior place it there, and the eight per-phase offsets $u_p$ are not separable from one another. The size of the deficit therefore follows from the geometry and from the frequency, and not from where in its cycle the signal begins, which is what licenses the remaining models to average over phase and which also removes phase randomisation from the mitigations available to an operator.
 
-The token-collapse dips align with the stride grid and shift when the stride changes, consistent with $H3a$; the patch branch is not separately identifiable in the current design.
+The token-collapse dips align with the stride grid and shift when the stride changes, consistent with $H3a$, and \autoref{fig:combs} shows the pattern holding across configurations and generators; the patch branch is not separately identifiable in the current design.
 
 
 \begin{figure*}[!tp]
@@ -213,7 +213,15 @@ The token-collapse dips align with the stride grid and shift when the stride cha
     \label{fig:phasePosterior}
 \end{figure*}
 
-The overlap-based mitigation of \nameref{sec:mitigation} does not reduce the behavioural deficit, because the deficit itself is absent at the forecast level; its effect on the representational cost is assessed in the final deliverable.
+
+\begin{figure*}[p]
+    \centering
+    \includegraphics[height=0.88\textheight]{figures/FIG_H3_combs.png}
+    \caption{Collapse profiles against the two candidate grids. Rows are the fitted configurations and columns the three generators; each panel plots the profile over the sweep band, with the stride grid $cf_s/S$ dashed and the patch grid $kf_s/P$ dotted. A dip that sits on the dashed grid and follows it as the stride changes belongs to the stride branch.}
+    \label{fig:combs}
+\end{figure*}
+
+The overlap-based mitigation of \nameref{sec:mitigation} is left to the final deliverable, where the representational cost is what it will be measured against.
 
 Models~A and~C have not reached the preregistered convergence thresholds; their estimand signs are nonetheless consistent with the converged representational model~(B) and with the independent frequentist sweeps, so the qualitative conclusions hold provisionally. The final deliverable will either report consolidated posteriors or, if convergence remains out of reach, document the limitation and fall back on the frequentist evidence.
 
