@@ -46,17 +46,6 @@ Taking into account the frequency of the input tone, the dominant frequency of t
     \label{fig:reconstruction}
 \end{figure*}
 
-The $P{=}16,\,S{=}16$ geometry is that of the published Chronos-Bolt checkpoint, but only the setting is shared: the model evaluated here is not that checkpoint, it is a variant retrained from scratch under the budget of this deliverable. Its reconstruction curve leaves the diagonal over wide stretches of the band. The figure does not license a claim about structural aliasing: it is behavioural, and records what the model outputs rather than what its representation retains.
-
-\autoref{fig:reconstruction} repeats the reading on the other four geometries, and the pattern is the same in each of them: every model rebuilds some frequencies correctly while others are not rebuilt at all.
-
-\subsubsection{Spectral Recovery}
-This reading is representational and records what the model still represents. The internal state is captured at the projected quantile head and a linear probe, standardisation then a principal component reduction then logistic regression, is scored by cross-validation. Two task families are run. The seven band tasks are those of Deliverable~1, each asking whether a tone falls in the lower or upper half of its band; their folds are grouped by frequency, so every phase of a held-out frequency is excluded from training and the probe has to generalise the boundary instead of memorising individual frequencies. An ungrouped split inflates those rows, so the earlier reading of them was optimistic. The local task poses one question of constant difficulty at every frequency, whether $f-1$\,Hz can be separated from $f+1$\,Hz, and holds out phases rather than frequencies; having no boundary artefact, it is the row the cross-geometry comparison uses. Cell colour is that cross-validated accuracy on a continuous scale from chance to one, so a partial loss is rendered as such rather than rounded into a bin; grey marks a frequency no task covers, which is a statement about the design and not about the model. Dashed markers on both panels are $\mathcal F_{lock}$ for that geometry.
-
-\autoref{fig:spectralRecovery} and \autoref{fig:spectralRecovery2} ask the same band of the representation instead of the forecast. In the local task the accuracy drops are narrow and fall close to some of the predicted lock frequencies; in the band tasks the drops instead extend over a range of frequencies around them.
-
-These observations do not establish structural aliasing either, but they do show that the models represent certain frequencies with more difficulty than others. They are the empirical ground on which the hypotheses of \nameref{sec:bayes} are built.
-
 \begin{figure*}[!t]
     \centering
     \includegraphics[width=0.90\textwidth]{figures/FIG_p16-s8_spectral_recovery.png}\\[4pt]
@@ -73,6 +62,17 @@ These observations do not establish structural aliasing either, but they do show
     \caption{Spectral recovery at the two $P=S$ geometries, where the patch length varies at zero overlap and the two branches coincide in both. Rows are the seven band tasks and, above the rule, the local $f\pm1$\,Hz task; colour is probe accuracy from chance to one, grey a frequency the task does not cover, dashed verticals $\mathcal F_{lock}$.}
     \label{fig:spectralRecovery2}
 \end{figure*}
+
+The $P{=}16,\,S{=}16$ geometry is that of the published Chronos-Bolt checkpoint, but only the setting is shared: the model evaluated here is not that checkpoint, it is a variant retrained from scratch under the budget of this deliverable. Its reconstruction curve leaves the diagonal over wide stretches of the band. The figure does not license a claim about structural aliasing: it is behavioural, and records what the model outputs rather than what its representation retains.
+
+\autoref{fig:reconstruction} repeats the reading on the other four geometries, and the pattern is the same in each of them: every model rebuilds some frequencies correctly while others are not rebuilt at all.
+
+\subsubsection{Spectral Recovery}
+This reading is representational and records what the model still represents. The internal state is captured at the projected quantile head and a linear probe, standardisation then a principal component reduction then logistic regression, is scored by cross-validation. Two task families are run. The seven band tasks are those of Deliverable~1, each asking whether a tone falls in the lower or upper half of its band; their folds are grouped by frequency, so every phase of a held-out frequency is excluded from training and the probe has to generalise the boundary instead of memorising individual frequencies. An ungrouped split inflates those rows, so the earlier reading of them was optimistic. The local task poses one question of constant difficulty at every frequency, whether $f-1$\,Hz can be separated from $f+1$\,Hz, and holds out phases rather than frequencies; having no boundary artefact, it is the row the cross-geometry comparison uses. Cell colour is that cross-validated accuracy on a continuous scale from chance to one, so a partial loss is rendered as such rather than rounded into a bin; grey marks a frequency no task covers, which is a statement about the design and not about the model. Dashed markers on both panels are $\mathcal F_{lock}$ for that geometry.
+
+\autoref{fig:spectralRecovery} and \autoref{fig:spectralRecovery2} ask the same band of the representation instead of the forecast. In the local task the accuracy drops are narrow and fall close to some of the predicted lock frequencies; in the band tasks the drops instead extend over a range of frequencies around them.
+
+These observations do not establish structural aliasing either, but they do show that the models represent certain frequencies with more difficulty than others. They are the empirical ground on which the hypotheses of \nameref{sec:bayes} are built.
 
 \input{tables/hfModels.tex}
 
@@ -178,6 +178,8 @@ Every threshold in \autoref{tab:bayesDecisions} is fixed before a posterior is i
     \item \textbf{Sampling diagnostics}: NUTS with four chains, and a fit reported only at $\hat R<1.01$, effective sample sizes above $1000$ and no divergences. Where a model does not meet these thresholds, its estimand sign is cross-checked against the converged models and the frequentist probes; it is reported as provisional.
 \end{itemize}
 
+\input{tables/bayesDecisions.tex}
+
 \section{Semantic Layer}
 \label{sec:semantic}
 
@@ -197,7 +199,7 @@ Both halves are testable rather than asserted, and $M1$ in \autoref{tab:bayesDec
 
 The frequency sweeps and the Bayesian models of \nameref{sec:bayes} point in the same direction: phase-locking affects the internal representation but does not appear to propagate to the forecast output.
 
-On the behavioural side, locked frequencies are not systematically attenuated in the rollout. In several geometries the model reconstructs them as well as their unlocked neighbours, contrary to what a na\"ive reading of the degeneracy would predict. The representational side points toward a different pattern: the prequential codelength at a locked frequency tends to be higher than at an unlocked one, suggesting that the internal state carries a measurable cost at those sites. This split---representation penalised, forecast intact---is consistent across generators and geometries and is the central finding of this deliverable.
+On the behavioural side, locked frequencies are not systematically attenuated in the rollout. In several geometries the model reconstructs them as well as their unlocked neighbours, contrary to what the degeneracy alone would predict. The representational side points toward a different pattern: the prequential codelength at a locked frequency tends to be higher than at an unlocked one, suggesting that the internal state carries a measurable cost at those sites. This split, representation penalised and forecast intact, is consistent across generators and geometries and is the central finding of this deliverable.
 
 The phase of the input signal does not appear to modulate the deficit appreciably, consistent with $H2$. The token-collapse dips align with the stride grid and shift when the stride changes, consistent with $H3a$; the patch branch is not separately identifiable in the current design.
 
@@ -214,4 +216,16 @@ The limitation itself is unusual, and characterising it correctly determines wha
 
 The attack surface follows directly. The perturbation an adversary needs is physical and small: a periodic component injected at, or dithered onto, a locked frequency by any controllable load, inverter switching pattern or curtailment schedule is present in the plant and absent from the forecast, because the tokenisation maps it to the same latent state as its absence. Two consequences are operationally significant. The signal is invisible rather than misread, so residual-based anomaly detection downstream of the forecaster does not see it either; and the same arithmetic that makes the exploit inexpensive also makes it stealthy, since the injected component is legitimate plant behaviour at a frequency the operator has no reason to treat as special. Detection has to be placed before tokenisation, on the raw telemetry, or it is placed inside the blind spot it is meant to guard.
 
-What the framework then requires is that this be mapped, measured and managed rather than merely noted. Mapping is \autoref{tab:hfModels} together with the lock arithmetic, which enumerates the affected set for every deployed configuration. Measurement is the Bayesian analysis of \nameref{sec:bayes}: the estimand and its credible interval are the evidence artefact, and the prior probability recorded beside each threshold is what makes the verdict auditable rather than asserted. Management has two components, one in the model and one in the system. In the model it is the overlap mitigation, whose bound is stated alongside it, since overlap thins one branch and leaves the other untouched, so residual risk survives by construction and has to be reported as such. In the system it is the semantic layer, where a \valueof{PartiallyObservable} assessment degrades actuation instead of failing silently, which is the resilience property the framework asks for. The full risk assessment, with the threat model, the residual-risk register and the operational controls, is carried in the final deliverable.
+What the framework then requires is that this be mapped, measured and managed rather than merely noted. Mapping is \autoref{tab:hfModels} together with the lock arithmetic, which enumerates the affected set for every deployed configuration. Measurement is the Bayesian analysis of \nameref{sec:bayes}: the estimand and its credible interval are the evidence artefact, and the prior probability recorded beside each threshold is what makes the verdict auditable rather than asserted. Management has two components, one in the model and one in the system. In the model it is the overlap mitigation, whose bound is stated alongside it, since overlap thins one branch and leaves the other untouched, so residual risk survives by construction and has to be reported as such. In the system it is the semantic layer, where a \valueof{PartiallyObservable} assessment degrades actuation instead of failing silently, which is the resilience property the framework asks for.
+
+A weakness becomes a vulnerability only when someone can reach it, and the final deliverable will make that step explicit. The five elements it needs are already determined by what precedes.
+
+\begin{itemize}\setlength{\itemsep}{2pt}
+    \item \textbf{Adversary capabilities.} No model access of any kind, and no knowledge of the training corpus; only the ability to drive a periodic load on the plant, which an inverter switching schedule or a switchable load already provides.
+    \item \textbf{Attack surface.} The telemetry stream upstream of tokenisation, reached by acting on the physical process rather than on the data path.
+    \item \textbf{Manipulation of telemetry.} A small periodic component at a locked frequency, which is legitimate plant behaviour and survives any plausibility check on the raw signal.
+    \item \textbf{Operational consequence.} The component is present in the plant and absent from the forecast, so battery dispatch and curtailment are decided on a signal the plant is not producing, and no residual-based detector downstream flags the discrepancy.
+    \item \textbf{Residual risk.} Overlap thins the stride branch alone, so the patch branch stays exploitable at every deployed configuration and cannot be closed by the mitigation carried here.
+\end{itemize}
+
+The threat model, the risk register and the operational controls that follow from these are carried in the final deliverable.
