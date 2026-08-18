@@ -142,28 +142,28 @@ C&=(L_S\vee L_P)\wedge\left(0<f<\frac{f_s}{2}\right),
 \end{aligned}
 \label{eq:locking-candidate}
 \end{equation}
-where $\varepsilon_S$ and $\varepsilon_P$ are tied to frequency resolution and are never hardcoded frequency bands. Only $L_S$ expresses equality of consecutive patch phases; $L_P$ records whole-cycle repetition inside a patch and is retained as an H3 experimental factor. Their union $C$ is a candidate geometry class, not proof that two domain concepts are indistinguishable.
+where $\varepsilon_S$ and $\varepsilon_P$ are tied to frequency resolution and are never hardcoded frequency bands. Only $L_S$ expresses equality of consecutive patch phases; $L_P$ records whole-cycle repetition inside a patch and is retained as an H3 experimental factor. Their union $Z$ is a candidate geometry class, not proof that two domain concepts are indistinguishable.
 
-This is a division of labour, and it bounds what the ontology can conclude on its own. Phase-locking is \emph{derivable}: $L_S$, $L_P$ and $C$ follow by rule from \pv{signalFrequencyHz}, \pv{samplingFrequencyHz}, \pv{patchSize} and \pv{stride}, all of which the knowledge base already holds, so a reasoner can enumerate the candidate set for any configuration without observing a model. Structural aliasing is \emph{not} derivable and is only recorded: it enters through $B$ below, which is posterior evidence from an experiment external to the ontology, and no rule here can produce it. An agent using this ontology therefore detects phase-locking and reports structural aliasing.
+This is a division of labour, and it bounds what the ontology can conclude on its own. Phase-locking is \emph{derivable}: $L_S$, $L_P$ and $Z$ follow by rule from \pv{signalFrequencyHz}, \pv{samplingFrequencyHz}, \pv{patchSize} and \pv{stride}, all of which the knowledge base already holds, so a reasoner can enumerate the candidate set for any configuration without observing a model. Structural aliasing is \emph{not} derivable and is only recorded: it enters through $Y$ below, which is posterior evidence from an experiment external to the ontology, and no rule here can produce it. An agent using this ontology therefore detects phase-locking and reports structural aliasing.
 
-Let $q$ denote the task-relevant information being tested, for example frequency or amplitude. Let $\Delta_{\mathrm{loss}}(q)$ be its predeclared behavioral or representational loss relative to matched controls, $\delta$ the maximum practically negligible loss, $D$ the experimental evidence, and $\tau>1/2$ the posterior confidence threshold. Define confirmed information loss $B$ and confirmed preservation $R$ as
+Let $q$ denote the task-relevant information being tested, for example frequency or amplitude. Let $\Delta_{\mathrm{loss}}(q)$ be its predeclared behavioral or representational loss relative to matched controls, $\delta$ the maximum practically negligible loss, $D$ the experimental evidence, and $\tau>1/2$ the posterior confidence threshold. Define confirmed information loss $Y$ and confirmed preservation $R$ as
 \begin{equation}
-B=\left[\Pr\!\left(\Delta_{\mathrm{loss}}(q)>\delta\mid D\right)\geq\tau\right],
+Y=\left[\Pr\!\left(\Delta_{\mathrm{loss}}(q)>\delta\mid D\right)\geq\tau\right],
 \qquad
 R=\left[\Pr\!\left(\Delta_{\mathrm{loss}}(q)\leq\delta\mid D\right)\geq\tau\right].
 \label{eq:bayesian-evidence}
 \end{equation}
-Because $\tau>1/2$, $B$ and $R$ cannot both hold for the same assessment. The assessment interface is designed to receive the planned offline evidence already specified in Deliverable~1: a local amplitude-recovery contrast with a heavy-tailed Student-$t_4$ likelihood and a Gamma regression with log link for non-negative prequential-MDL codelength. The population contrast uses the weakly informative prior $\bar\beta\sim\text{Student-}t_4(0,0.5)$; the Gamma model uses $\theta_{\mathrm{lock}}\sim\mathcal N(0,0.5)$ and shape $k\sim\mathrm{Gamma}(2,0.1)$. The stored record identifies the tested $(P,S)$ configuration, matched controls, method and metric, effect estimate, $95\%$ credible interval, and posterior probability of at least $20\%$ attenuation. These are evidence fields, not universal ontology thresholds. Until that planned inference has completed and satisfies the predeclared criterion, no instance may be asserted as \valueof{StructurallyAliased}.
+Because $\tau>1/2$, $Y$ and $R$ cannot both hold for the same assessment. The assessment interface is designed to receive the planned offline evidence already specified in Deliverable~1: a local amplitude-recovery contrast with a heavy-tailed Student-$t_4$ likelihood and a Gamma regression with log link for non-negative prequential-MDL codelength. The population contrast uses the weakly informative prior $\bar\beta\sim\text{Student-}t_4(0,0.5)$; the Gamma model uses $\theta_{\mathrm{lock}}\sim\mathcal N(0,0.5)$ and shape $k\sim\mathrm{Gamma}(2,0.1)$. The stored record identifies the tested $(P,S)$ configuration, matched controls, method and metric, effect estimate, $95\%$ credible interval, and posterior probability of at least $20\%$ attenuation. These are evidence fields, not universal ontology thresholds. Until that planned inference has completed and satisfies the predeclared criterion, no instance may be asserted as \valueof{StructurallyAliased}.
 
 The three observability values are assigned as follows:
 \begin{equation}
 C_O=
 \begin{cases}
-\valueof{StructurallyAliased}, & A,\\
-\valueof{Observable}, & \neg A\wedge R,\\
-\valueof{PartiallyObservable}, & \neg A\wedge\neg R,
+\valueof{StructurallyAliased}, & X,\\
+\valueof{Observable}, & \neg X\wedge R,\\
+\valueof{PartiallyObservable}, & \neg X\wedge\neg R,
 \end{cases}
-\qquad A=C\wedge B.
+\qquad X=Z\wedge Y.
 \label{eq:observability-state}
 \end{equation}
 \valueof{Observable} therefore means that positive evidence shows the tested representation preserves the task-relevant information within tolerance $\delta$. It does not mean global observability of the physical system, nor does it merely mean that aliasing was not found. Candidate geometry may still be \valueof{Observable} when the experiment demonstrates preservation. \valueof{PartiallyObservable} is the epistemic fallback: preservation has not been certified, while structural aliasing has not been confirmed. It includes a candidate with inconclusive evidence, an unfinished test, a credible interval crossing the decision threshold, conflicting metrics, or no preservation evidence. The term means \emph{partially trusted}, not that a fixed fraction of samples or sensors is visible.
