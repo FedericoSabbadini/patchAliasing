@@ -237,3 +237,8 @@ report/main.zip
 chronos/models/weights/
 # Local training data subset
 chronos/data/corpus/
+
+# Bayesian MCMC run data (large .nc traces kept local only)
+chronos/bayesian/_run/
+# Signal .npy files (generated, too large for git)
+chronos/bayesian/results/**/signals/
