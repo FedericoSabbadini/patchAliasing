@@ -1,123 +1,34 @@
 \input{tables/hfModels.tex}
-\input{tables/bayesModels.tex}
 
-Each hypothesis receives its own measurement, its own model and its own estimand. \autoref{tab:bayesModels} lists the models with the value each claim predicts, \autoref{tab:bayesPriors} every prior, and \autoref{tab:bayesDecisions} the rule that turns a posterior into a verdict. All are ordinary regressions; only the quantity on the left and the question the coefficient answers change between them.
+The experimental evaluation uses three synthetic signal generators: a single-harmonic sinusoidal generator, a modified TSMixup generator, and a KernelSynth generator. The last two are based on methods proposed for Chronos training.\cite{ansariChronosLearningLanguage2024}
 
-Each model is built the same way: a measurement, a linear predictor $\mu_i$ that adds one offset per group the observation belongs to, and a likelihood. One coefficient is the estimand and the rest keep it unconfounded. \autoref{tab:bayesPriors} gives every prior with the role its parameter plays. The range over which the prior scale is varied as a sensitivity check is $\{0.25,0.5,1.0\}$; all are centred on no effect, so a posterior that has not moved from its prior is itself a report of an absent effect.
+\subsection{Synthetic Probing Setup}
 
-\subsection{H1}
-The behavioural measurement is the forecast amplitude recovery $R=A_{\text{pred}}/A_{\text{true}}$, collected in matched triplets: each lock $f_k$ with its two controls, all three sharing the same background realisation and the same phase, which is what makes the contrast paired. The contrast used is
-
-\begin{equation}
-\label{eq:d3contrast}
-d = \log(R_k + 0.01) - \tfrac{1}{2}\left[\log(R_- + 0.01) + \log(R_+ + 0.01)\right],
-\end{equation}
-
-one number per triplet, negative when the lock recovers less than its neighbours. It can be formed only because the injected tone has a known frequency. Model~A fits it as
+\subsubsection{Single-Harmonic Sinusoidal Generator}
+This generator produces a simple sinusoidal signal with a single frequency component. The generated signal can be expressed mathematically as:
 
 \begin{equation}
-\label{eq:d3hier}
-d_i \sim \text{Student-}t_4(\mu_i,\ \sigma),
-\quad
-\mu_i = \beta_{c[i]} + u_{k[i]} + u_{b[i]},
-\quad
-\beta_c \sim \mathcal{N}\!\left(\bar\beta + \delta_O \widetilde O_c + \delta_P \widetilde{\log P}_c,\ \tau\right).
+    x(t) = A \cdot \sin(2\pi f t + \phi)
 \end{equation}
 
-\autoref{eq:d3hier} has four components, each motivated separately.
+The continuous signal is then sampled at a specified rate to create a discrete time-series. The parameters of the generator, such as amplitude, frequency, and phase, can be adjusted to create different sinusoidal signals for testing purposes.
 
-\begin{itemize}\setlength{\itemsep}{2pt}
-    \item \textbf{Three offsets in $\mu_i$}: $\beta_c$ per configuration, $u_k$ per lock harmonic and $u_b$ per background draw, so that neither an unusual frequency nor a single corpus can be mistaken for the effect.
-    \item \textbf{Student-$t_4$, not Gaussian.} Where the model rebuilds nothing, recovery is near zero and the logarithm returns very large contrasts; under a Gaussian a small number of them would determine the estimate.
-    \item \textbf{$\beta_c$ drawn around $\bar\beta$}, making the geometries instances of one phenomenon rather than unrelated experiments. Two consequences follow. $\bar\beta$ exists as a parameter, which $H1$ requires, being a claim about patch-based tokenisation and not about a single checkpoint; and each geometry contributes equal weight, so the largest design cannot dominate the estimate when the number of usable triplets varies several-fold with the in-band lock count.
-    \item \textbf{Two configuration-level covariates}, estimable together rather than confounded because the design varies overlap and patch size independently. Overlap enters as a ratio, patch size as $\log P$ because the patch grid has spacing $f_s/P$ and equal steps in $\log P$ are equal ratios of spacing. The tilde denotes centring on the design, $\widetilde O_c=(O_c-\bar O)/0.5$ and $\widetilde{\log P}_c=\log P_c-\overline{\log P}$, which leaves $\bar\beta$ the effect at the average configuration rather than an extrapolation to $O=0$ and $P=1$.
-\end{itemize}
+\subsubsection{Light TSMixup Generator}
+We propose a controlled probing variant of the TSMixup method described in the Chronos data augmentation procedure.\cite{ansariChronosLearningLanguage2024} The original TSMixup algorithm samples subsequences from real training datasets, applies mean scaling to each sampled time series, draws mixing coefficients from a symmetric Dirichlet distribution, and returns their convex combination.
 
-Model~B poses the same question of the representation, on a frequency-local prequential codelength: at each $f_c$ a probe separates tones at $f_c \pm 1$\,Hz from a captured internal state. Ten states are probed: the encoder $[\mathrm{REG}]$ token after each encoder block, the decoder state after each decoder block, the pre-projection vector and the quantile head; the decoder-side vectors are named decoder states because Chronos-Bolt carries $[\mathrm{REG}]$ in the encoder only. The regression is Gamma with a log link, so $e^{\theta_{lock}}$ is the factor by which the codelength of a locked frequency increases, with probe stage and geometry as zero-mean offsets since codelengths differ several-fold between stages. Deliverable~1's band tasks summarise hundreds of frequencies at once, so the lock indicator has nothing to attach to; they are kept as a cross-check.
+Light TSMixup preserves this stochastic mixing structure, but replaces the real dataset collection with a controlled pool of sinusoidal signals. Each base signal is defined by frequency, amplitude, phase, length, and sampling frequency. This simplification makes the generated signals easier to interpret when testing whether Chronos-Bolt exhibits frequency-dependent blind spots or phase-locking effects.
 
-\input{tables/bayesPriors.tex}
+The parameters of the generator, such as the maximum number of sinusoidal components, Dirichlet concentration, target length, and sampling frequency, can be adjusted to create different synthetic signals for testing purposes. The pseudocode for the Light TSMixup generator is listed in \autoref{sec:appB}.
 
-\subsection{H2}
-$H2$ uses the same triplets with one change. \autoref{eq:d3contrast} has already averaged over phase, so the phase index is kept instead and the response becomes the per-phase deficit $y_i = \log(R_{\text{ctrl},i}+0.01)-\log(R_{\text{lock},i}+0.01)$, which is $d$ with its sign reversed and positive when the lock is worse. Model~C is Model~A on that response, without the configuration-level covariates and with the phase circle cut into eight slices, each given its own offset $u_p$:
+\subsubsection{KernelSynth Generator}
+Since TSMixup is able to produce only simple composition of sinusoidal signals, we implement KernelSynth as a more complex alternative, which can generate signals with richer frequency content and temporal dynamics. By comparing the performance of Chronos-Bolt on signals generated by both methods, we can gain insights into how structural aliasing affects the model's ability to learn and forecast time-series data with varying levels of complexity.
 
-\begin{equation}
-\label{eq:d3phase}
-y_i \sim \text{Student-}t_4(\mu_i,\ \sigma),
-\qquad
-\mu_i = \beta_{c[i]} + u_{k[i]} + u_{b[i]} + u_{p[i]},
-\qquad
-u_p \sim \mathcal{N}(0, \sigma_\phi).
-\end{equation}
+The KernelSynth generator is also described in the Chronos data augmentation procedure.\cite{ansariChronosLearningLanguage2024} It produces synthetic signals by combining different kernel functions, using randomly selected weights from a normal distribution. The selected kernels are combined using sum and product operators. Its pseudocode, kernel bank and parameters are listed in \autoref{sec:appC}.
 
-The estimand $\sigma_\phi$ is the spread of those eight offsets, and it answers the question with one number. If the deficit depends on where in its cycle the signal starts, the offsets differ and $\sigma_\phi$ is large. If the geometry alone determines it, they are equal and $\sigma_\phi$ is near zero, as $H2$ predicts. Slices are used rather than a fitted curve because they assume nothing about the form a dependence might take. Dropping $u_p$ gives a nested null, and comparing the two by leave-one-out cross-validation (LOO) separates the size of the phase effect from the evidence that it exists.
+\subsection{Experimental Protocol}
 
-\subsection{H3}
-$H3$ was stated as two claims, one per branch. Both are tested on the token collapse $z_g(f)$, the dispersion of the input-patch embeddings across patches, which is zero when consecutive patches are identical. All geometries share one sweep grid: a uniform $1$\,Hz sweep unioned with the predicted sites of every configuration swept. No geometry is therefore scored only where its own theory predicts a dip, and non-integer sites such as $42.\overline{6}$\,Hz for $S{=}12$ are covered.
+All signals are sampled at $f_s = 512$\,Hz. Pure sinusoids are swept from $2$ to $250$\,Hz in one-hertz steps at several non-redundant starting phases, so that every tone is fully representable under the Nyquist--Shannon theorem and a loss observed at a predicted lock frequency cannot be attributed to undersampling. A single seed ($42$) controls all stochastic generation, ensuring full reproducibility.
 
-The first question is where the dips are located. Each swept frequency carries two labels, one per branch:
+The complete experimental grid is built before any data are collected: one row per combination of geometry $(P,S)$, lock frequency, background type, and phase. For each experimental condition, $200$ background draws from both the Light TSMixup and KernelSynth generators are archived alongside the probing results, so that the exact inputs behind every posterior can be reloaded for verification. Each geometry is probed independently: the retrained Chronos-Bolt weights are loaded, the synthetic signals are generated, predictions are run, and the outputs are written to the observation tables that feed the Bayesian models of \nameref{sec:four}.
 
-\begin{equation}
-\label{eq:d3sites}
-\log z_g(f) \sim \mathcal{N}\!\left(
-\alpha_g + \theta_S \cdot \text{OnStrideGrid} + \theta_P \cdot \text{OnPatchGrid},\ \sigma
-\right).
-\end{equation}
-
-The logarithm makes the labels multiplicative on the per-geometry off-grid level $\alpha_g$. The two label coefficients $\theta_S$ and $\theta_P$ are the estimands, and $H3$ predicts both negative, so the two-label fit should win the LOO comparison against each label alone and against neither. The two labels are not competing explanations of the same dips, since a frequency may carry either or both. The two coefficients separate, however, only where exactly one label applies, which for $\theta_S$ means the geometries with $S \nmid P$.
-
-The second question is whether the dips move. The fit above remains compatible with dips that merely sit on a fixed grid, so each branch is checked against its own scaling law. Every detected dip is assigned to the branch that predicts it, and sites belonging to both are set aside. The fundamental $\hat f^{\,F}_{1,g}$ of branch $F$ in geometry $g$ is then compared with the spacing that branch predicts, $\Delta^S_g=f_s/S_g$ or $\Delta^P_g=f_s/P_g$:
-
-\begin{equation}
-\label{eq:d3move}
-\hat f^{\,F}_{1,g} \sim \mathcal{N}\!\left(
-\kappa_F \,\Delta^F_g,\ \sqrt{\sigma_F^2+\Delta f^2}
-\right).
-\end{equation}
-
-The slope $\kappa_F$ is the estimand, measured spacing per unit of predicted spacing, so $\kappa_F=1$ denotes a branch that tracks its own arithmetic. The scatter $\sigma_F$ about it is given a floor $\Delta f$, the sweep step, since a spacing read off a discrete grid is no more precise than one step; without the floor, sites landing exactly on the prediction drive $\sigma_F$ to zero and the posterior degenerates.
-
-\subsubsection{$H3a$, the stride branch}
-The prediction is $\kappa_S=1$: the stride sites track $f_s/S$ one for one, so a site that remains fixed while $S$ changes refutes it. Identification needs a series that holds $P$ fixed and varies $S$, which \autoref{tab:hfModels} supplies at $P{=}16$, $24$ and $32$.
-
-\subsubsection{$H3b$, the patch branch}
-The prediction is $\kappa_P=1$ in the same way. Identification needs a series that holds $S$ fixed and varies $P$, which \autoref{tab:hfModels} supplies at $S{=}8$, $12$ and $16$.
-
-\subsection{Decisions and validation}
-All signals are sampled at $f_s = 512$\,Hz. Pure sinusoids are swept from $2$ to $250$\,Hz in one-hertz steps at several non-redundant starting phases, so that every tone is fully representable under the Nyquist-Shannon theorem and a loss observed at a predicted lock frequency cannot be attributed to undersampling. A single seed ($42$) controls all stochastic generation, ensuring full reproducibility.
-
-The complete experimental grid is built before any data are collected: one row per combination of geometry $(P,S)$, lock frequency, background type, and phase. Models~A and~C include a per-background random offset $u_b$ with scale $\sigma_b$; this lets the posterior separate generator-specific variation from the aliasing effect itself, so that a recovery difference between Light TSMixup and KernelSynth backgrounds is attributed to the generator rather than inflating or deflating the estimate of $\bar\beta$. For each experimental condition, $200$ background draws are archived alongside the probing results, so that the exact inputs behind every posterior can be reloaded for verification.
-
-Every threshold in \autoref{tab:bayesDecisions} is fixed before a posterior is inspected, and validation comes before interpretation. The analysis is implemented in a single reproducible notebook organised in five sequential parts, each corresponding to one ingredient of the Bayesian inference.
-
-\input{tables/bayesDecisions.tex}
-
-\subsection{Notebook workflow}
-
-The Bayesian analysis is implemented in one reproducible notebook, \texttt{bayesian\_analysis.ipynb}. Its role is not to introduce a new method after the fact, but to execute the hypotheses, measurements, priors and decision rules defined above in a fixed order. The notebook therefore has a short setup stage followed by five inferential parts: priors, observation, likelihood, posterior inference and checks. Each part writes checkpoints to disk, so that an interrupted run can resume without changing the statistical design.
-
-\textbf{Part~0 (Setup).} The notebook installs only missing dependencies, locates the repository, fixes the random seed at $42$ for full reproducibility, and creates the checkpoint directories. The design constants are imported from \texttt{probe\_lib.py}: a nominal sampling rate $f_s = 512$\,Hz that maps discrete indices to physical frequencies, a $480$-point context window observed by Chronos-Bolt, a $64$-point prediction horizon that the model must forecast, the $2$--$250$\,Hz analysis band, the retrained $(P,S)$ geometries listed in \autoref{tab:hfModels}, and the phase-locking frequency set $\mathcal{F}_{lock}$. All generators produce sequences of $480+64=544$ points directly as discrete values; no analog-to-digital conversion is involved.
-
-The Bayesian sampler that will be used in Parts~3--5 is also configured here: the NUTS algorithm explores the posterior distribution with $4$ independent chains, each discarding $2000$ initial warm-up steps used to calibrate the step size and retaining the subsequent $2000$ draws as posterior samples; \texttt{target\_accept}${}=0.9$ controls the sampler's step-size adaptation, with higher values producing more cautious but more precise exploration.
-
-\medskip
-\textbf{Part~1 (Priors).} Before any Chronos output is loaded, the notebook builds the design skeleton: one planned row per geometry, lock frequency, background realisation, generator and phase. It then declares the priors of \autoref{tab:bayesPriors}, the decision thresholds of \autoref{tab:bayesDecisions}, and the prior-sensitivity ladder $\{0.25,0.5,1.0\}$, three scales at which the prior width of Model~A will be varied in Part~5 to verify that the H1 conclusion is driven by the data rather than by the choice of scale. Prior predictive checks simulate data from the prior alone, without any Chronos output, to verify that the declared priors are centred on no effect, admit effects large enough to falsify or support the hypotheses, and make the decision thresholds reachable from both sides. The prior specification is saved as both JSON and Parquet, making later drift between the notebook and the report detectable.
-
-\medskip
-\textbf{Part~2 (Observation).} The collection module \texttt{collect.py} loads, for each geometry, the retrained Chronos-Bolt weights, generates the synthetic signals, runs the predictions, and writes five tables in which each row is one observation and each column is one variable:
-\begin{itemize}\setlength{\itemsep}{2pt}
-    \item \textbf{\texttt{contrasts}}: one row per triplet (lock frequency $f_k$ with its two controls $f_k \pm \delta$), sharing background realisation and phase. Each row carries the forecast amplitude recovery $R$ at the three frequencies and the contrast $d$. Feeds Models~A and~C; the phase index is retained for H2.
-    \item \textbf{\texttt{mdl\_cells}}: one row per probed frequency $f_c$, probe stage and geometry. Each row carries the prequential codelength of a linear probe separating $f_c - 1$\,Hz from $f_c + 1$\,Hz. Feeds Model~B.
-    \item \textbf{\texttt{mdl\_bandtasks}}: one row per band task, geometry and probe stage. Retained only as a descriptive cross-check of overall decodability; not used by any Bayesian model.
-    \item \textbf{\texttt{collapse}}: one row per swept frequency and geometry. Each row carries the across-patch token dispersion $z_g(f)$. Feeds Model~D1.
-    \item \textbf{\texttt{sites}}: one row per detected collapse site and branch. Each row carries the fundamental $f_1$ and the measured spacing $\hat\Delta$. Feeds Model~D2.
-\end{itemize}
-Collection is checkpointed per geometry: a completed geometry is reloaded rather than recomputed, so an interrupted run resumes from the last incomplete geometry without altering the statistical design. The generated TSMixup and KernelSynth backgrounds are archived alongside the results, so that the exact signals behind any posterior can be inspected.
-
-\medskip
-\textbf{Part~3 (Likelihood).} The notebook defines the five statistical models (A, B, C, D1, D2) as PyMC specifications, each built from the corresponding table of Part~2. A shared sampling wrapper fits every model with the same NUTS settings declared in Part~0, so that no model receives a more or less careful exploration than another. Before fitting the real observations, a parameter-recovery test is run on Model~A, the central and most complex model. Synthetic contrasts are generated from Model~A itself on the real experimental structure (the same geometries, lock frequencies, backgrounds and phases that the actual data follow), fixing the population effect $\bar\beta$ at four known values: $0$ (no attenuation), $\log 0.8$ ($20\%$), $\log 0.5$ ($50\%$) and $\log 0.1$ ($90\%$). For each scenario the model is refitted on these synthetic data and the posterior of $\bar\beta$ is compared against the known value. If the posterior recovers it, the experimental design has enough statistical power to detect the effect or mark a genuine absence rather than insufficient design.
-
-\medskip
-\textbf{Part~4 (Posterior inference).} The fitted posteriors are either sampled or reloaded from NetCDF checkpoints. For each hypothesis, the notebook reports the estimand on its natural scale, a $95\%$ credible interval, the posterior probability of the preregistered decision threshold, and the practical-equivalence probability. Model comparisons use leave-one-out cross-validation where the report defined competing formulations: the phase-dependent and phase-free versions of Model~C, the adjusted and literal versions of Model~B, the configuration-level variants of Model~A for mitigation, and the competing grid labels of Model~D1.
-
-\medskip
-\textbf{Part~5 (Checks and verdicts).} The final part tests whether the posterior can be trusted before interpreting it. Convergence diagnostics require $\hat R<1.01$, adequate bulk and tail effective sample size, and zero divergences. Posterior predictive checks compare data generated from Model~A against the observed contrasts, both pooled and stratified by configuration and generator. Prior sensitivity refits Model~A across the scale ladder and with a Gaussian likelihood replacing the Student-$t_4$ likelihood; the H1 conclusion is reportable only if the decision probability and credible interval remain stable. LOO tables are read using the rule $|\text{elpd\_diff}| < 2\cdot\text{dse}$ as inconclusive. The notebook finally writes a verdict table with the three-way rule fixed before observation: supported, refuted or inconclusive.
+The geometries listed in \autoref{tab:hfModels} are chosen to allow independent variation of $P$ and $S$. Series at fixed $P$ and varying $S$ ($P{=}16$ with $S\in\{4,8,12,15,16\}$; $P{=}24$ with $S\in\{8,12,15,16,20,24\}$; $P{=}32$ with $S\in\{8,12,15,16,20,24,28,32\}$) isolate the stride effect, while series at fixed $S$ and varying $P$ ($S{=}8$ with $P\in\{8,16,24,32\}$; $S{=}12$ with $P\in\{16,24,32\}$; $S{=}16$ with $P\in\{16,24,32\}$) isolate the patch effect. This factorial structure is what lets Models~A and~D of \nameref{sec:four} separate the two branches and estimate the overlap and patch-size covariates without confounding.

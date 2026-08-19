@@ -1,0 +1,66 @@
+\input{tables/patchStride.tex}
+
+The first analysis sweeps pure sinusoids from $2$ to $250$\,Hz in one-hertz steps, at a sampling frequency of $f_s=512$\,Hz. For each tone, the frequency produced by Chronos is compared with the known input frequency. Pure sinusoids keep the test easy to interpret: no background spectral content can explain a loss at a predicted lock frequency. The band stops below the Nyquist limit $f_s/2=256$\,Hz, so every tone swept is fully representable under the Nyquist--Shannon theorem, as \nameref{sec:one} sets out, and a loss observed here cannot be attributed to undersampling.
+
+\autoref{tab:patchStride} summarises the patch size $P$, stride $S$, overlap $O=(P-S)/P$, and token count of each configuration. All models, including the $P{=}S{=}16$ baseline, are trained from scratch with the same $100$k-step budget and seed; the published \texttt{chronos-bolt-tiny} checkpoint is not used. This keeps training length fixed across configurations while the token count shows the computational cost of overlap.
+
+A locked frequency can satisfy the stride condition, the patch condition, or both. The notation $S\mid P$ means that $P$ is an integer multiple of $S$. In that case every stride-lock site is also a patch-null site, so there are no stride-only sites, although patch-only sites may remain. Conversely, $P\mid S$ means that every patch-null site is also a stride-lock site, so there are no patch-only sites. If neither relation holds, both types of exclusive site are possible; if $P=S$, the two sets coincide.
+
+\input{tables/flockDomains.tex}
+
+\autoref{tab:flock} applies this rule to the sweep by sorting each candidate frequency into stride only, both, or patch only. Its main purpose is attribution: a dip at an exclusive site can be associated with one branch, whereas a dip at a shared site cannot separate their contributions.
+
+Each configuration is swept over the same band at several non-redundant starting phases. The nominal $512$-sample context is shortened, when necessary, to a whole number of strides so that the final patch is not padded; otherwise padding could create an artificial collapse. When the stride divides $512$, integer-frequency tones also complete whole cycles in the window. For other strides, the context differs by fewer than $S$ samples. Each model is loaded, measured, and released in turn.
+
+\subsection{Frequency Reconstruction}
+This reading is behavioural and records what the model outputs. The sinusoid is given as context, the median forecast is appended and fed back, and the rollout continues to $512$ generated samples. Its dominant frequency is read as the largest magnitude of the discrete Fourier transform after the mean is removed and the zero-frequency bin skipped, then averaged over phases and plotted against the input frequency. A point on the diagonal is a tone rebuilt correctly, a flat segment is a set of distinct inputs collapsing onto one output, and the shaded band is one standard deviation over phases.
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=0.53\textwidth]{figures/FIG_p16-s16_reconstruction.png}
+    \caption{Reconstruction on the $P=16, S=16$ geometry: dominant frequency of the rollout against the tone supplied, averaged over phases, one standard deviation shaded. The dotted diagonal is a tone rebuilt correctly; the dashed verticals are $\mathcal F_{lock}$.}
+    \label{fig:reconstruction16}
+\end{figure}
+
+\begin{figure*}[!h]
+    \centering
+    \includegraphics[width=0.45\textwidth]{figures/FIG_p8-s8_reconstruction.png}\hfill
+    \includegraphics[width=0.45\textwidth]{figures/FIG_p16-s8_reconstruction.png}\\[6pt]
+    \includegraphics[width=0.45\textwidth]{figures/FIG_p16-s12_reconstruction.png}\hfill
+    \includegraphics[width=0.45\textwidth]{figures/FIG_p24-s24_reconstruction.png}
+    \caption{Reconstruction on the other four geometries: dominant frequency of the rollout against the tone supplied, averaged over phases, one standard deviation shaded. The dotted diagonal is a tone rebuilt correctly; the dashed verticals are $\mathcal F_{lock}$.}
+    \label{fig:reconstruction}
+\end{figure*}
+
+\autoref{fig:reconstruction16} plots the dominant frequency of the rollout against the frequency of the input tone. The dotted diagonal is a perfect reconstruction and the dashed verticals are $\mathcal F_{lock}$.
+
+The $P{=}16,\,S{=}16$ geometry is that of the published Chronos-Bolt checkpoint, but only the setting is shared: the model evaluated here is not that checkpoint; it is a variant retrained from scratch under the same $100$k-step budget. Its reconstruction curve leaves the diagonal over wide stretches of the band. The figure does not licence a claim about structural aliasing: it is behavioural, and records what the model outputs rather than what its representation retains.
+
+\autoref{fig:reconstruction} repeats the reading on the other four geometries, and the pattern is the same in each of them: every model rebuilds some frequencies correctly while others are not rebuilt at all.
+
+\subsection{Spectral Recovery}
+This reading is representational and records what the model still represents. The internal state is captured at the projected quantile head, and a linear probe (standardisation, then a principal component reduction, then logistic regression) is scored by cross-validation. The reading here is taken at that one stage; Model~B of \nameref{sec:four} repeats it at ten. Two task families are run. The seven band tasks each ask whether a tone falls in the lower or upper half of its band; their folds are grouped by frequency, so every phase of a held-out frequency is excluded from training and the probe has to generalise the boundary instead of memorising individual frequencies. An ungrouped split inflates those rows. The local task poses one question of constant difficulty at every frequency, whether $f-1$\,Hz can be separated from $f+1$\,Hz, and holds out phases rather than frequencies; having no boundary artefact, it is the row the cross-geometry comparison uses. Cell colour is that cross-validated accuracy on a continuous scale from chance to one, so a partial loss is rendered as such rather than rounded into a bin; grey marks a frequency no task covers, which is a statement about the design and not about the model. Dashed markers on both panels are $\mathcal F_{lock}$ for that geometry.
+
+\begin{figure*}[!t]
+    \centering
+    \includegraphics[width=0.90\textwidth]{figures/FIG_p16-s8_spectral_recovery.png}\\[4pt]
+    \includegraphics[width=0.90\textwidth]{figures/FIG_p16-s12_spectral_recovery.png}\\[4pt]
+    \includegraphics[width=0.90\textwidth]{figures/FIG_p16-s16_spectral_recovery.png}
+    \caption{Spectral recovery at $P=16$, the stride lengthening from $S=8$ to $S=16$, so a feature that moves between panels belongs to the stride branch. Rows are the seven band tasks and, above the rule, the local $f\pm1$\,Hz task; colour is probe accuracy from chance to one, grey a frequency the task does not cover, dashed verticals $\mathcal F_{lock}$.}
+    \label{fig:spectralRecovery}
+\end{figure*}
+
+\begin{figure*}[!t]
+    \centering
+    \includegraphics[width=0.90\textwidth]{figures/FIG_p8-s8_spectral_recovery.png}\\[4pt]
+    \includegraphics[width=0.90\textwidth]{figures/FIG_p24-s24_spectral_recovery.png}
+    \caption{Spectral recovery at the two $P=S$ geometries, where the patch length varies at zero overlap and the two branches coincide in both. Rows are the seven band tasks and, above the rule, the local $f\pm1$\,Hz task; colour is probe accuracy from chance to one, grey a frequency the task does not cover, dashed verticals $\mathcal F_{lock}$.}
+    \label{fig:spectralRecovery2}
+\end{figure*}
+
+\autoref{fig:spectralRecovery} and \autoref{fig:spectralRecovery2} ask the same band of the representation instead of the forecast. In the local task the accuracy drops are narrow and fall close to some of the predicted lock frequencies; in the band tasks the drops instead extend over a range of frequencies around them.
+
+These observations do not establish structural aliasing by themselves, but they do show that the models represent certain frequencies with more difficulty than others. They are the empirical ground on which the Bayesian models of \nameref{sec:four} are built. The Bayesian fits share a fixed $480$-sample probing context across geometries, so a stride that does not divide it can be swept but not fitted.
+
+\subsection{Limits of this design}
+The five geometries of \autoref{tab:patchStride} bound what can be concluded from the sweep above. Three of them have $P=S$, so their two branches coincide at every locked frequency and no observation in those geometries can be attributed to one branch. Stride-only sites exist in one geometry, $P{=}16,\,S{=}12$, and patch-only sites in two, so a claim about the stride branch rests on a single configuration and a claim about the patch branch on two. The configuration axes are equally short: the overlap ratio takes three values, and exactly one pair shares a stride while differing in patch size, which is the only place an effect of the patch can be separated from an effect of the stride. Every statement is therefore conditional on a narrow design. Attributing an effect to one branch, and testing whether either branch moves with the spacing it predicts, is beyond what these five runs can support: they can show that some frequencies are lost, not which of the two grids accounts for them. Both properties require the extended set of \autoref{tab:hfModels}.

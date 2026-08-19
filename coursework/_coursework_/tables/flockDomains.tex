@@ -1,0 +1,24 @@
+\begin{table*}[!t]
+    \centering
+    \small
+    \setlength{\tabcolsep}{5pt}
+    \begin{tabular}{@{}lrr>{\raggedright\arraybackslash}p{3.9cm}>{\raggedright\arraybackslash}p{3.1cm}>{\raggedright\arraybackslash}p{3.1cm}@{}}
+        \toprule
+        \textbf{Model} & $f_s/S$ [Hz] & $f_s/P$ [Hz] & \textbf{stride only} & \textbf{both} & \textbf{patch only} \\
+        \midrule
+        \addlinespace[2pt]
+        \texttt{p8-s8} & $64$ & $64$ & --- & 64 128 192 & --- \\
+        \specialrule{\cmidrulewidth}{4pt}{4pt}
+        \texttt{p16-s8} & $64$ & $32$ & --- & 64 128 192 & 32 96 160 224 \\
+        \specialrule{\cmidrulewidth}{4pt}{4pt}
+        \texttt{p16-s12} & $42.67$ & $32$ & 42.67 85.33 170.67 213.33 & 128 & 32 64 96 160 192 224 \\
+        \specialrule{\cmidrulewidth}{4pt}{4pt}
+        \texttt{p16-s16} & $32$ & $32$ & --- & 32 64 96 128 160 192 224 & --- \\
+        \specialrule{\cmidrulewidth}{4pt}{4pt}
+        \texttt{p24-s24} & $21.33$ & $21.33$ & --- & 21.33 42.67 64 85.33 106.67 128 149.33 170.67 192 213.33 234.67 & --- \\
+        \addlinespace[2pt]
+        \bottomrule
+    \end{tabular}
+    \caption{The locked frequencies of the five geometries of \autoref{tab:patchStride}, with each frequency placed under the branch that produces it. A geometry with empty outer columns is one where $S \mid P$: the two branches coincide everywhere and no frequency is attributable to either alone.}
+    \label{tab:flock}
+\end{table*}
