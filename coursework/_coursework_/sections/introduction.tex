@@ -1,38 +1,23 @@
-Time-series forecasting stands as a cornerstone of modern predictive analytics, vital for interpreting and anticipating the dynamic, state-dependent behaviors inherent to complex systems. Whether predicting fluctuating loads in renewable energy grids, identifying macro-economic trends, or monitoring structural health in industrial machinery, the ability to project historical sequential data into future horizons shifts organizational strategy from reactive mitigation to proactive optimization. As systems grow increasingly interconnected and generate data at unprecedented scales, the demand for forecasting frameworks capable of parsing intricate temporal dynamics has driven a massive evolution in modeling methodologies.
+Time-series forecasting underpins operational decision-making wherever a system's future state must be anticipated from its past, from grid load to industrial condition monitoring: projecting historical sequences into future horizons is what allows a control policy to be proactive rather than reactive\autocite{hyndmanForecastingPrinciplesPractice2021}.
 
-\subsection{Signal Representation and Aliasing Vulnerabilities}
-Regardless of the downstream modeling architecture utilized, the predictive fidelity of any forecasting pipeline remains strictly bounded by the digital representation of the underlying signal. This representation relies heavily on initial data acquisition, signal conditioning, and pre-processing protocols.
+\subsection{Evolution of Forecasting Methodologies}
+Classical time-series analysis relies on statistical models such as AutoRegressive Integrated Moving Average (ARIMA) and Exponential Smoothing (ETS)\autocite{hyndmanForecastingPrinciplesPractice2021}. These are interpretable and robust on stable low-dimensional data, but they assume linearity and stationarity and are fitted to one series at a time.
 
-The fundamental mathematical boundary governing the digitization of continuous physical processes is the Nyquist-Shannon sampling theorem. The theorem dictates that a continuous-time signal containing frequency components can be perfectly captured and reconstructed without loss of information if and only if it is sampled uniformly at a sampling frequency $f_s$ that is strictly greater than twice the highest frequency component ($f_{\max}$) present within the signal:
+Deep learning relaxed those assumptions: recurrent networks and their gated variants\autocite{hochreiterLongShortTermMemory1997} model non-linear dynamics through a hidden state, and training jointly across many related series established the global forecasting paradigm\autocite{benidisDeepLearningTime2022}. Transformers then replaced the recurrent bottleneck with self-attention\autocite{vaswaniAttentionAllYou2017}, computing dependencies between distant time steps directly. Two costs follow for sampled signals: attention scales quadratically with sequence length, and a single time step is a weak unit of meaning. Patching addresses both, segmenting the series into contiguous sub-sequences and embedding each as one token, which shortens the sequence and gives every token a locally semantic support\autocite{nieTimeSeriesWorth2023}.
+
+Time-series foundation models sit at the end of this line. Chronos treats time-series values as discrete tokens obtained by scaling and quantisation\autocite{ansariChronosLearningLanguage2024}; its successor Chronos-Bolt replaces quantisation with the patching scheme above and a direct multi-quantile head\autocite{ansariChronosLearningLanguage2024a}.\footnote{The vendor reports up to a $250\times$ inference speed-up over the original Chronos\autocite{FastAccurateZeroshot2024a}; no peer-reviewed description of Chronos-Bolt has been published.} Patching is therefore not an incidental implementation detail, but the design choice that makes this class of models practical at scale.
+
+\subsection{Classic Aliasing}
+Whatever the architecture downstream, predictive fidelity is bounded by the digital representation of the signal. The governing limit is the Nyquist--Shannon sampling theorem\autocite{shannonCommunicationPresenceNoise1949}: a band-limited continuous-time signal is perfectly reconstructible only if sampled uniformly at a rate $f_s$ strictly greater than twice its highest frequency component $f_{\max}$,
+
 \begin{equation}
 \label{eq:nyquist_criterion}
 f_s > 2f_{\max}.
 \end{equation}
-The threshold $f_N = \frac{f_s}{2}$ is defined as the Nyquist frequency. When a system violates this criterion, either due to an insufficient sampling rate or the absence of a proper low-pass anti-aliasing filter, high-frequency components beyond the Nyquist limit fold back into the lower spectrum. This distortive phenomenon, known as \textit{aliasing}, introduces spurious, artificial low-frequency components that permanently mask and corrupt the true underlying dynamics of the signal.
 
+The threshold $f_N = f_s/2$ is the Nyquist frequency. When the criterion is violated, through an insufficient sampling rate or a missing anti-aliasing filter, components above $f_N$ fold back into the lower spectrum and become indistinguishable from genuine low-frequency content\autocite{oppenheimDiscreteTimeSignalProcessing2010}. This is \textit{aliasing}, and it is irreversible: the information is destroyed at acquisition, not at inference. Respecting \autoref{eq:nyquist_criterion} is consequently taken as sufficient for a discrete sequence to represent its source faithfully. This report asks whether that sufficiency survives patch-based tokenization.
 
-{\color{red}This work addresses a distinct, architecturally induced phenomenon: \emph{structural aliasing}.
-Unlike classical aliasing, structural aliasing does not arise from an insufficient sampling rate ---
-the signal is correctly Nyquist-sampled at $f_s$.
-Instead, it emerges from the interaction between signal periodicity and the patch tokenization grid,
-making certain frequencies effectively invisible to the model despite being fully representable
-in the discrete sample sequence.}
+\subsection{Application Domain and Scope}
+The reference setting is a designed scenario: a photovoltaic array supplying an internal load, a local storage battery and the national grid, with a control agent performing load balancing, battery dispatch, state monitoring and anomaly detection on short-horizon forecasts. Measured photovoltaic and weather telemetry are taken from the SolarTech Lab dataset\autocite{levaPhotovoltaicPowerWeather2020}; the concepts, states and relations of the scenario are formalised as an OWL2 ontology in \nameref{sec:two}.% \autoref once `unnumberedsections` is removed from main.tex
 
-\subsection{Evolution of Forecasting Methodologies}
-Historically, time-series analysis relied on classical statistical models such as AutoRegressive Integrated Moving Average (ARIMA) and Exponential Smoothing (ETS). These traditional methods are deeply rooted in mathematical theory, offering high interpretability, exact statistical guarantees, and robust performance on stable, low-dimensional datasets. However, they rely heavily on strict underlying assumptions such as linearity, and stationarity.
-
-To capture complex, non-linear temporal behaviors without rigid feature engineering, the paradigm shifted toward deep learning. Early architectures leveraged Recurrent Neural Networks (RNNs), Long Short-Term Memory (LSTM) networks, and Convolutional Neural Networks (CNNs) to map temporal sequences sequentially.
-{\color{red}These architectures operate on the raw scalar sequence and therefore do not introduce
-patch-based structural aliasing, a risk specific to the windowed tokenization
-strategies adopted by transformer-based foundation models.}
-
-More recently, the state of the art has been dominated by transformer-based architectures. By replacing recurrent bottlenecks with self-attention mechanisms, transformers can process sequences in parallel and explicitly compute dependencies between distant time steps. This allows the model to learn both localized high-frequency fluctuations and long-range macro-patterns simultaneously, forming highly adaptive architectures that can be fine-tuned to specific downstream industrial or scientific applications.
-
-Representing the cutting edge of this evolution is the emergence of time-series foundation models, most notably exemplified by the \textit{Chronos} family of frameworks. Unifying time-series forecasting with the architectures powering modern natural language processing, Chronos treats time-series values not as continuous regressions, but as discrete language tokens. The framework tokenizes real-valued historical data by quantizing values into discrete buckets via a scaling and binning operator.
-
-{\color{red}
-This paper targets Chronos-Bolt, the Chronos 1.0 successor variant, which introduces patch-based
-tokenization as a key efficiency improvement in terms of sequence length and scalability over the original architecture.
-All formal claims in this document apply to Chronos-Bolt's patch preprocessing stage,
-not to the value-quantization scheme of original Chronos.
-}
+The target architecture is Chronos-Bolt-Tiny, with default patch size $P=16$, stride $S=16$, context window $T=2048$, four encoder and four decoder blocks, and a direct quantile projection head\autocite{AmazonChronosbolttinyHugging2025}. The objective is to test the assumption that such a model preserves the frequency content of Nyquist-compliant signals, and to characterise how $f_s$, $P$ and $S$ interact in determining when it does not\autocite{paganiPreliminaryInsightsChronos2026}.

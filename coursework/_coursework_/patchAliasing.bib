@@ -1,16 +1,231 @@
-@online{ansariChronosLearningLanguage2024,
-  title = {Chronos: {{Learning}} the {{Language}} of {{Time Series}}},
+@dataset{levaPhotovoltaicPowerWeather2020,
+  title = {Photovoltaic Power and Weather Parameters},
+  author = {Leva, Sonia and Nespoli, Alfredo and Pretto, Silvia and Mussetta, Marco and Ogliari, Emanuele},
+  date = {2020-09-23},
+  publisher = {IEEE DataPort},
+  doi = {10.21227/42V0-JZ14},
+  url = {https://ieee-dataport.org/open-access/photovoltaic-power-and-weather-parameters},
+  urldate = {2026-06-01},
+  abstract = {This dataset includes PV power production measured on the SolarTech Lab, Politecnico di Milano, Italy. Data are freely available for scientific research purpose and further data validation.In particular, the dataset is composed of the following variables and specifics, with a time resolution of 1 minute:Timestamp: column with time recordings; the data format is “dd-MM-yyyy hh:mm:ss”, with the time always expressed in Central European Time (CET).Pm: power recordings from the PV module (W); module tilt: 30°.Tair: ambient temperature (°C) measured by the weather station described in SolarTech Lab website (http://www.solartech.polimi.it/instrumentation/).GHI: measured Global Horizontal Irradiance (W/m2).GPOA: global irradiance measured on the plane of array (30°).Ws: measured wind speed (m/s).Wd: measured wind direction (°), assuming 0° east, positive south.It is worth noticing that this dataset includes original measurements, i.e. these raw data can be used for any additional post-processing, validation and further research. When a value is missing in the original measurements recording, a “NaN” is reported.},
+  keywords = {Machine Learning,neural network,Nowcasting,Photovoltaics,Power forecast}
+}
+
+
+
+@online{FastAccurateZeroshot2024a,
+  title = {Fast and Accurate Zero-Shot Forecasting with {{Chronos-Bolt}} and {{AutoGluon}} | {{Artificial Intelligence}}},
+  author = {Ansari, Abdul Fatir and Turkmen, Caner and Shchur, Oleksandr and Stella, Lorenzo},
+  date = {2024-12-02T10:20:13-08:00},
+  url = {https://aws.amazon.com/blogs/machine-learning/fast-and-accurate-zero-shot-forecasting-with-chronos-bolt-and-autogluon/},
+  urldate = {2026-05-13}
+}
+
+
+
+@inproceedings{voitaInformationTheoreticProbingMinimum2020,
+  title = {Information-{{Theoretic Probing}} with {{Minimum Description Length}}},
+  booktitle = {Proceedings of the 2020 {{Conference}} on {{Empirical Methods}} in {{Natural Language Processing}} ({{EMNLP}})},
+  author = {Voita, Elena and Titov, Ivan},
+  editor = {Webber, Bonnie and Cohn, Trevor and He, Yulan and Liu, Yang},
+  date = {2020-11},
+  pages = {183--196},
+  publisher = {Association for Computational Linguistics},
+  location = {Online},
+  doi = {10.18653/v1/2020.emnlp-main.14},
+  url = {https://aclanthology.org/2020.emnlp-main.14/},
+  urldate = {2026-05-13},
+  abstract = {To measure how well pretrained representations encode some linguistic property, it is common to use accuracy of a probe, i.e. a classifier trained to predict the property from the representations. Despite widespread adoption of probes, differences in their accuracy fail to adequately reflect differences in representations. For example, they do not substantially favour pretrained representations over randomly initialized ones. Analogously, their accuracy can be similar when probing for genuine linguistic labels and probing for random synthetic tasks. To see reasonable differences in accuracy with respect to these random baselines, previous work had to constrain either the amount of probe training data or its model size. Instead, we propose an alternative to the standard probes, information-theoretic probing with minimum description length (MDL). With MDL probing, training a probe to predict labels is recast as teaching it to effectively transmit the data. Therefore, the measure of interest changes from probe accuracy to the description length of labels given representations. In addition to probe quality, the description length evaluates “the amount of effort” needed to achieve the quality. This amount of effort characterizes either (i) size of a probing model, or (ii) the amount of data needed to achieve the high quality. We consider two methods for estimating MDL which can be easily implemented on top of the standard probing pipelines: variational coding and online coding. We show that these methods agree in results and are more informative and stable than the standard probes.},
+  eventtitle = {{{EMNLP}} 2020}
+}
+
+
+
+@report{tabassiArtificialIntelligenceRisk2023,
+  title = {Artificial {{Intelligence Risk Management Framework}} ({{AI RMF}} 1.0)},
+  author = {Tabassi, Elham},
+  date = {2023-01-26},
+  number = {NIST AI 100-1},
+  pages = {NIST AI 100-1},
+  institution = {{National Institute of Standards and Technology (U.S.)}},
+  location = {Gaithersburg, MD},
+  doi = {10.6028/NIST.AI.100-1},
+  url = {http://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf},
+  urldate = {2026-06-01},
+  abstract = {As directed by the National Artificial Intelligence Initiative Act of 2020 (P.L. 116-283), the goal of the AI RMF is to offer a resource to the organizations designing, developing, deploying, or using AI systems to help manage the many risks of AI and promote trustworthy and responsible development and use of AI systems. The Framework is intended to be voluntary, rights-preserving, non-sector specific, and use-case agnostic, providing flexibility to organizations of all sizes and in all sectors and throughout society to implement the approaches in the Framework.   The AI RMF is intended to be practical, to adapt to the AI landscape as AI technologies continue to develop, and to be operationalized by organizations in varying degrees and capacities so society can benefit from AI while also being protected from its potential harms.}
+}
+
+
+
+@software{ansariChronosLearningLanguage2024a,
+  title = {Chronos: {{Learning}} the {{Language}} of {{Time Series}} [{{SW}}]},
   shorttitle = {Chronos},
-  author = {Ansari, Abdul Fatir and Stella, Lorenzo and Turkmen, Caner and Zhang, Xiyuan and Mercado, Pedro and Shen, Huibin and Shchur, Oleksandr and Rangapuram, Syama Sundar and Arango, Sebastian Pineda and Kapoor, Shubham and Zschiegner, Jasper and Maddix, Danielle C. and Wang, Hao and Mahoney, Michael W. and Torkkola, Kari and Wilson, Andrew Gordon and Bohlke-Schneider, Michael and Wang, Yuyang},
-  date = {2024-11-04},
+  author = {Ansari, Abdul Fatir and Stella, Lorenzo and Turkmen, Caner and Zhang, Xiyuan and Mercado, Pedro and Shen, Huibin and Shchur, Oleksandr and Rangapuram, Syama Syndar and Arango, Sebastian Pineda and Kapoor, Shubham and Zschiegner, Jasper and Maddix, Danielle C. and Mahoney, Michael W. and Torkkola, Kari and Wilson, Andrew Gordon and Bohlke-Schneider, Michael and Wang, Yuyang},
+  date = {2024},
+  origdate = {2024-02-23T10:35:42Z},
   eprint = {2403.07815},
   eprinttype = {arXiv},
+  url = {https://github.com/amazon-science/chronos-forecasting},
+  urldate = {2026-07-06},
+  abstract = {Chronos: Pretrained Models for Time Series Forecasting}
+}
+
+
+
+@online{sabbadiniChronosBoltPatchSweep2026,
+  title = {Chronos-Bolt Patch Sweep},
+  author = {Sabbadini, Federico},
+  date = {2026-08},
+  url = {https://huggingface.co/federicosabbadini/chronos-bolt-patch-sweep},
+  urldate = {2026-08-17},
+  organization = {Hugging Face},
+  note = {Model repository: Chronos-Bolt checkpoints retrained from scratch over a grid of patch
+          sizes and strides, one subfolder per geometry}
+}
+
+
+
+@report{vassilevAdversarialMachineLearning2024,
+  title = {Adversarial Machine Learning: {{A}} Taxonomy and Terminology of Attacks and Mitigations},
+  author = {Vassilev, Apostol and Oprea, Alina and Fordyce, Alie and Anderson, Hyrum},
+  date = {2024-01},
+  number = {NIST AI 100-2e2023},
+  institution = {National Institute of Standards and Technology},
+  doi = {10.6028/NIST.AI.100-2e2023},
+  url = {https://doi.org/10.6028/NIST.AI.100-2e2023},
+  urldate = {2026-08-17},
+  type = {report}
+}
+
+
+@book{hyndmanForecastingPrinciplesPractice2021,
+  title = {Forecasting: {{Principles}} and Practice},
+  shorttitle = {Forecasting},
+  author = {Hyndman, Rob J. and Athanasopoulos, George},
+  date = {2021},
+  edition = {3},
+  publisher = {OTexts},
+  location = {Melbourne, Australia},
+  url = {https://otexts.com/fpp3/},
+  urldate = {2026-08-19},
+  isbn = {978-0-9875071-3-6}
+}
+
+
+@article{benidisDeepLearningTime2022,
+  title = {Deep Learning for Time Series Forecasting: {{Tutorial}} and Literature Survey},
+  shorttitle = {Deep Learning for Time Series Forecasting},
+  author = {Benidis, Konstantinos and Rangapuram, Syama Sundar and Flunkert, Valentin and Wang, Yuyang and Maddix, Danielle and Turkmen, Caner and Gasthaus, Jan and Bohlke-Schneider, Michael and Salinas, David and Stella, Lorenzo and {Aubet}, François-Xavier and Callot, Laurent and Januschowski, Tim},
+  date = {2022-12-31},
+  journaltitle = {ACM Computing Surveys},
+  volume = {55},
+  number = {6},
+  pages = {1--36},
+  doi = {10.1145/3533382},
+  url = {https://dl.acm.org/doi/10.1145/3533382},
+  urldate = {2026-08-19}
+}
+
+
+@article{hochreiterLongShortTermMemory1997,
+  title = {Long {{Short-Term Memory}}},
+  author = {Hochreiter, Sepp and Schmidhuber, Jürgen},
+  date = {1997-11-15},
+  journaltitle = {Neural Computation},
+  volume = {9},
+  number = {8},
+  pages = {1735--1780},
+  doi = {10.1162/neco.1997.9.8.1735}
+}
+
+
+@inproceedings{vaswaniAttentionAllYou2017,
+  title = {Attention Is All You Need},
+  booktitle = {Advances in {{Neural Information Processing Systems}} 30 ({{NIPS}} 2017)},
+  author = {Vaswani, Ashish and Shazeer, Noam and Parmar, Niki and Uszkoreit, Jakob and Jones, Llion and Gomez, Aidan N. and Kaiser, Łukasz and Polosukhin, Illia},
+  date = {2017},
+  pages = {5998--6008},
+  publisher = {Curran Associates, Inc.},
+  location = {Long Beach, CA},
+  eprint = {1706.03762},
+  eprinttype = {arXiv},
+  url = {https://arxiv.org/abs/1706.03762},
+  urldate = {2026-08-19}
+}
+
+
+@inproceedings{nieTimeSeriesWorth2023,
+  title = {A {{Time Series}} Is {{Worth}} 64 {{Words}}: {{Long-term Forecasting}} with {{Transformers}}},
+  shorttitle = {A {{Time Series}} Is {{Worth}} 64 {{Words}}},
+  booktitle = {The {{Eleventh International Conference}} on {{Learning Representations}} ({{ICLR}} 2023)},
+  author = {Nie, Yuqi and Nguyen, Nam H. and Sinthong, Phanwadee and Kalagnanam, Jayant},
+  date = {2023},
+  location = {Kigali, Rwanda},
+  eprint = {2211.14730},
+  eprinttype = {arXiv},
+  url = {https://openreview.net/forum?id=Jbdc0vTOcol},
+  urldate = {2026-08-19}
+}
+
+
+@article{shannonCommunicationPresenceNoise1949,
+  title = {Communication in the {{Presence}} of {{Noise}}},
+  author = {Shannon, Claude E.},
+  date = {1949-01},
+  journaltitle = {Proceedings of the IRE},
+  volume = {37},
+  number = {1},
+  pages = {10--21},
+  doi = {10.1109/JRPROC.1949.232969}
+}
+
+
+@book{oppenheimDiscreteTimeSignalProcessing2010,
+  title = {Discrete-Time Signal Processing},
+  author = {Oppenheim, Alan V. and Schafer, Ronald W.},
+  date = {2010},
+  edition = {3},
+  publisher = {Pearson},
+  location = {Upper Saddle River, NJ},
+  isbn = {978-0-13-198842-2},
+  series = {Prentice{-}Hall Signal Processing Series}
+}
+
+@article{ansariChronosLearningLanguage2024,
+  title = {Chronos: {{Learning}} the {{Language}} of {{Time Series}}},
+  shorttitle = {Chronos},
+  author = {Ansari, Abdul Fatir and Stella, Lorenzo and Turkmen, Caner and Zhang, Xiyuan and Mercado, Pedro and Shen, Huibin and Shchur, Oleksandr and Rangapuram, Syama Sundar and Pineda Arango, Sebastian and Kapoor, Shubham and Zschiegner, Jasper and Maddix, Danielle C. and Mahoney, Michael W. and Torkkola, Kari and Wilson, Andrew Gordon and Bohlke-Schneider, Michael and Wang, Yuyang},
+  date = {2024},
+  journaltitle = {Transactions on Machine Learning Research},
+  issn = {2835-8856},
+  eprint = {2403.07815},
+  eprinttype = {arXiv},
+  url = {https://openreview.net/forum?id=gerNCVqqtR},
+  urldate = {2026-08-19}
+}
+
+@software{AmazonChronosbolttinyHugging2025,
+  title = {Chronos-{{Bolt-Tiny}}},
+  author = {{Amazon Web Services}},
+  organization = {Amazon},
+  date = {2024},
+  version = {a0e552de83495b5c28c14c71c374f3e33280b340},
+  url = {https://huggingface.co/amazon/chronos-bolt-tiny},
+  urldate = {2026-08-19},
+  publisher = {Hugging Face},
+  note = {Model repository, pinned revision \texttt{a0e552d} of 21 November 2025.
+          Documents the T5 encoder--decoder configuration used here: patch size 16,
+          stride 16, context 2048, four encoder and four decoder blocks}
+}
+
+@online{paganiPreliminaryInsightsChronos2026,
+  title = {Preliminary {{Insights}} in {{Chronos Frequency Data Understanding}} and {{Reconstruction}}},
+  author = {Pagani, Alessandro and Cominelli, Marco and Han, Liying and Dong, Gaofeng and Benini, Sergio and Gringoli, Francesco and Savardi, Mattia and Srivastava, Mani B. and Bihl, Trevor and Blasch, Erik P. and Brigham, Daniel O. and Combs, Kara and Kaplan, Lance M. and Cerutti, Federico},
+  date = {2026-05-07},
+  eprint = {2605.06361},
+  eprinttype = {arXiv},
   eprintclass = {cs.LG},
-  doi = {10.48550/arXiv.2403.07815},
-  url = {http://arxiv.org/abs/2403.07815},
+  doi = {10.48550/arXiv.2605.06361},
+  url = {http://arxiv.org/abs/2605.06361},
   urldate = {2026-05-13},
-  abstract = {We introduce Chronos, a simple yet effective framework for pretrained probabilistic time series models. Chronos tokenizes time series values using scaling and quantization into a fixed vocabulary and trains existing transformer-based language model architectures on these tokenized time series via the cross-entropy loss. We pretrained Chronos models based on the T5 family (ranging from 20M to 710M parameters) on a large collection of publicly available datasets, complemented by a synthetic dataset that we generated via Gaussian processes to improve generalization. In a comprehensive benchmark consisting of 42 datasets, and comprising both classical local models and deep learning methods, we show that Chronos models: (a) significantly outperform other methods on datasets that were part of the training corpus; and (b) have comparable and occasionally superior zero-shot performance on new datasets, relative to methods that were trained specifically on them. Our results demonstrate that Chronos models can leverage time series data from diverse domains to improve zero-shot accuracy on unseen forecasting tasks, positioning pretrained models as a viable tool to greatly simplify forecasting pipelines.},
-  pubstate = {prepublished},
-  keywords = {Computer Science - Artificial Intelligence,Computer Science - Machine Learning},
-  file = {/Users/gianlucabrignoli/Zotero/storage/45QCGFYH/Ansari et al. - 2024 - Chronos Learning the Language of Time Series.pdf}
+  pubstate = {prepublished}
 }
