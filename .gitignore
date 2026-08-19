@@ -242,3 +242,6 @@ chronos/data/corpus/
 chronos/bayesian/_run/
 # Signal .npy files (generated, too large for git)
 chronos/bayesian/results/**/signals/
+
+# Temporary files
+tmp
