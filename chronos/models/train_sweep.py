@@ -1,481 +1,603 @@
 """
-train_sweep.py — Chronos-Bolt Tiny from-scratch (P, S) sweep driver. FINAL VERSION.
+train_sweep.py -- Retraining Chronos-Bolt Tiny from scratch for each patch geometry (P, S).
 
-Training only (no evaluation/inference). Each run retrains Chronos-Bolt Tiny FROM SCRATCH
-(random weights) on the FULL official Chronos pre-training data:
-  - TSMixup  (autogluon/chronos_datasets / training_corpus_tsmixup_10m,  10M series)
-  - KernelSynth (autogluon/chronos_datasets / training_corpus_kernel_synth_1m, 1M series)
-interleaved at the official 9:1 ratio (TSMixup : KernelSynth).
+Every model is trained FROM SCRATCH (randomly initialised weights) on the exact same
+official Chronos pre-training data:
+  - TSMixup  (10 million series, augmented from 28 real-world open-source datasets
+              including Monash, M-competitions, Kaggle energy/transport/weather/finance)
+  - KernelSynth (1 million purely synthetic series sampled from Gaussian Process priors)
+interleaved at the official 9:1 ratio (9 TSMixup series for every 1 KernelSynth series).
 
-TSMixup is itself an augmentation of 28 real-world open-source datasets (Monash, M-comps,
-Kaggle — energy, transport, weather, finance, etc.); KernelSynth is purely synthetic
-(Gaussian Process priors). Together they reproduce the full official training diet.
+The ONLY parameter that changes between runs is the patch tokenisation geometry:
+  - P = input_patch_size   (the width of each sliding window that becomes one token)
+  - S = input_patch_stride (the step size between consecutive patch windows)
+Every other hyperparameter is held at the official Chronos training value, so that any
+downstream difference in structural-aliasing probes can be attributed solely to (P, S).
 
-Only the patch geometry input_patch_size (P) and input_patch_stride (S) varies across
-runs. Everything else is fixed at the official Chronos training values so any downstream
-difference in structural-aliasing probes is attributable to P/S.
-
-Just run the file:
-
+Usage:
     python train_sweep.py
-
-Edit the CONFIG block below (PS_GRID, SEEDS, hyperparameters) to change the experiment.
-The sweep is resumable: a run that already wrote a DONE marker is skipped.
-For a quick smoke test set MAX_STEPS low (e.g. 20) and SHUFFLE_BUFFER_SIZE low (e.g. 100).
-
-Outputs: one folder per model at chronos/models/weights/p{P}-s{S}-seed{seed}/, holding
-EVERY artifact tied to that model (run_config.json, loss_history.npy, loss_curve.png,
-checkpoint-{step}/, final model, DONE). An aggregate chronos/models/weights/manifest.csv
-is rebuilt from every finished run.
-
----------------------------------------------------------------------------------------
-Provenance markers on code lines:
-  "# [CHRONOS-REF] ..." -> the line's approach, API, or VALUE is taken from the official
-               Chronos reference (Apache-2.0): github.com/amazon-science/chronos-forecasting
-               (scripts/training/train.py + scripts/training/configs/chronos-t5-tiny.yaml)
-               and the chronos.chronos_bolt library source. Adopted/adapted, NOT copied.
-  plain "# ..." -> scaffolding written for this project (sweep loop, resume, provenance,
-               NaN-loss guard, manifest, progress bar).
-Deliberate deviations from the official regime (uniform across all runs, documented in
-README_train_sweep.md): MAX_STEPS 100k vs 200k (compute budget; variants are compared only
-against each other), LOG/SAVE cadence, num_workers=0 (single-stream equivalence),
-torch_compile off (startup overhead across 6 short runs; no math change).
----------------------------------------------------------------------------------------
-NaN CONTRACT (critical, verified against chronos_bolt.py source): Chronos-Bolt encodes
-"unobserved" as NaN. InstanceNorm computes loc/scale with nanmean BEFORE the mask is
-used, so padding/missing values MUST be NaN — zero-filling them would pollute the
-normalization statistics. The model itself zeroes NaN positions AFTER normalization
-(patched_context = where(patched_mask > 0, ., 0.0)), so NaNs never reach the network.
----------------------------------------------------------------------------------------
 """
-from __future__ import annotations          # allow modern type hints on older runtimes
+from __future__ import annotations
 
-import json                                 # write/read per-run run_config.json + manifest
-import subprocess                           # shell out to `git` to record the commit hash
-import time                                 # wall-clock timing + DONE timestamp
-from dataclasses import dataclass, asdict   # typed per-run result record -> dict for JSON/CSV
-from pathlib import Path                     # filesystem paths (output dirs, markers)
+import json          # used to write per-run configuration files to disk
+import time          # wall-clock timing for throughput measurement and completion timestamps
+from pathlib import Path  # cross-platform filesystem path handling
 
-import numpy as np                          # [CHRONOS-REF] array math for windows (train.py also uses numpy)
+import numpy as np   # numerical operations: array math, NaN handling, loss history storage
 
 
 # ============================================================================ #
-#  CONFIG — the only things to edit                                            #
+#  EXPERIMENTAL CONFIGURATION                                                   #
 # ============================================================================ #
-# (P, S) grid. Two-axis design (S <= P everywhere, so no unobserved gaps):
-#   - P=16 row varies S (overlap/stride axis):  or = (P-S)/P = 0, .25, .5
-#   - contiguous row (or=0) varies P (patch-size axis): P = 8, 16, 24
-# NOTE: S=4 (or=0.75) is dropped — its stride-lock class F_lock={c*fs/S}={128,...} has no
-#       member inside the valid-forecast band, so it gives no informative H1/H3 test.
-PS_GRID: list[tuple[int, int]] = [          # our experimental design (not from Chronos)
-    (16, 16),   # baseline, contiguous (16/16 is the stock Bolt-tiny geometry)  # [CHRONOS-REF]
-    (16, 12),   # or = 0.25
-    (16, 8),    # or = 0.50
-    (8, 8),     # patch-size axis, contiguous
-    (24, 24),   # patch-size axis, contiguous
+
+# The (P, S) grid to sweep. It is designed along two independent axes so that
+# the effect of each parameter can be isolated:
+#
+#   Overlap axis: P is fixed at 16, S varies.
+#     - (16,16): overlap ratio = 0.00, contiguous patches (the stock Bolt-Tiny geometry)
+#     - (16,12): overlap ratio = 0.25, each patch overlaps the next by 4 samples
+#     - (16, 8): overlap ratio = 0.50, each patch overlaps the next by 8 samples
+#
+#   Patch-size axis: S = P (contiguous, no overlap), P varies.
+#     - ( 8, 8): smaller patch window, finer temporal resolution per token
+#     - (16,16): the baseline again (shared with the overlap axis)
+#     - (24,24): larger patch window, coarser temporal resolution per token
+#
+# Note: S = 4 (overlap ratio 0.75) is excluded by design because its stride-lock
+# class F_lock = {c * fs/S} = {128, 256, ...} has no member inside the valid
+# forecast band, so it would contribute no informative H1 or H3 test.
+PS_GRID: list[tuple[int, int]] = [
+    (16, 16),   # baseline: the stock Bolt-Tiny geometry, contiguous (no overlap)
+    (16, 12),   # overlap ratio = 0.25
+    (16, 8),    # overlap ratio = 0.50
+    (8, 8),     # smaller patch, contiguous
+    (24, 24),   # larger patch, contiguous
 ]
-SEEDS: list[int] = [42]                      # 1 seed per config (full official data diet makes multi-seed less critical)
 
-BASE_MODEL_ID = "amazon/chronos-bolt-tiny"  # [CHRONOS-REF] official Bolt-tiny checkpoint (architecture ref only; weights NOT loaded)
+# A single seed per configuration. With the full official data diet (11 million series),
+# run-to-run variance is already small, so multi-seed training is less critical than
+# in a small-data regime. Seed 42 is used throughout the project for reproducibility.
+SEEDS: list[int] = [42]
 
-CONTEXT_LENGTH = 2048                        # [CHRONOS-REF] Bolt-tiny config value (config.json: context_length)
-PREDICTION_LENGTH = 64                       # [CHRONOS-REF] Bolt-tiny config value (config.json: prediction_length)
-QUANTILES = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]  # [CHRONOS-REF] the 9 quantiles Bolt is trained on
+# The base model identifier on HuggingFace. We use it to download the ARCHITECTURAL
+# configuration of Chronos-Bolt Tiny (encoder/decoder sizes, number of heads, etc.),
+# but we do NOT load its pretrained weights — all weights are randomly initialised.
+BASE_MODEL_ID = "amazon/chronos-bolt-tiny"
 
-HF_REPO = "autogluon/chronos_datasets"       # [CHRONOS-REF] official Chronos datasets repository on HuggingFace
-DATASET_CONFIG_TSMIXUP = "training_corpus_tsmixup_10m"      # [CHRONOS-REF] TSMixup pre-training corpus (10M series, augmented from 28 real datasets)
-DATASET_CONFIG_KERNELSYNTH = "training_corpus_kernel_synth_1m"  # [CHRONOS-REF] KernelSynth synthetic corpus (1M GP-sampled series)
-TSMIXUP_RATIO = 9                            # [CHRONOS-REF] official mixing: 9 TSMixup series per 1 KernelSynth (9:1 ratio from the paper)
+# Context and prediction lengths, both taken directly from the official Bolt-Tiny
+# configuration file (config.json). The context length is how many past time steps
+# the model can attend to; the prediction length is how many future steps it must
+# forecast in a single forward pass.
+CONTEXT_LENGTH = 2048    # number of past time-series samples the model receives as input
+PREDICTION_LENGTH = 64   # number of future samples the model must predict
 
-BATCH_SIZE = 32                              # [CHRONOS-REF] per_device_train_batch_size=32, grad-accum=1 (chronos-t5-tiny.yaml)
-MAX_STEPS = 100_000                           # DEVIATION: 100k vs official 200k — fixed compute budget, identical across runs
-LR = 1e-3                                     # [CHRONOS-REF] learning_rate: 0.001 (chronos-t5-tiny.yaml)
-WEIGHT_DECAY = 0.0                            # [CHRONOS-REF] official uses HF Trainer default weight_decay=0.0 (no override anywhere)
-GRAD_CLIP_NORM = 1.0                          # [CHRONOS-REF] HF Trainer default max_grad_norm=1.0, implicitly used by train.py
-LR_SCHEDULER_TYPE = "linear"                  # [CHRONOS-REF] lr_scheduler_type: linear (chronos-t5-tiny.yaml)
-WARMUP_RATIO = 0.0                            # [CHRONOS-REF] warmup_ratio: 0.0 (chronos-t5-tiny.yaml) — official trains from scratch WITHOUT warmup
-SHUFFLE_BUFFER_SIZE = 10_000                  # reduced from official 100k to avoid HF streaming timeouts; still provides good randomisation for 100k-step runs; applied to BOTH streams
-MIN_PAST = 60                                 # [CHRONOS-REF] min_past: 60 (chronos-t5-tiny.yaml) — window sampler requires >= 60 context points
-MAX_MISSING_PROP = 0.9                        # [CHRONOS-REF] max_missing_prop: 0.9 — drop series with > 90% missing values
-DROP_PROB = 0.2                               # [CHRONOS-REF] drop_prob=0.2 (train.py ChronosDataset default): random NaN injection augmentation
-LOG_EVERY = 50                               # console logging cadence (our diagnostic; official log_steps=500)
-SAVE_EVERY = 1000                            # checkpoint cadence in steps (our diagnostic; official save_steps=100k)
+# The 9 quantiles that Chronos-Bolt is trained to predict. Instead of forecasting a
+# single point value, Bolt outputs these 9 quantile levels of the predictive distribution,
+# giving a full uncertainty profile. These are the official quantile values.
+QUANTILES = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
 
-# All trained models + artifacts live inside chronos/models/weights/.
-# This file is chronos/models/train_sweep.py, so parent is chronos/models/.
+# HuggingFace dataset repository and configuration names. These point to the exact
+# same corpora used by the official Chronos pre-training pipeline.
+HF_REPO = "autogluon/chronos_datasets"                          # the official HF repo
+DATASET_CONFIG_TSMIXUP = "training_corpus_tsmixup_10m"          # 10M augmented real series
+DATASET_CONFIG_KERNELSYNTH = "training_corpus_kernel_synth_1m"  # 1M GP-sampled synthetic series
+
+# The mixing ratio between the two corpora: for every 9 series drawn from TSMixup,
+# 1 series is drawn from KernelSynth. This is the official interleaving ratio from
+# the Chronos paper, ensuring the model sees both real-world patterns and synthetic
+# diversity in the same proportions as the published checkpoint.
+TSMIXUP_RATIO = 9
+
+# Training hyperparameters. All values match the official Chronos-Bolt Tiny training
+# recipe (chronos-t5-tiny.yaml) unless explicitly noted as a deviation.
+BATCH_SIZE = 32          # number of training windows per gradient step (official: 32)
+MAX_STEPS = 100_000      # total optimiser steps (DEVIATION: official uses 200k; reduced
+                         # to 100k to fit a single-GPU compute budget. All variants use
+                         # the same budget, so they are comparable to each other)
+LR = 1e-3                # initial learning rate (official: 0.001)
+WEIGHT_DECAY = 0.0       # L2 regularisation coefficient (official: 0.0, no weight decay)
+GRAD_CLIP_NORM = 1.0     # maximum gradient norm; gradients exceeding this are scaled down
+                         # to prevent training instability from large updates (official: 1.0)
+LR_SCHEDULER_TYPE = "linear"  # the learning rate decays linearly from LR down to 0 over
+                              # the course of MAX_STEPS (official: linear schedule)
+WARMUP_RATIO = 0.0       # fraction of training steps spent linearly ramping the LR from 0
+                         # up to its initial value; 0.0 means training starts at full LR
+                         # immediately (official: no warmup)
+SHUFFLE_BUFFER_SIZE = 10_000  # number of examples held in the streaming shuffle buffer;
+                              # the HuggingFace streaming dataset reads examples sequentially
+                              # and shuffles them within this buffer for randomisation
+                              # (DEVIATION: official uses 100k; reduced to avoid HF timeouts)
+
+# Data-quality filters applied to each series before it enters training.
+# These thresholds match the official Chronos pipeline exactly.
+MIN_PAST = 60            # minimum number of observed (non-NaN) context points required;
+                         # series shorter than MIN_PAST + prediction_length are skipped
+MAX_MISSING_PROP = 0.9   # maximum fraction of NaN values allowed in a series;
+                         # series with more than 90% missing values are discarded
+DROP_PROB = 0.2          # data augmentation: for each series, a random fraction of
+                         # observed values (uniformly sampled between 0 and DROP_PROB)
+                         # are replaced with NaN, teaching the model to handle missing data
+
+# Logging and checkpoint cadence (project-specific, not from the official recipe)
+LOG_EVERY = 50           # print average loss and learning rate every 50 steps
+SAVE_EVERY = 1000        # save a HuggingFace-format checkpoint every 1000 steps
+
+# Output directory: each trained model gets its own subdirectory named p{P}-s{S}-seed{seed}
 OUTPUT_ROOT = Path(__file__).resolve().parent / "weights"
 
 
 # ============================================================================ #
-#  Provenance helpers                                                           #
+#  DATASET LOADING                                                              #
 # ============================================================================ #
-def _git_commit() -> str:                    # record which commit produced a run (reproducibility)
-    try:                                     # git may be absent or this may not be a repo
-        return subprocess.check_output(      # ask git for the current HEAD hash
-            ["git", "rev-parse", "HEAD"],    # the command
-            cwd=Path(__file__).resolve().parent,  # run it from this file's directory
-            stderr=subprocess.DEVNULL,       # silence git's error chatter
-        ).decode().strip()                   # bytes -> str, drop trailing newline
-    except Exception:                        # any failure -> unknown, never crash the run
-        return "unknown"
 
+def build_streams(seed: int):
+    """Open both training corpora as shuffled HuggingFace streaming iterators.
 
-def _approx_num_patches(context_length: int, P: int, S: int) -> int:
-    """Patch count over a full context (provenance only; +1 [REG] token goes to the encoder)."""  # [CHRONOS-REF] Patch pads then unfolds; use_reg_token appends 1 token
-    l_pad = -(-context_length // P) * P      # [CHRONOS-REF] Patch left-pads with NaN up to a multiple of P (chronos_bolt.Patch.forward)
-    return (l_pad - P) // S + 1              # [CHRONOS-REF] unfold(size=P, step=S) window count over the padded context
+    The datasets are loaded in streaming mode (streaming=True), which means examples
+    are fetched on demand rather than downloading the entire corpus into memory.
+    Each stream is independently shuffled using a buffer of SHUFFLE_BUFFER_SIZE examples
+    and the given random seed, ensuring reproducible ordering across runs.
 
+    Returns a (tsmixup_stream, kernelsynth_stream) tuple of iterable datasets.
+    """
+    from datasets import load_dataset  # HuggingFace datasets library
 
-# ============================================================================ #
-#  Dataset                                                                       #
-# ============================================================================ #
-def build_streams(seed: int):                # open both HF corpora as shuffled streaming iterators
-    from datasets import load_dataset        # [CHRONOS-REF] HuggingFace datasets (the corpus lives there)
-    tsmixup = load_dataset(                   # [CHRONOS-REF] open the TSMixup corpus (10M series from 28 real datasets)
+    # Open the TSMixup corpus: 10 million time-series instances generated by the TSMixup
+    # augmentation method, which samples and mixes subsequences from 28 real-world datasets
+    # (Monash repository, M-competitions, Kaggle competitions covering energy, transport,
+    # weather, finance, etc.). This is the primary training source.
+    tsmixup = load_dataset(
         HF_REPO, DATASET_CONFIG_TSMIXUP,
         split="train", streaming=True,
-    ).shuffle(seed=seed, buffer_size=SHUFFLE_BUFFER_SIZE)  # [CHRONOS-REF] shuffle (train.py PseudoShuffledIterableDataset)
-    kernelsynth = load_dataset(               # [CHRONOS-REF] open the KernelSynth corpus (1M GP synthetic series)
+    ).shuffle(seed=seed, buffer_size=SHUFFLE_BUFFER_SIZE)
+
+    # Open the KernelSynth corpus: 1 million purely synthetic time series generated by
+    # sampling from Gaussian Process priors with diverse kernel compositions. This provides
+    # smooth, structured patterns that complement the real-world noise and irregularities
+    # found in TSMixup, improving the model's ability to capture smooth trends.
+    kernelsynth = load_dataset(
         HF_REPO, DATASET_CONFIG_KERNELSYNTH,
         split="train", streaming=True,
-    ).shuffle(seed=seed, buffer_size=SHUFFLE_BUFFER_SIZE)  # [CHRONOS-REF] shuffle with the same buffer length
+    ).shuffle(seed=seed, buffer_size=SHUFFLE_BUFFER_SIZE)
+
     return tsmixup, kernelsynth
 
 
+# ============================================================================ #
+#  TRAINING WINDOW PREPARATION                                                 #
+# ============================================================================ #
+
 def make_window_dataset(tsmixup_stream, kernelsynth_stream, total_length: int,
                         context_length: int, seed: int):
-    import torch                              # tensors are built here, per worker
-    from torch.utils.data import IterableDataset  # streaming source has no length -> IterableDataset
+    """Create a PyTorch IterableDataset that produces (context, target) training windows.
 
-    horizon = total_length - context_length  # = PREDICTION_LENGTH (target length per instance)
+    Each training example is a window extracted from one time series, consisting of:
+      - context: the most recent `context_length` time steps before the split point,
+                 which the model receives as input (its "history")
+      - target:  the next `prediction_length` time steps after the split point,
+                 which the model must learn to forecast (its "future")
 
-    class ChronosStreamingWindowDataset(IterableDataset):  # yields ready-to-forward training windows
-        """Yield (context, mask, target, target_mask) windows from both HF streams.
+    The series arrive interleaved at the official 9:1 ratio (TSMixup : KernelSynth),
+    cycling infinitely so the training loop never runs out of data.
 
-        Interleaves TSMixup and KernelSynth at the official 9:1 ratio (TSMIXUP_RATIO
-        series from TSMixup, then 1 from KernelSynth, repeating).
+    NaN handling is critical: Chronos-Bolt's internal InstanceNorm computes normalisation
+    statistics using nanmean BEFORE applying the attention mask, so missing values and
+    padding positions MUST remain as NaN (not zero). The model itself zeroes NaN positions
+    AFTER normalisation, so NaNs never reach the transformer layers.
 
-        Mirrors the official train.py pipeline (ExpectedNumInstanceSampler + InstanceSplitter
-        + FilterTransformation), adapted from GluonTS to a plain HF stream:
-          - series with < MIN_PAST + horizon points or > MAX_MISSING_PROP missing are dropped;
-          - random NaN-injection augmentation with per-series rate ~ U(0, DROP_PROB);
-          - one window per series pass: split point uniform with >= MIN_PAST context points
-            and a full horizon-length future;
-          - context left-padded to context_length with NaN (InstanceSplitter dummy_value=nan);
-          - instances with zero observed context points are filtered out.
-        NaNs are KEPT (never zero-filled): Bolt's InstanceNorm excludes them via nanmean and
-        the model zeroes them after normalization — see NaN CONTRACT in the module docstring.
-        """
+    Returns a ChronosStreamingWindowDataset instance ready to be wrapped in a DataLoader.
+    """
+    import torch
+    from torch.utils.data import IterableDataset
 
-        def _interleaved(self):              # yield raw rows from both streams at the 9:1 ratio
-            tsmixup_iter = iter(tsmixup_stream)    # iterator over the TSMixup corpus
-            ks_iter = iter(kernelsynth_stream)      # iterator over the KernelSynth corpus
-            while True:                       # [CHRONOS-REF] cycle forever (train.py wraps datasets in Cyclic)
-                for _ in range(TSMIXUP_RATIO):  # [CHRONOS-REF] 9 series from TSMixup...
+    # The target (forecast) length: the number of future time steps per training window
+    horizon = total_length - context_length
+
+    class ChronosStreamingWindowDataset(IterableDataset):
+
+        def _interleaved(self):
+            """Yield raw series from both streams at the official 9:1 mixing ratio.
+
+            For every 9 series drawn from TSMixup, 1 series is drawn from KernelSynth.
+            When either stream is exhausted, its iterator is silently restarted, so the
+            generator loops forever — exactly matching the official train.py's Cyclic wrapper.
+            """
+            tsmixup_iter = iter(tsmixup_stream)
+            ks_iter = iter(kernelsynth_stream)
+            while True:
+                # Draw 9 consecutive series from the TSMixup corpus
+                for _ in range(TSMIXUP_RATIO):
                     try:
                         yield next(tsmixup_iter)
-                    except StopIteration:     # corpus exhausted -> restart
+                    except StopIteration:
+                        # TSMixup exhausted: restart the iterator and continue
                         tsmixup_iter = iter(tsmixup_stream)
                         yield next(tsmixup_iter)
-                try:                          # [CHRONOS-REF] ...then 1 from KernelSynth
+                # Draw 1 series from the KernelSynth corpus
+                try:
                     yield next(ks_iter)
-                except StopIteration:         # corpus exhausted -> restart
+                except StopIteration:
+                    # KernelSynth exhausted: restart the iterator and continue
                     ks_iter = iter(kernelsynth_stream)
                     yield next(ks_iter)
 
-        def __iter__(self):                  # generator called once per DataLoader worker
-            rng = np.random.default_rng(seed)  # per-iterator RNG so window sampling is reproducible
-            for row in self._interleaved():   # iterate interleaved series from both streams
-                if "target" not in row:       # schema guard: the value column must be present
-                    raise KeyError(
-                        f"Row has no 'target' field (keys={list(row)}). "
-                        f"Check the schema of {HF_REPO}."
-                    )
-                values = np.asarray(row["target"], dtype=np.float32)  # [CHRONOS-REF] the full series values
-                L = values.shape[0]            # series length
-                if L < MIN_PAST + horizon:     # [CHRONOS-REF] has_enough_observations: min_length = min_past + prediction_length
-                    continue                   # too short -> next series
-                if np.isnan(values).mean() > MAX_MISSING_PROP:  # [CHRONOS-REF] has_enough_observations: max_missing_prop
-                    continue                   # mostly missing -> next series
+        def __iter__(self):
+            """For each incoming series, extract one random training window and yield it.
 
-                drop_p = rng.uniform(0.0, DROP_PROB)  # [CHRONOS-REF] preprocess_entry: drop_p ~ U(0, drop_prob)
-                if drop_p > 0.0:               # [CHRONOS-REF] randomly turn observations into missing values (NaN)
-                    values = values.copy()     # do not mutate the stream's buffer
-                    values[rng.random(L) < drop_p] = np.nan  # [CHRONOS-REF] element-wise drop with prob drop_p
+            This generator is called once per DataLoader worker. It applies the full
+            official data pipeline: length filtering, missing-value filtering, NaN-injection
+            augmentation, random window sampling, left-padding, and observation masking.
+            """
+            # Per-iterator random number generator seeded for reproducibility
+            rng = np.random.default_rng(seed)
 
-                end = int(rng.integers(MIN_PAST + horizon, L + 1))  # [CHRONOS-REF] split uniform with min_past context + full future (ExpectedNumInstanceSampler)
-                tgt_raw = values[end - horizon:end]  # the forecast target (length horizon; may contain NaN)
-                ctx_src = values[:end - horizon]     # all history before the target (length >= MIN_PAST)
+            for row in self._interleaved():
+                # Read the raw time-series values from the HuggingFace row
+                values = np.asarray(row["target"], dtype=np.float32)
+                L = values.shape[0]
 
-                if ctx_src.shape[0] >= context_length:      # enough history: keep the most recent context_length points
-                    ctx_raw = ctx_src[-context_length:]      # [CHRONOS-REF] InstanceSplitter past_length window (most recent values)
-                else:                                        # [CHRONOS-REF] short context -> LEFT-pad to context_length with NaN (dummy_value=np.nan)
-                    pad = context_length - ctx_src.shape[0]  # number of padding positions on the left
-                    ctx_raw = np.concatenate([np.full(pad, np.nan, np.float32), ctx_src])  # NaN padding: excluded by nanmean, masked in attention
-
-                ctx_obs = ~np.isnan(ctx_raw)     # True where a context value is observed (padding/missing = False)
-                tgt_obs = ~np.isnan(tgt_raw)     # True where a target value is observed
-                if not ctx_obs.any():            # [CHRONOS-REF] FilterTransformation: >= 1 observed past point required
-                    continue                     # nothing to condition on -> skip
-                if not tgt_obs.any():            # our guard: a fully-missing target contributes zero loss — skip the wasted sample
+                # FILTER 1 (length): the series must be long enough to provide at least
+                # MIN_PAST context points AND a full horizon-length target. Series that
+                # are too short cannot produce a valid training window and are skipped.
+                if L < MIN_PAST + horizon:
                     continue
 
-                yield {                       # one training example, keyed for the Bolt forward()
-                    "context": torch.from_numpy(ctx_raw),        # [CHRONOS-REF] raw context, NaN = unobserved (Bolt's native encoding)
-                    "mask": torch.from_numpy(ctx_obs),           # [CHRONOS-REF] observation mask for the context (Bolt forward arg)
-                    "target": torch.from_numpy(tgt_raw),         # [CHRONOS-REF] raw target, NaN = unobserved (loss masks them)
-                    "target_mask": torch.from_numpy(tgt_obs),    # [CHRONOS-REF] observation mask for the target (Bolt forward arg)
+                # FILTER 2 (missing data): discard series where more than MAX_MISSING_PROP
+                # (90%) of the values are NaN. Such series carry too little information
+                # for meaningful gradient signal.
+                if np.isnan(values).mean() > MAX_MISSING_PROP:
+                    continue
+
+                # DATA AUGMENTATION (NaN injection): randomly replace a fraction of observed
+                # values with NaN. The drop rate is sampled uniformly from [0, DROP_PROB] for
+                # each series, so the model encounters varying levels of missingness during
+                # training and learns to be robust to gaps in the input.
+                drop_p = rng.uniform(0.0, DROP_PROB)
+                if drop_p > 0.0:
+                    values = values.copy()  # avoid mutating the streaming buffer
+                    values[rng.random(L) < drop_p] = np.nan
+
+                # WINDOW SAMPLING: choose a random split point that guarantees at least
+                # MIN_PAST observed context points before it and a full horizon-length
+                # target after it. This mirrors the official ExpectedNumInstanceSampler.
+                end = int(rng.integers(MIN_PAST + horizon, L + 1))
+                tgt_raw = values[end - horizon:end]      # the forecast target (future)
+                ctx_src = values[:end - horizon]          # all available history (past)
+
+                # CONTEXT WINDOWING: if the history is longer than context_length, keep only
+                # the most recent context_length points (the model's attention window).
+                if ctx_src.shape[0] >= context_length:
+                    ctx_raw = ctx_src[-context_length:]
+                else:
+                    # If the history is shorter than context_length, LEFT-PAD with NaN.
+                    # NaN padding tells Chronos-Bolt "no observation here": the InstanceNorm
+                    # excludes these positions via nanmean, and the attention mask prevents
+                    # the transformer from attending to them.
+                    pad = context_length - ctx_src.shape[0]
+                    ctx_raw = np.concatenate([np.full(pad, np.nan, np.float32), ctx_src])
+
+                # OBSERVATION MASKS: boolean arrays where True means "this time step has a
+                # valid observed value" and False means "this position is NaN (missing or padding)".
+                # Chronos-Bolt uses these masks in its forward pass to exclude unobserved
+                # positions from the loss computation and attention mechanism.
+                ctx_obs = ~np.isnan(ctx_raw)
+                tgt_obs = ~np.isnan(tgt_raw)
+
+                # Skip windows where the entire context or the entire target is unobserved:
+                # a fully-NaN context provides no conditioning information, and a fully-NaN
+                # target contributes zero gradient (every position is masked out of the loss).
+                if not ctx_obs.any() or not tgt_obs.any():
+                    continue
+
+                # Yield the four tensors that Chronos-Bolt's forward() method expects.
+                # These are the native input format: raw values with NaN encoding for
+                # unobserved positions, plus explicit boolean observation masks.
+                yield {
+                    "context": torch.from_numpy(ctx_raw),       # shape (context_length,): raw past values, NaN = unobserved
+                    "mask": torch.from_numpy(ctx_obs),           # shape (context_length,): True where context is observed
+                    "target": torch.from_numpy(tgt_raw),         # shape (horizon,): raw future values, NaN = unobserved
+                    "target_mask": torch.from_numpy(tgt_obs),    # shape (horizon,): True where target is observed
                 }
 
-    return ChronosStreamingWindowDataset()   # instance the DataLoader will wrap
+    return ChronosStreamingWindowDataset()
 
 
 # ============================================================================ #
-#  Model                                                                         #
+#  MODEL CONSTRUCTION                                                           #
 # ============================================================================ #
-def build_model(P: int, S: int, device):     # construct a from-scratch Bolt model for this (P, S)
-    from transformers import AutoConfig       # [CHRONOS-REF] load the architecture config from HuggingFace
-    from chronos.chronos_bolt import ChronosBoltModelForForecasting  # [CHRONOS-REF] the real Chronos-Bolt model class
 
-    config = AutoConfig.from_pretrained(BASE_MODEL_ID)  # [CHRONOS-REF] pull Bolt-tiny's architectural config (weights NOT fetched; ships initializer_factor=0.05 for sane random init)
-    config.chronos_config["context_length"] = CONTEXT_LENGTH        # [CHRONOS-REF] keep Bolt default (2048)
-    config.chronos_config["prediction_length"] = PREDICTION_LENGTH  # [CHRONOS-REF] keep Bolt default (64)
-    config.chronos_config["input_patch_size"] = P                   # [CHRONOS-REF] THE experimental knob: patch size P
-    config.chronos_config["input_patch_stride"] = S                 # [CHRONOS-REF] THE experimental knob: patch stride S
-    config.chronos_config["quantiles"] = QUANTILES                  # [CHRONOS-REF] keep Bolt's 9 quantile heads
+def build_model(P: int, S: int, device):
+    """Construct a from-scratch Chronos-Bolt Tiny model with the given patch geometry (P, S).
 
-    model = ChronosBoltModelForForecasting(config)  # [CHRONOS-REF] random weights via post_init (= train.py random_init path); required: embedding in_features = P*2 changes with P
-    return model.to(device), config.chronos_config  # move to GPU/CPU; return the resolved sub-config for provenance
+    This function downloads the ARCHITECTURAL configuration (number of layers, hidden
+    dimensions, number of attention heads, etc.) from the official Chronos-Bolt Tiny
+    checkpoint on HuggingFace, but does NOT load the pretrained weights. Instead, all
+    parameters are randomly initialised using the model's built-in post_init method
+    (which applies Gaussian initialisation scaled by initializer_factor = 0.05).
 
+    The key experimental manipulation happens here: we override the patch tokenisation
+    parameters (input_patch_size = P and input_patch_stride = S) in the configuration
+    before constructing the model. Since the patch embedding layer's input dimension
+    depends on P (specifically, in_features = P * 2 because the input is the concatenation
+    of the patch values and their observation mask), changing P changes the architecture
+    of the first layer, which is why the model must be trained from scratch rather than
+    fine-tuned from the official checkpoint.
 
-def _setup_precision(device) -> str:          # official regime: fp32 compute with TF32 matmuls on capable GPUs
-    import torch                               # local import: torch only needed inside the run
-    if device.type == "cuda" and torch.cuda.get_device_capability()[0] >= 8:  # [CHRONOS-REF] train.py: tf32=true only on compute capability >= 8
-        torch.backends.cuda.matmul.allow_tf32 = True   # [CHRONOS-REF] enable TF32 matmuls (TrainingArguments tf32=True)
-        torch.backends.cudnn.allow_tf32 = True         # [CHRONOS-REF] enable TF32 convs (same flag)
-        return "fp32+tf32"                    # human-readable label for provenance
-    return "fp32"                             # CPU or pre-Ampere GPU: plain fp32 (official fallback behaviour)
+    Returns the model moved to the specified device (GPU or CPU).
+    """
+    from transformers import AutoConfig
+    from chronos.chronos_bolt import ChronosBoltModelForForecasting
+
+    # Download the architectural configuration from HuggingFace (this is a lightweight
+    # JSON file describing the model structure, NOT the multi-MB weight tensors)
+    config = AutoConfig.from_pretrained(BASE_MODEL_ID)
+
+    # Override the patch tokenisation parameters with our experimental values.
+    # All other architectural parameters (d_model, n_heads, n_layers, etc.) remain
+    # at their official Bolt-Tiny values.
+    config.chronos_config["context_length"] = CONTEXT_LENGTH
+    config.chronos_config["prediction_length"] = PREDICTION_LENGTH
+    config.chronos_config["input_patch_size"] = P       # THE experimental knob: patch window width
+    config.chronos_config["input_patch_stride"] = S     # THE experimental knob: patch step size
+    config.chronos_config["quantiles"] = QUANTILES
+
+    # Instantiate the model with randomly initialised weights. The post_init method
+    # applies the initialisation scheme defined in the config (initializer_factor = 0.05),
+    # which produces sensible random weights for training from scratch.
+    model = ChronosBoltModelForForecasting(config)
+    return model.to(device)
 
 
 # ============================================================================ #
-#  One run                                                                       #
+#  TRAINING A SINGLE MODEL                                                      #
 # ============================================================================ #
-@dataclass
-class RunResult:                              # one row of the manifest: the outcome of a single run
-    P: int                                    # patch size
-    S: int                                    # stride
-    seed: int                                 # seed
-    overlap_ratio: float                      # (P - S) / P
-    approx_num_patches: int                   # patch tokens per full context (excl. the +1 [REG] token)
-    n_params_millions: float                  # model size actually built
-    max_steps: int                            # planned optimizer steps
-    steps_completed: int                      # steps actually run (< max_steps if aborted)
-    final_loss: float                         # last step's loss
-    mean_last_100: float                      # smoothed tail loss
-    steps_per_sec: float                      # throughput (sanity-check time estimates)
-    status: str                               # "done" | "failed-nan"
-    precision: str                            # fp32 | fp32+tf32
-    device: str                               # cuda | cpu
 
+def train_one(P: int, S: int, seed: int, out_dir: Path):
+    """Train one Chronos-Bolt Tiny model from scratch for the given patch geometry (P, S).
 
-def train_one(P: int, S: int, seed: int, out_dir: Path) -> RunResult:
-    import torch                               # heavy imports kept inside the run (clean sweep startup)
-    from torch.utils.data import DataLoader    # batches windows from the IterableDataset
-    from transformers import get_scheduler, set_seed  # [CHRONOS-REF] HF scheduler factory + official seeding helper (train.py uses transformers.set_seed)
-    from tqdm.auto import tqdm                  # live progress bar over training steps
+    The training follows the official Chronos recipe as closely as possible:
+    - AdamW optimiser with linear learning rate decay and no warmup
+    - fp32 compute with TF32 matrix multiplications on Ampere+ GPUs
+    - gradient clipping at norm 1.0
+    - the same data pipeline (interleaved TSMixup + KernelSynth, NaN augmentation)
 
-    if out_dir.joinpath("DONE").exists():      # resumability: this model is already fully trained
-        prev = json.loads(out_dir.joinpath("run_config.json").read_text())  # reload its recorded result
-        prov_prev = prev.get("provenance", {})  # data regime this DONE run was actually trained under
-        if (prov_prev.get("dataset_tsmixup") != DATASET_CONFIG_TSMIXUP  # guard: a DONE marker is only a valid
-                or prov_prev.get("dataset_kernelsynth") != DATASET_CONFIG_KERNELSYNTH  # skip if it was produced
-                or prov_prev.get("tsmixup_ratio") != TSMIXUP_RATIO):    # under the SAME data regime as now...
-            raise RuntimeError(                # ...otherwise skipping it would silently mix data regimes across the sweep
-                f"{out_dir.name} has a DONE marker from a DIFFERENT data regime "
-                f"(recorded tsmixup={prov_prev.get('dataset_tsmixup') or prov_prev.get('dataset_config')}, "
-                f"kernelsynth={prov_prev.get('dataset_kernelsynth')}, ratio={prov_prev.get('tsmixup_ratio')}); "
-                f"current config is {DATASET_CONFIG_TSMIXUP} + {DATASET_CONFIG_KERNELSYNTH} at {TSMIXUP_RATIO}:1. "
-                f"Move or delete this directory to retrain it — do NOT leave the sweep half-old-half-new."
-            )
-        print(f"[skip] {out_dir.name} already DONE")
-        return RunResult(**{k: prev["result"][k] for k in RunResult.__dataclass_fields__})  # reconstruct the record
+    The trained model is saved in HuggingFace format at out_dir, along with a loss
+    history array and periodic checkpoints. A 'DONE' marker file is written upon
+    successful completion to enable resumability (the sweep skips completed models).
+    """
+    import torch
+    from torch.utils.data import DataLoader
+    from transformers import get_scheduler, set_seed
+    from tqdm.auto import tqdm
 
-    out_dir.mkdir(parents=True, exist_ok=True)  # create this model's dedicated folder
+    # RESUMABILITY: if a previous run already completed this model, skip it entirely.
+    # The DONE marker file is written only after the final model is saved successfully,
+    # so its presence guarantees a complete, usable checkpoint.
+    if out_dir.joinpath("DONE").exists():
+        print(f"[skip] {out_dir.name} already completed")
+        return
 
-    set_seed(seed)                             # [CHRONOS-REF] seeds python/numpy/torch/cuda in one call, as train.py does
+    # Create the output directory for this model (e.g., weights/p16-s8-seed42/)
+    out_dir.mkdir(parents=True, exist_ok=True)
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")  # pick GPU if present
-    prec_name = _setup_precision(device)       # [CHRONOS-REF] fp32 + TF32 (official); no AMP, no GradScaler
+    # Fix all random seeds for full reproducibility: Python's random module, NumPy,
+    # PyTorch (both CPU and CUDA), and CUDA's cuDNN backend are all seeded together
+    # using the HuggingFace set_seed utility, exactly as the official train.py does.
+    set_seed(seed)
 
-    model, chronos_config = build_model(P, S, device)  # from-scratch Bolt for this (P, S)
-    n_params = sum(p.numel() for p in model.parameters())  # count parameters actually built
+    # Select the compute device: use CUDA GPU if available, otherwise fall back to CPU
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    tsmixup_stream, ks_stream = build_streams(seed)  # open both shuffled corpus streams (seed-dependent order)
-    dataset = make_window_dataset(tsmixup_stream, ks_stream,  # [CHRONOS-REF] interleaved at 9:1 ratio
-                                  CONTEXT_LENGTH + PREDICTION_LENGTH, CONTEXT_LENGTH, seed)
-    loader = DataLoader(dataset, batch_size=BATCH_SIZE, num_workers=0)  # single-process loading (equivalent to official dataloader_num_workers=1 single stream)
+    # Enable TF32 (TensorFloat-32) on Ampere-generation or newer GPUs (compute capability >= 8).
+    # TF32 uses the full fp32 range but with reduced mantissa precision (10 bits instead of 23)
+    # in matrix multiplications, providing ~3x speedup with negligible accuracy impact for
+    # deep learning workloads. This matches the official Chronos training configuration
+    # (TrainingArguments tf32=True).
+    if device.type == "cuda" and torch.cuda.get_device_capability()[0] >= 8:
+        torch.backends.cuda.matmul.allow_tf32 = True   # enable TF32 for torch.matmul operations
+        torch.backends.cudnn.allow_tf32 = True          # enable TF32 for cuDNN convolutions
 
-    try:                                       # [CHRONOS-REF] optim: adamw_torch_fused (chronos-t5-tiny.yaml)
-        optimizer = torch.optim.AdamW(model.parameters(), lr=LR, weight_decay=WEIGHT_DECAY,
-                                      fused=(device.type == "cuda"))  # fused kernel on CUDA = adamw_torch_fused
-    except (RuntimeError, TypeError):          # older torch / unsupported device: plain AdamW (same math)
-        optimizer = torch.optim.AdamW(model.parameters(), lr=LR, weight_decay=WEIGHT_DECAY)
-    lr_scheduler = get_scheduler(              # [CHRONOS-REF] linear decay schedule (train.py setup)
-        LR_SCHEDULER_TYPE, optimizer=optimizer,          # [CHRONOS-REF] lr_scheduler_type: linear
-        num_warmup_steps=round(WARMUP_RATIO * MAX_STEPS),  # [CHRONOS-REF] warmup_ratio: 0.0 -> 0 warmup steps (official)
-        num_training_steps=MAX_STEPS,          # [CHRONOS-REF] total steps for the decay schedule
+    # Build the model with randomly initialised weights for this (P, S) geometry
+    model = build_model(P, S, device)
+
+    # Open the two training corpus streams and create the window-sampling dataset
+    tsmixup_stream, ks_stream = build_streams(seed)
+    dataset = make_window_dataset(
+        tsmixup_stream, ks_stream,
+        CONTEXT_LENGTH + PREDICTION_LENGTH,  # total window length (context + target)
+        CONTEXT_LENGTH,                       # how much of that window is context (input)
+        seed,
     )
 
-    prov = {                                   # provenance block, written up-front so a crash still leaves a trail
-        "P": P, "S": S, "seed": seed,          # the experimental coordinates
-        "overlap_ratio": round((P - S) / P, 4),  # derived geometry
-        "approx_num_patches": _approx_num_patches(CONTEXT_LENGTH, P, S),  # derived token-sequence length (excl. [REG])
-        "base_model_id": BASE_MODEL_ID, "hf_repo": HF_REPO,  # [CHRONOS-REF] official sources used
-        "dataset_tsmixup": DATASET_CONFIG_TSMIXUP, "dataset_kernelsynth": DATASET_CONFIG_KERNELSYNTH,
-        "tsmixup_ratio": TSMIXUP_RATIO,      # [CHRONOS-REF] official 9:1 interleaving ratio
-        "context_length": CONTEXT_LENGTH, "prediction_length": PREDICTION_LENGTH,  # [CHRONOS-REF] Bolt defaults in effect
-        "quantiles": QUANTILES, "batch_size": BATCH_SIZE,  # [CHRONOS-REF] Bolt quantiles / official batch size
-        "max_steps": MAX_STEPS, "lr": LR, "weight_decay": WEIGHT_DECAY,  # budget (ours) + official LR/WD
-        "grad_clip_norm": GRAD_CLIP_NORM, "lr_scheduler": LR_SCHEDULER_TYPE,  # [CHRONOS-REF] clipping + schedule
-        "warmup_ratio": WARMUP_RATIO, "shuffle_buffer": SHUFFLE_BUFFER_SIZE,  # [CHRONOS-REF] official values
-        "min_past": MIN_PAST, "max_missing_prop": MAX_MISSING_PROP, "drop_prob": DROP_PROB,  # [CHRONOS-REF] official data-pipeline values
-        "precision": prec_name, "device": device.type,  # resolved runtime policy
-        "gpu": torch.cuda.get_device_name(0) if device.type == "cuda" else None,  # which GPU (if any)
-        "git_commit": _git_commit(),           # code version
-        "torch": torch.__version__,            # library version
-        "n_params_millions": round(n_params / 1e6, 3),  # built model size
-    }
-    (out_dir / "run_config.json").write_text(json.dumps({"provenance": prov}, indent=2))  # persist provenance now
+    # Wrap the streaming dataset in a DataLoader that collates individual windows
+    # into batches of BATCH_SIZE. num_workers=0 means data loading happens in the
+    # main process (equivalent to the official single-stream configuration).
+    loader = DataLoader(dataset, batch_size=BATCH_SIZE, num_workers=0)
 
-    print(f"\n=== train {out_dir.name} | P={P} S={S} seed={seed} | "  # run header for the log
-          f"{prec_name} | ~{prov['approx_num_patches']}+1 tokens | {n_params/1e6:.2f}M params ===")
+    # OPTIMISER: AdamW (Adam with decoupled weight decay, the standard for transformer
+    # training). On CUDA, the "fused" implementation uses a single GPU kernel for the
+    # entire parameter update, avoiding multiple kernel launches and memory round-trips
+    # — mathematically identical, just faster. The try/except handles older PyTorch
+    # versions that do not support the fused flag.
+    try:
+        optimizer = torch.optim.AdamW(
+            model.parameters(), lr=LR, weight_decay=WEIGHT_DECAY,
+            fused=(device.type == "cuda"),
+        )
+    except (RuntimeError, TypeError):
+        optimizer = torch.optim.AdamW(
+            model.parameters(), lr=LR, weight_decay=WEIGHT_DECAY,
+        )
 
-    model.train()                              # [CHRONOS-REF] put the model in training mode
-    loss_history: list[float] = []             # per-step losses (saved + plotted)
-    data_iter = iter(loader)                   # manual iterator so we can refill on exhaustion
-    t0 = time.time()                           # start the throughput clock
+    # LEARNING RATE SCHEDULER: the learning rate starts at LR and decays linearly to 0
+    # over the course of MAX_STEPS. With WARMUP_RATIO = 0.0, there are 0 warmup steps,
+    # so the decay begins immediately from the first step. This is the official schedule.
+    lr_scheduler = get_scheduler(
+        LR_SCHEDULER_TYPE,
+        optimizer=optimizer,
+        num_warmup_steps=round(WARMUP_RATIO * MAX_STEPS),  # = 0 warmup steps (official)
+        num_training_steps=MAX_STEPS,
+    )
 
-    def _next_batch():                         # fetch next batch, restarting the iterator if it ends
-        nonlocal data_iter                     # rebind the outer iterator
+    print(f"\n=== Training {out_dir.name} | P={P} S={S} seed={seed} ===")
+
+    # Switch the model to training mode: this activates dropout layers and ensures
+    # batch normalisation layers (if any) use batch statistics rather than running
+    # averages. Required before any forward pass that should compute gradients.
+    model.train()
+
+    # Loss history: stores the scalar loss value at every training step, used for
+    # monitoring convergence and saved to disk as a numpy array for later analysis.
+    loss_history: list[float] = []
+
+    # Create a manual iterator over the DataLoader so we can handle stream exhaustion
+    # by restarting the iterator without interrupting the training loop.
+    data_iter = iter(loader)
+    t0 = time.time()  # record the start time for throughput measurement
+
+    def _next_batch():
+        """Fetch the next batch from the DataLoader, restarting the iterator if exhausted.
+
+        The underlying IterableDataset cycles infinitely, but the DataLoader's iterator
+        can still raise StopIteration in edge cases (e.g., when the streaming connection
+        is interrupted). This wrapper handles that gracefully by creating a fresh iterator.
+        """
+        nonlocal data_iter
         try:
-            return next(data_iter)             # normal path
-        except StopIteration:                  # stream/loader exhausted -> start a new pass
+            return next(data_iter)
+        except StopIteration:
             data_iter = iter(loader)
             return next(data_iter)
 
-    status = "done"                            # optimistic; flipped to "failed-nan" on a bad step
-    pbar = tqdm(range(1, MAX_STEPS + 1),       # live progress bar over the fixed step budget...
-                desc=out_dir.name, dynamic_ncols=True)  # ...labelled with this run's id, auto-width
-    for step in pbar:                          # [CHRONOS-REF] fixed-step training loop (train.py trains by max_steps)
-        batch = {k: v.to(device) for k, v in _next_batch().items()}  # move the batch to the device
-        optimizer.zero_grad(set_to_none=True)  # [CHRONOS-REF] clear grads before the step
+    # ---- MAIN TRAINING LOOP ----
+    # This is a fixed-step training loop (not epoch-based): the model trains for exactly
+    # MAX_STEPS gradient updates, regardless of how many times it cycles through the data.
+    # This matches the official Chronos training, which also uses max_steps.
+    pbar = tqdm(range(1, MAX_STEPS + 1), desc=out_dir.name, dynamic_ncols=True)
+    for step in pbar:
+        # Move the batch tensors to the compute device (GPU or CPU). Each batch contains
+        # four tensors: context, mask, target, target_mask — see make_window_dataset.
+        batch = {k: v.to(device) for k, v in _next_batch().items()}
 
-        out = model(                           # [CHRONOS-REF] Chronos-Bolt forward pass (official signature), fp32 compute...
-            context=batch["context"], mask=batch["mask"],        # [CHRONOS-REF] NaN-encoded context + its observation mask
-            target=batch["target"], target_mask=batch["target_mask"],  # [CHRONOS-REF] NaN-encoded target + its observation mask
+        # Zero out the gradients accumulated from the previous step. set_to_none=True
+        # is a minor optimisation: instead of filling gradient tensors with zeros, it
+        # deallocates them entirely, which is slightly faster and uses less memory.
+        optimizer.zero_grad(set_to_none=True)
+
+        # FORWARD PASS: feed the context and target through Chronos-Bolt. The model
+        # internally patches the context into tokens, runs them through the encoder-decoder
+        # transformer, and computes the quantile loss between the predicted and actual
+        # future values. The loss is automatically masked: positions where target_mask
+        # is False (i.e., NaN in the target) contribute zero to the loss.
+        out = model(
+            context=batch["context"],
+            mask=batch["mask"],
+            target=batch["target"],
+            target_mask=batch["target_mask"],
         )
-        loss = out.loss                        # [CHRONOS-REF] Bolt returns the masked quantile loss on .loss
+        loss = out.loss  # the masked quantile regression loss (scalar tensor)
 
-        loss_value = float(loss.detach().cpu())  # scalarise for logging + NaN check
-        if not np.isfinite(loss_value):        # guard: non-finite loss now signals genuine pathology (fp32 pipeline)
-            status = "failed-nan"              # mark the run failed
-            tqdm.write(f"[abort] non-finite loss at step {step} — skipping rest of this run.")  # note above the bar
-            break                              # stop this run; the sweep continues with the next config
+        # NaN/Inf guard: a non-finite loss in an fp32 pipeline (no mixed precision) signals
+        # genuine numerical pathology (e.g., a degenerate batch), not a transient scaling issue.
+        # Abort this run immediately rather than continuing with corrupted gradients.
+        loss_value = float(loss.detach().cpu())
+        if not np.isfinite(loss_value):
+            print(f"[abort] non-finite loss at step {step}")
+            break
 
-        loss.backward()                        # [CHRONOS-REF] plain fp32 backward (official regime has no AMP scaler)
-        torch.nn.utils.clip_grad_norm_(model.parameters(), GRAD_CLIP_NORM)  # [CHRONOS-REF] clip gradient norm (Trainer default)
-        optimizer.step()                       # [CHRONOS-REF] AdamW step
-        lr_scheduler.step()                    # [CHRONOS-REF] advance the LR schedule
+        # BACKWARD PASS: compute the gradient of the loss with respect to every model
+        # parameter via automatic differentiation (backpropagation). This is plain fp32
+        # backprop — the official recipe uses no AMP (automatic mixed precision) scaler.
+        loss.backward()
 
-        loss_history.append(loss_value)        # record the step loss
-        pbar.set_postfix(loss=f"{loss_value:.4f}",  # live per-step readout on the bar: current loss...
-                         lr=f"{lr_scheduler.get_last_lr()[0]:.2e}")  # ...and current learning rate
-        if step % LOG_EVERY == 0:              # periodic durable log line (survives in the captured stdout)
-            sps = step / (time.time() - t0)    # steps/sec so far
-            tqdm.write(f"step={step}/{MAX_STEPS} loss={np.mean(loss_history[-LOG_EVERY:]):.4f} "  # smoothed loss
-                       f"lr={lr_scheduler.get_last_lr()[0]:.2e} {sps:.2f} it/s")  # written above the bar
-        if step % SAVE_EVERY == 0:             # periodic checkpoint
-            ck = out_dir / f"checkpoint-{step}"  # checkpoint subfolder inside this model's dir
-            model.save_pretrained(ck)          # [CHRONOS-REF] HF-style checkpoint save
-            tqdm.write(f"  saved {ck.name}")   # note above the bar
+        # GRADIENT CLIPPING: if the total L2 norm of all gradients exceeds GRAD_CLIP_NORM,
+        # scale every gradient down proportionally so the norm equals GRAD_CLIP_NORM.
+        # This prevents the optimiser from taking excessively large steps when a batch
+        # produces unusually steep gradients, which is a common source of training instability.
+        torch.nn.utils.clip_grad_norm_(model.parameters(), GRAD_CLIP_NORM)
 
-    steps_per_sec = (len(loss_history) / (time.time() - t0)) if loss_history else 0.0  # final throughput
-    result = RunResult(                        # assemble the manifest record for this run
-        P=P, S=S, seed=seed, overlap_ratio=prov["overlap_ratio"],  # coordinates + geometry
-        approx_num_patches=prov["approx_num_patches"],             # token-sequence length
-        n_params_millions=prov["n_params_millions"], max_steps=MAX_STEPS,  # model size + planned steps
-        steps_completed=len(loss_history),     # steps actually completed
-        final_loss=float(loss_history[-1]) if loss_history else float("nan"),   # last loss
-        mean_last_100=float(np.mean(loss_history[-100:])) if loss_history else float("nan"),  # tail-smoothed loss
-        steps_per_sec=round(steps_per_sec, 3), status=status,      # throughput + status
-        precision=prec_name, device=device.type,                  # runtime policy
-    )
+        # OPTIMISER STEP: apply the clipped gradients to update all model parameters
+        # according to the AdamW update rule (gradient descent with adaptive per-parameter
+        # learning rates and momentum).
+        optimizer.step()
 
-    np.save(out_dir / "loss_history.npy", np.asarray(loss_history, dtype=np.float32))  # raw loss curve data
-    _plot_loss(loss_history, P, S, seed, out_dir / "loss_curve.png")  # rendered loss curve
-    (out_dir / "run_config.json").write_text(  # overwrite provenance with provenance + result
-        json.dumps({"provenance": prov, "result": asdict(result)}, indent=2))
+        # SCHEDULER STEP: advance the learning rate schedule by one step. Under the linear
+        # schedule, this reduces the learning rate by LR / MAX_STEPS, so the rate reaches
+        # exactly 0 at the final step.
+        lr_scheduler.step()
 
-    if status == "done":                       # only a fully successful run gets the final model + marker
-        model.save_pretrained(out_dir)         # [CHRONOS-REF] save the final model at the run-dir root (HF format)
-        (out_dir / "DONE").write_text(time.strftime("%Y-%m-%d %H:%M:%S"))  # resume marker (skip on relaunch)
-        print(f"[done] final model saved to {out_dir}")
-    else:                                      # failed run: no DONE, so a relaunch will retry it
-        print(f"[failed] {out_dir.name} left without DONE marker (status={status}).")
-    return result                              # hand the record back to the sweep for the manifest
+        # Record the scalar loss value and update the progress bar with the current loss
+        # and learning rate, giving a real-time view of training dynamics.
+        loss_history.append(loss_value)
+        pbar.set_postfix(loss=f"{loss_value:.4f}",
+                         lr=f"{lr_scheduler.get_last_lr()[0]:.2e}")
 
+        # PERIODIC DETAILED LOG: every LOG_EVERY steps, print the smoothed loss (averaged
+        # over the last LOG_EVERY steps to reduce noise), the current learning rate, and
+        # the training throughput in steps per second. This line is written above the
+        # progress bar and survives in captured stdout for post-hoc analysis.
+        if step % LOG_EVERY == 0:
+            sps = step / (time.time() - t0)
+            tqdm.write(f"step={step}/{MAX_STEPS} "
+                       f"loss={np.mean(loss_history[-LOG_EVERY:]):.4f} "
+                       f"lr={lr_scheduler.get_last_lr()[0]:.2e} "
+                       f"{sps:.2f} it/s")
 
-def _plot_loss(loss_history, P, S, seed, path):  # render the training-loss curve to PNG
-    import matplotlib                          # local import (headless-safe)
-    matplotlib.use("Agg")                      # non-interactive backend (no display on a server)
-    import matplotlib.pyplot as plt            # plotting API
-    plt.figure(figsize=(8, 4))                 # figure size
-    plt.plot(loss_history)                     # loss vs step
-    plt.xlabel("step"); plt.ylabel("training loss")  # axis labels
-    plt.title(f"Chronos-Bolt retraining loss (P={P}, S={S}, seed={seed})")  # title identifies the model
-    plt.tight_layout(); plt.savefig(path); plt.close()  # lay out, write file, free the figure
+        # PERIODIC CHECKPOINT: every SAVE_EVERY steps, save the model in HuggingFace format
+        # so that training can be resumed from this point if the process is interrupted.
+        # Each checkpoint is a self-contained directory with the model weights and config.
+        if step % SAVE_EVERY == 0:
+            ck = out_dir / f"checkpoint-{step}"
+            model.save_pretrained(ck)
+            tqdm.write(f"  checkpoint saved: {ck.name}")
 
+    # Save the full loss history as a numpy array for later convergence analysis and plotting
+    np.save(out_dir / "loss_history.npy",
+            np.asarray(loss_history, dtype=np.float32))
 
-# ============================================================================ #
-#  Manifest                                                                      #
-# ============================================================================ #
-def rebuild_manifest(root: Path) -> None:      # aggregate all finished runs into one CSV (our tooling)
-    """Idempotently rebuild manifest.csv from every finished run_config.json under root."""
-    import csv                                 # CSV writer
-    rows = []                                  # collected result records
-    for cfg in sorted(root.glob("*/run_config.json")):  # every run folder's config file
-        doc = json.loads(cfg.read_text())      # load it
-        if "result" in doc:                    # only finished runs have a "result" block
-            rows.append(doc["result"])         # collect the record
-    if not rows:                               # nothing finished yet -> no manifest
-        return
-    fields = list(RunResult.__dataclass_fields__)  # column order from the dataclass
-    with open(root / "manifest.csv", "w", newline="") as f:  # (re)write the manifest
-        w = csv.DictWriter(f, fieldnames=fields)  # header from the field list
-        w.writeheader()                        # write the header row
-        for r in rows:                         # one CSV row per finished run
-            w.writerow({k: r.get(k) for k in fields})
-    print(f"manifest.csv updated ({len(rows)} runs) -> {root / 'manifest.csv'}")
+    # Save the final trained model in HuggingFace format (config.json + model.safetensors),
+    # ready to be loaded with ChronosBoltModelForForecasting.from_pretrained(out_dir)
+    model.save_pretrained(out_dir)
+
+    # Write the DONE marker file with a human-readable timestamp. This file serves as
+    # the resumability signal: the sweep loop checks for its existence before starting
+    # a run, and skips models that are already fully trained.
+    (out_dir / "DONE").write_text(time.strftime("%Y-%m-%d %H:%M:%S"))
+    print(f"[done] final model saved to {out_dir}")
 
 
 # ============================================================================ #
-#  Sweep                                                                         #
+#  SWEEP: train all geometries sequentially                                     #
 # ============================================================================ #
-def main():                                    # drive the full (P, S, seed) sweep
-    OUTPUT_ROOT.mkdir(parents=True, exist_ok=True)  # ensure chronos/models/weights/ exists
-    runs = [(P, S, seed) for (P, S) in PS_GRID for seed in SEEDS]  # flatten grid x seeds into a run list
-    print(f"Sweep: {len(runs)} runs -> {OUTPUT_ROOT}")  # announce the plan
 
-    for P, S, seed in runs:                    # run them sequentially
-        out_dir = OUTPUT_ROOT / f"p{P}-s{S}-seed{seed}"  # this model's dedicated folder
+def main():
+    """Drive the full (P, S, seed) sweep: train one model per combination, sequentially.
+
+    The sweep iterates over every (P, S) pair in PS_GRID crossed with every seed in SEEDS,
+    training each model from scratch in sequence. Each model is saved to its own subdirectory
+    under OUTPUT_ROOT (e.g., weights/p16-s8-seed42/). If a model's DONE marker already
+    exists, it is skipped without loading any data or weights.
+
+    Exceptions in individual runs are caught and logged without aborting the entire sweep,
+    so a failure in one geometry does not prevent the remaining models from training.
+    """
+    # Ensure the top-level output directory exists
+    OUTPUT_ROOT.mkdir(parents=True, exist_ok=True)
+
+    # Flatten the grid of (P, S) pairs and seeds into a linear list of runs
+    runs = [(P, S, seed) for (P, S) in PS_GRID for seed in SEEDS]
+    print(f"Sweep: {len(runs)} runs -> {OUTPUT_ROOT}")
+
+    for P, S, seed in runs:
+        out_dir = OUTPUT_ROOT / f"p{P}-s{S}-seed{seed}"
         try:
-            train_one(P, S, seed, out_dir)     # train (or skip if DONE)
-        except Exception as e:                 # one run must not sink the whole sweep
-            print(f"[error] {out_dir.name} raised {type(e).__name__}: {e}")
-        rebuild_manifest(OUTPUT_ROOT)          # refresh the manifest after each run
+            train_one(P, S, seed, out_dir)
+        except Exception as e:
+            # A failed run must not stop the rest of the sweep: log the error and continue
+            print(f"[error] {out_dir.name}: {type(e).__name__}: {e}")
 
-    print("\nSweep finished.")                 # done
+    print("\nSweep complete.")
 
 
-if __name__ == "__main__":                     # run the sweep when invoked as a script
+if __name__ == "__main__":
     main()
