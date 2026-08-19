@@ -1,0 +1,18 @@
+\begin{table}[t]
+    \centering
+    \small
+    \begin{tabular}{@{}llrl@{}}
+        \toprule
+        \textbf{Claim} & \textbf{Rule} & \textbf{Prior} & \textbf{Reads as} \\
+        \midrule
+        $H1$ supported & $\Pr(\bar\beta < \log 0.8 \mid D) \ge 0.95$   & $0.34$ & at least $20\%$ attenuation at a lock \\
+        $H1$ refuted   & $\Pr(|\bar\beta| < \log 1.1 \mid D) \ge 0.95$ & $0.14$ & any effect is smaller than $10\%$ \\
+        $H2$ supported & $\Pr(\sigma_\phi < \log 1.1 \mid D) \ge 0.95$ & $0.30$ & phase moves the deficit by under $10\%$ \\
+        $H3$ location  & two-label fit wins LOO, $\theta_S,\theta_P<0$ & ---    & dips sit on both predicted grids \\
+        $H3a$, $H3b$   & $\Pr(|\kappa_F - 1| < 0.1 \mid D) \ge 0.95$   & $0.05$ & that branch tracks its own parameter \\
+        $M1$ supported & $\Pr(\delta_O < 0 \mid D) \ge 0.95$, overlap term wins LOO & $0.50$ & overlap reduces the deficit \\
+        \bottomrule
+    \end{tabular}
+    \caption{Decision rules. \textbf{Prior} is the probability each rule already scored under the priors of \autoref{tab:bayesPriors}: a posterior counts as evidence only in as much as it has moved away from that value. A claim is supported at $0.95$, refuted at $0.05$, and otherwise inconclusive.}
+    \label{tab:bayesDecisions}
+\end{table}

@@ -1,0 +1,32 @@
+\begin{table*}[!b]
+    \centering
+    \small
+    \begin{tabular}{@{}cccccccc@{}}
+        \toprule
+        \textbf{Run} & \textbf{Patch ($P$)} & \textbf{Stride ($S$)} & \textbf{overlap} & \textbf{tokens} & $S \mid P$ & $P \mid S$ \\
+        \midrule
+        $1$ & $8$ & $4$ & $0.50$ & $511$ & yes & \textbf{no} \\
+        $2$ & $8$ & $8$ & $0.00$ & $256$ & yes & yes \\
+        \midrule
+        $3$ & $16$ & $4$ & $0.75$ & $509$ & yes & \textbf{no} \\
+        $4$ & $16$ & $8$ & $0.50$ & $255$ & yes & \textbf{no} \\
+        $5$ & $16$ & $12$ & $0.25$ & $170$ & \textbf{no} & \textbf{no} \\
+        $6$ & $16$ & $16$ & $0.00$ & $128$ & yes & yes \\
+        \midrule
+        $7$ & $24$ & $8$ & $0.67$ & $254$ & yes & \textbf{no} \\
+        $8$ & $24$ & $12$ & $0.50$ & $169$ & yes & \textbf{no} \\
+        $9$ & $24$ & $16$ & $0.33$ & $127$ & \textbf{no} & \textbf{no} \\
+        $10$ & $24$ & $20$ & $0.17$ & $102$ & \textbf{no} & \textbf{no} \\
+        $11$ & $24$ & $24$ & $0.00$ & $85$ & yes & yes \\
+        \midrule
+        $12$ & $32$ & $8$ & $0.75$ & $253$ & yes & \textbf{no} \\
+        $13$ & $32$ & $12$ & $0.62$ & $169$ & \textbf{no} & \textbf{no} \\
+        $14$ & $32$ & $16$ & $0.50$ & $127$ & yes & \textbf{no} \\
+        $15$ & $32$ & $20$ & $0.38$ & $101$ & \textbf{no} & \textbf{no} \\
+        $16$ & $32$ & $24$ & $0.25$ & $85$ & \textbf{no} & \textbf{no} \\
+        $17$ & $32$ & $32$ & $0.00$ & $64$ & yes & yes \\
+        \bottomrule
+    \end{tabular}
+    \caption{The extended configurations retained for the analysis. All are retrained from scratch under the same $100$k-step budget and from the same seed. $S \mid P$ means every stride lock is also a patch null, and $P \mid S$ the converse; both hold only at $P=S$, where the two branches are the same set of frequencies.}
+    \label{tab:hfModels}
+\end{table*}

@@ -23,7 +23,7 @@ Historically, time-series analysis relied on classical statistical models such a
 
 To capture complex, non-linear temporal behaviors without rigid feature engineering, the paradigm shifted toward deep learning. Early architectures leveraged Recurrent Neural Networks (RNNs), Long Short-Term Memory (LSTM) networks, and Convolutional Neural Networks (CNNs) to map temporal sequences sequentially.
 {\color{red}These architectures operate on the raw scalar sequence and therefore do not introduce
-patch-based structural aliasing --- that risk is specific to the windowed tokenization
+patch-based structural aliasing, a risk specific to the windowed tokenization
 strategies adopted by transformer-based foundation models.}
 
 More recently, the state of the art has been dominated by transformer-based architectures. By replacing recurrent bottlenecks with self-attention mechanisms, transformers can process sequences in parallel and explicitly compute dependencies between distant time steps. This allows the model to learn both localized high-frequency fluctuations and long-range macro-patterns simultaneously, forming highly adaptive architectures that can be fine-tuned to specific downstream industrial or scientific applications.

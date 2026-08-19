@@ -1,0 +1,19 @@
+\begin{table*}[!b]
+    \centering
+    \small
+    \begin{tabular}{@{}cccccc@{}}
+        \toprule
+        $P$ & $S$ & $O$ & \textbf{tokens} & $S \mid P$ & $P \mid S$ \\
+        \midrule
+        $8$ & $8$ & $0.000$ & $256$ & yes & yes \\
+        \midrule
+        $16$ & $8$ & $0.500$ & $255$ & yes & \textbf{no} \\
+        $16$ & $12$ & $0.250$ & $170$ & \textbf{no} & \textbf{no} \\
+        $16$ & $16$ & $0.000$ & $128$ & yes & yes \\
+        \midrule
+        $24$ & $24$ & $0.000$ & $85$ & yes & yes \\
+        \bottomrule
+    \end{tabular}
+    \caption{The five initial geometries. The token count is the number of patch tokens at the $2048$-sample training context. The last two columns are divisibility conditions: $S \mid P$ means every stride lock is also a patch null, and $P \mid S$ the converse. Both hold only at $P=S$, where the two branches are the same set of frequencies.}
+    \label{tab:patchStride}
+\end{table*}
