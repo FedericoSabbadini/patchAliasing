@@ -27,7 +27,27 @@ x[kS+m],
 m\in\{0,\ldots,P-1\}.
 \end{equation}
 
-\subsection{Phase-Locking and Patch Indistinguishability}
+Before examining the degeneracies of this operator it is worth fixing what it does
+not do. Whenever $S\le P$, every sample of the input appears in at least one
+token and can be read back from it: taking $k=\lfloor n/S\rfloor$ and
+$m = n \bmod S \le S-1 \le P-1$ in \autoref{eq:element_def} gives
+
+\begin{equation}
+\label{eq:reconstruction}
+x[n]
+=
+\mathbf{t}_{\lfloor n/S\rfloor}\!\left[n \bmod S\right],
+\qquad
+S\le P.
+\end{equation}
+
+Complete raw patching with $S\le P$ is therefore injective: the token sequence
+determines the signal, and no frequency below Nyquist is destroyed by tokenization
+itself. Everything that follows concerns redundancy in the token sequence
+rather than loss of information, the single exception being the $S>P$ regime of
+Case 3 below, where the operator does discard samples.
+
+\subsection{Phase-Locking and Patch Repetition}
 Consider a continuous-time periodic signal sampled uniformly at sampling frequency $f_s$, yielding the discrete-time sequence $x[n]$. We isolate a fundamental harmonic component and model it as
 
 \begin{equation}
@@ -146,20 +166,25 @@ It is convenient to express both conditions in units that do not depend on the s
 
 \autoref{eq:phase_boundary} and \autoref{eq:phase_boundary_2} read simply $\mathrm{cps}\in\mathbb{N}^{+}$ and $\mathrm{cpp}\in\mathbb{N}^{+}$: $\mathcal{F}_{\mathrm{lock}}$ is the set of frequencies completing a whole number of cycles within one stride or within one patch. This normalisation makes the two branches directly comparable across geometries and across sampling rates.
 
-The collapse of consecutive tokens is not restricted to sinusoidal signals. Consider an arbitrary discrete-time signal satisfying the translational invariance condition
+Neither branch is restricted to sinusoidal signals. Both conditions generalise to an arbitrary discrete-time signal invariant under a translation equal to the stride or to the patch,
 
 \begin{equation}
 \label{eq:general_periodicity}
 x[n+S]
 =
+x[n]
+\qquad\text{or}\qquad
+x[n+P]
+=
 x[n],
 \qquad
-\forall n.
+\forall n,
 \end{equation}
 
-Taking into account two consecutive tokens, using the element-wise notation from \autoref{eq:element_def} and applying \autoref{eq:general_periodicity} gives
+but only the first bears on consecutive patches. Tokens begin at multiples of the stride, so the step from token $k$ to token $k+j$ is a shift of $jS$ samples. Substituting \autoref{eq:element_def} and reducing by the stride condition at $j=1$ gives
 
 \begin{equation}
+\label{eq:collapse_S}
 \mathbf{t}_{k+1}[m]
 =
 x[(k+1)S+m]
@@ -168,21 +193,51 @@ x[kS+m+S]
 =
 x[kS+m]
 =
-\mathbf{t}_k[m].
+\mathbf{t}_k[m],
 \end{equation}
 
-Since this equality holds for every component,
+and since this holds for every component,
 
 \begin{equation}
-\label{eq:general_token_collapse}
+\label{eq:token_collapse}
 \mathbf{t}_{k+1}
 =
 \mathbf{t}_k.
 \end{equation}
 
-The derivation above shows that some translations leave a signal unchanged; this repetition is not, by itself, evidence that two distinct signals become indistinguishable to the model. Structural aliasing is therefore treated as an emergent, falsifiable property of the trained representations\cite{paganiPreliminaryInsightsChronos2026}. At a phase-lock consecutive patch tokens coincide, $\mathbf{t}_k=\mathbf{t}_{k+1}$, so distinct inputs can share a token sequence. We diagnose the phenomenon by \emph{readability} rather than by a fixed distance between representations: structural aliasing is present when the signal's frequency can no longer be recovered from the model's internal state at a locked frequency as well as it can at neighbouring, non-locked ones.
+The patch condition reduces the same shift only when $P$ divides $jS$. At $j=1$ that requires $P \mid S$, which under $S\le P$ occurs only at $S=P$, so consecutive tokens are left distinct. It does hold at the smallest $j$ for which $P \mid jS$, namely $j = P/\gcd(P,S)$, giving
 
-\subsection{Analysis of Structural Degeneracies and Invariances}
+\begin{equation}
+\label{eq:collapse_P}
+\mathbf{t}_{k+j}[m]
+=
+x[(k+j)S+m]
+=
+x[kS+m+jS]
+=
+x[kS+m]
+=
+\mathbf{t}_k[m],
+\qquad
+j
+=
+\frac{P}{\gcd(P,S)},
+\end{equation}
+
+and therefore
+
+\begin{equation}
+\label{eq:token_period_P}
+\mathbf{t}_{k+j}
+=
+\mathbf{t}_k.
+\end{equation}
+
+Patch-periodicity thus makes tokens equal as well, but at a spacing of $j$ rather than between neighbours. The two conditions coincide on consecutive patches only in the non-overlapping geometry, where $j=1$.
+
+The derivations above show that some translations leave a signal unchanged; by \autoref{eq:reconstruction} this repetition is not, by itself, evidence that two distinct signals become indistinguishable to the model. Structural aliasing is therefore treated as an emergent, falsifiable property of the trained representations\autocite{paganiPreliminaryInsightsChronos2026}: it is diagnosed by readability rather than by a distance between raw tokens, and it is present when the signal's frequency can no longer be recovered from the model's internal state at a locked frequency as well as it can at neighbouring, non-locked ones. $\mathcal{F}_{\mathrm{lock}}$ is accordingly a set of candidate frequencies, derived from the geometry alone; whether the candidates are realised is an empirical question.
+
+\subsection{Analysis of Structural Redundancies and Invariances}
 
 \autoref{eq:flock_set} is the union of two distinct families,
 
@@ -207,38 +262,12 @@ k\frac{f_s}{P}
 \left[0,\tfrac{f_s}{2}\right),
 \end{equation}
 
-which coincide if and only if $S=P$. The two families act on the token sequence in structurally different ways, and it is this difference, rather than the locking condition alone, that determines the behaviour of $\mathcal{T}_{P,S}$.
+which coincide if and only if $S=P$, and which act on the token sequence in different ways. A frequency in $\mathcal{F}_{S}$ satisfies the stride condition, so by \autoref{eq:collapse_S} every token equals its predecessor: the sequence becomes one window repeated, and the number of distinct tokens drops to one however long the context. A frequency in $\mathcal{F}_{P}$ has a period $T_0=f_s/f$ dividing $P$, so it satisfies the patch condition and by \autoref{eq:token_period_P} the sequence instead repeats every $j=P/\gcd(P,S)$ tokens, cycling through at most that many distinct vectors. Each token still holds a whole number of cycles, but neighbours read that waveform from different starting points and coincide only when $j=1$. The two branches therefore differ in what they repeat rather than in whether they repeat: the stride branch acts between neighbouring tokens, the patch branch on the sequence as a whole.
 
-\subsubsection{Stride branch: inter-patch degeneracy}
-For $f\in\mathcal{F}_{S}$ the signal satisfies \autoref{eq:general_periodicity}, and \autoref{eq:general_token_collapse} applies directly: every token equals its predecessor, so the token sequence collapses into a static series of identical vectors. Two signals that agree on a single window of length $P$ and share the stride period are then mapped to the same sequence, so $\mathcal{T}_{P,S}$ is not injective on this class. The stride branch therefore produces a genuine \emph{degeneracy}: distinct inputs collide, and all inter-token temporal variation is eliminated.
-
-\subsubsection{Patch branch: token-space invariance}
-For $f\in\mathcal{F}_{P}$ the signal period $T_0=f_s/f$ divides $P$, so $x$ is $P$-periodic and every token spans an integer number of complete cycles. Using \autoref{eq:element_def},
-
-\begin{equation}
-\label{eq:circular_shift}
-\mathbf{t}_k[m]
-=
-x[kS+m]
-=
-x\!\left[(kS+m)\bmod P\right]
-=
-\mathbf{t}_0\!\left[(kS+m)\bmod P\right],
-\end{equation}
-
-so that
-
-\begin{equation}
-\label{eq:token_orbit}
-\mathbf{t}_k
-=
-\mathbf{C}^{\,kS \bmod P}\,\mathbf{t}_0,
-\end{equation}
-
-where $\mathbf{C}$ denotes the circular left-shift operator on $\mathbb{R}^{P}$, $(\mathbf{C}\mathbf{v})[m]=\mathbf{v}[(m+1)\bmod P]$. Every token is a circular shift of the first, and the token alphabet is finite, containing at most $P/\gcd(P,S)$ distinct elements irrespective of the length of the context window. This is an \emph{invariance} rather than a collapse: consecutive tokens need not be identical, but the whole sequence is generated by a single vector under a group action, and carries no information about the signal beyond $\mathbf{t}_0$ and the token index.
+Neither removes information. For $S\le P$ both are regimes of \autoref{eq:reconstruction}, so the signal remains recoverable and two inputs with the same token sequence are the same signal on the observed support. Both repetitions belong to the raw tokens, not to the learned representation; treating either as an invariance of the model would require showing that the patch embedding is itself shift-equivariant, which is neither established here nor assumed.
 
 \subsubsection{Case 1: Equal Patch Size and Stride ($P=S$)}
-When patches are contiguous and non-overlapping the two branches coincide, $\mathcal{F}_{S}=\mathcal{F}_{P}$, and $kS \bmod P = 0$ for every $k$. The circular shift of \autoref{eq:token_orbit} reduces to the identity, and the invariance of the patch branch degenerates into the collapse of the stride branch,
+When patches are contiguous and non-overlapping the two branches coincide, $\mathcal{F}_{S}=\mathcal{F}_{P}$, and $j=P/\gcd(P,P)=1$, so \autoref{eq:token_period_P} collapses onto \autoref{eq:token_collapse}. This is the only geometry in which both conditions act on consecutive patches, and every locked frequency then gives
 
 \begin{equation}
 \mathbf{t}_k
@@ -248,15 +277,28 @@ When patches are contiguous and non-overlapping the two branches coincide, $\mat
 \forall k.
 \end{equation}
 
-This is the worst case of the family: it is the only geometry in which \emph{every} locked frequency produces exact and total collapse, with no residual structure in the token sequence. It is also the default configuration of the target architecture, which operates at $P=S=16$.
+This is the most redundant geometry of the family: the only one in which every locked frequency reduces the token sequence to a single repeated vector, leaving no residual structure across tokens. It is also the default configuration of the target architecture, which operates at $P=S=16$.
 
 \subsubsection{Case 2: Overlapping Windows ($S<P$)}
-When the stride is smaller than the patch length the two branches separate. Since $f_s/S>f_s/P$, the stride comb is the sparser of the two: strictly below Nyquist it contributes $\lceil S/2 \rceil - 1$ members against the $\lceil P/2 \rceil - 1$ of the patch comb, and whenever $S$ divides $P$ the stride comb is a subset of the patch comb. Most locked frequencies in this regime therefore belong to $\mathcal{F}_{P}\setminus\mathcal{F}_{S}$ and produce the shift-invariance of \autoref{eq:token_orbit}, not total collapse.
+When the stride is smaller than the patch length the two branches separate. Since $f_s/S>f_s/P$, the stride comb is the sparser of the two: strictly below Nyquist it contributes $\lceil S/2 \rceil - 1$ members against the $\lceil P/2 \rceil - 1$ of the patch comb, and whenever $S$ divides $P$ the stride comb is a subset of the patch comb. Most locked frequencies in this regime therefore belong to $\mathcal{F}_{P}\setminus\mathcal{F}_{S}$, where consecutive tokens remain distinct and the sequence merely repeats with period $j>1$.
 
-Overlap does not weaken the exact condition. The derivation of \autoref{eq:general_token_collapse} makes no use of the relation between $P$ and $S$, so at $f\in\mathcal{F}_{S}$ consecutive tokens are still exactly equal. What overlap changes is the behaviour \emph{around} a lock: adjacent windows share $P-S$ samples by construction, so two consecutive tokens are constrained to agree on their common support regardless of frequency, and the transition into collapse is correspondingly smoother. Reducing the stride at fixed patch size therefore raises the lowest member of $\mathcal{F}_{S}$, thins the stride comb below Nyquist, and softens the local shape of the effect without removing it.
+Overlap does not weaken the exact condition. The derivation of \autoref{eq:collapse_S} makes no use of the relation between $P$ and $S$, so at $f\in\mathcal{F}_{S}$ consecutive tokens are still exactly equal. What overlap changes is the behaviour around a lock: adjacent windows share $P-S$ samples by construction, so two consecutive tokens are constrained to agree on their common support regardless of frequency, and the transition into repetition is correspondingly smoother. Reducing the stride at fixed patch size therefore raises the lowest member of $\mathcal{F}_{S}$, thins the stride comb below Nyquist, and softens the local shape of the effect without removing it.
 
 \subsubsection{Case 3: Disjoint Windows ($S>P$)}
-When the stride exceeds the patch length the windows leave $S-P$ unobserved samples between consecutive patches: the operator observes only the intervals $[kS,\,kS+P-1]$, while the regions $[kS+P,\,(k+1)S-1]$ are never seen. Two signals that coincide on every observed window but differ on the gaps are mapped to the same token sequence, so $\mathcal{T}_{P,S}$ is non-injective for \emph{any} $f$, independently of the locking condition. The resulting loss of information cannot be attributed to the interaction between signal periodicity and the tokenization grid, since it is already implied by the discarded samples. Configurations with $S>P$ are therefore excluded by construction from the experimental design, so that any observed degradation remains attributable to tokenization geometry rather than to missing data.
+\label{sec:disjoint}
+When the stride exceeds the patch length the windows leave $S-P$ unobserved samples between consecutive patches, and \autoref{eq:reconstruction} fails: $\mathcal{T}_{P,S}$ is non-injective for every $f$, since signals differing only on the gaps share a token sequence. The loss is one of discarded samples rather than of tokenization geometry, so these configurations are excluded by construction from the experimental design.
 
-\subsubsection{Consequences for observability}
-Across all three cases the effect on the token sequence is the same in kind: at $f\in\mathcal{F}_{\mathrm{lock}}$ the operator $\mathcal{T}_{P,S}$ ceases to be injective, and the frequency $f$ can no longer be identified from the tokens alone. Under the stride branch the sequence carries a single vector; under the patch branch it carries a single vector and an index. In both cases the quantity that the downstream model would need in order to recover $f$ has been removed before the first attention layer, and no property of the trained weights can restore it. Whether that formal loss actually translates into a measurable loss of \emph{readability} in the learned representations is an empirical question, and it is the object of the hypotheses formulated in \autoref{sec:four}.
+\subsubsection{What the geometry does and does not establish}
+The three cases can be summarised in four statements, of which only the last is an
+empirical claim. $\mathcal{F}_{S}$ collects the stride-lock candidates, at which
+consecutive raw tokens repeat. $\mathcal{F}_{P}$ collects the frequencies whose
+period divides the patch, at which the sequence repeats every $P/\gcd(P,S)$ tokens
+while neighbours stay distinct unless $S=P$.
+Their union $\mathcal{F}_{\mathrm{lock}}$ is therefore a statement about
+candidate geometry, not a proof of aliasing: for $S\le P$ the raw token
+sequence remains a lossless encoding of the input at every one of these
+frequencies. Structural aliasing is the separate, representation-level
+proposition that a model trained on such sequences nevertheless fails to make those
+frequencies readable from its internal state — a property of the learned
+representation rather than of the operator, and one that can only be established
+empirically. The hypotheses that test it are formulated in \nameref{sec:four}.% \autoref once `unnumberedsections` is removed from main.tex
