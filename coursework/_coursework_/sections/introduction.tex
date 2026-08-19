@@ -8,7 +8,7 @@ Deep learning relaxed those assumptions: recurrent networks and their gated vari
 Time-series foundation models sit at the end of this line. Chronos treats time-series values as discrete tokens obtained by scaling and quantisation\autocite{ansariChronosLearningLanguage2024}; its successor Chronos-Bolt replaces quantisation with the patching scheme above and a direct multi-quantile head\autocite{ansariChronosLearningLanguage2024a}.\footnote{The vendor reports up to a $250\times$ inference speed-up over the original Chronos\autocite{FastAccurateZeroshot2024a}; no peer-reviewed description of Chronos-Bolt has been published.} Patching is therefore not an incidental implementation detail, but the design choice that makes this class of models practical at scale.
 
 \subsection{Classic Aliasing}
-Whatever the architecture downstream, predictive fidelity is bounded by the digital representation of the signal. The governing limit is the Nyquist--Shannon sampling theorem\autocite{shannonCommunicationPresenceNoise1949}: a band-limited continuous-time signal is perfectly reconstructible only if sampled uniformly at a rate $f_s$ strictly greater than twice its highest frequency component $f_{\max}$,
+Whatever the architecture downstream, predictive fidelity is bounded by the digital representation of the signal. The governing limit is the Nyquist-Shannon sampling theorem\autocite{shannonCommunicationPresenceNoise1949}: a band-limited continuous-time signal is perfectly reconstructible only if sampled uniformly at a rate $f_s$ strictly greater than twice its highest frequency component $f_{\max}$,
 
 \begin{equation}
 \label{eq:nyquist_criterion}

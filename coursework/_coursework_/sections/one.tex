@@ -80,7 +80,7 @@ x[n+S]
 \right).
 \end{equation}
 
-For exact alignment between the signal and the tokenization operator, the phase accumulation over one stride must correspond to an integer number of $2\pi$--periods
+For exact alignment between the signal and the tokenization operator, the phase accumulation over one stride must correspond to an integer number of $2\pi$-periods
 
 \begin{equation}
 \label{eq:phase_boundary}
@@ -299,6 +299,6 @@ candidate geometry, not a proof of aliasing: for $S\le P$ the raw token
 sequence remains a lossless encoding of the input at every one of these
 frequencies. Structural aliasing is the separate, representation-level
 proposition that a model trained on such sequences nevertheless fails to make those
-frequencies readable from its internal state — a property of the learned
+frequencies readable from its internal state. It is a property of the learned
 representation rather than of the operator, and one that can only be established
 empirically. The hypotheses that test it are formulated in \nameref{sec:four}.% \autoref once `unnumberedsections` is removed from main.tex
