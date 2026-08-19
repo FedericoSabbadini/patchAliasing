@@ -1,0 +1,18 @@
+{
+  "prior_scale": 0.5,
+  "prior_ladder": [
+    0.25,
+    0.5,
+    1.0
+  ],
+  "nu": 4,
+  "attenuation_20": -0.2231435513142097,
+  "rope_log": 0.09531017980432493,
+  "rope_slope": 0.1,
+  "p_attenuation20_prior": 0.33585,
+  "p_sigma_phase_in_rope_prior": 0.2987,
+  "p_kappaS_in_rope_prior": 0.0479,
+  "planned_contrast_rows": 22260,
+  "smoke": false,
+  "seed": 42
+}
