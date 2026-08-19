@@ -27,21 +27,6 @@ x[kS+m],
 m\in\{0,\ldots,P-1\}.
 \end{equation}
 
-{\color{red}%
-\textbf{Linearity of $\mathcal{T}_{P,S}$.}
-The operator $\mathcal{T}_{P,S}$ is \emph{linear}: since each component
-$\mathbf{t}_k[m] = x[kS+m]$ is a linear function of $x$, it follows directly that
-\begin{align}
-    \mathcal{T}_{P,S}(\alpha\, x) &= \alpha\,\mathcal{T}_{P,S}(x), \\
-    \mathcal{T}_{P,S}(x+y) &= \mathcal{T}_{P,S}(x) + \mathcal{T}_{P,S}(y).
-\end{align}
-Linearity implies superposition: the token representation of a mixture of sinusoids
-equals the mixture of their individual token representations.
-This is the theoretical foundation for the TSMixup experiments: frequency-specific
-aliasing effects can be isolated and recombined linearly.
-In matrix form, collecting $K$ patches yields $\mathbf{P} = \mathbf{W}\cdot\mathbf{x}$
-where $\mathbf{W}\in\{0,1\}^{KP\times N}$ is a binary selection matrix.}
-
 \subsection{Phase-Locking and Patch Indistinguishability}
 Consider a continuous-time periodic signal sampled uniformly at sampling frequency $f_s$, yielding the discrete-time sequence $x[n]$. We isolate a fundamental harmonic component and model it as
 
@@ -108,52 +93,58 @@ x[n+S]
 x[n].
 \end{equation}
 
-Solving Equation \eqref{eq:phase_boundary} for $f$ yields the phase-locking frequency class $\mathcal{F}_{\mathrm{lock}}$:
+The same derivation can be applied taking into account translational shifts equal to the patch size $P$, yielding a similar phase-locking condition
+
+\begin{equation}
+\label{eq:phase_boundary_2}
+2\pi\frac{fP}{f_s}
+=
+2\pi k
+\Rightarrow
+x[n+P]
+=
+x[n],
+\qquad
+k\in\mathbb{N}^{+}.
+\end{equation}
+
+Solving \autoref{eq:phase_boundary} and \autoref{eq:phase_boundary_2} for $f$ yields the phase-locking frequency class $\mathcal{F}_{\mathrm{lock}}$, which is defined as the set of frequencies producing self-repetition over one stride or over one patch.
 
 \begin{equation}
 \label{eq:flock_set}
-\mathcal{F}_{\mathrm{lock}}
+\mathcal F_{\mathrm{lock}}
 =
 \left\{
 f\in\mathbb{R}^{+}
 \;\middle|\;
 f
 =
-c\frac{f_s}{S},
+c\frac{f_s}{S}
+\lor
+f
+=
+k\frac{f_s}{P},
 \;
-c\in\mathbb{N}^{+},
+c, k\in\mathbb{N}^{+},
 \;
 f<\frac{f_s}{2}
 \right\}.
 \end{equation}
 
+It is convenient to express both conditions in units that do not depend on the sampling rate. Introducing the cycles-per-stride and cycles-per-patch ratios
 
-{\color{red}
-\subsubsection{Complete Degeneracy Classification (Three Regimes)}
+\begin{equation}
+\label{eq:cpp}
+\mathrm{cps}
+=
+\frac{f S}{f_s},
+\qquad
+\mathrm{cpp}
+=
+\frac{f P}{f_s},
+\end{equation}
 
-Equation~\eqref{eq:flock_set} captures only the \emph{integer} case
-($S\cdot f/f_s\in\mathbb{Z}^+$, full degeneracy). A complete characterisation requires
-analysis of rational and irrational values of the ratio $\rho = S\cdot f / f_s$:
-
-\begin{description}
-    \item[Full degeneracy ($\rho\in\mathbb{Z}^+$):]
-        $x[n+S] = x[n]$ exactly.
-        Consecutive tokens are identical: $\mathbf{t}_{k+1} = \mathbf{t}_k$ for all $k$.
-
-    \item[Partial degeneracy ($\rho = p/q \in \mathbb{Q}\setminus\mathbb{Z}$, in lowest terms):]
-        The signal is periodic with respect to the patch grid with period $q$ strides:
-        $\mathbf{t}_{k+q} = \mathbf{t}_k$ for all $k$.
-        Every $q$-th patch is identical; within a window of $L$ tokens.
-
-    \item[No degeneracy ($\rho\notin\mathbb{Q}$):]
-        No two patches are identical; the token sequence is quasi-periodic.
-        Full information is preserved.
-\end{description}
-
-The rational case ($\rho = p/q$) is required by CW task item 2 (``analyse whether these
-induce degeneracies \emph{or invariances}'') and is experimentally detectable via
-probing the rank of $\mathbf{M}$ at frequencies $f = (p/q)\cdot f_s/S$.
-}
+\autoref{eq:phase_boundary} and \autoref{eq:phase_boundary_2} read simply $\mathrm{cps}\in\mathbb{N}^{+}$ and $\mathrm{cpp}\in\mathbb{N}^{+}$: $\mathcal{F}_{\mathrm{lock}}$ is the set of frequencies completing a whole number of cycles within one stride or within one patch. This normalisation makes the two branches directly comparable across geometries and across sampling rates.
 
 The collapse of consecutive tokens is not restricted to sinusoidal signals. Consider an arbitrary discrete-time signal satisfying the translational invariance condition
 
@@ -166,7 +157,7 @@ x[n],
 \forall n.
 \end{equation}
 
-Taking into account two consecutive tokens, using the element-wise notation from Equation \eqref{eq:element_def} and applying Equation \eqref{eq:general_periodicity} gives
+Taking into account two consecutive tokens, using the element-wise notation from \autoref{eq:element_def} and applying \autoref{eq:general_periodicity} gives
 
 \begin{equation}
 \mathbf{t}_{k+1}[m]
@@ -189,253 +180,83 @@ Since this equality holds for every component,
 \mathbf{t}_k.
 \end{equation}
 
-This result holds under the \emph{integer} phase-locking condition (full degeneracy).
-{\color{red}%
-\subsubsection{Role of Patch Size $P$: Within-Patch Periodicity}
+The derivation above shows that some translations leave a signal unchanged; this repetition is not, by itself, evidence that two distinct signals become indistinguishable to the model. Structural aliasing is therefore treated as an emergent, falsifiable property of the trained representations\cite{paganiPreliminaryInsightsChronos2026}. At a phase-lock consecutive patch tokens coincide, $\mathbf{t}_k=\mathbf{t}_{k+1}$, so distinct inputs can share a token sequence. We diagnose the phenomenon by \emph{readability} rather than by a fixed distance between representations: structural aliasing is present when the signal's frequency can no longer be recovered from the model's internal state at a locked frequency as well as it can at neighbouring, non-locked ones.
 
-Independently of the stride-period alignment above, a single patch may exhibit
-\emph{internal redundancy} when the signal period $T_0 = f_s/f$ (in samples)
-divides $P$ exactly.
-Formally, when $P = k\cdot T_0$ for $k\in\mathbb{Z}^+$, each patch contains
-$k$ complete signal cycles, so
+\subsection{Analysis of Structural Degeneracies and Invariances}
+
+\autoref{eq:flock_set} is the union of two distinct families,
 
 \begin{equation}
-\mathbf{t}_{\ell}[m] = \mathbf{t}_{\ell}[m + T_0]
-\quad \forall\, m\in\{0,\ldots,P-T_0-1\}.
-\end{equation}
-
-The patch vector is internally redundant: the model sees the waveform repeated
-$k$ times within a single token and cannot distinguish it from a single-cycle
-patch of length $T_0$.
-Equivalently, $\mathcal{T}_{P,S}$ is non-injective on the class of $T_0$-periodic signals
-when $T_0\mid P$.
-
-The \textbf{combined worst-case} occurs when both conditions hold simultaneously:
-\begin{equation}
-    S = m\cdot T_0 \quad \text{AND} \quad P = k\cdot T_0,
-    \qquad m,k\in\mathbb{Z}^+.
-\end{equation}
-Inter-patch degeneracy ($\mathbf{t}_{k+1}=\mathbf{t}_k$) and within-patch redundancy
-then co-occur, producing \emph{maximum degeneracy}, the most severe structural
-aliasing regime.
-Stating that $P$ is ``irrelevant'' to token collapse (as the preceding general argument
-may suggest) actively hides this second axis of degeneracy, which CW task item 2
-explicitly requires characterisation of.
-}
-
-\subsection{Characterization of the Loss of Observability}
-
-When consecutive patches become indistinguishable, a localized structural aliasing event occurs. This degradation can be characterized through three complementary perspectives.
-
-\begin{enumerate}
-
-\item \textbf{Rank Deficiency in the Embedding Space}
-
-Let
-
-\begin{equation}
-\mathbf{M}
+\label{eq:branches}
+\mathcal{F}_{S}
 =
-[\mathbf{t}_k,\mathbf{t}_{k+1},\ldots,\mathbf{t}_{k+L-1}]
-\in
-\mathbb{R}^{P\times L}
+\left\{
+c\frac{f_s}{S}
+\right\}_{c\in\mathbb{N}^{+}},
+\qquad
+\mathcal{F}_{P}
+=
+\left\{
+k\frac{f_s}{P}
+\right\}_{k\in\mathbb{N}^{+}},
+\qquad
+\mathcal{F}_{\mathrm{lock}}
+=
+\left(\mathcal{F}_{S}\cup\mathcal{F}_{P}\right)
+\cap
+\left[0,\tfrac{f_s}{2}\right),
 \end{equation}
 
-be the local trajectory matrix.
+which coincide if and only if $S=P$. The two families act on the token sequence in structurally different ways, and it is this difference, rather than the locking condition alone, that determines the behaviour of $\mathcal{T}_{P,S}$.
 
-If two consecutive tokens become identical, then the corresponding columns become linearly dependent. Consequently, the trajectory matrix cannot achieve full rank:
+\subsubsection{Stride branch: inter-patch degeneracy}
+For $f\in\mathcal{F}_{S}$ the signal satisfies \autoref{eq:general_periodicity}, and \autoref{eq:general_token_collapse} applies directly: every token equals its predecessor, so the token sequence collapses into a static series of identical vectors. Two signals that agree on a single window of length $P$ and share the stride period are then mapped to the same sequence, so $\mathcal{T}_{P,S}$ is not injective on this class. The stride branch therefore produces a genuine \emph{degeneracy}: distinct inputs collide, and all inter-token temporal variation is eliminated.
+
+\subsubsection{Patch branch: token-space invariance}
+For $f\in\mathcal{F}_{P}$ the signal period $T_0=f_s/f$ divides $P$, so $x$ is $P$-periodic and every token spans an integer number of complete cycles. Using \autoref{eq:element_def},
 
 \begin{equation}
-\operatorname{rank}(\mathbf{M})
-<
-\min(P,L).
+\label{eq:circular_shift}
+\mathbf{t}_k[m]
+=
+x[kS+m]
+=
+x\!\left[(kS+m)\bmod P\right]
+=
+\mathbf{t}_0\!\left[(kS+m)\bmod P\right],
 \end{equation}
 
+so that
 
-{\color{red}More precisely, the minimum achievable rank in each degeneracy regime is:
-full integer phase-locking $\Rightarrow \mathrm{rank}(\mathbf{M}) = 1$;
-rational phase-locking with denominator $q$ $\Rightarrow \mathrm{rank}(\mathbf{M}) \leq q$;
-no phase-locking $\Rightarrow \mathrm{rank}(\mathbf{M}) = \min(P,L)$ (full rank).
-This graduated characterisation is directly testable in experiments and maps to H1/H1b.}
+\begin{equation}
+\label{eq:token_orbit}
+\mathbf{t}_k
+=
+\mathbf{C}^{\,kS \bmod P}\,\mathbf{t}_0,
+\end{equation}
 
-Repeated patch collapse systematically reduces the information content available to downstream attention layers.
+where $\mathbf{C}$ denotes the circular left-shift operator on $\mathbb{R}^{P}$, $(\mathbf{C}\mathbf{v})[m]=\mathbf{v}[(m+1)\bmod P]$. Every token is a circular shift of the first, and the token alphabet is finite, containing at most $P/\gcd(P,S)$ distinct elements irrespective of the length of the context window. This is an \emph{invariance} rather than a collapse: consecutive tokens need not be identical, but the whole sequence is generated by a single vector under a group action, and carries no information about the signal beyond $\mathbf{t}_0$ and the token index.
 
-\item \textbf{Content Degeneration in Self-Attention}
-
-If consecutive patches satisfy
+\subsubsection{Case 1: Equal Patch Size and Stride ($P=S$)}
+When patches are contiguous and non-overlapping the two branches coincide, $\mathcal{F}_{S}=\mathcal{F}_{P}$, and $kS \bmod P = 0$ for every $k$. The circular shift of \autoref{eq:token_orbit} reduces to the identity, and the invariance of the patch branch degenerates into the collapse of the stride branch,
 
 \begin{equation}
 \mathbf{t}_k
 =
-\mathbf{t}_{k+1},
-\end{equation}
-
-their content representations become identical.
-
-{\color{red}%
-\textbf{(a) Content-derived attention degeneracy.}
-For any transformer backbone, the dot-product similarity between token $k$ and
-any other token $j$ in the absence of positional modulation equals
-$\mathbf{q}_k^\top \mathbf{k}_j$.
-Under full token collapse ($\mathbf{t}_k = \mathbf{t}_{k+1}$), the content-derived
-query and key vectors satisfy $\mathbf{q}_k = \mathbf{q}_{k+1}$ and
-$\mathbf{k}_k = \mathbf{k}_{k+1}$, making rows $k$ and $k+1$ of the
-content-derived attention score matrix identical.
-This component of the loss is valid regardless of positional encoding scheme.
-
-\textbf{(b) RPE partial rescue.}
-Chronos-Bolt uses a T5 backbone with relative positional biases (RPE).
-Under RPE, the attention bias term encodes pairwise position distance, so even
-identical token vectors produce different bias-corrected attention patterns ---
-the model can still distinguish \emph{when} a token occurred.
-However, RPE does not recover \emph{what} the signal was doing: the content
-information lost to degeneracy is not restored by positional bias.
-Accurate forecasting requires both temporal position and signal content;
-RPE provides only the former.
-Framing RPE as a complete ``mitigation'' is therefore incorrect ---
-it is a partial rescue that breaks the position degeneracy without
-addressing the content degeneracy.
-}
-
-\item \textbf{Loss of Sub-Stride Observability}
-
-The tokenization operator observes the signal only at stride-separated locations. This induces an effective observation frequency
-
-\begin{equation}
-f_{\mathrm{eff}}
-=
-\frac{f_s}{S},
-\end{equation}
-
-Signal dynamics occurring at temporal scales shorter than the stride interval become progressively harder to observe through the token sequence.
-
-
-{\color{red}%
-The token sequence, sampled at $f_\mathrm{eff} = f_s/S$, cannot represent frequencies
-above $f_\mathrm{eff}/2 = f_s/(2S)$.
-This is the \emph{Nyquist constraint on the token domain}, distinct from classical
-aliasing in the sample domain.
-Combining with the phase-locking condition, the \emph{blind-spot frequencies} are:
-\begin{equation}
-\label{eq:fblind}
-f_{\mathrm{blind}} = m\cdot\frac{f_s}{S},
-\qquad m = 1, 2, \ldots, \left\lfloor\frac{S}{2}\right\rfloor.
-\end{equation}
-Signals at these exact frequencies are invisible to the model: their token
-sequences are constant or aliased, regardless of the signal's true dynamics.
-}
-
-Under phase-locking conditions, consecutive tokens become identical and the local representation collapses into a stationary state. Fine-grained phase evolution and high-frequency variations occurring between token boundaries therefore become hidden from the observable representation presented to the model.
-
-\end{enumerate}
-
-\subsection{Analysis of Structural Degeneracies and Invariances}
-
-When $f\in\mathcal{F}_{\mathrm{lock}}$, the resulting behavior depends on the relationship between $P$ and $S$.
-
-\subsubsection{Case 1: Equal Patch Size and Stride ($P=S$)}
-
-When patches are contiguous and non-overlapping,
-
-\begin{equation}
-P=S.
-\end{equation}
-
-Equation \eqref{eq:general_periodicity} directly implies
-
-\begin{equation}
-\mathbf{t}_{j+1}
-=
-\mathbf{t}_j
+\mathbf{t}_0,
 \qquad
-\forall j.
+\forall k.
 \end{equation}
 
-The token sequence collapses into a static series of identical vectors, eliminating all observable temporal variation.
+This is the worst case of the family: it is the only geometry in which \emph{every} locked frequency produces exact and total collapse, with no residual structure in the token sequence. It is also the default configuration of the target architecture, which operates at $P=S=16$.
 
 \subsubsection{Case 2: Overlapping Windows ($S<P$)}
+When the stride is smaller than the patch length the two branches separate. Since $f_s/S>f_s/P$, the stride comb is the sparser of the two: strictly below Nyquist it contributes $\lceil S/2 \rceil - 1$ members against the $\lceil P/2 \rceil - 1$ of the patch comb, and whenever $S$ divides $P$ the stride comb is a subset of the patch comb. Most locked frequencies in this regime therefore belong to $\mathcal{F}_{P}\setminus\mathcal{F}_{S}$ and produce the shift-invariance of \autoref{eq:token_orbit}, not total collapse.
 
-When the stride is smaller than the patch length,
-
-\begin{equation}
-	S<P,
-\end{equation}
-
-assume the stride-aligned invariance condition holds:
-
-\begin{equation}
-	x[n+S]=x[n].
-\end{equation}
-
-Then for the $k$-th token,
-
-\begin{equation}
-	\mathbf{t}_k[m] = x[kS+m],
-\end{equation}
-
-we obtain
-
-\begin{equation}
-	\mathbf{t}_{k+1}[m]
-	=
-	x[(k+1)S+m]
-	=
-	x[kS+m+S]
-	=
-	x[kS+m]
-	=
-	\mathbf{t}_k[m].
-\end{equation}
-
-Hence,
-
-\begin{equation}
-	\mathbf{t}_{k+1}=\mathbf{t}_k.
-\end{equation}
-{\color{red}
-However, this equality represents a worst-case exact phase-locking regime. In general,
-overlap introduces shared samples between adjacent tokens:
-
-\begin{equation}
-	\mathbf{t}_k \cap \mathbf{t}_{k+1} \neq \emptyset,
-	\qquad S<P,
-\end{equation}
-
-so even under near-periodic conditions the two tokens share structure that constrains
-their divergence.
-}
-Therefore, overlap does not change the exact degeneracy condition, but it increases the
-information shared between adjacent windows, making exact collapse harder to sustain
-outside idealized phase alignment.
+Overlap does not weaken the exact condition. The derivation of \autoref{eq:general_token_collapse} makes no use of the relation between $P$ and $S$, so at $f\in\mathcal{F}_{S}$ consecutive tokens are still exactly equal. What overlap changes is the behaviour \emph{around} a lock: adjacent windows share $P-S$ samples by construction, so two consecutive tokens are constrained to agree on their common support regardless of frequency, and the transition into collapse is correspondingly smoother. Reducing the stride at fixed patch size therefore raises the lowest member of $\mathcal{F}_{S}$, thins the stride comb below Nyquist, and softens the local shape of the effect without removing it.
 
 \subsubsection{Case 3: Disjoint Windows ($S>P$)}
+When the stride exceeds the patch length the windows leave $S-P$ unobserved samples between consecutive patches: the operator observes only the intervals $[kS,\,kS+P-1]$, while the regions $[kS+P,\,(k+1)S-1]$ are never seen. Two signals that coincide on every observed window but differ on the gaps are mapped to the same token sequence, so $\mathcal{T}_{P,S}$ is non-injective for \emph{any} $f$, independently of the locking condition. The resulting loss of information cannot be attributed to the interaction between signal periodicity and the tokenization grid, since it is already implied by the discarded samples. Configurations with $S>P$ are therefore excluded by construction from the experimental design, so that any observed degradation remains attributable to tokenization geometry rather than to missing data.
 
-When
-
-\begin{equation}
-	S>P,
-\end{equation}
-
-the windows do not overlap and leave unobserved intervals of length $S-P$ between consecutive patches.
-
-The tokenization operator only observes samples in the intervals
-$[kS,\,kS+P-1]$, while the regions
-$[kS+P,\,(k+1)S-1]$ are never observed.
-
-If the signal satisfies the stride-period condition
-
-\begin{equation}
-	x[n+S]=x[n],
-\end{equation}
-
-then consecutive tokens satisfy
-
-\begin{equation}
-	\mathbf{t}_{j+1}=\mathbf{t}_j.
-\end{equation}
-
-Independently of this condition, when $S>P$ the operator is non-injective: different signals that coincide on the observed windows but differ on the unobserved gaps produce the same token sequence.
-
-Therefore, in this regime, information loss arises both from:
-(i) missing samples in the gaps, and
-(ii) possible periodic collapse under phase-locking.
+\subsubsection{Consequences for observability}
+Across all three cases the effect on the token sequence is the same in kind: at $f\in\mathcal{F}_{\mathrm{lock}}$ the operator $\mathcal{T}_{P,S}$ ceases to be injective, and the frequency $f$ can no longer be identified from the tokens alone. Under the stride branch the sequence carries a single vector; under the patch branch it carries a single vector and an index. In both cases the quantity that the downstream model would need in order to recover $f$ has been removed before the first attention layer, and no property of the trained weights can restore it. Whether that formal loss actually translates into a measurable loss of \emph{readability} in the learned representations is an empirical question, and it is the object of the hypotheses formulated in \autoref{sec:four}.
