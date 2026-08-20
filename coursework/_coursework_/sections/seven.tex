@@ -1,23 +1,62 @@
-The frequency sweeps and the models of \nameref{sec:four} point in the same direction: phase-locking tends to affect the internal representation but does not appear to propagate to the forecast output.
+The models of \nameref{sec:four} are fitted on two subsets of the grid (\autoref{tab:hfModels}): a \emph{clean} set of $15$ configurations whose strides divide the probing context ($\text{CTX}=480$), and a \emph{full} set of $22$ that adds seven geometries with shorter or odd strides. Posteriors are from the clean set unless stated otherwise; qualitative conclusions hold on both.
 
-On the behavioural side, locked frequencies are not systematically attenuated in the rollout. In several geometries the model reconstructs them as well as their unlocked neighbours, contrary to what the degeneracy alone would predict. The representational side points toward a different pattern: the prequential codelength at a locked frequency tends to be higher than at an unlocked one, suggesting that the internal state carries a measurable cost at those sites. This split, representation penalised and forecast intact, is the pattern the evidence points to, and the per-generator and per-geometry evidence follows.
+\subsection{Validation}
 
-The phase of the input signal does not appear to modulate the deficit appreciably, consistent with $H2$: the posterior for $\sigma_\phi$ in \autoref{fig:phasePosterior} lies inside the region of practical equivalence (ROPE). It concentrates well below the threshold and is far tighter than the prior it started from, so the data and not the prior place it there, and the eight per-phase offsets $u_p$ are not separable from one another. The size of the deficit therefore follows from the geometry and from the frequency, and not from where in its cycle the signal begins, which is what licences the remaining models to average over phase and which also removes phase randomisation from the mitigations available to an operator.
+A parameter-recovery test on Model~A fixes $\bar\beta$ at four known values ($0$, $\log 0.8$, $\log 0.5$, $\log 0.1$). Every $95\%$ credible interval covers the truth, and the posterior standard deviation shrinks from the prior width of $0.71$ to $0.04$--$0.18$; the full set passes with tighter intervals ($0.04$--$0.11$).
 
-The token-collapse dips align with the stride grid and shift when the stride changes, consistent with $H3a$, and \autoref{fig:combs} shows the pattern holding across configurations and generators; the scaling law of the patch branch is not identified in the runs fitted for this deliverable.
+Models~D1 and~D2 pass every convergence criterion ($\hat R \le 1.003$, ESS $> 1000$, zero divergences). Models~A and~C do not ($\hat R > 1.3$, ESS $< 12$), and Model~B falls short on ESS ($676$ bulk clean, $525$ full). No posterior from a non-converged model is used to \emph{support} a claim at the $0.95$ threshold.
+
+\subsection{H1: Behavioural and representational effects}
+
+\subsubsection{Behavioural (Model~A)}
+The population effect is $e^{\bar\beta} = 1.08\;[0.45,\,2.49]$ (clean) and $1.02\;[0.61,\,1.70]$ (full). The probability of at least $20\%$ attenuation is $0.19$ and $0.21$; the ROPE probability is $0.13$ and $0.25$: the verdict is \textbf{inconclusive}. \autoref{fig:forest} shows the per-configuration posteriors spanning both sides of zero with no systematic direction.
+
+\begin{figure*}[!t]
+    \centering
+    \includegraphics[width=0.85\textwidth]{figures/FIG_H1_forest.png}
+    \caption{Forest plot of the per-configuration phase-lock effect $\beta_c$ (Model~A, clean set). Each bar is the $95\%$ credible interval; the dashed line at $\log 0.8$ marks $20\%$ attenuation. The wide, bidirectional intervals explain the inconclusive population estimate.}
+    \label{fig:forest}
+\end{figure*}
+
+\subsubsection{Representational (Model~B)}
+The codelength expansion at a locked frequency is $e^{\theta_{lock}} = 1.27\;[1.23,\,1.31]$ (clean, $\Pr > \log 1.2 = 1.00$, \textbf{supported}) and $1.22\;[1.19,\,1.24]$ (full, $\Pr = 0.84$, \textbf{inconclusive}). Both agree on direction and approximate size; the difference is whether the lower tail clears the $20\%$ mark.
+
+\subsubsection{The split}
+The behavioural test finds no consistent forecast attenuation; the representational test finds a consistent internal cost. This split --- \emph{representation penalised, forecast intact} --- is the central finding: the model encodes a locked frequency less efficiently yet still reconstructs it, presumably because the decoder draws on enough redundant context to compensate.
+
+\subsection{H2: Phase invariance}
+
+The posterior is $\sigma_\phi = 0.033\;[0.020,\,0.067]$ (clean) and $0.031\;[0.019,\,0.067]$ (full), well inside the ROPE at $\log 1.1 \approx 0.095$. The ROPE probability is $0.997$ in both runs, against a prior of $0.30$: the verdict is \textbf{supported}. Model~C has convergence issues ($\hat R > 1.6$), but the margin is wide enough ($0.997$ vs $0.95$) that the conclusion survives. Phase randomisation is therefore not a viable mitigation.
 
 \begin{figure*}[!b]
     \centering
     \includegraphics[width=0.92\textwidth]{figures/FIG_H2_phase.png}
-    \caption{Posterior for the phase term of $H2$. On the left the observed deficit against the signal phase $\phi$, with the per-phase offset $u_p$ and its $95\%$ credible interval; on the right the posterior for $\sigma_\phi$ against its prior, the dashed line marking the ROPE edge at $\log 1.1$. Both panels pool every configuration fitted, so the estimate is not conditioned on a single geometry. Model~C has not met the convergence thresholds of \nameref{sec:four}, so the posterior is shown as provisional.}
+    \caption{Posterior for the phase term of $H2$. Left: observed deficit against phase $\phi$ with per-phase offsets $u_p$. Right: posterior for $\sigma_\phi$ against its prior, the dashed line marking the ROPE edge. Model~C has not met convergence thresholds, so the posterior is provisional.}
     \label{fig:phasePosterior}
 \end{figure*}
+
+\subsection{H3: Token-collapse sites}
+
+All D1 models converge ($\hat R \le 1.003$, ESS $> 5000$). The stride-only label ($M_S$) wins LOO for TSMixup; the two-label model ($M_{SP}$) wins for pure sinusoids. In every comparison $\theta_S < 0$, confirming that frequencies on the stride grid have lower token dispersion. \autoref{fig:combs} shows the dips sitting on the stride grid and shifting when the stride changes.
 
 \begin{figure*}[p]
     \centering
     \includegraphics[height=0.88\textheight]{figures/FIG_H3_combs.png}
-    \caption{Collapse profiles against the two candidate grids. Rows are the fitted configurations and columns the three generators; each panel plots the profile over the sweep band, with the stride grid $cf_s/S$ dashed and the patch grid $kf_s/P$ dotted. A dip that sits on the dashed grid and follows it as the stride changes belongs to the stride branch. The run covers every configuration of \autoref{tab:hfModels}.}
+    \caption{Collapse profiles against the two candidate grids. Rows are configurations, columns generators; the stride grid $cf_s/S$ is dashed and the patch grid $kf_s/P$ dotted. Dips that follow the dashed grid as the stride changes belong to the stride branch.}
     \label{fig:combs}
 \end{figure*}
 
-Models~A and~C have not reached the preregistered convergence thresholds; their estimands are nonetheless consistent with the converged representational model~(B) and with the independent frequentist sweeps, so the qualitative conclusions hold provisionally. Consolidated posteriors or, if convergence remains out of reach, a documented limitation and fall-back on the frequentist evidence will follow.
+The stride scaling slope is $\kappa_S = 1.000\;[0.992,\,1.008]$ (clean) and $1.006\;[0.990,\,1.022]$ (full), with $\Pr(|\kappa_S-1|<0.1) = 1.00$ in both runs against a prior of $0.048$: $H3a$ is \textbf{supported}. The patch branch ($H3b$) is \textbf{not identified}: only $9$ out of $180$+ rows carry a valid fundamental, because in most configurations $S \mid P$ and no observation can be attributed to the patch branch alone.
+
+\subsection{Sensitivity and concordance}
+
+Model~A is refitted across the prior-scale ladder $\{0.25,\,0.5,\,1.0\}$ and with a Gaussian likelihood (\autoref{fig:sensitivity}). The clean-set median of $\bar\beta$ moves from $-0.05$ to $+0.29$ to $-0.31$; the full set shows the same instability ($+0.06$ to $-0.19$ to $+0.17$). The $20\%$-attenuation probability ranges from $0.00$ to $0.62$ (clean) and $0.05$ to $0.43$ (full). The H1 behavioural conclusion is prior-dependent and cannot be reported as data-driven.
+
+\begin{figure}[!t]
+    \centering
+    \includegraphics[width=0.48\textwidth]{figures/FIG_H1_sensitivity.png}
+    \caption{Prior and likelihood sensitivity for Model~A. The posterior of $\bar\beta$ is shown for three prior scales and for the Gaussian variant. The median shifts sign across variants.}
+    \label{fig:sensitivity}
+\end{figure}
+
+Where Bayesian and frequentist analyses address the same question, they agree: $H1$ behavioural inconclusive, $H2$ supported, $H3a$ supported. The well-converged models (D1, D2) deliver the firmest findings; the poorly converged ones (A, B, C) deliver qualified ones.
