@@ -2,11 +2,11 @@
     \centering
     \small
     \setlength{\tabcolsep}{4.5pt}
-    \begin{tabular}{@{}l>{\raggedright\arraybackslash}p{3.5cm}l>{\raggedright\arraybackslash}p{4.0cm}>{\raggedright\arraybackslash}p{3.4cm}c@{}}
+    \begin{tabular}{@{}c>{\raggedright\arraybackslash}p{3.3cm}>{\raggedright\arraybackslash}p{1.9cm}>{\raggedright\arraybackslash}p{4.0cm}>{\raggedright\arraybackslash}p{3.2cm}c@{}}
         \toprule
         \textbf{ID} & \textbf{Risk} & \textbf{AI RMF} & \textbf{Evidence in this report} & \textbf{Control available} & \textbf{Residual} \\
         \midrule
-        $T1$ & Adversarial masking: a periodic component injected on a candidate frequency is under-represented and escapes forecast-residual detection & MAP, MEASURE & Precondition confirmed ($e^{\theta_{lock}}=1.27$, sites track $f_s/S$ with $\kappa_S=1.000$); the behavioural pathway is \textbf{not} established (inconclusive and prior-dependent) & Spectral monitor on the raw stream, upstream of tokenisation, at the enumerated candidate set & high \\
+        $T1$ & Adversarial masking: a periodic component injected on a candidate frequency is under-represented and escapes forecast-residual detection & MAP, MEASURE & Precondition confirmed ($e^{\theta_{\mathrm{lock}}}=1.27$, sites track $f_s/S$ with $\kappa_S=1.000$); the behavioural pathway is \textbf{not} established (inconclusive and prior-dependent) & Spectral monitor on the raw stream, upstream of tokenisation, at the enumerated candidate set & high \\
         \addlinespace[3pt]
         $T2$ & Systematic blind spot with no adversary: a legitimate plant harmonic sits on a candidate frequency and is persistently under-represented & MAP, MEASURE, MANAGE & Confirmed at the representational level; candidate set is closed-form in $(f_s,P,S)$ & Choose $(P,S)$ against the known spectral content of the plant; \valueof{PartiallyObservable} degradation & medium \\
         \addlinespace[3pt]
