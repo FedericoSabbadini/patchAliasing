@@ -2,21 +2,21 @@
     \centering
     \small
     \setlength{\tabcolsep}{4.5pt}
-    \begin{tabular}{@{}l>{\raggedright\arraybackslash}p{3.5cm}l>{\raggedright\arraybackslash}p{4.0cm}>{\raggedright\arraybackslash}p{3.4cm}c@{}}
+    \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}>{\raggedright\arraybackslash}m{0.45cm}>{\raggedright\arraybackslash}m{3.35cm}>{\raggedright\arraybackslash}m{1.70cm}>{\raggedright\arraybackslash}m{3.85cm}>{\raggedright\arraybackslash}m{3.25cm}>{\centering\arraybackslash}m{1.45cm}@{}}
         \toprule
         \textbf{ID} & \textbf{Risk} & \textbf{AI RMF} & \textbf{Evidence in this report} & \textbf{Control available} & \textbf{Residual} \\
         \midrule
-        $T1$ & Adversarial masking: a periodic component injected on a candidate frequency is under-represented and escapes forecast-residual detection & MAP, MEASURE & Precondition confirmed ($e^{\theta_{lock}}=1.27$, sites track $f_s/S$ with $\kappa_S=1.000$); the behavioural pathway is \textbf{not} established (inconclusive and prior-dependent) & Spectral monitor on the raw stream, upstream of tokenisation, at the enumerated candidate set & high \\
-        \addlinespace[3pt]
-        $T2$ & Systematic blind spot with no adversary: a legitimate plant harmonic sits on a candidate frequency and is persistently under-represented & MAP, MEASURE, MANAGE & Confirmed at the representational level; candidate set is closed-form in $(f_s,P,S)$ & Choose $(P,S)$ against the known spectral content of the plant; \valueof{PartiallyObservable} degradation & medium \\
-        \addlinespace[3pt]
-        $T3$ & Configuration drift: a change of sampling interval, patch size or checkpoint silently relocates the blind set & GOVERN, MAP & $H3a$ supported: the sites move exactly as $f_s/S$ predicts, so relocation is deterministic and predictable & Recompute the candidate set from the knowledge base at every configuration change & low \\
-        \addlinespace[3pt]
-        $T4$ & False assurance: overlap is increased and treated as a fix & GOVERN, MANAGE & $M1$ refuted: $\delta_O=0.44\,[-0.03,0.81]$, the wrong sign; the patch branch is invariant to $S$ by construction & Do not credit overlap as a control; record the refutation in the model card & high \\
-        \addlinespace[3pt]
+        $T1$ & Adversarial masking: a periodic component injected on a candidate frequency is under-represented and escapes forecast-residual detection & \shortstack[l]{MAP\\MEASURE} & Precondition confirmed ($e^{\theta_{lock}}=1.27$, sites track $f_s/S$ with $\kappa_S=1.000$); the behavioural pathway is \textbf{not} established (inconclusive and prior-dependent) & Spectral monitor on the raw stream, upstream of tokenisation, at the enumerated candidate set & high \\
+        \cmidrule(lr){1-6}
+        $T2$ & Systematic blind spot with no adversary: a legitimate plant harmonic sits on a candidate frequency and is persistently under-represented & \shortstack[l]{MAP\\MEASURE\\MANAGE} & Confirmed at the representational level; candidate set is closed-form in $(f_s,P,S)$ & Choose $(P,S)$ against the known spectral content of the plant; \valueof{PartiallyObservable} degradation & medium \\
+        \cmidrule(lr){1-6}
+        $T3$ & Configuration drift: a change of sampling interval, patch size or checkpoint silently relocates the blind set & \shortstack[l]{GOVERN\\MAP} & $H3a$ supported: the sites move exactly as $f_s/S$ predicts, so relocation is deterministic and predictable & Recompute the candidate set from the knowledge base at every configuration change & low \\
+        \cmidrule(lr){1-6}
+        $T4$ & False assurance: overlap is increased and treated as a fix & \shortstack[l]{GOVERN\\MANAGE} & $M1$ refuted: $\delta_O=0.44\,[-0.03,0.81]$, the wrong sign; the patch branch is invariant to $S$ by construction & Do not credit overlap as a control; record the refutation in the model card & high \\
+        \cmidrule(lr){1-6}
         $T5$ & Defence placed inside the blind spot: phase randomisation, or anomaly detection on forecast residuals & MANAGE & $H2$ supported ($\Pr=0.997$): the deficit does not depend on phase, so randomising it changes nothing & Move detection upstream of tokenisation; treat residual-based detection as insufficient alone & medium \\
         \bottomrule
-    \end{tabular}
+    \end{tabular*}
     \caption{Risk register. \textbf{AI RMF} names the function of the framework\autocite{tabassiArtificialIntelligenceRisk2023} under which each item is handled. \textbf{Residual} is the exposure that survives the control in the adjacent column, judged qualitatively: \textbf{high} where no control available to an operator closes the exposure, \textbf{medium} where a control exists but is partial or requires design-time choices, \textbf{low} where the exposure is closed by a procedure that follows from the arithmetic. Every entry is anchored to a posterior reported in \nameref{sec:seven} rather than asserted, and the two entries whose residual is \textbf{high} are so because the evidence is negative: $T1$ because the behavioural pathway is unproven, $T4$ because the pre-registered mitigation failed.}
     \label{tab:riskRegister}
 \end{table*}
