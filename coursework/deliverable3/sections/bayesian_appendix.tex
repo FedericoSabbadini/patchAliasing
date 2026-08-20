@@ -48,18 +48,18 @@ The estimand is $\bar\beta$, reported as $e^{\bar\beta}$: the multiplicative cha
 
 Model~B replaces the forecast with a measurement of the internal state. At each candidate frequency $f_c$, examples are drawn at $f_c-1$\,Hz and $f_c+1$\,Hz, the representation is captured, and a linear probe is charged the prequential description length of the labels\autocite{voitaInformationTheoreticProbingMinimum2020}: the data are split into successive chunks, each chunk encoded by a probe trained only on the chunks before it, and the cost accumulated in bits. A probe that memorises noise pays for itself and gains nothing, which is why description length is preferred to accuracy. The reading is direct: at a frequency whose neighbourhood has become linearly indistinguishable in representation space, the labels cost more bits.
 
-Ten states are probed per geometry: the encoder $[\mathrm{REG}]$ token after each of the four encoder blocks, the decoder state after each of the four decoder blocks, the pre-projection vector and the projected quantile head. The decoder-side vectors are named decoder states rather than $[\mathrm{REG}]$ tokens because Chronos-Bolt carries $[\mathrm{REG}]$ in the encoder only and the decoder is entered through a single start token.
+Ten states are probed per geometry: the encoder $[\mathrm{REG}]$ token after each of the four encoder blocks, the decoder state after each of the four decoder blocks, the pre-projection vector and the output quantile head. The decoder-side vectors are named decoder states rather than $[\mathrm{REG}]$ tokens because Chronos-Bolt carries $[\mathrm{REG}]$ in the encoder only and the decoder is entered through a single start token.
 
 The fit is
 
 \begin{equation}
 \label{eq:appB:model}
-L_i \sim \text{Gamma}\!\left(k,\ k/\mu_i\right),
+L_i \sim \text{Gamma}\!\left(r,\ r/\mu_i\right),
 \qquad
-\log \mu_i = \alpha_0 + \theta_{lock}\,\mathrm{IsLocked}_i + s_{\text{st}[i]} + g_{\text{geo}[i]}.
+\log \mu_i = \alpha_0 + \theta_{\mathrm{lock}}\,\mathrm{IsLocked}_i + s_{\text{st}[i]} + g_{\text{geo}[i]}.
 \end{equation}
 
-A codelength is strictly positive, right-skewed and has a variance that grows with its mean, which is what the Gamma likelihood with a log link is for; $k$ is its shape and carries the dispersion. The log link makes $\theta_{lock}$ multiplicative, so $e^{\theta_{lock}}$ is the factor by which the cost of the labels expands at a candidate frequency. The offsets $s_{\text{st}}$ and $g_{\text{geo}}$ are zero-mean and absorb the level differences between probe stages and between geometries, which run to several-fold and would otherwise be attributed to the lock indicator. The unadjusted form, without those offsets, is fitted alongside and compared by LOO, so the blocking decision is reported rather than assumed.
+A codelength is strictly positive, right-skewed and has a variance that grows with its mean, which is what the Gamma likelihood with a log link is for; $r$ is its shape and carries the dispersion. The log link makes $\theta_{\mathrm{lock}}$ multiplicative, so $e^{\theta_{\mathrm{lock}}}$ is the factor by which the cost of the labels expands at a candidate frequency. The offsets $s_{\text{st}}$ and $g_{\text{geo}}$ are zero-mean and absorb the level differences between probe stages and between geometries, which run to several-fold and would otherwise be attributed to the lock indicator. The unadjusted form, without those offsets, is fitted alongside and compared by LOO, so the blocking decision is reported rather than assumed.
 
 The scope of the probe task is deliberately narrow. The seven hierarchical band tasks used in the exploratory sweep of \nameref{sec:five} each summarise hundreds of frequencies in one codelength, so the lock indicator has nothing to attach to; they are retained as a descriptive cross-check of overall decodability and are not fitted by any Bayesian model.
 
