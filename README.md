@@ -15,14 +15,10 @@ patchAliasing/
 │   │   ├── train_sweep.py      # from-scratch retraining driver
 │   │   ├── upload_models.py    # push checkpoints to HuggingFace
 │   │   └── weights/            # local checkpoints (gitignored)
-│   ├── testing/                # hypothesis testing (Deliverable 1 workflow)
-│   │   ├── testing_lib.py      # model loader and shared helpers
-│   │   ├── hypotheses.py       # H1/H2/H3 tests (pure + background signals)
-│   │   ├── run_all.py          # single-command reproducible run
-│   │   └── chronosBolt_layer_probing.ipynb
 │   ├── bayesian/               # Bayesian analysis (Deliverable 2 workflow)
 │   │   ├── probe_lib.py        # batched probing core (22 geometries)
 │   │   ├── collect.py          # data collection for the Bayesian models
+│   │   ├── model_loader.py     # checkpoint resolution (local or HuggingFace)
 │   │   ├── bayesian_analysis.ipynb
 │   │   └── reconstruction_figures.ipynb
 │   ├── data/
@@ -69,14 +65,7 @@ uv sync
 
 ### Running the experiments
 
-**Hypothesis tests** (Deliverable 1 workflow):
-```bash
-cd chronos/testing
-python run_all.py              # full run: 5 models x {probing, pure, tsm, ks}
-python run_all.py --smoke      # fast sanity check
-```
-
-**Bayesian data collection** (Deliverable 2 workflow):
+**Bayesian data collection**:
 ```bash
 cd chronos/bayesian
 python -m collect --out ./results --smoke   # pipeline check

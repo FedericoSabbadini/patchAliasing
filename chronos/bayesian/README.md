@@ -10,10 +10,10 @@ the deliverable is the specification.
 | `bayesian_analysis.ipynb` | **the** notebook — priors, observation, likelihood, posterior, checks |
 | `probe_lib.py` | light, notebook-free probing core (forecast recovery, token collapse, `[REG]` capture, prequential MDL, lock geometry) |
 | `collect.py` | runs every geometry in `probe_lib.MODELS` and writes the tidy tables; shards per model so a run resumes |
+| `model_loader.py` | checkpoint resolution: finds local weights or falls back to HuggingFace |
 
-Nothing under `chronos/testing/` is modified. Local checkpoint discovery is reused from
-`chronos/testing/testing_lib.py`; which checkpoint a geometry means is decided here, in
-`probe_lib.load_checkpoint` (see Geometries below).
+Checkpoint discovery lives in `model_loader.py`; which checkpoint a geometry means is decided
+in `probe_lib.load_checkpoint` (see Geometries below).
 
 ## The seven estimands
 
@@ -42,11 +42,10 @@ budget-matched retrained baseline. The shortest strides on the sweep repository 
 matching `deliverable1.tex`: their stride-lock class has too few in-band members to carry a local
 H1 contrast.
 
-Checkpoints are resolved by `probe_lib.load_checkpoint`, not by `testing_lib.load_pipeline`: the
-latter belongs to the Deliverable 1 workflow, where `(16,16)` means the published checkpoint and
-only the first five geometries exist. Here every geometry is `p{P}-s{S}-seed42`, taken from the
-local weights directory if there is one and otherwise from the Hugging Face sweep repo. If a run is
-missing from the hub, `load_checkpoint` raises rather than silently substituting another geometry.
+Checkpoints are resolved by `probe_lib.load_checkpoint` via `model_loader.py`: every geometry is
+`p{P}-s{S}-seed42`, taken from the local weights directory if there is one and otherwise from the
+Hugging Face sweep repo. If a run is missing from the hub, `load_checkpoint` raises rather than
+silently substituting another geometry.
 
 **`MODELS` and `BAYES_MODELS` are not the same list.** `MODELS` is the full design and is what the
 sweeps and the descriptive figures run on. `BAYES_MODELS` is the subset the Bayesian models are
@@ -72,20 +71,15 @@ effect of the overlap ratio from an effect of the absolute stride.
 
 ## Running it
 
-The notebook is written for Colab. Open it, run Part 0, and go. Part 0 clones this repository,
-mounts Google Drive for checkpoints (falling back to `/content` if you decline), and prints the
-design.
+Open the notebook, run Part 0, and go.
 
-**Every part checkpoints.** After a disconnect, re-run from the top: completed parts reload instead
-of recomputing, so Part 2's Chronos work is paid for once. Because the parts communicate only
-through files, they can run in different runtimes:
+**Every part checkpoints.** Completed parts reload instead of recomputing, so Part 2's Chronos work
+is paid for once. Because the parts communicate only through files, they can run in different
+runtimes:
 
 * **Part 2** wants a **GPU** runtime (it is the only part that loads a model);
 * **Parts 1, 3, 4, 5** are **CPU**-only PyMC and detect the absence of `torch` automatically,
   reading the tables a previous GPU run wrote.
-
-Set `SMOKE = True` in Part 0.3 for a few-minute pipeline check. Smoke output goes to its own
-directory and every part prints a banner, so it cannot be confused with a reportable run.
 
 ## Collecting without the notebook
 
@@ -112,8 +106,7 @@ Shards live in `<out>/raw/{table}__p{P}-s{S}.parquet`; merged tables in `<out>/0
 ## Design decisions worth knowing
 
 **Matched triplets.** Each lock $f_k$ is paired with two controls sharing the *same* background
-realisation and the *same* phase. This differs deliberately from `hypotheses.py`, which averages
-over phases sampled independently per frequency: the contrast has to be paired for the deliverable's
+realisation and the *same* phase. The contrast has to be paired for the deliverable's
 Eq. (1) to mean what it says, and the phase index has to survive for H2 to be testable at all.
 
 **The control offset is chosen per site, not per geometry.** Deliverable 1 fixed it at

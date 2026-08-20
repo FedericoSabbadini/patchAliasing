@@ -9,11 +9,11 @@ execute another notebook.
 
 Provenance of each piece (so the port can be audited against the originals):
 
-    forecast / recovery / collapse ....... chronos/testing/hypotheses.py
-    [REG] capture across enc/dec/output ... chronos/testing/chronosBolt_layer_probing.ipynb  §3
-    prequential MDL codelength ........... chronos/testing/chronosBolt_layer_probing.ipynb  §5
-    lock geometry (k*fs/P, c*fs/S) ....... chronos/testing/hypotheses.py + notebook §0.1
-    model registry / loader .............. chronos/testing/testing_lib.py  (imported, not copied)
+    forecast / recovery / collapse ....... originally from hypotheses.py (D1)
+    [REG] capture across enc/dec/output ... originally from probing notebook (D1) §3
+    prequential MDL codelength ........... originally from probing notebook (D1) §5
+    lock geometry (k*fs/P, c*fs/S) ....... deliverable Eq. 7
+    model registry / loader .............. model_loader.py  (in this directory)
 
 The one substantive change is **batching**: `hypotheses.py` runs one context per forward pass,
 which is fine for a handful of figures but not for the ~37k forward passes the Bayesian design
@@ -32,13 +32,12 @@ from pathlib import Path
 import numpy as np
 
 # --------------------------------------------------------------------------------- #
-#  Repo wiring, this file lives in chronos/bayesian/, so parent.parent is the repo's chronos/
+#  Repo wiring: this file lives in chronos/bayesian/
 # --------------------------------------------------------------------------------- #
 _HERE = Path(__file__).resolve().parent
 _CHRONOS = _HERE.parent
-_TESTING = _CHRONOS / "testing"
 _SYNTHETIC = _CHRONOS / "data" / "synthetic"
-for _p in (_TESTING, _SYNTHETIC):
+for _p in (_HERE, _SYNTHETIC):
     if str(_p) not in sys.path:
         sys.path.insert(0, str(_p))
 
@@ -101,7 +100,7 @@ BAYES_MODELS: list[tuple[int, int]] = [(P, S) for (P, S) in MODELS if CTX % S ==
 
 # Optional runtime override, so a local-only subset can be run without editing this file or the
 # notebook: PATCHALIASING_MODELS="p16-s12,p16-s8,p8-s8,p24-s24" restricts MODELS to those tags.
-# Combined with HF_HUB_OFFLINE=1 (which testing_lib.load_pipeline honours) this drives a fully
+# Combined with HF_HUB_OFFLINE=1 (which model_loader honours) this drives a fully
 # offline run on the local checkpoints alone.
 import os as _os
 _only = _os.environ.get("PATCHALIASING_MODELS", "").strip()
@@ -144,7 +143,7 @@ GENERATORS = ("tsmixup", "kernelsynth")   # the deliverable's two synthetic corp
 
 
 def model_tag(P: int, S: int) -> str:
-    """Filesystem-safe id for a geometry, matching testing_lib.model_tag."""
+    """Filesystem-safe id for a geometry (e.g. 'p16-s12')."""
     return f"p{P}-s{S}"
 
 
@@ -383,33 +382,26 @@ def control_offset(P: int, S: int, fk: float | None = None, guard: float = 1.0,
 def load_checkpoint(P: int, S: int, device: str = "cpu", pipeline_cls=None):
     """Resolve (P, S) to a retrained checkpoint. Returns (pipeline, label).
 
-    `chronos/testing/testing_lib.py` is the repo-wide loader, but it belongs to the Deliverable 1
-    workflow and carries two conventions this analysis does not share: it maps (16, 16) to the
-    published `amazon/chronos-bolt-tiny`, and it knows only the first five geometries of the sweep.
-    deliverable2.tex is explicit on the first, "The published chronos-bolt-tiny checkpoint is not
-    used at any point, so the P=S=16 baseline is budget-matched like the rest of the design", and
-    tab:patchStride adds four runs on the second.
-
-    Rather than change a module the Deliverable 1 notebooks still import, checkpoints are resolved
-    here: every geometry is `p{P}-s{S}-seed42`, taken from testing_lib's local weights directory
-    when there is one and otherwise from the Hugging Face sweep repo, which is what happens on
-    Colab. Local discovery is reused from testing_lib so the search path stays in one place.
+    Every geometry is ``p{P}-s{S}-seed42``, resolved by ``model_loader.py`` in this directory.
+    The local checkpoint is preferred; if absent, the Hugging Face sweep repository is tried.
+    The published ``amazon/chronos-bolt-tiny`` is never used: even (16, 16) loads the retrained
+    variant so the baseline is budget-matched like the rest of the design.
     """
-    import testing_lib as tl
+    import model_loader as ml
 
     if pipeline_cls is None:
         from chronos import BaseChronosPipeline as pipeline_cls
-    ck = tl._resolve_local_ckpt(P, S)
+    ck = ml.resolve_local_checkpoint(P, S)
     if ck is not None:
         return pipeline_cls.from_pretrained(str(ck), device_map=device), f"p{P}-s{S} (local {ck.name})"
     sub = f"p{P}-s{S}-seed42"
     try:
-        pipe = pipeline_cls.from_pretrained(tl.SWEEP_REPO, subfolder=sub, device_map=device)
+        pipe = pipeline_cls.from_pretrained(ml.SWEEP_REPO, subfolder=sub, device_map=device)
     except Exception as e:
         pend = "" if (P, S) in MODELS_ALL else " It is not one of probe_lib.MODELS_ALL."
         raise RuntimeError(
-            f"No checkpoint for (P={P}, S={S}). Expected subfolder '{sub}' in {tl.SWEEP_REPO}, or a "
-            f"local copy under {tl._WEIGHTS_DIR}.{pend}\n  original error: {e}") from e
+            f"No checkpoint for (P={P}, S={S}). Expected subfolder '{sub}' in {ml.SWEEP_REPO}, or a "
+            f"local copy under {ml._WEIGHTS_DIR}.{pend}\n  original error: {e}") from e
     return pipe, f"p{P}-s{S} (HF {sub})"
 
 
@@ -453,7 +445,7 @@ class Probe:
 
     # ---------------------------------------------------------------------- #
     def close(self) -> None:
-        """Drop the model and free GPU memory, Colab runtimes are small and we load five in a row."""
+        """Drop the model and free GPU memory so the next geometry can be loaded."""
         del self.pipe
         self.pipe = None
         if self.device == "cuda":
