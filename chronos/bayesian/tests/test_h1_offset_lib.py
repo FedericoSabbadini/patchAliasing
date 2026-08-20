@@ -13,7 +13,7 @@ BAYESIAN_DIR = Path(__file__).resolve().parents[1]
 if str(BAYESIAN_DIR) not in sys.path:
     sys.path.insert(0, str(BAYESIAN_DIR))
 
-import h1_offset_lib as h1
+import chronos.bayesian.tests.h1_offset_lib as h1
 import probe_lib as pl
 
 
