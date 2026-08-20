@@ -1,0 +1,102 @@
+This appendix collects the full mathematical specification of each Bayesian model used in the analysis. The models are summarised in \autoref{tab:bayesModelsApp}; the main text in \nameref{sec:four} gives the high-level rationale and the estimands.
+
+\begin{table*}[!t]
+    \centering
+    \small
+    \begin{tabular}{@{}lllll@{}}
+        \toprule
+        \textbf{Model} & \textbf{Claim} & \textbf{Estimand} & \textbf{Predicts} & \textbf{Input} \\
+        \midrule
+        A  & $H1$ behavioural      & $e^{\bar\beta}$: recovery at a lock / at its controls   & $<1$        & \texttt{contrasts} \\
+        B  & $H1$ representational & $e^{\theta_{lock}}$: codelength at a lock / elsewhere   & $>1$        & \texttt{mdl\_cells} \\
+        C  & $H2$                  & $\sigma_\phi$: spread of the deficit across phase       & $\approx 0$ & \texttt{contrasts} \\
+        D1 & $H3$ location         & $\theta_S,\theta_P$: dip depth on each grid, by LOO     & both $<0$   & \texttt{collapse} \\
+        D2 & $H3a$ stride branch   & $\kappa_S$: measured / stride-predicted spacing         & $=1$        & \texttt{sites} \\
+        D2 & $H3b$ patch branch    & $\kappa_P$: measured / patch-predicted spacing          & $=1$        & \texttt{sites} \\
+        A$'$ & $M1$ mitigation     & $\delta_O$: change in the deficit per unit of overlap   & $<0$        & \texttt{contrasts} \\
+        \bottomrule
+    \end{tabular}
+    \caption{Summary of the Bayesian models, estimands, predicted values and probing inputs. This table is reproduced from the main text for convenience of reference alongside the full model specifications below.}
+    \label{tab:bayesModelsApp}
+\end{table*}
+\FloatBarrier
+
+\subsection*{Model~A (behavioural H1)}
+
+Model~A tests whether the forecast amplitude recovery at locked frequencies is systematically lower than at neighbouring control frequencies. The measurement is the forecast amplitude recovery $R = A_{\text{pred}}/A_{\text{true}}$, collected in matched triplets: each lock frequency $f_k$ paired with two controls $f_k \pm \delta$, sharing the same background realisation and the same phase. The log-contrast
+
+\begin{equation}
+\tag{\ref{eq:d2contrast}}
+d = \log(R_k + 0.01) - \tfrac{1}{2}\left[\log(R_- + 0.01) + \log(R_+ + 0.01)\right]
+\end{equation}
+
+is negative when the lock recovers less than its neighbours. The offset $0.01$ prevents the logarithm from diverging when recovery is near zero. Model~A fits the contrast as
+
+\begin{equation}
+\tag{\ref{eq:d2hier}}
+d_i \sim \text{Student-}t_4(\mu_i,\ \sigma),
+\quad
+\mu_i = \beta_{c[i]} + u_{k[i]} + u_{b[i]},
+\quad
+\beta_c \sim \mathcal{N}\!\left(\bar\beta + \delta_O \widetilde O_c + \delta_P \widetilde{\log P}_c,\ \tau\right).
+\end{equation}
+
+The linear predictor $\mu_i$ contains three offsets: $\beta_c$ absorbs the per-configuration baseline, $u_k$ absorbs variation across lock harmonics, and $u_b$ absorbs variation across background draws. The Student-$t_4$ likelihood is chosen over a Gaussian because near-zero recoveries produce very large log-contrasts that would otherwise dominate the estimate. The configuration effects $\beta_c$ are drawn around the population mean $\bar\beta$, making the geometries instances of one phenomenon; two centred covariates, overlap $\widetilde O_c$ and $\widetilde{\log P}_c$, allow the effect to vary with the configuration without confounding.
+
+The estimand is $\bar\beta$. If locked frequencies are not attenuated, $\bar\beta$ is near zero and the posterior remains close to its prior. If they are attenuated, $\bar\beta$ is negative and its credible interval excludes zero.
+
+\subsection*{Model~B (representational H1)}
+
+Model~B tests whether the internal representation retains less information at locked frequencies than at unlocked ones. At each frequency $f_c$ a linear probe separates tones at $f_c \pm 1$\,Hz from a captured internal state, and the probe's prequential codelength $\ell$ measures how hard the separation is. Ten internal states are probed: the encoder $[\mathrm{REG}]$ token after each encoder block, the decoder state after each decoder block, the pre-projection vector and the quantile head. The regression is
+
+\begin{equation}
+\tag{\ref{eq:d2modelB}}
+\log \ell_i \sim \mathcal{N}\!\left(\mu_i,\ \sigma\right),
+\qquad
+\mu_i = \alpha + \theta_{\text{lock}} \cdot \text{IsLocked}_i + u_{s[i]} + u_{g[i]},
+\end{equation}
+
+where $u_s$ and $u_g$ are zero-mean offsets for probe stage and geometry, since codelengths differ several-fold between stages.
+
+The estimand is $\theta_{\text{lock}}$. If locked frequencies are not harder to decode, $\theta_{\text{lock}}$ is near zero. If they are, $e^{\theta_{\text{lock}}}$ gives the factor by which the codelength increases at a locked frequency relative to an unlocked one.
+
+\subsection*{Model~C (phase H2)}
+
+Model~C tests whether the starting phase of the input signal modulates the deficit at locked frequencies. The response is the per-phase deficit $y_i = \log(R_{\text{ctrl},i}+0.01)-\log(R_{\text{lock},i}+0.01)$, positive when the lock is worse. The phase circle is cut into eight slices, each given its own offset $u_p$:
+
+\begin{equation}
+\tag{\ref{eq:d2phase}}
+y_i \sim \text{Student-}t_4(\mu_i,\ \sigma),
+\qquad
+\mu_i = \beta_{c[i]} + u_{k[i]} + u_{b[i]} + u_{p[i]},
+\qquad
+u_p \sim \mathcal{N}(0, \sigma_\phi).
+\end{equation}
+
+The estimand is $\sigma_\phi$, the spread of the eight phase offsets. If the deficit does not depend on phase, the offsets are equal and $\sigma_\phi$ is near zero, as H2 predicts. If it does depend on phase, the offsets differ and $\sigma_\phi$ is large. Slices are used rather than a fitted curve because they assume nothing about the functional form of a phase dependence.
+
+\subsection*{Model~D1 (collapse sites, H3 location)}
+
+Model~D1 tests whether the token-collapse dips fall on the frequency grids predicted by the stride and patch branches. The token collapse $z_g(f)$, the dispersion of the input-patch embeddings across patches, is measured at each swept frequency. Each frequency carries two binary labels indicating whether it sits on the stride grid or the patch grid:
+
+\begin{equation}
+\tag{\ref{eq:d2sites}}
+\log z_g(f) \sim \mathcal{N}\!\left(
+\alpha_g + \theta_S \cdot \text{OnStrideGrid} + \theta_P \cdot \text{OnPatchGrid},\ \sigma
+\right).
+\end{equation}
+
+The logarithm makes the labels multiplicative on the per-geometry off-grid level $\alpha_g$. The two label coefficients $\theta_S$ and $\theta_P$ are the estimands. If the collapse dips do not align with the predicted grids, both coefficients are near zero. If they do, H3 predicts both negative, and the two-label fit should win the LOO comparison against each label alone and against neither. The two coefficients separate only where exactly one label applies, which for $\theta_S$ means the geometries with $S \nmid P$.
+
+\subsection*{Model~D2 (scaling law, H3 movement)}
+
+Model~D2 tests whether the collapse dips move with the geometry as each branch predicts. Every detected dip is assigned to the branch that predicts it, and sites belonging to both are set aside. The fundamental $\hat f^{\,F}_{1,g}$ of branch $F$ in geometry $g$ is compared with the spacing that branch predicts, $\Delta^S_g = f_s/S_g$ or $\Delta^P_g = f_s/P_g$:
+
+\begin{equation}
+\tag{\ref{eq:d2move}}
+\hat f^{\,F}_{1,g} \sim \mathcal{N}\!\left(
+\kappa_F \,\Delta^F_g,\ \sqrt{\sigma_F^2+\Delta f^2}
+\right).
+\end{equation}
+
+The estimand is $\kappa_F$, measured spacing per unit of predicted spacing. If the branch tracks its own arithmetic, $\kappa_F = 1$; if the dips sit on a fixed grid that does not move with the geometry, $\kappa_F$ departs from unity. The scatter $\sigma_F$ is given a floor $\Delta f$ (the sweep step) because a spacing read off a discrete grid is no more precise than one step; without the floor, sites landing exactly on the prediction drive $\sigma_F$ to zero and the posterior degenerates.

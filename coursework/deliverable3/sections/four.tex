@@ -1,9 +1,6 @@
 Bayesian inference is used to test the structural-aliasing hypotheses while making the analysis assumptions and uncertainty explicit: prior assumptions are stated for each estimand, posterior uncertainty is quantified for every estimated effect, and competing hypotheses and the mitigation claim are compared without relying only on point estimates or null-hypothesis significance testing.
 
-Each hypothesis receives its own measurement, its own model and its own estimand. \autoref{tab:bayesModels} lists the models with the value each claim predicts, \autoref{tab:bayesPriors} every prior, and \autoref{tab:bayesDecisions} the rule that turns a posterior into a verdict. All are ordinary regressions; only the quantity on the left and the question the coefficient answers change between them.
-
-\input{tables/bayesModels.tex}
-\FloatBarrier
+Each hypothesis receives its own measurement, its own model and its own estimand. \autoref{tab:bayesModelsApp} in \autoref{sec:appBayes} lists the models with the value each claim predicts, \autoref{tab:bayesPriors} every prior, and \autoref{tab:bayesDecisions} the rule that turns a posterior into a verdict. All are ordinary regressions; only the quantity on the left and the question the coefficient answers change between them.
 
 Each model is built the same way: a measurement, a linear predictor $\mu_i$ that adds one offset per group the observation belongs to, and a likelihood. One coefficient is the estimand and the rest keep it unconfounded. \autoref{tab:bayesPriors} gives every prior with the role its parameter plays. The range over which the prior scale is varied as a sensitivity check is $\{0.25,0.5,1.0\}$; all are centred on no effect, so a posterior that has not moved from its prior is itself a report of an absent effect.
 
@@ -26,7 +23,7 @@ d_i \sim \text{Student-}t_4(\mu_i,\ \sigma),
 \beta_c \sim \mathcal{N}\!\left(\bar\beta + \delta_O \widetilde O_c + \delta_P \widetilde{\log P}_c,\ \tau\right).
 \end{equation}
 
-\autoref{eq:d2hier} has four components, each motivated separately.
+The estimand is $\bar\beta$, the population-level contrast at the average configuration. If locked frequencies are not attenuated relative to their neighbours, $\bar\beta$ is near zero and the posterior remains close to its prior; if they are, $\bar\beta$ is negative and its credible interval excludes zero.
 
 \begin{itemize}\setlength{\itemsep}{2pt}
     \item \textbf{Three offsets in $\mu_i$}: $\beta_c$ per configuration, $u_k$ per lock harmonic and $u_b$ per background draw, so that neither an unusual frequency nor a single corpus can be mistaken for the effect.
@@ -35,7 +32,16 @@ d_i \sim \text{Student-}t_4(\mu_i,\ \sigma),
     \item \textbf{Two configuration-level covariates}, estimable together rather than confounded because the design varies overlap and patch size independently. Overlap enters as a ratio, patch size as $\log P$ because the patch grid has spacing $f_s/P$ and equal steps in $\log P$ are equal ratios of spacing. The tilde denotes centring on the design, $\widetilde O_c=(O_c-\bar O)/0.5$ and $\widetilde{\log P}_c=\log P_c-\overline{\log P}$, which leaves $\bar\beta$ the effect at the average configuration rather than an extrapolation to $O=0$ and $P=1$.
 \end{itemize}
 
-Model~B poses the same question of the representation, on a frequency-local prequential codelength: at each $f_c$ a probe separates tones at $f_c \pm 1$\,Hz from a captured internal state. Ten states are probed: the encoder $[\mathrm{REG}]$ token after each encoder block, the decoder state after each decoder block, the pre-projection vector and the quantile head; the decoder-side vectors are named decoder states because Chronos-Bolt carries $[\mathrm{REG}]$ in the encoder only. The regression is Gamma with a log link, so $e^{\theta_{lock}}$ is the factor by which the codelength of a locked frequency increases, with probe stage and geometry as zero-mean offsets since codelengths differ several-fold between stages. Deliverable~1's band tasks summarise hundreds of frequencies at once, so the lock indicator has nothing to attach to; they are kept as a cross-check.
+Model~B poses the same question of the representation rather than the forecast. At each frequency $f_c$ a linear probe separates tones at $f_c \pm 1$\,Hz from a captured internal state, and the probe's prequential codelength $\ell$ measures how hard the separation is. Ten internal states are probed: the encoder $[\mathrm{REG}]$ token after each encoder block, the decoder state after each decoder block, the pre-projection vector and the quantile head. The regression is
+
+\begin{equation}
+\label{eq:d2modelB}
+\log \ell_i \sim \mathcal{N}\!\left(\mu_i,\ \sigma\right),
+\qquad
+\mu_i = \alpha + \theta_{\text{lock}} \cdot \text{IsLocked}_i + u_{s[i]} + u_{g[i]},
+\end{equation}
+
+where $u_s$ and $u_g$ are zero-mean offsets for probe stage and geometry, since codelengths differ several-fold between stages. The estimand is $\theta_{\text{lock}}$: if locked frequencies are not harder to decode, $\theta_{\text{lock}}$ is near zero; if they are, $e^{\theta_{\text{lock}}}$ gives the factor by which the codelength increases. The band tasks summarise hundreds of frequencies at once, so the lock indicator has nothing to attach to; they are kept as a cross-check.
 
 \input{tables/bayesPriors.tex}
 
@@ -51,10 +57,10 @@ y_i \sim \text{Student-}t_4(\mu_i,\ \sigma),
 u_p \sim \mathcal{N}(0, \sigma_\phi).
 \end{equation}
 
-The estimand $\sigma_\phi$ is the spread of those eight offsets, and it answers the question with one number. If the deficit depends on where in its cycle the signal starts, the offsets differ and $\sigma_\phi$ is large. If the geometry alone determines it, they are equal and $\sigma_\phi$ is near zero, as $H2$ predicts. Slices are used rather than a fitted curve because they assume nothing about the form a dependence might take. Dropping $u_p$ gives a nested null, and comparing the two by leave-one-out cross-validation (LOO) separates the size of the phase effect from the evidence that it exists.
+The estimand $\sigma_\phi$ is the spread of those eight offsets. If the deficit does not depend on where in its cycle the signal starts, $\sigma_\phi$ is near zero, as $H2$ predicts; if it does, the offsets differ and $\sigma_\phi$ is large. Slices are used rather than a fitted curve because they assume nothing about the form a dependence might take. Dropping $u_p$ gives a nested null, and comparing the two by leave-one-out cross-validation (LOO) separates the size of the phase effect from the evidence that it exists.
 
 \subsection{H3}
-$H3$ was stated in Deliverable~1 as two claims, one per branch. Both are tested on the token collapse $z_g(f)$, the dispersion of the input-patch embeddings across patches, which is zero when consecutive patches are identical. All geometries share one sweep grid: a uniform $1$\,Hz sweep unioned with the predicted sites of every configuration swept. No geometry is therefore scored only where its own theory predicts a dip, and non-integer sites such as $42.\overline{6}$\,Hz for $S{=}12$ are covered.
+$H3$ is stated as two claims, one per branch. Both are tested on the token collapse $z_g(f)$, the dispersion of the input-patch embeddings across patches, which is zero when consecutive patches are identical. All geometries share one sweep grid: a uniform $1$\,Hz sweep unioned with the predicted sites of every configuration swept. No geometry is therefore scored only where its own theory predicts a dip, and non-integer sites such as $42.\overline{6}$\,Hz for $S{=}12$ are covered.
 
 The first question is where the dips are located. Each swept frequency carries two labels, one per branch:
 
@@ -65,7 +71,7 @@ The first question is where the dips are located. Each swept frequency carries t
 \right).
 \end{equation}
 
-The logarithm makes the labels multiplicative on the per-geometry off-grid level $\alpha_g$. The two label coefficients $\theta_S$ and $\theta_P$ are the estimands, and $H3$ predicts both negative, so the two-label fit should win the LOO comparison against each label alone and against neither. The two labels are not competing explanations of the same dips, since a frequency may carry either or both. The two coefficients separate, however, only where exactly one label applies, which for $\theta_S$ means the geometries with $S \nmid P$.
+The two label coefficients $\theta_S$ and $\theta_P$ are the estimands. If the collapse dips do not align with the predicted grids, both coefficients are near zero; if they do, $H3$ predicts both negative, and the two-label fit should win the LOO comparison against each label alone and against neither. The two labels are not competing explanations of the same dips, since a frequency may carry either or both. The two coefficients separate, however, only where exactly one label applies, which for $\theta_S$ means the geometries with $S \nmid P$.
 
 The second question is whether the dips move. The fit above remains compatible with dips that merely sit on a fixed grid, so each branch is checked against its own scaling law. Every detected dip is assigned to the branch that predicts it, and sites belonging to both are set aside. The fundamental $\hat f^{\,F}_{1,g}$ of branch $F$ in geometry $g$ is then compared with the spacing that branch predicts, $\Delta^S_g=f_s/S_g$ or $\Delta^P_g=f_s/P_g$:
 
@@ -76,60 +82,10 @@ The second question is whether the dips move. The fit above remains compatible w
 \right).
 \end{equation}
 
-The slope $\kappa_F$ is the estimand, measured spacing per unit of predicted spacing, so $\kappa_F=1$ denotes a branch that tracks its own arithmetic. The scatter $\sigma_F$ about it is given a floor $\Delta f$, the sweep step, since a spacing read off a discrete grid is no more precise than one step; without the floor, sites landing exactly on the prediction drive $\sigma_F$ to zero and the posterior degenerates.
+The estimand is $\kappa_F$, measured spacing per unit of predicted spacing. If the branch tracks its own arithmetic, $\kappa_F = 1$; if the dips do not move with the geometry, $\kappa_F$ departs from unity. The scatter $\sigma_F$ about it is given a floor $\Delta f$, the sweep step, since a spacing read off a discrete grid is no more precise than one step; without the floor, sites landing exactly on the prediction drive $\sigma_F$ to zero and the posterior degenerates.
 
 \subsubsection{$H3a$, the stride branch}
 The prediction is $\kappa_S=1$: the stride sites track $f_s/S$ one for one, so a site that remains fixed while $S$ changes refutes it. Identification needs a series that holds $P$ fixed and varies $S$, which \autoref{tab:hfModels} supplies at $P{=}16$, $24$ and $32$.
 
 \subsubsection{$H3b$, the patch branch}
 The prediction is $\kappa_P=1$ in the same way. Identification needs a series that holds $S$ fixed and varies $P$, which \autoref{tab:hfModels} supplies at $S{=}8$, $12$ and $16$.
-
-\subsection{Decisions and validation}
-Every threshold in \autoref{tab:bayesDecisions} is fixed before a posterior is inspected, and validation comes before interpretation. Models~A and~C include a per-background random offset $u_b$ with scale $\sigma_b$; this lets the posterior separate generator-specific variation from the aliasing effect itself, so that a recovery difference between Light TSMixup and KernelSynth backgrounds is attributed to the generator rather than inflating or deflating the estimate of $\bar\beta$. The experimental grid, sampling parameters and generators are described in \nameref{sec:five}.
-
-\input{tables/bayesDecisions.tex}
-
-\subsection{Notebook workflow}
-
-The Bayesian analysis is implemented in one reproducible notebook. Its role is not to introduce a new method after the fact, but to execute the hypotheses, measurements, priors and decision rules defined above in a fixed order. The notebook therefore has a short setup stage followed by five inferential parts: priors, observation, likelihood, posterior inference and checks. Each part writes checkpoints to disk, so that an interrupted run can resume without changing the statistical design.
-
-\medskip
-\textbf{Part~0 (Setup).} The notebook installs only missing dependencies, locates the repository, and creates the checkpoint directories. The design constants, including sampling rate, analysis band, context window, prediction horizon and the retrained geometries of \autoref{tab:hfModels}, are imported from a shared probing library as described in \nameref{sec:five}.
-
-The Bayesian sampler that will be used in Parts~3--5 is also configured here: the NUTS algorithm explores the posterior distribution with $4$ independent chains, each discarding $2000$ initial warm-up steps used to calibrate the step size and retaining the subsequent $2000$ draws as posterior samples; \texttt{target\_accept}${}=0.9$ controls the sampler's step-size adaptation, with higher values producing more cautious but more precise exploration.
-
-\medskip
-\textbf{Part~1 (Priors).} Before any Chronos output is loaded, the notebook builds the design skeleton: one planned row per geometry, lock frequency, background realisation, generator and phase. It then declares the priors of \autoref{tab:bayesPriors}, the decision thresholds of \autoref{tab:bayesDecisions}, and the prior-sensitivity ladder $\{0.25,0.5,1.0\}$, three scales at which the prior width of Model~A will be varied in Part~5 to verify that the H1 conclusion is driven by the data rather than by the choice of scale. Prior predictive checks simulate data from the prior alone, without any Chronos output, to verify that the declared priors are centred on no effect, admit effects large enough to falsify or support the hypotheses, and make the decision thresholds reachable from both sides. The prior specification is saved as both JSON and Parquet, making later drift between the notebook and the report detectable.
-
-\medskip
-\textbf{Part~2 (Observation).} A collection module loads, for each geometry, the retrained Chronos-Bolt weights, generates the synthetic signals, runs the predictions, and writes five tables in which each row is one observation and each column is one variable:
-\begin{itemize}\setlength{\itemsep}{2pt}
-    \item \textbf{\texttt{contrasts}}: one row per triplet (lock frequency $f_k$ with its two controls $f_k \pm \delta$), sharing background realisation and phase. Each row carries the forecast amplitude recovery $R$ at the three frequencies and the contrast $d$. Feeds Models~A and~C; the phase index is retained for H2.
-    \item \textbf{\texttt{mdl\_cells}}: one row per probed frequency $f_c$, probe stage and geometry. Each row carries the prequential codelength of a linear probe separating $f_c - 1$\,Hz from $f_c + 1$\,Hz. Feeds Model~B.
-    \item \textbf{\texttt{mdl\_bandtasks}}: one row per band task, geometry and probe stage. Retained only as a descriptive cross-check of overall decodability; not used by any Bayesian model.
-    \item \textbf{\texttt{collapse}}: one row per swept frequency and geometry. Each row carries the across-patch token dispersion $z_g(f)$. Feeds Model~D1.
-    \item \textbf{\texttt{sites}}: one row per detected collapse site and branch. Each row carries the fundamental $f_1$ and the measured spacing $\hat\Delta$. Feeds Model~D2.
-\end{itemize}
-Collection is checkpointed per geometry: a completed geometry is reloaded rather than recomputed, so an interrupted run resumes from the last incomplete geometry without altering the statistical design. The generated TSMixup and KernelSynth backgrounds are archived alongside the results, so that the exact signals behind any posterior can be inspected.
-
-\medskip
-\textbf{Part~3 (Likelihood).} The notebook defines the five statistical models (A, B, C, D1, D2) as PyMC specifications, each built from the corresponding table of Part~2. A shared sampling wrapper fits every model with the same NUTS settings declared in Part~0, so that no model receives a more or less careful exploration than another. Before fitting the real observations, a parameter-recovery test is run on Model~A, the central and most complex model. Synthetic contrasts are generated from Model~A itself on the real experimental structure (the same geometries, lock frequencies, backgrounds and phases that the actual data follow), fixing the population effect $\bar\beta$ at four known values: $0$ (no attenuation), $\log 0.8$ ($20\%$), $\log 0.5$ ($50\%$) and $\log 0.1$ ($90\%$). For each scenario the model is refitted on these synthetic data and the posterior of $\bar\beta$ is compared against the known value. If the posterior recovers it, the experimental design has enough statistical power to detect the effect or mark a genuine absence rather than insufficient design.
-
-\medskip
-\textbf{Part~4 (Posterior inference).} Each model is fitted with NUTS or reloaded from disk. For each hypothesis the notebook reports the $95\%$ credible interval of the estimand, the posterior probability of the decision threshold of \autoref{tab:bayesDecisions}, and the ROPE (Region Of Practical Equivalence) probability. Where the analysis defined competing formulations, leave-one-out cross-validation (LOO) selects the one that better predicts unseen data: each observation is virtually removed in turn, the model is refitted on the remainder, and its prediction of the held-out point is scored. The formulation with the higher total score is preferred. The comparisons are:
-\begin{itemize}\setlength{\itemsep}{2pt}
-    \item Model~A across configuration-level covariate sets, testing whether overlap or patch size mitigates the effect (M1);
-    \item Model~B with and without probe-stage and geometry corrections (H1 representational);
-    \item Model~C with and without per-phase offsets, testing whether phase affects the deficit (H2);
-    \item Model~D1 across four grid labellings --- stride only, patch only, both, neither --- testing which branch generates the collapse sites (H3a, H3b).
-\end{itemize}
-
-\medskip
-\textbf{Part~5 (Checks and verdicts).} The final part tests whether each posterior can be trusted before interpreting it. The checks are not uniform across models because they target different risks:
-\begin{itemize}\setlength{\itemsep}{2pt}
-    \item \textbf{Convergence} (all models): three preregistered diagnostics are verified for every fit. $\hat R < 1.01$ measures agreement across the four independent chains; values near $1$ indicate that each chain has converged to the same distribution. Bulk and tail effective sample size above $1000$ counts the genuinely independent posterior draws after correcting for autocorrelation. Zero divergences requires that the sampler encountered no geometric pathology. A model that fails any criterion is not interpreted.
-    \item \textbf{Posterior predictive} (Model~A): data are generated from the fitted posterior and compared against the observed contrasts, both pooled and stratified by configuration and generator. Model~A is selected because it is the most complex and hierarchical; a simpler model that passes convergence is unlikely to fail this check.
-    \item \textbf{Prior sensitivity} (Model~A): the model is refitted across the scale ladder $\{0.25,0.5,1.0\}$ and with a Gaussian likelihood replacing the Student-$t_4$. The H1 conclusion is reportable only if the decision probability and credible interval remain stable across all variants; otherwise the conclusion reflects the choice of prior, not the data.
-    \item \textbf{LOO reading rule}: the comparisons defined in Part~4 are collected. The key quantity is the difference in expected log pointwise predictive density ($\text{elpd\_diff}$), which measures how much better one formulation predicts unseen data than the other; a difference smaller than two standard errors ($|\text{elpd\_diff}| < 2\cdot\text{dse}$) is reported as inconclusive rather than rounded into a decision.
-\end{itemize}
-The notebook finally writes a verdict table applying the three-way rule of \autoref{tab:bayesDecisions} to every hypothesis: supported, refuted or inconclusive.
