@@ -1,5 +1,13 @@
 The models of \nameref{sec:four} are fitted on two subsets of the grid (\autoref{tab:hfModels}): a \emph{clean} set of $15$ configurations whose strides divide the probing context ($\text{CTX}=480$), and a \emph{full} set of $22$ that adds seven geometries with shorter or odd strides. Posteriors are from the clean set unless stated otherwise; qualitative conclusions hold on both.
 
+\subsection{The exploratory sweep}
+
+Before any model was fitted, the five geometries of the initial design ($P{=}S{=}8$, $P{=}16$ with $S\in\{8,12,16\}$, and $P{=}S{=}24$) were swept with pure sinusoids at one-hertz steps, as \nameref{sec:five} describes; both readings are reproduced in \autoref{sec:appSweep}. Neither is a test: both average over phase and neither reports uncertainty.
+
+Reconstruction is poor everywhere. Only $12$--$27\%$ of the swept tones return a dominant frequency within $2$\,Hz of the input, and the root-mean-square error between output and input frequency is $127$--$133$\,Hz in every geometry, so wide stretches of the band collapse onto a few output frequencies whatever the tokenisation. The representation discriminates more finely. Pooled over the five geometries, the local $f\pm1$\,Hz probe scores $0.77$ within one hertz of a predicted site against $0.85$ elsewhere, and the share of frequencies below the $0.6$ threshold doubles, from $10.4\%$ off the candidate set to $21.0\%$ on it. The gap holds in four of the five geometries and is widest in the two non-overlapping ones.
+
+This is a marginal comparison, confounded with frequency and with the reduced training budget, which is why what follows pairs each candidate with matched controls and blocks on probe stage and geometry instead of reading the sweep directly. What the sweep establishes is only the premise: something in the band is harder to represent, and it is not uniformly distributed.
+
 \subsection{Validation}
 
 A parameter-recovery test on Model~A fixes $\bar\beta$ at four known values ($0$, $\log 0.8$, $\log 0.5$, $\log 0.1$). Every $95\%$ credible interval covers the truth, and the posterior standard deviation shrinks from the prior width of $0.71$ to $0.04$--$0.18$; the full set passes with tighter intervals ($0.04$--$0.11$).

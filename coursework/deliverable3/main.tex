@@ -40,6 +40,21 @@
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta, shapes.geometric}
 
+% \autoref needs a printed name for the algorithm environment used in Appendices B and C
+\providecommand{\algorithmautorefname}{Algorithm}
+
+% The class sets subsubsections as run-in headings, which makes the stages of a multi-part
+% procedure indistinguishable from emphasised text. They are given their own line instead.
+\titleformat
+	{\subsubsection}
+	[block]
+	{\raggedright\normalsize\bfseries}
+	{\thesubsubsection}
+	{0.5em}
+	{}
+	[]
+\titlespacing*{\subsubsection}{0pt}{1.0\baselineskip}{3pt}
+
 % pv: a class, an object property or a data property of the ontology
 % valueof: a named individual of one of the closed vocabularies
 \newcommand{\pv}[1]{\texttt{pv:#1}}
@@ -101,11 +116,8 @@
 \section{Bayesian Analysis} \label{sec:four}
 \input{sections/four}
 
-\section{Signal Generation and Testing} \label{sec:five}
+\section{Signal Generation, Experimental Setup and Workflow} \label{sec:five}
 \input{sections/five}
-
-\section{Behavioral and Representational Analysis} \label{sec:six}
-\input{sections/six}
 
 \section{Bayesian Results} \label{sec:seven}
 \input{sections/seven}
@@ -116,7 +128,7 @@
 \section{Agentic AI} \label{sec:nine}
 \input{sections/nine}
 
-\section{Computer Security} \label{sec:ten}
+\section{Security Risk Assessment} \label{sec:ten}
 \input{sections/ten}
 
 \printbibliography
@@ -130,15 +142,19 @@
 \endgroup
 
 \newpage
-\appendixsection{Light TSMixup Pseudocode}{sec:appB}
+\appendixsection{Light TSMixup: Description and Pseudocode}{sec:appB}
 \input{sections/lighttsmixup}
 
 \newpage
-\appendixsection{KernelSynth Pseudocode and Kernel Bank}{sec:appC}
+\appendixsection{KernelSynth: Description, Pseudocode and Kernel Bank}{sec:appC}
 \input{sections/kernelsynth}
 
 \newpage
 \appendixsection{Bayesian Model Specifications}{sec:appBayes}
 \input{sections/bayesian_appendix}
+
+\newpage
+\appendixsection{The Exploratory Frequency Sweep}{sec:appSweep}
+\input{sections/sweep_appendix}
 
 \end{document}

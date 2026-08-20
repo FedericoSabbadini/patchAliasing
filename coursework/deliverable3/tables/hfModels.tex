@@ -1,9 +1,9 @@
-\begin{table*}[!b]
+\begin{table*}[!t]
     \centering
     \small
     \begin{tabular}{@{}ccccccc@{}}
         \toprule
-        \textbf{Run} & \textbf{Patch ($P$)} & \textbf{Stride ($S$)} & $O$ & \textbf{tokens} & $S \mid P$ & $P \mid S$ \\
+        \textbf{Run} & \textbf{Patch ($P$)} & \textbf{Stride ($S$)} & \textbf{Overlap ($O$)} & \textbf{Tokens} & $S \mid P$ & $P \mid S$ \\
         \midrule
         $1$ & $8$ & $4$ & $0.50$ & $511$ & yes & \textbf{no} \\
         $2$ & $8$ & $8$ & $0.00$ & $256$ & yes & yes \\
@@ -27,6 +27,6 @@
         $17$ & $32$ & $32$ & $0.00$ & $64$ & yes & yes \\
         \bottomrule
     \end{tabular}
-    \caption{The extended configurations retained for the analysis. All are retrained from scratch under the same $100$k-step budget and from the same seed ($42$). The token count is the number of patch tokens at the $2048$-sample training context. $S \mid P$ means every stride lock is also a patch null, and $P \mid S$ the converse; both hold only at $P=S$, where the two branches are the same set of frequencies.}
+    \caption{The retrained configurations of the design, with the overlap ratio $O$ of \autoref{eq:overlap} and the number of patch tokens at the $2048$-sample training context. All are trained from scratch under the same $100$k-step budget and from the same seed ($42$); the published \texttt{chronos-bolt-tiny} checkpoint is not used. The last two columns are the divisibility conditions that decide what a geometry can attribute: $S \mid P$ means every stride site $c f_s/S$ is also a patch site $k f_s/P$, so the geometry yields no stride-only frequency, and $P \mid S$ is the converse. Both hold exactly when $P=S$, where the two branches are the same set of frequencies and nothing can be attributed to either alone.}
     \label{tab:hfModels}
 \end{table*}

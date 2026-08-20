@@ -1,0 +1,15 @@
+The two figures below are the descriptive pass that precedes the Bayesian analysis, run on pure sinusoids swept from $2$ to $250$\,Hz in one-hertz steps at $f_s=512$\,Hz over the five geometries of the initial design. They are reported here rather than in the body because neither is a hypothesis test: both average over phase, use a single signal family, and carry no statement of uncertainty. Their role is to show that the phenomenon the models of \nameref{sec:four} are built to measure is present in the raw sweep. The summary statistics read off them are given in \nameref{sec:seven}.
+
+\begin{figure*}[!p]
+    \centering
+    \includegraphics[width=0.92\textwidth]{figures/FIG_ALL_reconstruction.png}
+    \caption{Behavioural reading. Each panel plots, for one geometry, the dominant frequency of the autoregressive rollout against the frequency of the tone supplied as context, averaged over the non-redundant starting phases with one standard deviation shaded. The tone is given as context, the median forecast is appended and fed back until a full window has been generated, and the dominant frequency is read as the largest magnitude of the discrete Fourier transform after the mean is removed. A point on the dotted diagonal is a tone rebuilt correctly; a flat segment is a set of distinct inputs collapsing onto one output; a jump is a tone the model rebuilds that was never supplied. Dashed verticals are the predicted candidates $\mathcal F_{\mathrm{lock}}$ of that geometry. The reading is behavioural and records what the model outputs, not what its representation retains.}
+    \label{fig:allReconstruction}
+\end{figure*}
+
+\begin{figure*}[!p]
+    \centering
+    \includegraphics[width=0.98\textwidth]{figures/FIG_ALL_spectral_recovery.png}
+    \caption{Representational reading. Each strip is one geometry, and each cell one swept frequency, coloured by the cross-validated accuracy of a linear probe trained on the internal state at the projected quantile head. The task is local and of constant difficulty at every frequency, whether a tone at $f-1$\,Hz can be separated from one at $f+1$\,Hz, and it holds out phases rather than frequencies, so no cell is inflated by a probe memorising individual frequencies. Green is accuracy at or above $0.9$, amber between $0.6$ and $0.9$, red below $0.6$, which is close to chance on a two-class task; grey marks a frequency the task does not cover, which is a statement about the design and not about the model. Dashed verticals are the predicted candidates of that geometry. Read against \autoref{fig:allReconstruction}, a frequency that is off the diagonal but still green has lost the tone at the projection rather than at the tokenisation; a red cell is the stronger condition that structural aliasing predicts.}
+    \label{fig:allSpectralRecovery}
+\end{figure*}

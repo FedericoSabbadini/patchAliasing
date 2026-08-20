@@ -230,7 +230,20 @@ When patches are contiguous and non-overlapping the two branches coincide, $\mat
 This is the most redundant geometry of the family: the only one in which every locked frequency reduces the token sequence to a single repeated vector, leaving no residual structure across tokens. It is also the default configuration of the target architecture, which operates at $P=S=16$.
 
 \subsubsection{Case 2: Overlapping Windows ($S<P$)}
-When the stride is smaller than the patch length the two branches separate. Since $f_s/S>f_s/P$, the stride comb is the sparser of the two: strictly below Nyquist it contributes $\lceil S/2 \rceil - 1$ members against the $\lceil P/2 \rceil - 1$ of the patch comb, and whenever $S$ divides $P$ the stride comb is a subset of the patch comb. Most locked frequencies in this regime therefore belong to $\mathcal{F}_{P}\setminus\mathcal{F}_{S}$, where consecutive tokens remain distinct and the sequence merely repeats with period $j>1$.
+When the stride is smaller than the patch length consecutive windows share samples, and the fraction of a patch they share is the overlap ratio
+
+\begin{equation}
+\label{eq:overlap}
+O
+=
+\frac{P-S}{P}
+\in
+[0,1),
+\end{equation}
+
+which is $0$ for contiguous patches and approaches $1$ as the stride shortens. It is the third parameter of the geometry alongside $P$ and $S$, it is fixed by them rather than chosen independently, and every later reference to overlap in this report is to this quantity.
+
+In this regime the two branches also separate. Since $f_s/S>f_s/P$, the stride comb is the sparser of the two: strictly below Nyquist it contributes $\lceil S/2 \rceil - 1$ members against the $\lceil P/2 \rceil - 1$ of the patch comb, and whenever $S$ divides $P$ the stride comb is a subset of the patch comb. Most locked frequencies in this regime therefore belong to $\mathcal{F}_{P}\setminus\mathcal{F}_{S}$, where consecutive tokens remain distinct and the sequence merely repeats with period $j>1$.
 
 Overlap does not weaken the exact condition. The derivation of \autoref{eq:collapse_S} makes no use of the relation between $P$ and $S$, so at $f\in\mathcal{F}_{S}$ consecutive tokens are still exactly equal. What overlap changes is the behaviour around a lock: adjacent windows share $P-S$ samples by construction, so two consecutive tokens are constrained to agree on their common support regardless of frequency, and the transition into repetition is correspondingly smoother. Reducing the stride at fixed patch size therefore raises the lowest member of $\mathcal{F}_{S}$, thins the stride comb below Nyquist, and softens the local shape of the effect without removing it.
 
