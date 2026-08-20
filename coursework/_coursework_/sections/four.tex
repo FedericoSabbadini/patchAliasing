@@ -1,6 +1,9 @@
-\input{tables/bayesModels.tex}
+Bayesian inference is used to test the structural-aliasing hypotheses while making the analysis assumptions and uncertainty explicit: prior assumptions are stated for each estimand, posterior uncertainty is quantified for every estimated effect, and competing hypotheses and the mitigation claim are compared without relying only on point estimates or null-hypothesis significance testing.
 
 Each hypothesis receives its own measurement, its own model and its own estimand. \autoref{tab:bayesModels} lists the models with the value each claim predicts, \autoref{tab:bayesPriors} every prior, and \autoref{tab:bayesDecisions} the rule that turns a posterior into a verdict. All are ordinary regressions; only the quantity on the left and the question the coefficient answers change between them.
+
+\input{tables/bayesModels.tex}
+\FloatBarrier
 
 Each model is built the same way: a measurement, a linear predictor $\mu_i$ that adds one offset per group the observation belongs to, and a likelihood. One coefficient is the estimand and the rest keep it unconfounded. \autoref{tab:bayesPriors} gives every prior with the role its parameter plays. The range over which the prior scale is varied as a sensitivity check is $\{0.25,0.5,1.0\}$; all are centred on no effect, so a posterior that has not moved from its prior is itself a report of an absent effect.
 
@@ -8,14 +11,14 @@ Each model is built the same way: a measurement, a linear predictor $\mu_i$ that
 The behavioural measurement is the forecast amplitude recovery $R=A_{\text{pred}}/A_{\text{true}}$, collected in matched triplets: each lock $f_k$ with its two controls, all three sharing the same background realisation and the same phase, which is what makes the contrast paired. The contrast used is
 
 \begin{equation}
-\label{eq:d3contrast}
+\label{eq:d2contrast}
 d = \log(R_k + 0.01) - \tfrac{1}{2}\left[\log(R_- + 0.01) + \log(R_+ + 0.01)\right],
 \end{equation}
 
 one number per triplet, negative when the lock recovers less than its neighbours. It can be formed only because the injected tone has a known frequency. Model~A fits it as
 
 \begin{equation}
-\label{eq:d3hier}
+\label{eq:d2hier}
 d_i \sim \text{Student-}t_4(\mu_i,\ \sigma),
 \quad
 \mu_i = \beta_{c[i]} + u_{k[i]} + u_{b[i]},
@@ -23,7 +26,7 @@ d_i \sim \text{Student-}t_4(\mu_i,\ \sigma),
 \beta_c \sim \mathcal{N}\!\left(\bar\beta + \delta_O \widetilde O_c + \delta_P \widetilde{\log P}_c,\ \tau\right).
 \end{equation}
 
-\autoref{eq:d3hier} has four components, each motivated separately.
+\autoref{eq:d2hier} has four components, each motivated separately.
 
 \begin{itemize}\setlength{\itemsep}{2pt}
     \item \textbf{Three offsets in $\mu_i$}: $\beta_c$ per configuration, $u_k$ per lock harmonic and $u_b$ per background draw, so that neither an unusual frequency nor a single corpus can be mistaken for the effect.
@@ -32,15 +35,15 @@ d_i \sim \text{Student-}t_4(\mu_i,\ \sigma),
     \item \textbf{Two configuration-level covariates}, estimable together rather than confounded because the design varies overlap and patch size independently. Overlap enters as a ratio, patch size as $\log P$ because the patch grid has spacing $f_s/P$ and equal steps in $\log P$ are equal ratios of spacing. The tilde denotes centring on the design, $\widetilde O_c=(O_c-\bar O)/0.5$ and $\widetilde{\log P}_c=\log P_c-\overline{\log P}$, which leaves $\bar\beta$ the effect at the average configuration rather than an extrapolation to $O=0$ and $P=1$.
 \end{itemize}
 
-Model~B poses the same question of the representation, on a frequency-local prequential codelength: at each $f_c$ a probe separates tones at $f_c \pm 1$\,Hz from a captured internal state. Ten states are probed: the encoder $[\mathrm{REG}]$ token after each encoder block, the decoder state after each decoder block, the pre-projection vector and the quantile head; the decoder-side vectors are named decoder states because Chronos-Bolt carries $[\mathrm{REG}]$ in the encoder only. The regression is Gamma with a log link, so $e^{\theta_{lock}}$ is the factor by which the codelength of a locked frequency increases, with probe stage and geometry as zero-mean offsets since codelengths differ several-fold between stages. The band tasks summarise hundreds of frequencies at once, so the lock indicator has nothing to attach to; they are kept as a cross-check.
+Model~B poses the same question of the representation, on a frequency-local prequential codelength: at each $f_c$ a probe separates tones at $f_c \pm 1$\,Hz from a captured internal state. Ten states are probed: the encoder $[\mathrm{REG}]$ token after each encoder block, the decoder state after each decoder block, the pre-projection vector and the quantile head; the decoder-side vectors are named decoder states because Chronos-Bolt carries $[\mathrm{REG}]$ in the encoder only. The regression is Gamma with a log link, so $e^{\theta_{lock}}$ is the factor by which the codelength of a locked frequency increases, with probe stage and geometry as zero-mean offsets since codelengths differ several-fold between stages. Deliverable~1's band tasks summarise hundreds of frequencies at once, so the lock indicator has nothing to attach to; they are kept as a cross-check.
 
 \input{tables/bayesPriors.tex}
 
 \subsection{H2}
-$H2$ uses the same triplets with one change. \autoref{eq:d3contrast} has already averaged over phase, so the phase index is kept instead and the response becomes the per-phase deficit $y_i = \log(R_{\text{ctrl},i}+0.01)-\log(R_{\text{lock},i}+0.01)$, which is $d$ with its sign reversed and positive when the lock is worse. Model~C is Model~A on that response, without the configuration-level covariates and with the phase circle cut into eight slices, each given its own offset $u_p$:
+$H2$ uses the same triplets with one change. \autoref{eq:d2contrast} has already averaged over phase, so the phase index is kept instead and the response becomes the per-phase deficit $y_i = \log(R_{\text{ctrl},i}+0.01)-\log(R_{\text{lock},i}+0.01)$, which is $d$ with its sign reversed and positive when the lock is worse. Model~C is Model~A on that response, without the configuration-level covariates and with the phase circle cut into eight slices, each given its own offset $u_p$:
 
 \begin{equation}
-\label{eq:d3phase}
+\label{eq:d2phase}
 y_i \sim \text{Student-}t_4(\mu_i,\ \sigma),
 \qquad
 \mu_i = \beta_{c[i]} + u_{k[i]} + u_{b[i]} + u_{p[i]},
@@ -51,12 +54,12 @@ u_p \sim \mathcal{N}(0, \sigma_\phi).
 The estimand $\sigma_\phi$ is the spread of those eight offsets, and it answers the question with one number. If the deficit depends on where in its cycle the signal starts, the offsets differ and $\sigma_\phi$ is large. If the geometry alone determines it, they are equal and $\sigma_\phi$ is near zero, as $H2$ predicts. Slices are used rather than a fitted curve because they assume nothing about the form a dependence might take. Dropping $u_p$ gives a nested null, and comparing the two by leave-one-out cross-validation (LOO) separates the size of the phase effect from the evidence that it exists.
 
 \subsection{H3}
-$H3$ was stated as two claims, one per branch. Both are tested on the token collapse $z_g(f)$, the dispersion of the input-patch embeddings across patches, which is zero when consecutive patches are identical. All geometries share one sweep grid: a uniform $1$\,Hz sweep unioned with the predicted sites of every configuration swept. No geometry is therefore scored only where its own theory predicts a dip, and non-integer sites such as $42.\overline{6}$\,Hz for $S{=}12$ are covered.
+$H3$ was stated in Deliverable~1 as two claims, one per branch. Both are tested on the token collapse $z_g(f)$, the dispersion of the input-patch embeddings across patches, which is zero when consecutive patches are identical. All geometries share one sweep grid: a uniform $1$\,Hz sweep unioned with the predicted sites of every configuration swept. No geometry is therefore scored only where its own theory predicts a dip, and non-integer sites such as $42.\overline{6}$\,Hz for $S{=}12$ are covered.
 
 The first question is where the dips are located. Each swept frequency carries two labels, one per branch:
 
 \begin{equation}
-\label{eq:d3sites}
+\label{eq:d2sites}
 \log z_g(f) \sim \mathcal{N}\!\left(
 \alpha_g + \theta_S \cdot \text{OnStrideGrid} + \theta_P \cdot \text{OnPatchGrid},\ \sigma
 \right).
@@ -67,7 +70,7 @@ The logarithm makes the labels multiplicative on the per-geometry off-grid level
 The second question is whether the dips move. The fit above remains compatible with dips that merely sit on a fixed grid, so each branch is checked against its own scaling law. Every detected dip is assigned to the branch that predicts it, and sites belonging to both are set aside. The fundamental $\hat f^{\,F}_{1,g}$ of branch $F$ in geometry $g$ is then compared with the spacing that branch predicts, $\Delta^S_g=f_s/S_g$ or $\Delta^P_g=f_s/P_g$:
 
 \begin{equation}
-\label{eq:d3move}
+\label{eq:d2move}
 \hat f^{\,F}_{1,g} \sim \mathcal{N}\!\left(
 \kappa_F \,\Delta^F_g,\ \sqrt{\sigma_F^2+\Delta f^2}
 \right).
