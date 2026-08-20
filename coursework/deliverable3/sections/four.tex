@@ -12,7 +12,7 @@ Three claims are carried into the analysis, each stated so that a particular pos
 
 \input{tables/bayesPriors.tex}
 
-Each claim receives its own measurement, model and estimand. All the models are ordinary regressions built the same way: a measurement, a linear predictor $\mu_i$ carrying one offset per group the observation belongs to, and a likelihood, of which one coefficient is the estimand and the rest keep it unconfounded. \autoref{tab:bayesPriors} gives every prior with its role, and \autoref{sec:appBayes} states each model in full. Every effect prior is centred on no effect, and its scale is varied over $\{0.25,0.5,1.0\}$ as a sensitivity check.
+Each claim receives its own measurement, model and estimand. All the models are ordinary regressions built the same way: a measurement, a linear predictor $\mu_i$ carrying one offset per group the observation belongs to, and a likelihood, of which one coefficient is the estimand and the rest keep it unconfounded. \autoref{tab:bayesPriors} gives every prior with its role, and \autoref{sec:appBayes} states each model in full. Every effect prior is centred on no effect, and its scale is varied over the sensitivity ladder $\{0.25,0.5,1.0\}$, sceptical, primary and wide, so that a conclusion resting on the choice of scale rather than on the data is detected as such.
 
 \subsection{$H1$}
 

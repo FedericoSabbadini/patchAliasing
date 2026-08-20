@@ -48,7 +48,7 @@ The estimand is $\bar\beta$, reported as $e^{\bar\beta}$: the multiplicative cha
 
 Model~B replaces the forecast with a measurement of the internal state. At each candidate frequency $f_c$, examples are drawn at $f_c-1$\,Hz and $f_c+1$\,Hz, the representation is captured, and a linear probe is charged the prequential description length of the labels\autocite{voitaInformationTheoreticProbingMinimum2020}: the data are split into successive chunks, each chunk encoded by a probe trained only on the chunks before it, and the cost accumulated in bits. A probe that memorises noise pays for itself and gains nothing, which is why description length is preferred to accuracy. The reading is direct: at a frequency whose neighbourhood has become linearly indistinguishable in representation space, the labels cost more bits.
 
-Ten states are probed per geometry: the encoder $[\mathrm{REG}]$ token after each of the four encoder blocks, the decoder state after each of the four decoder blocks, the pre-projection vector and the projected quantile head. The decoder-side vectors are named decoder states rather than $[\mathrm{REG}]$ tokens because Chronos-Bolt carries $[\mathrm{REG}]$ in the encoder only and the decoder is entered through a single start token.
+Ten states are probed per geometry: the encoder $[\mathrm{REG}]$ token after each of the four encoder blocks, the decoder state after each of the four decoder blocks, the pre-projection vector and the output quantile head. The decoder-side vectors are named decoder states rather than $[\mathrm{REG}]$ tokens because Chronos-Bolt carries $[\mathrm{REG}]$ in the encoder only and the decoder is entered through a single start token.
 
 The fit is
 
