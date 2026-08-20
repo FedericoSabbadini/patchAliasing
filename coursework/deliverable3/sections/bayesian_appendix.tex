@@ -2,6 +2,14 @@ This appendix states in full the five models summarised in \nameref{sec:four}. \
 
 \input{tables/bayesModels.tex}
 
+\subsection{Sampling and diagnostics}
+
+Every model is fitted by the No-U-Turn sampler with the same settings, so that none receives a more or less careful exploration than another: four independent chains, $2000$ warm-up draws per chain used to adapt the step size and discarded, $2000$ retained draws per chain, and a target acceptance rate of $0.9$, which trades a shorter step for a more cautious traversal of the posterior geometry. Group effects are written non-centred, $u=\sigma_u z$ with $z\sim\mathcal N(0,1)$: the two forms are the same distribution, but the first removes the funnel that produces divergences when a group scale is small, which is exactly what is expected if $H2$ holds.
+
+Three diagnostics are preregistered and gate interpretation. $\hat R<1.01$ measures agreement between the four chains, and values near one indicate that each has converged to the same distribution. Bulk and tail effective sample size above $1000$ counts the genuinely independent draws remaining after correcting for autocorrelation, the tail figure guarding the interval endpoints that the credible intervals are read from. Zero divergences requires that the sampler encountered no geometric pathology it could not traverse. A fit failing any of the three is not used to support a claim, although it may still be reported.
+
+Where two formulations compete they are compared by leave-one-out cross-validation. The quantity read is the difference in expected log pointwise predictive density, $\mathrm{elpd\_diff}$, with its standard error $\mathrm{dse}$; a difference smaller than twice its standard error is reported as inconclusive rather than rounded into a decision, so that a nominal ranking is not mistaken for evidence.
+
 \subsection{Model A, the behavioural reading of $H1$}
 
 Model~A is fitted to the paired contrast of \autoref{eq:d2contrast},
@@ -38,7 +46,7 @@ The estimand is $\bar\beta$, reported as $e^{\bar\beta}$: the multiplicative cha
 
 \subsection{Model B, the representational reading of $H1$}
 
-Model~B replaces the forecast with a measurement of the internal state. At each candidate frequency $f_c$, examples are drawn at $f_c-1$\,Hz and $f_c+1$\,Hz, the representation is captured, and a linear probe is charged the prequential description length of the labels: the data are split into successive chunks, each chunk encoded by a probe trained only on the chunks before it, and the cost accumulated in bits. A probe that memorises noise pays for itself and gains nothing, which is why description length is preferred to accuracy. The reading is direct: at a frequency whose neighbourhood has become linearly indistinguishable in representation space, the labels cost more bits.
+Model~B replaces the forecast with a measurement of the internal state. At each candidate frequency $f_c$, examples are drawn at $f_c-1$\,Hz and $f_c+1$\,Hz, the representation is captured, and a linear probe is charged the prequential description length of the labels\autocite{voitaInformationTheoreticProbingMinimum2020}: the data are split into successive chunks, each chunk encoded by a probe trained only on the chunks before it, and the cost accumulated in bits. A probe that memorises noise pays for itself and gains nothing, which is why description length is preferred to accuracy. The reading is direct: at a frequency whose neighbourhood has become linearly indistinguishable in representation space, the labels cost more bits.
 
 Ten states are probed per geometry: the encoder $[\mathrm{REG}]$ token after each of the four encoder blocks, the decoder state after each of the four decoder blocks, the pre-projection vector and the projected quantile head. The decoder-side vectors are named decoder states rather than $[\mathrm{REG}]$ tokens because Chronos-Bolt carries $[\mathrm{REG}]$ in the encoder only and the decoder is entered through a single start token.
 

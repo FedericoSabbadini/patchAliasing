@@ -5,28 +5,26 @@
         \toprule
         \textbf{Run} & \textbf{Patch ($P$)} & \textbf{Stride ($S$)} & \textbf{Overlap ($O$)} & \textbf{Tokens} & $S \mid P$ & $P \mid S$ \\
         \midrule
-        $1$ & $8$ & $4$ & $0.50$ & $511$ & yes & \textbf{no} \\
-        $2$ & $8$ & $8$ & $0.00$ & $256$ & yes & yes \\
+        $1$ & $8$ & $8$ & $0.00$ & $256$ & yes & yes \\
         \midrule
-        $3$ & $16$ & $4$ & $0.75$ & $509$ & yes & \textbf{no} \\
-        $4$ & $16$ & $8$ & $0.50$ & $255$ & yes & \textbf{no} \\
-        $5$ & $16$ & $12$ & $0.25$ & $170$ & \textbf{no} & \textbf{no} \\
-        $6$ & $16$ & $16$ & $0.00$ & $128$ & yes & yes \\
+        $2$ & $16$ & $8$ & $0.50$ & $255$ & yes & \textbf{no} \\
+        $3$ & $16$ & $12$ & $0.25$ & $170$ & \textbf{no} & \textbf{no} \\
+        $4$ & $16$ & $16$ & $0.00$ & $128$ & yes & yes \\
         \midrule
-        $7$ & $24$ & $8$ & $0.67$ & $254$ & yes & \textbf{no} \\
-        $8$ & $24$ & $12$ & $0.50$ & $169$ & yes & \textbf{no} \\
-        $9$ & $24$ & $16$ & $0.33$ & $127$ & \textbf{no} & \textbf{no} \\
-        $10$ & $24$ & $20$ & $0.17$ & $102$ & \textbf{no} & \textbf{no} \\
-        $11$ & $24$ & $24$ & $0.00$ & $85$ & yes & yes \\
+        $5$ & $24$ & $8$ & $0.67$ & $254$ & yes & \textbf{no} \\
+        $6$ & $24$ & $12$ & $0.50$ & $169$ & yes & \textbf{no} \\
+        $7$ & $24$ & $16$ & $0.33$ & $127$ & \textbf{no} & \textbf{no} \\
+        $8$ & $24$ & $20$ & $0.17$ & $102$ & \textbf{no} & \textbf{no} \\
+        $9$ & $24$ & $24$ & $0.00$ & $85$ & yes & yes \\
         \midrule
-        $12$ & $32$ & $8$ & $0.75$ & $253$ & yes & \textbf{no} \\
-        $13$ & $32$ & $12$ & $0.62$ & $169$ & \textbf{no} & \textbf{no} \\
-        $14$ & $32$ & $16$ & $0.50$ & $127$ & yes & \textbf{no} \\
-        $15$ & $32$ & $20$ & $0.38$ & $101$ & \textbf{no} & \textbf{no} \\
-        $16$ & $32$ & $24$ & $0.25$ & $85$ & \textbf{no} & \textbf{no} \\
-        $17$ & $32$ & $32$ & $0.00$ & $64$ & yes & yes \\
+        $10$ & $32$ & $8$ & $0.75$ & $253$ & yes & \textbf{no} \\
+        $11$ & $32$ & $12$ & $0.62$ & $169$ & \textbf{no} & \textbf{no} \\
+        $12$ & $32$ & $16$ & $0.50$ & $127$ & yes & \textbf{no} \\
+        $13$ & $32$ & $20$ & $0.38$ & $101$ & \textbf{no} & \textbf{no} \\
+        $14$ & $32$ & $24$ & $0.25$ & $85$ & \textbf{no} & \textbf{no} \\
+        $15$ & $32$ & $32$ & $0.00$ & $64$ & yes & yes \\
         \bottomrule
     \end{tabular}
-    \caption{The retrained configurations of the design, with the overlap ratio $O$ of \autoref{eq:overlap} and the number of patch tokens at the $2048$-sample training context. All are trained from scratch under the same $100$k-step budget and from the same seed ($42$); the published \texttt{chronos-bolt-tiny} checkpoint is not used. The last two columns are the divisibility conditions that decide what a geometry can attribute: $S \mid P$ means every stride site $c f_s/S$ is also a patch site $k f_s/P$, so the geometry yields no stride-only frequency, and $P \mid S$ is the converse. Both hold exactly when $P=S$, where the two branches are the same set of frequencies and nothing can be attributed to either alone.}
+    \caption{The fifteen configurations carried into the analysis, with the overlap ratio $O$ of \autoref{eq:overlap} and the number of patch tokens at the $2048$-sample training context. All are trained from scratch under the same $100$k-step budget and from the same seed ($42$); the published \texttt{chronos-bolt-tiny} checkpoint is not used. The last two columns are the divisibility conditions that decide what a geometry can attribute: $S \mid P$ means every stride site $c f_s/S$ is also a patch site $k f_s/P$, so the geometry yields no stride-only frequency, and $P \mid S$ is the converse. Both hold exactly when $P=S$, where the two branches are the same set of frequencies and nothing can be attributed to either alone.}
     \label{tab:hfModels}
 \end{table*}
