@@ -30,6 +30,33 @@
 \addbibresource{patchAliasing.bib} % BibLaTeX bibliography file
 
 \usepackage{float} % enables the [H] float specifier to pin figures/tables in place
+\usepackage{stfloats} % a table* may only be [t] or [p] by default; this adds [b]
+\usepackage{placeins} % keeps the Bayesian model table inside its section
+
+%----------------------------------------------------------------------------------------
+% ONTOLOGY APPENDIX SUPPORT
+%----------------------------------------------------------------------------------------
+
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, shapes.geometric}
+
+% pv: a class, an object property or a data property of the ontology
+% valueof: a named individual of one of the closed vocabularies
+\newcommand{\pv}[1]{\texttt{pv:#1}}
+\newcommand{\valueof}[1]{\textsf{#1}}
+
+% The ontology appendix is table-heavy, so allow LaTeX to place its floats
+% without deferring the whole queue to the end of the document.
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.6}
+\renewcommand{\dbltopfraction}{0.9}
+\renewcommand{\textfraction}{0.07}
+\renewcommand{\floatpagefraction}{0.75}
+\renewcommand{\dblfloatpagefraction}{0.75}
+\setcounter{topnumber}{3}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{5}
+\setcounter{dbltopnumber}{3}
 
 \runninghead{Structural Aliasing Analysis in Time-Series Forecasting Using Chronos} % A shortened article title to appear in the running head, leave this command empty for no running head
 
@@ -71,7 +98,7 @@
 \section{Ontology Domain Description} \label{sec:three}
 \input{sections/three}
 
-\section{Bayesian Hypothesis} \label{sec:four}
+\section{Bayesian Analysis} \label{sec:four}
 \input{sections/four}
 
 \section{Signal Generation and Testing} \label{sec:five}
@@ -95,8 +122,15 @@
 \printbibliography
 
 \newpage
-\appendixsection{Ontology Representation}{sec:appendix_ontology}
-\input{sections/ontology}
+\appendixsection{Ontology of the Photovoltaic Application Domain}{sec:appendixA}
+\begingroup
+\makeatletter
+\def\input@path{{../delivered/deliverable_2/deliverable2_v0/}}
+\makeatother
+\let\section\subsection
+\let\subsection\subsubsection
+\input{../delivered/deliverable_2/deliverable2_v0/sections/ontology.tex}
+\endgroup
 
 \newpage
 \appendixsection{Light TSMixup Pseudocode}{sec:appB}
