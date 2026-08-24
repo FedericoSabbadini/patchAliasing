@@ -1,4 +1,4 @@
-Let $\mathbf{x} = \{x[n]\}_{n \in \mathbb{Z}}$ be a discrete-time signal representing the input time series. We define the patch-based tokenization operator $\mathcal{T}_{P,S}$ with patch length $P \in \mathbb{N}^{+}$ and stride $S \in \mathbb{N}^{+}$ as a mapping that transforms the signal $\mathbf{x}$ into a sequence of vector-valued tokens $\mathbf{T}=\{\mathbf{t}_k\}_{k\in\mathbb{Z}}$, where each token $\mathbf{t}_k\in\mathbb{R}^{P}$.
+Let $\mathbf{x} = \{x[n]\}_{n \in \mathbb{N}}$, with $\mathbb{N}=\{0,1,\ldots\}$, be a discrete-time signal representing the input time series. We define the patch-based tokenization operator $\mathcal{T}_{P,S}$ with patch size $P \in \mathbb{N}^{+}$ and stride $S \in \mathbb{N}^{+}$ as a mapping that transforms the signal $\mathbf{x}$ into a sequence of vector-valued tokens $\mathbf{T}=\{\mathbf{t}_k\}_{k\in\mathbb{N}}$, where each token $\mathbf{t}_k\in\mathbb{R}^{P}$.
 
 The $k$-th token is defined as
 
@@ -26,23 +26,3 @@ x[kS+m],
 \qquad
 m\in\{0,\ldots,P-1\}.
 \end{equation}
-
-Before examining the degeneracies of this operator it is worth fixing what it does
-not do. Whenever $S\le P$, every sample of the input appears in at least one
-token and can be read back from it: taking $k=\lfloor n/S\rfloor$ and
-$m = n \bmod S \le S-1 \le P-1$ in \autoref{eq:element_def} gives
-
-\begin{equation}
-\label{eq:reconstruction}
-x[n]
-=
-\mathbf{t}_{\lfloor n/S\rfloor}\!\left[n \bmod S\right],
-\qquad
-S\le P.
-\end{equation}
-
-Complete raw patching with $S\le P$ is therefore injective: the token sequence
-determines the signal, and no frequency below Nyquist is destroyed by tokenization
-itself. Everything that follows concerns redundancy in the token sequence
-rather than loss of information, the single exception being the $S>P$ regime of
-Case 3 below, where the operator does discard samples.
