@@ -45,8 +45,7 @@
 
 % The class sets subsubsections as run-in headings, which makes the stages of a multi-part
 % procedure indistinguishable from emphasised text. They are given their own line instead.
-\titleformat
-	{\subsubsection}
+\titleformat{\subsubsection}
 	[block]
 	{\raggedright\normalsize\bfseries}
 	{\thesubsubsection}
@@ -101,40 +100,40 @@
 \begin{document}
 \maketitle
 
-\section{Time-Series Forecasting} \label{sec:introduction}
+\section{Time-Series Forecasting}\label{sec:introduction}
 \input{sections/introduction}
 
-\section{Patch-Based Tokenization: a Formal Description} \label{sec:one}
+\section{Patch-Based Tokenization: a Formal Description}\label{sec:one}
 \input{sections/one}
 
-\section{Phase Locking} \label{sec:two}
+\section{Phase Locking}\label{sec:two}
 \input{sections/two}
 
-\section{Ontology Domain Description} \label{sec:three}
+\section{Ontology Domain Description}\label{sec:three}
 \input{sections/three}
 
-\section{Bayesian Analysis} \label{sec:four}
+\section{Expected Behaviors of Blind Spots Frequencies}\label{sec:four}
 \input{sections/four}
 
-\section{Signal Generation, Experimental Setup and Workflow} \label{sec:five}
+\section{Signal Generation, Experimental Setup and Workflow}\label{sec:five}
 \input{sections/five}
 
-\section{Bayesian Results} \label{sec:seven}
+\section{Bayesian Results}\label{sec:seven}
 \input{sections/seven}
 
-\section{Mitigation and Agentic Deployment} \label{sec:eight}
+\section{Mitigation and Agentic Deployment}\label{sec:eight}
 \input{sections/eight}
 
-\section{Security Risk Assessment} \label{sec:ten}
+\section{Security Risk Assessment}\label{sec:ten}
 \input{sections/ten}
 
-\printbibliography
+\printbibliography[]
 
 \newpage
 \appendixsection{Ontology of the Photovoltaic Application Domain}{sec:appendixA}
 \begingroup
-\let\section\subsection
-\let\subsection\subsubsection
+\let\section\subsection[]
+\let\subsection\subsubsection[]
 \input{sections/ontology.tex}
 \endgroup
 
