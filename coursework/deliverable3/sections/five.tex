@@ -1,12 +1,12 @@
-Testing the hypotheses of \nameref{sec:four} requires a design in which the two branches of $\mathcal F_{\mathrm{lock}}$ can be told apart, signals whose frequency content is known by construction, and an order of execution in which nothing that decides a hypothesis is chosen after the data have been seen. This section fixes all three.
+Testing the hypotheses of \nameref{sec:four} requires a design in which the two branches of $\mathcal F_{\mathrm{lock}}$ can be told apart, signals whose frequency content is known by construction, and an order of execution in which nothing that decides a hypothesis is chosen after the data have been seen.
 
 \subsection{The grid of geometries}
 
-Since any change to $P$ or $S$ requires retraining, the design is a grid of variants trained from scratch rather than a set of published checkpoints, each described by its patch size, its stride and the overlap ratio $O$ of \autoref{eq:overlap}. Configurations with $S>P$ are excluded by construction: they leave $S-P$ unobserved samples between consecutive patches, so their loss is one of discarded samples and not of tokenisation geometry, as \nameref{sec:two} sets out.
+Since any change to $P$ or $S$ requires retraining due to modification of the weight matrix and to internal representation respectively when P and S are varied. The design is a grid of variants trained from scratch, configurations with $S>P$ are excluded by construction.
 
 \input{tables/hfModels.tex}
 
-\autoref{tab:hfModels} lists the retrained runs, and two properties of the grid do the identifying work. First, $P$ and $S$ vary independently: series at fixed $P$ with varying $S$ ($P\in\{16,24,32\}$) isolate the stride, while series at fixed $S$ with varying $P$ ($S\in\{8,12,16\}$) isolate the patch. This is what lets Models~A, D1 and~D2 separate the two branches and estimate the overlap and patch-size covariates without confounding them. Second, the divisibility columns decide whether a geometry can attribute anything at all: where $S \mid P$ every stride site is also a patch site and no stride-only frequency exists, and at $P=S$ the two combs coincide entirely. Six of the fifteen runs have $S \nmid P$, and those are the ones on which $\theta_S$ and $\kappa_S$ rest. All share the same training budget and seed, so a difference between them is a difference of geometry and not of training.
+\autoref{tab:hfModels} lists the retrained runs, $P$ and $S$ vary independently: series at fixed $P$ with varying $S$ isolate the stride, while series at fixed $S$ with varying $P$ isolate the patch. This is what lets Models~A, D1 and~D2 separate the two branches and estimate the overlap and patch-size covariates without confounding them. Six of the fifteen runs have $S \nmid P$, and those are the ones on which $\theta_S$ and $\kappa_S$ rest. All share the same training budget and seed, so a difference between them is a difference of geometry and not of training.
 
 \subsection{Signal generators}
 
