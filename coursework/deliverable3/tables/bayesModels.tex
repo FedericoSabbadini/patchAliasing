@@ -5,13 +5,13 @@
         \toprule
         \textbf{Model} & \textbf{Claim} & \textbf{Estimand} & \textbf{Predicts} & \textbf{Input} \\
         \midrule
-        A  & $H1$ behavioural      & $e^{\bar\beta}$: recovery at a lock / at its controls   & $<1$        & \texttt{contrasts} \\
-        B  & $H1$ representational & $e^{\theta_{\mathrm{lock}}}$: codelength at a lock / elsewhere   & $>1$        & \texttt{mdl\_cells} \\
-        C  & $H2$                  & $\sigma_\phi$: spread of the deficit across phase       & $\approx 0$ & \texttt{contrasts} \\
-        D1 & $H3$ location         & $\theta_S,\theta_P$: dip depth on each grid, by LOO     & both $<0$   & \texttt{collapse} \\
-        D2 & $H3a$ stride branch   & $\kappa_S$: measured / stride-predicted spacing         & $=1$        & \texttt{sites} \\
-        D2 & $H3b$ patch branch    & $\kappa_P$: measured / patch-predicted spacing          & $=1$        & \texttt{sites} \\
-        A$'$ & $M1$ mitigation     & $\delta_O$: change in the deficit per unit of overlap   & $<0$        & \texttt{contrasts} \\
+        A  & $H1$ behavioural      & $e^{\bar\beta}$: recovery at a lock / at its controls   & $e^{\bar\beta}<1$        & \texttt{contrasts} \\
+        B  & $H1$ representational & $e^{\theta_{\mathrm{lock}}}$: codelength at a lock / elsewhere   & $e^{\theta_{\mathrm{lock}}}>1$        & \texttt{mdl\_cells} \\
+        C  & $H2$                  & $\sigma_\phi$: spread of the deficit across phase       & $\sigma_\phi\approx 0$ & \texttt{contrasts} \\
+        D1 & $H3$ location         & $\theta_S,\theta_P$: dip depth on each grid, by LOO     & $\theta_S,\theta_P<0$   & \texttt{collapse} \\
+        D2 & $H3a$ stride branch   & $\kappa_S$: measured / stride-predicted spacing         & $\kappa_S=1$        & \texttt{sites} \\
+        D2 & $H3b$ patch branch    & $\kappa_P$: measured / patch-predicted spacing          & $\kappa_P=1$        & \texttt{sites} \\
+        A$'$ & $M1$ mitigation     & $\delta_O$: change in the deficit per unit of overlap   & $\delta_O<0$        & \texttt{contrasts} \\
         \bottomrule
     \end{tabular}
     \caption{The models, the quantity whose posterior decides each claim, the value the claim predicts, and the probing table each is fitted to. $H1$ is tested twice, on the forecast (A) and on the representation (B), so that a discrepancy between them stays visible. $H3$ is split into its two branches, since $\mathcal F_{lock}$ is a union and a frequency may belong to either. $M1$ is not a separate model but the configuration level of A, promoted to a named estimand.}

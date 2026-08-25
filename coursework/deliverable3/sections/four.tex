@@ -67,7 +67,7 @@ The estimand $\sigma_\phi$ is the spread of those eight offsets, which reduces t
 
 Both branches are tested on the token collapse $z_g(f)$, the dispersion, in geometry $g$ and at frequency $f$, of the input-patch embeddings across the patches of one context; it is zero when consecutive patches are identical. All geometries are swept on one common grid, the union of a uniform one-hertz sweep with the predicted sites of every configuration in the design, so that no geometry is scored only where its own theory predicts a dip.
 
-The first question is where the dips are located. Each swept frequency carries two binary labels, one per branch, recording whether it lies on the stride grid $\mathcal{F}_{S}$ or on the patch grid $\mathcal{F}_{P}$, the two families defined in \autoref{eq:branches}:
+The first question is where the dips are located, and Model~D1 answers it. Each swept frequency carries two binary labels, one per branch, recording whether it lies on the stride grid $\mathcal{F}_{S}$ or on the patch grid $\mathcal{F}_{P}$, the two families defined in \autoref{eq:branches}:
 
 \begin{equation}
 \label{eq:d2sites}
@@ -78,7 +78,7 @@ The first question is where the dips are located. Each swept frequency carries t
 
 with $\alpha_g$ the per-geometry off-grid level, and the label coefficients $\theta_S$ and $\theta_P$ as estimands. $H3$ predicts both negative, and the two-label fit should win the LOO comparison against each label alone and against neither; coefficients near zero mean the dips bear no relation to either grid.
 
-The second question is whether the dips move, since \autoref{eq:d2sites} remains compatible with dips that merely sit on a grid fixed once and for all. Every detected dip is assigned to the branch that predicts it and sites predicted by both are set aside, since the union of two combs has two interlaced spacings rather than one. The fundamental $\hat f^{\,F}_{1,g}$ of branch $F$ in geometry $g$, its lowest detected site, is then compared with the spacing that branch predicts, $\Delta^S_g=f_s/S_g$ or $\Delta^P_g=f_s/P_g$:
+The second question is whether the dips move, and Model~D2 answers it, since \autoref{eq:d2sites} remains compatible with dips that merely sit on a grid fixed once and for all. Every detected dip is assigned to the branch that predicts it and sites predicted by both are set aside, since the union of two combs has two interlaced spacings rather than one. The fundamental $\hat f^{\,F}_{1,g}$ of branch $F$ in geometry $g$, its lowest detected site, is then compared with the spacing that branch predicts, $\Delta^S_g=f_s/S_g$ or $\Delta^P_g=f_s/P_g$:
 
 \begin{equation}
 \label{eq:d2move}
@@ -90,4 +90,26 @@ The second question is whether the dips move, since \autoref{eq:d2sites} remains
 The slope $\kappa_F$ is the estimand, measured spacing per unit of predicted spacing, and the residual scatter $\sigma_F$ is given the floor $\Delta f$, the sweep step, because a spacing read off a discrete grid is no more precise than one step. $\kappa_F=1$ denotes a branch that tracks its own arithmetic, and any other value refutes that branch. Identification here is a property of the design and not of the model, since $\kappa_S$ requires a series holding $P$ fixed while $S$ varies and $\kappa_P$ the converse; \autoref{tab:hfModels} supplies both.
 
 \subsection{The mitigation claim}
-The configuration-level slope $\delta_O$ of the same fit carries $M1$ and is read in \nameref{sec:eight}.
+
+$M1$ is not a separate model but the configuration level of Model~A promoted to an estimand. It asserts that raising the overlap $O$ reduces the deficit, and is therefore read off the population line of \autoref{eq:d2hier},
+
+\begin{equation}
+\label{eq:d2mitigation}
+\mathbb{E}\!\left[\beta_c\right] = \bar\beta + \delta_O\,\widetilde O_c + \delta_P\,\widetilde{\log P}_c,
+\qquad
+\widetilde O_c=\frac{O_c-\bar O}{0.5},
+\qquad
+\widetilde{\log P}_c=\log P_c-\overline{\log P},
+\end{equation}
+
+where the tilde denotes centring on the design, which leaves $\bar\beta$ the effect at the average configuration rather than an extrapolation to $O=0$ and $P=1$. The two covariates are estimable jointly because \autoref{tab:hfModels} varies overlap and patch size independently. Model~A$'$ denotes Model~A read at this level, and the estimand is $\delta_O$, the change in the contrast per unit of centred overlap. $\delta_O<0$ is the mitigation $M1$ predicts; a slope at or above zero refutes it. The verdict is reported in \nameref{sec:eight}.
+
+\input{tables/bayesModels.tex}
+
+\subsection{Decisions and validation}
+
+Every threshold in \autoref{tab:bayesDecisions} is fixed before a posterior is inspected, and validation comes before interpretation. Beside each rule the table records the probability that the rule already scored under the prior, so that a posterior counts as evidence only in so far as it has moved away from that value. A claim is supported at $0.95$, refuted at $0.05$, and otherwise reported as inconclusive, which is a verdict in its own right.
+
+\input{tables/bayesDecisions.tex}
+
+Interpretation is gated by three preregistered convergence diagnostics, and competing formulations are compared by leave-one-out cross-validation under a reading rule that returns an inconclusive verdict for differences within twice their standard error. The diagnostics, the reading rule and the sampler settings shared by every fit are stated in \autoref{sec:appBayes}; a fit failing any diagnostic is not used to support a claim.
