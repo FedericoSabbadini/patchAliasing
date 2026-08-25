@@ -1,4 +1,4 @@
-This appendix states in full the five models summarised in \nameref{sec:four} and listed side by side in \autoref{tab:bayesModels}. For each, what follows gives what it measures, how the measurement is constructed, and what every parameter of it means. The equations are repeated here so that the appendix can be read on its own.
+This appendix states in full the five models summarised in \nameref{sec:four}, together with the reading of Model~A that carries the mitigation claim $M1$. For each, what follows gives what it measures, how the measurement is constructed, and what every parameter of it means. The equations are repeated here so that the appendix can be read on its own; the correspondence between claims, models, estimands and probing tables is the one given by \autoref{tab:bayesModels} in that section, and is not tabulated again here.
 
 \subsection{Sampling and diagnostics}
 
@@ -40,7 +40,7 @@ The configuration effects $\beta_c$ are in turn drawn around a population mean, 
 
 Two configuration-level covariates enter that population mean, and they are estimable together rather than confounded because the design varies overlap and patch size independently. Overlap enters as a ratio and patch size as $\log P$, because the patch grid has spacing $f_s/P$ and equal steps in $\log P$ are equal ratios of spacing. The tilde denotes centring on the design, $\widetilde O_c=(O_c-\bar O)/0.5$ and $\widetilde{\log P}_c=\log P_c-\overline{\log P}$, which leaves $\bar\beta$ the effect at the average configuration rather than an extrapolation to $O=0$ and $P=1$.
 
-The estimand is $\bar\beta$, reported as $e^{\bar\beta}$: the multiplicative change in forecast amplitude recovery at a candidate frequency relative to its controls. The overlap slope $\delta_O$ is not a separate model but this same configuration level promoted to a named estimand, and it carries $M1$.
+The estimand is $\bar\beta$, reported as $e^{\bar\beta}$: the multiplicative change in forecast amplitude recovery at a candidate frequency relative to its controls. The overlap slope $\delta_O$ of that same population mean is a second estimand of the same fit, and it carries $M1$; it is stated in full at the end of this appendix.
 
 \subsection{Model B, the representational reading of $H1$}
 
@@ -111,3 +111,26 @@ Where D1 says where the dips sit, D2 asks whether they move. Sites are detected 
 The slope $\kappa_F$ is the estimand: measured spacing per unit of predicted spacing, so $\kappa_F=1$ is a branch that tracks its own arithmetic one for one, and its prior is centred on $0$, no relationship, so the hypothesis has to be earned from the data. The residual carries the floor $\Delta f$, the sweep step, because a spacing read off a discrete grid is no more precise than one step; without it, sites landing exactly on the prediction drive $\sigma_F$ to zero and the posterior develops a funnel the sampler cannot traverse. With the floor, a near-zero $\sigma_F$ is a result rather than a sampler failure.
 
 Both the fundamental and the median gap between successive sites are fitted. With three or four sites in band a single spurious detection inserts a short interval and flips the median, to which the fundamental is immune, so a disagreement between the two is itself informative about the stability of the detection.
+
+\subsection{Model A$'$, the mitigation claim $M1$}
+
+$M1$ claims that the deficit Model~A measures is smaller where consecutive patches overlap more. It is not a separate fit. It is the configuration level of \autoref{eq:appA:model} read as an estimand, so the posterior that decides it is drawn from the same chains, on the same rows, as the posterior for $\bar\beta$; the prime in Model~A$'$ marks a reading of Model~A and not a second model. Written on its own, that level is
+
+\begin{equation}
+\label{eq:appM1:model}
+\beta_c \sim \mathcal{N}\!\left(\bar\beta + \delta_O \widetilde O_c + \delta_P \widetilde{\log P}_c,\ \tau\right),
+\qquad
+\widetilde O_c=\frac{O_c-\bar O}{0.5},
+\qquad
+\widetilde{\log P}_c=\log P_c-\overline{\log P},
+\end{equation}
+
+with $O_c=(P_c-S_c)/P_c$ the overlap ratio of \autoref{eq:overlap} and the averages $\bar O$ and $\overline{\log P}$ taken over the fifteen configurations of \autoref{tab:hfModels}.
+
+Each term has a distinct role. The response $\beta_c$ is the configuration effect of \autoref{eq:appA:model}, that is the deficit of geometry $c$ on the log-recovery scale of \autoref{eq:appA:contrast}, so a more negative $\beta_c$ is a geometry that rebuilds a candidate frequency worse relative to its own controls. The intercept $\bar\beta$ is the deficit at the average configuration of the design rather than at $O=0$ and $P=1$, which is what the centring buys: an uncentred fit would report an intercept extrapolated to a geometry that is not in the grid and is not meaningful for a patch size of one sample. The slope $\delta_O$ is the estimand of $M1$: the change in the configuration effect per unit of centred overlap, one unit being half of the raw ratio, so that the design spans about a unit and a half, from $\widetilde O=-0.66$ at $O=0$ to $\widetilde O=0.84$ at $O=0.75$. Its sign is the whole claim, and the orientation of the response is what fixes the reading: on the contrast of \autoref{eq:appA:contrast}, where attenuation at the candidate is negative, an overlap that mitigates lifts $\beta_c$ towards zero, whereas on the sign-flipped deficit $y=-d$ used by Model~C the same mitigation lowers it. The rule that decides $M1$, and the orientation it is stated on, are those of \autoref{tab:bayesDecisions}. A slope indistinguishable from zero, on either orientation, says that overlap does not move the effect at all. The slope $\delta_P$ carries patch size, entered as $\log P$ because the patch comb has spacing $f_s/P$ and equal steps in $\log P$ are equal ratios of spacing rather than equal numbers of hertz. It is not the object of any claim, but it must be in the model: overlap and patch size are two coordinates of the same pair $(P,S)$, and omitting one would load its variation onto the other. The scale $\tau$ is what remains of the spread between configurations once both covariates have been removed, so a $\tau$ that has not shrunk away from its prior is a report that the two design axes explain little of what separates the geometries, however large the slopes.
+
+Identification is a property of the grid rather than of the model. Because \autoref{tab:hfModels} varies $S$ at fixed $P$ and $P$ at fixed $S$, the two centred covariates are not collinear across the fifteen runs: their correlation is $0.43$, high enough to matter but far from the degeneracy of a design in which overlap could only be raised by enlarging the patch, where a single direction would be estimable and its decomposition into $\delta_O$ and $\delta_P$ arbitrary. The prior on both slopes is $\text{Student-}t_4(0,0.5)$, centred on no effect and varied over the sensitivity ladder $\{0.25,0.5,1.0\}$ with the rest of Model~A, so a mitigation reported at one scale and absent at another is detected as a property of the prior.
+
+The decision rule has two legs, and the second is not decoration. A posterior sign probability starts at $0.50$ under a prior symmetric about zero, so $\Pr(\delta_O<0\mid D)\ge 0.95$ alone would let a slope that is small but consistently signed count as mitigation; the rule therefore also requires that the model carrying the overlap term win the leave-one-out comparison against the same model without it, under the reading rule stated above. Both legs must hold, and the verdict is otherwise inconclusive.
+
+One limit is worth stating explicitly, since it bounds what $M1$ can license. The slope is a comparison between independently trained variants, not the effect of changing the overlap of a trained model: the fifteen runs share their budget, their seed and their data, so a difference between them is a difference of geometry, but the estimate remains a regression over fifteen design points and inherits their leverage. A mitigation supported here is evidence that the deficit varies with geometry in the direction predicted across this grid, which is what a deployment decision about patch and stride requires, and not a within-model intervention.

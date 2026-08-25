@@ -1,17 +1,19 @@
-\begin{algorithm}
-\caption{Light TSMixup: Controlled Sinusoidal Time Series Mixup}
+\begin{algorithm}[!ht]
+\caption{Light TSMixup: background generation from a sinusoidal frequency pool}
 \label{alg:light_tsmixup}
 \begin{algorithmic}[1]
-\Require Sinusoidal pool $\mathcal{P}=\{p_1,\ldots,p_{N_p}\}$, where each $p_n$ is defined by frequency $f_n$, amplitude $A_n$, phase $\phi_n$, source length $T_n$, and sampling frequency $f_s$; maximum components $K=10$; symmetric Dirichlet concentration $\alpha=1.5$; minimum and maximum augmented lengths $(l_{\min}=128,l_{\max}=2048)$.
-\Ensure An augmented time series.
-\State $k \sim U\{1,K\}$ \Comment{number of sinusoidal components to mix}
-\State $l \sim U\{l_{\min},l_{\max}\}$ \Comment{length of the augmented time series}
+\Require Frequency pool $\mathcal{P}=\{f_1,\ldots,f_M\}$ in Hz, with $M=574$, built from the design as described in this appendix; maximum components $K=10$; symmetric Dirichlet concentration $\alpha=1.5$; draw length $l$, the probing context plus the forecast horizon; sampling frequency $f_s$.
+\Ensure One background realisation $x_{1:l}$ of unit variance.
+\For{$m \gets 1$ to $M$}
+    \State $x^{(m)}_{1:l} \gets \sin\!\left(2\pi f_m\, n / f_s\right),\ n=0,\ldots,l-1$ \Comment{one sinusoid per pool frequency}
+\EndFor
+\State $k \sim U\{1,K\}$ \Comment{number of components to mix}
 \For{$i \gets 1$ to $k$}
-    \State $n \sim U\{1,N_p\}$ \Comment{sample a sinusoidal source}
-    \State $x^{(i)}_{1:l} \gets \operatorname{SampleSegment}(p_n,l,f_s)$ \Comment{generate or crop a length-$l$ segment}
-    \State $\tilde{x}^{(i)}_{1:l} \gets x^{(i)}_{1:l} \Big/ \left(\frac{1}{l}\sum_{j=1}^{l}\left|x^{(i)}_j\right|\right)$ \Comment{apply mean scaling}
+    \State $m \sim U\{1,M\}$ \Comment{draw a source, with replacement}
+    \State $\tilde{x}^{(i)}_{1:l} \gets x^{(m)}_{1:l} \Big/ \left(\frac{1}{l}\sum_{j=1}^{l}\left|x^{(m)}_j\right|\right)$ \Comment{apply mean scaling}
 \EndFor
 \State $[\lambda_1,\ldots,\lambda_k] \sim \operatorname{Dir}([\alpha_1=\alpha,\ldots,\alpha_k=\alpha])$ \Comment{sample mixing weights}
-\State \Return $\sum_{i=1}^{k}\lambda_i\tilde{x}^{(i)}_{1:l}$ \Comment{take a weighted combination of scaled signals}
+\State $x_{1:l} \gets \sum_{i=1}^{k}\lambda_i\tilde{x}^{(i)}_{1:l}$ \Comment{take a weighted combination of scaled sources}
+\State \Return $x_{1:l} / \operatorname{std}\!\left(x_{1:l}\right)$ \Comment{unit variance, so the injected tone sets a true SNR}
 \end{algorithmic}
 \end{algorithm}
