@@ -218,6 +218,7 @@ __marimo__/
 .streamlit/secrets.toml
 
 # PDF artifacts
+coursework/deliverable3/main.pdf
 *.out
 *.log
 *.fls
