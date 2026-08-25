@@ -100,7 +100,7 @@ k\frac{f_s}{P}
 \right\}_{k\in\mathbb{N}^{+}}.
 \end{equation}
 
-Using the two families in \autoref{eq:branches}, the phase-locking frequency class $\mathcal{F}_{\mathrm{lock}}$ is defined as
+Each family is a comb, that is an evenly spaced set of frequencies, of spacing $f_s/S$ and $f_s/P$ respectively. Using the two families in \autoref{eq:branches}, the phase-locking frequency class $\mathcal{F}_{\mathrm{lock}}$ is defined as
 
 \begin{equation}
 \label{eq:flock_set}
@@ -209,8 +209,6 @@ and therefore
 
 Patch-periodicity thus makes tokens equal as well, but at a spacing of $j$ rather than between neighbours. The two conditions coincide on consecutive patches only in the non-overlapping geometry, where $j=1$.
 
-The derivations above show that some translations leave a signal unchanged. Structural aliasing is therefore treated as an emergent, falsifiable property of the trained representations\autocite{paganiPreliminaryInsightsChronos2026}: it is diagnosed by readability rather than by a distance between raw tokens, and it is present when the signal's frequency can no longer be recovered from the model's internal state at a locked frequency as well as it can at neighbouring, non-locked ones. $\mathcal{F}_{\mathrm{lock}}$ is accordingly a set of candidate frequencies, derived from the geometry alone.
-
 \subsection{Analysis of Structural Redundancies and Invariances}
 
  Whenever $S\le P$, every sample of the input appears in at least one token and can be read back from it: taking $k=\lfloor n/S\rfloor$ and $m = n \bmod S \le S-1 \le P-1$ in \autoref{eq:element_def} gives
@@ -250,9 +248,8 @@ O
 \end{equation}
 
 which is $0$ for contiguous patches and approaches $1$ as the stride shortens.
-In this regime the two branches separate, since $f_s/S>f_s/P$, the stride comb is the sparser of the two.
 
-The derivation of \autoref{eq:collapse_S} makes no use of the relation between $P$ and $S$, so at $f\in\mathcal{F}_{S}$ consecutive tokens are still exactly equal. 
+In this regime the two branches separate. Since $f_s/S>f_s/P$, the stride comb is the sparser of the two. The derivation of \autoref{eq:collapse_S} makes no use of the relation between $P$ and $S$, so at $f\in\mathcal{F}_{S}$ consecutive tokens are still exactly equal.
 
 \subsubsection{Case 3: Disjoint Windows ($S>P$)}
 \label{sec:disjoint}
@@ -266,8 +263,18 @@ while neighbours stay distinct unless $S=P$.
 Their union $\mathcal{F}_{\mathrm{lock}}$ is therefore a statement about
 candidate geometry, not a proof of aliasing: for $S\le P$ the raw token
 sequence remains a lossless encoding of the input at every one of these
-frequencies. Structural aliasing is the separate, representation-level
-proposition that a model trained on such sequences nevertheless fails to make those
-frequencies readable from its internal state. It is a property of the learned
-representation rather than of the operator, and one that can be established
-empirically. The hypotheses that test it are formulated in \nameref{sec:four}.% \autoref once `unnumberedsections` is removed from main.tex
+frequencies, so none of the translations derived above is by itself evidence
+that two distinct signals become indistinguishable to the model.
+
+Structural aliasing is the separate, representation-level proposition that a
+model trained on such sequences nevertheless fails to make those frequencies
+readable from its internal state. It is treated here as an emergent and
+falsifiable property of the trained
+representations\autocite{paganiPreliminaryInsightsChronos2026}, diagnosed by
+readability rather than by a distance between raw tokens: it is present when
+the frequency of the signal can no longer be recovered from the internal state
+at a locked frequency as well as it can at neighbouring, non-locked ones. It is
+accordingly a property of the learned representation rather than of the
+operator, and one that can only be established empirically, with
+$\mathcal{F}_{\mathrm{lock}}$ supplying the candidate frequencies at which to
+look. The hypotheses that test it are formulated in \nameref{sec:four}.% \autoref once `unnumberedsections` is removed from main.tex

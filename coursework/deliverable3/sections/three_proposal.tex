@@ -1,0 +1,60 @@
+% =====================================================================
+% PROPOSTA -- non incluso in main.tex
+%
+% Scopo: chiudere la seconda meta' del punto 3 della consegna,
+%   "The coursework must discuss how structural aliasing at the signal and
+%    token levels may affect the correct recognition of these domain-level
+%    concepts."
+%
+% Dove va: in coda a sections/three.tex, dopo il paragrafo che finisce con
+%   "Confirmed aliasing suspends forecast-driven battery decisions."
+%   Quel paragrafo va sostituito dal blocco qui sotto, che lo riassorbe
+%   e ne recupera le due ancore perse nell'accorciamento:
+%     - il rimando a \autoref{tab:bayesDecisions} per la soglia di conferma;
+%     - la conseguenza per il caso intermedio (ConservativeMode).
+%
+% Costo: ~250 parole. Margine disponibile: ~470 (corpo a 8327 su 8800).
+%
+% Vocabolario verificato sull'Appendice A (versione corrente):
+%   Anomaly            : InverterTrip, RampEvent, SensorMalfunction
+%   Generation context : ClearSky, PartialCloud, Overcast, Nighttime
+%   Observability      : Observable, PartiallyObservable, StructurallyAliased
+%   Control mode       : NormalMode, ConservativeMode, SafeMode
+% =====================================================================
+
+Geometry alone yields a candidate, never a verdict. Because the confirmation
+threshold of \autoref{tab:bayesDecisions} exceeds one half, confirmed loss and
+confirmed preservation cannot both hold. A frequency for which preservation is
+positively confirmed is assigned \valueof{Observable}; everything else is
+assigned \valueof{PartiallyObservable}: an unfinished test, a credible interval
+crossing the threshold, or conflicting metrics.
+
+\subsection{How aliasing reaches the domain concepts}
+
+The concepts of the ontology are not read off the raw telemetry. A
+\valueof{RampEvent}, a \valueof{PartialCloud} generation context or an
+\valueof{InverterTrip} is inferred from an observation whose short-horizon
+forecast the agent has already trusted, so a frequency the representation
+cannot hold is a frequency whose signature cannot support that inference. The
+exposure is therefore selective, and the arithmetic says which concepts it
+selects. On the one-minute telemetry of this domain, with $P=16$, the patch
+comb sits at periods of $16/k$ minutes, that is at $16$, $8$, $5.3$, $4$,
+$3.2$, $2.7$ and $2.3$ minutes. Those are the timescales of cloud-edge
+crossings and of inverter duty cycling, so the fluctuation that distinguishes
+\valueof{PartialCloud} from \valueof{Overcast}, and the leading edge by which a
+\valueof{RampEvent} is recognised, fall inside the candidate set. A
+\valueof{SensorMalfunction} or an \valueof{InverterTrip} does not: a step is
+broadband, and no single comb can hide it.
+
+The failure this predicts is not a wrong number but a missed distinction. Two
+generation contexts that differ only in content at a candidate frequency are
+mapped towards the same latent state, so the state is silently misassigned
+rather than flagged as uncertain, and the anomaly whose onset carries that
+frequency is recognised late or not at all. That is precisely why the
+assessment, and not the geometry, selects the control mode. Confirmed aliasing
+forces \valueof{SafeMode} and suspends forecast-driven battery decisions; a
+merely \valueof{PartiallyObservable} assessment forces \valueof{ConservativeMode},
+which reduces the battery cap and lowers decision confidence. The inconclusive
+verdict of the Bayesian analysis is thus carried into the semantics instead of
+being resolved by assumption, and uncertainty about the representation reaches
+the actuator rather than stopping at the report.
