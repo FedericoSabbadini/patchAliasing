@@ -13,7 +13,9 @@ Because $\mathcal F_{\mathrm{lock}}$ is a union, the claim splits in two, one pe
 
 \input{tables/bayesPriors.tex}
 
-\autoref{tab:bayesPriors} gives every prior with its role, and \autoref{sec:appBayes} states each model in full. Every effect prior is centred on no effect, and its scale is varied over the sensitivity ladder $\{0.25,0.5,1.0\}$, sceptical, primary and wide, so that a conclusion resting on the choice of scale rather than on the data is detected as such.
+\input{tables/bayesModels.tex}
+
+\autoref{tab:bayesPriors} gives every prior with its role, \autoref{tab:bayesModels} pairs each claim with the model that decides it, its estimand, the value the claim predicts and the table of measurements it is fitted to, and \autoref{sec:appBayes} states each model in full. Every effect prior is centred on no effect, and its scale is varied over the sensitivity ladder $\{0.25,0.5,1.0\}$, sceptical, primary and wide, so that a conclusion resting on the choice of scale rather than on the data is detected as such.
 
 \subsection{H1}
 
@@ -104,7 +106,6 @@ $M1$ is not a separate model but the configuration level of Model~A promoted to 
 
 where the tilde denotes centring on the design, which leaves $\bar\beta$ the effect at the average configuration rather than an extrapolation to $O=0$ and $P=1$. The two covariates are estimable jointly because \autoref{tab:hfModels} varies overlap and patch size independently. Model~A$'$ denotes Model~A read at this level, and the estimand is $\delta_O$, the change in the contrast per unit of centred overlap. $\delta_O<0$ is the mitigation $M1$ predicts; a slope at or above zero refutes it. The verdict is reported in \nameref{sec:eight}.
 
-\input{tables/bayesModels.tex}
 
 \subsection{Decisions and validation}
 
