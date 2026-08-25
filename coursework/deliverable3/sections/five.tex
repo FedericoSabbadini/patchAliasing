@@ -30,14 +30,6 @@ The complete experimental grid is built before any data are collected: one row p
 
 The Bayesian fits share a fixed $480$-sample probing context, which has to close on a whole number of strides: otherwise the final patch is internally padded and the padding rather than the geometry would produce a collapse. A geometry whose stride does not divide it is swept descriptively but not fitted.
 
-\subsection{Decisions and validation}
-
-Every threshold in \autoref{tab:bayesDecisions} is fixed before a posterior is inspected, and validation comes before interpretation. Beside each rule the table records the probability that the rule already scored under the prior, so that a posterior counts as evidence only in so far as it has moved away from that value. A claim is supported at $0.95$, refuted at $0.05$, and otherwise reported as inconclusive, which is a verdict in its own right.
-
-\input{tables/bayesDecisions.tex}
-
-Interpretation is gated by three preregistered convergence diagnostics, and competing formulations are compared by leave-one-out cross-validation under a reading rule that returns an inconclusive verdict for differences within twice their standard error. The diagnostics, the reading rule and the sampler settings shared by every fit are stated in \autoref{sec:appBayes}; a fit failing any diagnostic is not used to support a claim.
-
 \subsection{Experimental workflow}
 
 The analysis executes in a fixed order, and the order is itself part of the design: every quantity that decides a hypothesis is specified before the model that could be tuned to it is loaded. Each stage writes its output to disk before the next begins, so that an interrupted run resumes without any statistical choice being revisited.
