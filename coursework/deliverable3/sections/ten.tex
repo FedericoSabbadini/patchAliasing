@@ -1,12 +1,32 @@
-The forecaster is not a standalone artefact. It sits inside a control loop in which its output drives battery dispatch and curtailment on a photovoltaic micro-grid, so a forecasting failure can become a control failure, and the property tested in this report has to be read as a security property and not only as an accuracy one. The NIST AI Risk Management Framework\autocite{tabassiArtificialIntelligenceRisk2023} is the reference adopted for that reading, because it separates the trustworthiness characteristics evidenced here, validity and reliability, security and resilience, from the governance functions that turn evidence into a control, and because it asks that known limitations be mapped, measured and managed rather than merely disclosed.
+The forecaster is not a standalone artefact. It sits inside a control loop in which its output drives battery dispatch and curtailment on a photovoltaic micro-grid, so a forecasting failure can become a control failure, and the property tested in this report has to be read as a security property and not only as an accuracy one. The NIST AI Risk Management Framework\autocite{tabassiArtificialIntelligenceRisk2023} is the reference adopted for that reading: it separates the trustworthiness characteristics evidenced here, validity and reliability, security and resilience, from the governance functions that turn evidence into a control, and it asks that known limitations be mapped, measured and managed rather than merely disclosed.
 
 \subsection{The limitation is a weakness before it is a vulnerability}
 
-Characterising the limitation correctly determines everything that follows. Phase-locking is deterministic, attacker-independent and present at deployment time. It is not introduced by an adversary and it is not a defect in the training data; it is a consequence of the tokenisation geometry, and it is closed-form. The candidate set follows from $(f_s,P,S)$ alone, and those three numbers are configuration, not weights. Structural aliasing is the phenomenon that may then appear in the learned representation, and phase-locking is necessary for it but not sufficient, so the candidate set bounds where the model can be blind while \nameref{sec:seven} is what establishes where it is.
+Phase-locking is deterministic, attacker-independent and present at deployment time. It is not introduced by an adversary and it is not a defect in the training data; it is a consequence of the tokenisation geometry. The candidate set follows from the configuration $(f_s,P,S)$ alone. Structural aliasing is the phenomenon that may then appear in the learned representation, and phase-locking set bounds where the model can be blind.
 
-An adversary therefore needs no model access, no gradients, no query budget and no knowledge of the training corpus to enumerate that set, and only observation of the deployed forecaster to find which of its members carry a deficit. In the taxonomy of adversarial machine learning\autocite{vassilevAdversarialMachineLearning2024} this places the weakness with the availability violations rather than with integrity or privacy, and it places the attack outside the white-box assumption, which is what a conventional threat model tends to miss because it reasons about perturbations of the input tensor rather than of the physical process.
+An adversary therefore needs no model access, no query budget and no knowledge of the training corpus, but only knowledge of the chosen forecaster to find $F_{lock}$. In the taxonomy of adversarial machine learning\autocite{vassilevAdversarialMachineLearning2024} this places the weakness with the availability violations rather than with integrity or privacy, and it places the attack outside the white-box assumption.
 
-A weakness becomes a vulnerability only when someone can reach it. For the leading threat model, adversarial masking, the five elements are the following. \textbf{Adversary capabilities}: no model access of any kind and no knowledge of the training corpus, only the ability to drive a periodic load on the plant, which an inverter switching schedule or a switchable load already provides. \textbf{Attack surface}: the telemetry stream upstream of tokenisation, reached by acting on the physical process rather than on the data path. \textbf{Manipulation of telemetry}: a small periodic component at a candidate frequency, which is legitimate plant behaviour and survives any plausibility check on the raw signal. \textbf{Operational consequence}: the component is present in the plant and under-represented in the model, so dispatch and curtailment are decided on an incomplete picture, and a detector reading the forecast residual is looking through the same tokeniser that lost it. \textbf{Residual risk}: overlap thins the stride branch alone, so the patch branch remains at every deployed configuration.
+A weakness becomes a vulnerability only when someone can reach it. For the leading threat model, adversarial masking, the five elements are the following. 
+
+\subsubsection{Adversary capabilities}
+
+No model access of any kind and no knowledge of the training corpus, only the ability to drive a periodic load on the plant, which an inverter switching schedule or a switchable load already provides.
+
+\subsubsection{Attack surface}
+
+The raw telemetry stream before tokenisation, reached by acting on the physical process or on the data path.
+
+\subsubsection{Manipulation of telemetry}
+
+A small periodic component at a candidate frequency, which is legitimate plant behaviour and survives any plausibility check on the raw signal.
+
+\subsubsection{Operational consequence}
+
+The component is present in the plant and under-represented in the model, so dispatch and curtailment are decided on an incomplete picture, and a detector reading the forecast residual is looking through the same tokeniser that lost it.
+
+\subsubsection{Residual risk}
+
+Considering the overlapping mitigation that thins the stride branch alone, the patch branch remains at every deployed configuration.
 
 \input{tables/riskRegister.tex}
 
