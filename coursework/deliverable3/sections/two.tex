@@ -259,7 +259,7 @@ When the stride exceeds the patch size the windows leave $S-P$ unobserved sample
 $\mathcal{F}_{S}$ collects the stride-lock candidates, at which
 consecutive raw tokens repeat. $\mathcal{F}_{P}$ collects the frequencies whose
 period divides the patch, at which the sequence repeats every $P/\gcd(P,S)$ tokens
-while neighbours stay distinct unless $S=P$.
+consecutive patches coincide exactly on $\mathcal{F}_{S}$, which for $S \mid P$ lies wholly inside $\mathcal{F}_{P}$.
 Their union $\mathcal{F}_{\mathrm{lock}}$ is therefore a statement about
 candidate geometry, not a proof of aliasing: for $S\le P$ the raw token
 sequence remains a lossless encoding of the input at every one of these
@@ -277,4 +277,8 @@ at a locked frequency as well as it can at neighbouring, non-locked ones. It is
 accordingly a property of the learned representation rather than of the
 operator, and one that can only be established empirically, with
 $\mathcal{F}_{\mathrm{lock}}$ supplying the candidate frequencies at which to
-look. The hypotheses that test it are formulated in \nameref{sec:four}.% \autoref once `unnumberedsections` is removed from main.tex
+look. The hypotheses that test it are formulated in \nameref{sec:four}.
+
+Observability is used in that sense throughout this report: not injectivity of
+$\mathcal{T}_{P,S}$, which \autoref{eq:reconstruction} settles, but readability
+of a frequency from the state the model builds.

@@ -133,7 +133,7 @@ A stride phase-lock candidate $L_S$ and a within-patch repetition candidate $L_P
 \begin{aligned}
 L_S&=\big[\exists m\in\mathbb{Z}^{+}:|\rho_S-m|\leq\varepsilon_S\big],\\
 L_P&=\big[\exists k\in\mathbb{Z}^{+}:|\rho_P-k|\leq\varepsilon_P\big],\\
-C&=(L_S\vee L_P)\wedge\left(0<f<\frac{f_s}{2}\right),
+Z&=(L_S\vee L_P)\wedge\left(0<f<\frac{f_s}{2}\right),
 \end{aligned}
 \label{eq:locking-candidate}
 \end{equation}
@@ -179,11 +179,16 @@ The semantic propagation path is explicit:
 &\longrightarrow \pv{PatchedRepresentation}\\
 &\longrightarrow \pv{ObservabilityAssessment}\\
 &\longrightarrow \pv{ControlMode}
-\longrightarrow \pv{PowerRoutingDecision}.
+\longrightarrow \pv{PowerRoutingDecision},\\
+\pv{PatchedRepresentation}
+&\longrightarrow \pv{Forecast}
+\longrightarrow \pv{AnomalyState}.
 \end{aligned}
 \label{eq:semantic-path}
 \end{equation}
 Aliasing can therefore reduce confidence in forecast-derived production, ramp expectations, forecast-driven anomaly recognition, and routing. It does not alter the directly observed values of $G_{\mathrm{tilt}}$, $P_{\mathrm{pv}}$, load demand, or SoC; those values are governed by the separate validity path.
+
+The second line of \autoref{eq:semantic-path} is where a signal-level candidate becomes a domain-level error, and one case makes it concrete. A \valueof{RampEvent} is asserted from the signed ramp rate of \autoref{eq:signed-ramp}, which the agent reads from a \pv{Forecast} and not from history. At one sample per minute with $P=16$, the patch branch places candidates at periods of $16/k$ minutes, so fluctuation on that scale is under-represented in the very forecast the rule consumes: the event is recognised late or not at all, and \autoref{eq:mode-selection} then selects a mode for a plant that is not the one outside. The concept is never contradicted by the ontology, which is the point, since nothing in the knowledge base records that the evidence behind it was incomplete unless an \pv{ObservabilityAssessment} says so.
 
 \section{Closed-Loop Control}
 

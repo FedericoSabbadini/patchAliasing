@@ -48,7 +48,7 @@ L_i \sim \text{Gamma}\!\left(r,\ r/\mu_i\right),
 \log \mu_i = \alpha_0 + \theta_{\mathrm{lock}}\,\mathrm{IsLocked}_i + s_{\text{st}[i]} + g_{\text{geo}[i]},
 \end{equation}
 
-The log link makes the estimand multiplicative: $e^{\theta_{\mathrm{lock}}}$ is the factor by which the codelength of a candidate frequency expands. $e^{\theta_{\mathrm{lock}}}>1$ is the representational cost $H1$ predicts, while $\theta_{\mathrm{lock}}$ near zero says the frequency remains as readable at a candidate as anywhere else.
+The log link makes the estimand multiplicative: $e^{\theta_{\mathrm{lock}}}$ is the factor by which the codelength of a candidate frequency expands. $e^{\theta_{\mathrm{lock}}}>1$ is the representational cost $H1$ predicts, while $\theta_{\mathrm{lock}}$ near zero says the frequency remains as readable at a candidate as anywhere else. The representational half of $H1$ is decided on the same footing as the behavioural one: supported at $\Pr(\theta_{\mathrm{lock}} > \log 1.2 \mid D)\ge 0.95$, refuted at $\Pr(|\theta_{\mathrm{lock}}| < \log 1.1 \mid D)\ge 0.95$, both fixed in \autoref{tab:bayesDecisions} before any posterior is inspected.
 
 \subsection{H2}
 
@@ -64,6 +64,8 @@ u_p \sim \mathcal{N}(0, \sigma_\phi).
 \end{equation}
 
 The estimand $\sigma_\phi$ is the spread of those eight offsets, which reduces the hypothesis to a single number and presupposes no shape for a possible dependence. $\sigma_\phi$ near zero means the offsets are indistinguishable and the deficit is set by the geometry alone, as $H2$ predicts, whereas a large $\sigma_\phi$ means it depends on where in its cycle the signal starts. Dropping $u_p$ gives a nested null, which is compared with the full model by leave-one-out cross-validation (LOO); the comparison separates the size of any phase effect from the evidence that one exists.
+
+One limit belongs here rather than with the results. Model~C measures the spread of the deficit on the response Model~A uses, so the two are not independent readings: where the population deficit is itself indistinguishable from zero, little remains for phase to move, and $H2$ is read conditionally.
 
 \subsection{H3}
 
@@ -104,7 +106,7 @@ $M1$ is not a separate model but the configuration level of Model~A promoted to 
 \widetilde{\log P}_c=\log P_c-\overline{\log P},
 \end{equation}
 
-where the tilde denotes centring on the design, which leaves $\bar\beta$ the effect at the average configuration rather than an extrapolation to $O=0$ and $P=1$. The two covariates are estimable jointly because \autoref{tab:hfModels} varies overlap and patch size independently. Model~A$'$ denotes Model~A read at this level, and the estimand is $\delta_O$, the change in the contrast per unit of centred overlap. $\delta_O<0$ is the mitigation $M1$ predicts; a slope at or above zero refutes it.
+where the tilde denotes centring on the design, which leaves $\bar\beta$ the effect at the average configuration rather than an extrapolation to $O=0$ and $P=1$. The two covariates are estimable jointly because \autoref{tab:hfModels} varies overlap and patch size independently. Model~A$'$ denotes Model~A read at this level, and the estimand is $\delta_O$, the change in the contrast $d$ of \autoref{eq:d2contrast} per unit of centred overlap. Its sign has to be read on the orientation the model is fitted on, and that orientation is $d$, which is negative when a candidate is rebuilt worse than its controls. An overlap that mitigates therefore lifts the contrast towards zero: $\delta_O>0$ is the direction $M1$ predicts, and a slope at or below zero refutes it. The claim itself does not depend on the convention, since it is the same statement that overlap reduces the deficit; only its sign flips between $d$ and the sign-reversed deficit $y=-d$ that Model~C uses, and every $\delta_O$ in this report is stated on $d$.
 
 
 \subsection{Decisions and validation}

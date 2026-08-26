@@ -10,6 +10,8 @@
 \pv{hasObservation} & \pv{PVSystem} & \pv{SystemObservation} \\
 \pv{hasSignal} & \pv{PhotovoltaicArray} & \pv{TimeSeriesSignal} \\
 \pv{hasRepresentation} & \pv{TimeSeriesSignal} & \pv{PatchedRepresentation} \\
+\pv{forecastFrom} & \pv{Forecast} & exactly one \pv{PatchedRepresentation} \\
+\pv{informsAnomaly} & \pv{Forecast} & \pv{AnomalyState} \\
 \pv{assessesRepresentation} & \pv{ObservabilityAssessment} & exactly one \pv{PatchedRepresentation} \\
 \pv{hasGenerationContext} & \pv{SystemObservation} & zero or one \pv{GenerationContext} value \\
 \pv{hasAnomaly} & \pv{SystemObservation} & zero or more \pv{AnomalyState} values \\
