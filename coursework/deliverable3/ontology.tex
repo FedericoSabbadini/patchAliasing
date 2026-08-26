@@ -276,7 +276,7 @@ C_O=
 \qquad A=C\wedge B.
 \label{eq:observability-state}
 \end{equation}
-\valueof{Observable} therefore means that positive evidence shows the tested representation preserves the task-relevant information within tolerance $\delta$. It does not mean global observability of the physical system, nor does it merely mean that aliasing was not found. Candidate geometry may still be \valueof{Observable} when the experiment demonstrates preservation. \valueof{PartiallyObservable} is the epistemic fallback: preservation has not been certified, while structural aliasing has not been confirmed. It includes a candidate with inconclusive evidence, an unfinished test, a credible interval crossing the decision threshold, conflicting metrics, or no preservation evidence. The term means \emph{partially trusted}, not that a fixed fraction of samples or sensors is visible.
+\valueof{Observable} therefore means that positive evidence shows the tested representation preserves the task-relevant information within tolerance $\delta$. It does not mean global observability of the physical system, nor does it merely mean that aliasing was not found. Candidate geometry may still be \valueof{Observable} when the experiment demonstrates preservation. \valueof{PartiallyObservable} is the epistemic fallback: preservation has not been certified, while structural aliasing has not been confirmed. It includes a candidate with inconclusive evidence, an unfinished test, a credible interval crossing the decision threshold, conflicting metrics, or no preservation evidence. The term means partially trusted, not that a fixed fraction of samples or sensors is visible.
 
 H1 compares each candidate frequency with matched nearby non-candidate controls and predicts higher MDL codelength or lower amplitude recovery; absent or non-localized loss refutes H1. H2 tests whether the loss at a candidate frequency remains approximately stable across sampled phase offsets; systematic phase dependence refutes that hypothesis. H3 tests whether candidate degradation sites move proportionally to $1/S$ or $1/P$ when the corresponding parameter varies. These hypotheses contribute controlled evidence to $D$, but remain falsifiable experimental factors rather than ontology subclasses or automatic action rules. Sensor validity is modeled separately as an anomaly and never relabels a model representation as structurally aliased.
 
@@ -334,7 +334,7 @@ P_{\mathrm{sur}}=(P_{\mathrm{pv}}-P_{\mathrm{load}})^{+},
 \qquad
 P_{\mathrm{def}}=(P_{\mathrm{load}}-P_{\mathrm{pv}})^{+}.
 \end{equation}
-Here \emph{daylight} abbreviates \{\valueof{ClearSky}, \valueof{PartialCloud}, \valueof{Overcast}\}. A cycle issues a route only for a strictly positive transfer and may issue several co-mode decisions. All setpoints are clipped to SoC, capacity, and charge/discharge limits.
+Here daylight abbreviates \{\valueof{ClearSky}, \valueof{PartialCloud}, \valueof{Overcast}\}. A cycle issues a route only for a strictly positive transfer and may issue several co-mode decisions. All setpoints are clipped to SoC, capacity, and charge/discharge limits.
 
 \autoref{fig:routing-policy} shows the priority scan and \autoref{tab:routing} states its boundary cases. The conservative branch rejoins the ordinary load-first router under its reduced cap. The ramp branch is available only in \valueof{NormalMode}.
 
