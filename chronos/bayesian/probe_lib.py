@@ -147,6 +147,10 @@ GENERATORS = ("tsmixup", "kernelsynth")   # the deliverable's two synthetic corp
 # --------------------------------------------------------------------------------- #
 TSMIXUP_POOL_N_FREE = 150      # non-integer, non-candidate frequencies added to the pool
 TSMIXUP_POOL_GUARD = 0.2       # [Hz] minimum distance of a "free" frequency from any candidate
+TSMIXUP_POOL_FMAX = 150.0      # [Hz] upper limit of the SOURCE POOL, which is not the analysed
+                               # band: candidates and controls are still defined over BAND, and
+                               # above this the background simply carries no energy, equally for
+                               # a candidate and for its controls
 
 
 def tsmixup_pool(n_free: int = TSMIXUP_POOL_N_FREE, guard: float = TSMIXUP_POOL_GUARD,
@@ -154,8 +158,9 @@ def tsmixup_pool(n_free: int = TSMIXUP_POOL_N_FREE, guard: float = TSMIXUP_POOL_
     """The frequencies of the Light TSMixup source pool, in Hz.
 
     Three groups:
-      1. every integer frequency in BAND, so the pool covers the analysed band uniformly and a
-         candidate site is not represented differently from the controls that flank it;
+      1. every integer frequency from BAND[0] up to TSMIXUP_POOL_FMAX, so the pool covers that
+         stretch uniformly and a candidate site is not represented differently from the controls
+         that flank it;
       2. the members of F_lock that are NOT integers, which group 1 cannot reach: they come from
          the geometries whose S or P is 12, 20 or 24, where fs/D is not a whole number of Hz;
       3. the control frequencies f_k +/- delta of every candidate of every geometry, so that the
@@ -169,7 +174,8 @@ def tsmixup_pool(n_free: int = TSMIXUP_POOL_N_FREE, guard: float = TSMIXUP_POOL_
     candidates automatically. Deterministic, hence reproducible without a seed.
     """
     models = models or MODELS
-    lo, hi = BAND
+    lo = BAND[0]
+    hi = min(BAND[1], TSMIXUP_POOL_FMAX)       # the pool stops here; the analysed band does not
 
     lock = set()
     for P, S in models:

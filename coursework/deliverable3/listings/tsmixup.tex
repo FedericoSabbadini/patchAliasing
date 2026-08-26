@@ -2,7 +2,7 @@
 \caption{Light TSMixup: background generation from a sinusoidal frequency pool}
 \label{alg:light_tsmixup}
 \begin{algorithmic}[1]
-\Require Frequency pool $\mathcal{P}=\{f_1,\ldots,f_M\}$ in Hz, with $M=574$, built from the design as described in this appendix; maximum components $K=10$; symmetric Dirichlet concentration $\alpha=1.5$; draw length $l$, the probing context plus the forecast horizon; sampling frequency $f_s$.
+\Require Frequency pool $\mathcal{P}=\{f_1,\ldots,f_M\}$ in Hz, with $M=397$ spanning $2$ to $150$\,Hz, built from the design as described in this appendix; maximum components $K=10$; symmetric Dirichlet concentration $\alpha=1.5$; draw length $l$, the probing context plus the forecast horizon; sampling frequency $f_s$.
 \Ensure One background realisation $x_{1:l}$ of unit variance.
 \For{$m \gets 1$ to $M$}
     \State $x^{(m)}_{1:l} \gets \sin\!\left(2\pi f_m\, n / f_s\right),\ n=0,\ldots,l-1$ \Comment{one sinusoid per pool frequency}
