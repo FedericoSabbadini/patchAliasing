@@ -119,31 +119,34 @@ The signed ramp rate, measured in watts per second when $\Delta t$ is expressed 
 r_t=\frac{P_t-P_{t-1}}{\Delta t}.
 \end{equation}
 The anomaly rules are expressed with configurable thresholds: $g_{\mathrm{trip}}$ for sufficient irradiance, $p_0$ for positive near-zero power, and $r_{\max}$ for maximum admissible ramp magnitude.
-\begin{align}
-\neg V_t
-&\longrightarrow \valueof{SensorMalfunction},
-\label{eq:sensor-malfunction}\\
-V_t\wedge G_t\geq g_{\mathrm{trip}}
-\wedge |P_t|\leq p_0
-&\longrightarrow \valueof{InverterTrip},
-\label{eq:inverter-trip}\\
-V_t\wedge V_{t-1}\wedge |r_t|>r_{\max}
-&\longrightarrow \valueof{RampEvent}.
-\label{eq:ramp-event}
-\end{align}
-No numerical value is inherited for $r_{\max}$ because it must be calibrated after invalid values and outliers have been excluded. The controller evaluates sensor validity first. A sensor malfunction therefore cannot be reinterpreted as a physical ramp or inverter trip. If a valid inverter trip also satisfies the ramp predicate, the safe response to the trip takes precedence over ramp smoothing.
+The controller evaluates sensor validity first. A sensor malfunction therefore cannot be reinterpreted as a physical ramp or inverter trip. If a valid inverter trip also satisfies the ramp predicate, the safe response to the trip takes precedence over ramp smoothing.
 
 \subsubsection{Sensor malfunction}
 
 \valueof{SensorMalfunction} denotes an observation that cannot safely support control because at least one control-critical measurement is absent, stale, non-finite, or outside its configured physical range. It is an evidence-quality condition rather than a claim that the photovoltaic plant itself has failed; physical-anomaly inference is therefore suspended and safe-mode selection takes precedence, as specified in \autoref{eq:sensor-malfunction}.
+\begin{equation}
+\neg V_t \longrightarrow \valueof{SensorMalfunction}.
+\label{eq:sensor-malfunction}
+\end{equation}
 
 \subsubsection{Inverter trip}
 
 \valueof{InverterTrip} denotes a loss of photovoltaic conversion while irradiance is sufficient for non-negligible production. It is distinguished from naturally low output at night or under weak irradiance by requiring valid telemetry, $G_t\geq g_{\mathrm{trip}}$, and $|P_t|\leq p_0$ in \autoref{eq:inverter-trip}; its safe response isolates the photovoltaic side.
+\begin{equation}
+V_t\wedge G_t\geq g_{\mathrm{trip}}\wedge |P_t|\leq p_0
+\longrightarrow \valueof{InverterTrip}.
+\label{eq:inverter-trip}
+\end{equation}
 
 \subsubsection{Ramp event}
 
 \valueof{RampEvent} denotes an abrupt change in photovoltaic power between two consecutive valid observations. Its magnitude is determined by the signed rate $r_t$ of \autoref{eq:signed-ramp} and must exceed the calibrated bound $r_{\max}$ in \autoref{eq:ramp-event}; the sign distinguishes a rapid production increase from a rapid decrease for the subsequent control response.
+\begin{equation}
+V_t\wedge V_{t-1}\wedge |r_t|>r_{\max}
+\longrightarrow \valueof{RampEvent}.
+\label{eq:ramp-event}
+\end{equation}
+No numerical value is inherited for $r_{\max}$ because it must be calibrated after invalid values and outliers have been excluded.
 
 \subsection{Signal observability and structural aliasing}
 
