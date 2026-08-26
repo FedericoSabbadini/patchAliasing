@@ -2,10 +2,8 @@
 One mitigation is carried through the design and pre-registered as $M1$: increase patch overlap $O$ by reducing the stride $S$ at fixed patch size $P$. Its geometric basis lies in the stride branch, whose candidates are in $\mathcal{F}_{S}$. $M1$ asks whether this reduction also decreases the observed recovery deficit. Model~A$'$ of \nameref{sec:four} tests the claim through the overlap slope $\delta_O$, read on the contrast $d$ that Model~A is fitted to, where a mitigation is a positive slope. The pre-registered rule has two legs: $\Pr(\delta_O>0\mid D)\geq0.95$, and the configuration level carrying the overlap term must win the leave-one-out comparison against the same level without it. Both must hold.
 
 \subsection{Comments on the Bayesian results}
---
 
 \subsection{Consequences for the control agent}
---
 
 \subsection{From representation to operational response}
 Taken together, the formal and Bayesian analyses establish an evidence-to-action workflow in which representation, monitoring, explanation and intervention operate as successive stages rather than independent capabilities. Patch size, stride and the derived overlap ratio are first recorded as properties of each \pv{PatchedRepresentation}. Since a signal may be evaluated under several geometries, this associates the potential frequency-specific loss of observability, with the relevant signal-configuration pair rather than with Chronos in the abstract. The declared geometry then provides the basis for monitoring: the stride-derived sites can be recomputed from $\mathcal{F}_{S}$ whenever the sampling interval or stride changes, ?????????????? as confirmed by $H3a$ ??????????????, while the patch-derived sites follow analytically from $\mathcal{F}_{P}$; only the former scaling was empirically identified here. A checkpoint change requires recomputation when it changes the associated $(P,S)$ geometry. Monitoring must be applied to the raw telemetry before tokenisation, because a detector placed downstream would inherit the blind spot it is intended to identify.
