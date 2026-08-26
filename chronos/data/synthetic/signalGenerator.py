@@ -21,6 +21,8 @@ def runTSMixup(p: dict, seed: int, output_dir: Path = OUTPUT_DIR) -> TSMixupGene
     return TSMixupGenerator(
         K=p["K"], alpha=p["alpha"], l_min=p["l_min"], l_max=p["l_max"],
         t_lengths=p.get("t_lengths"),
+        data_mode=p.get("data_mode", "synthetic"),
+        pool_freqs=p.get("pool_freqs"),
         output_dir=output_dir, seed=seed,
         inject=p.get("inject"),        # list of {freq_hz, amplitude, phase}
         P=p.get("P", 16),

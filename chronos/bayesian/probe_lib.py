@@ -142,6 +142,67 @@ def design_gaps(models: list[tuple[int, int]] | None = None) -> list[str]:
 GENERATORS = ("tsmixup", "kernelsynth")   # the deliverable's two synthetic corpora
 
 
+# --------------------------------------------------------------------------------- #
+#  The Light TSMixup sinusoidal pool
+# --------------------------------------------------------------------------------- #
+TSMIXUP_POOL_N_FREE = 150      # non-integer, non-candidate frequencies added to the pool
+TSMIXUP_POOL_GUARD = 0.2       # [Hz] minimum distance of a "free" frequency from any candidate
+
+
+def tsmixup_pool(n_free: int = TSMIXUP_POOL_N_FREE, guard: float = TSMIXUP_POOL_GUARD,
+                 models=None) -> list[float]:
+    """The frequencies of the Light TSMixup source pool, in Hz.
+
+    Three groups:
+      1. every integer frequency in BAND, so the pool covers the analysed band uniformly and a
+         candidate site is not represented differently from the controls that flank it;
+      2. the members of F_lock that are NOT integers, which group 1 cannot reach: they come from
+         the geometries whose S or P is 12, 20 or 24, where fs/D is not a whole number of Hz;
+      3. the control frequencies f_k +/- delta of every candidate of every geometry, so that the
+         two arms of a contrast triplet are represented in the background identically: without
+         them every locked arm would sit on a pool frequency and fewer than half the control arms
+         would, which is an asymmetry the paired contrast assumes is absent;
+      4. `n_free` non-integer frequencies spread across the band and kept at least `guard` Hz away
+         from every candidate, so the pool also carries content no geometry predicts.
+
+    Built from MODELS rather than hard-coded, so adding a geometry adds its own non-integer
+    candidates automatically. Deterministic, hence reproducible without a seed.
+    """
+    models = models or MODELS
+    lo, hi = BAND
+
+    lock = set()
+    for P, S in models:
+        lock |= {round(f, 9) for f in f_lock(P, S, fmax=hi, fmin=lo)}
+    lock_sorted = sorted(lock)
+
+    integers = [float(f) for f in range(int(np.ceil(lo)), int(np.floor(hi)) + 1)]
+    non_integer_locks = [f for f in lock_sorted if abs(f - round(f)) > 1e-9]
+
+    controls = set()
+    for P, S in models:
+        for fk in f_lock(P, S, fmax=hi, fmin=lo):
+            d = control_offset(P, S, fk)
+            if not np.isfinite(d):
+                continue
+            for f in (fk - d, fk + d):
+                if lo <= f <= hi:
+                    controls.add(round(f, 9))
+
+    def _clear(f: float) -> bool:
+        return (min(abs(f - l) for l in lock_sorted) >= guard) and (abs(f - round(f)) >= guard)
+
+    free = []
+    for f0 in np.linspace(lo + 0.5, hi - 0.5, n_free):
+        f, k = float(f0), 0
+        while not _clear(f) and k < 40:          # nudge off a collision, alternating either way
+            k += 1
+            f = float(f0) + 0.05 * ((k + 1) // 2) * (1 if k % 2 else -1)
+        free.append(round(f, 4))
+
+    return sorted(set(integers) | {round(f, 9) for f in non_integer_locks} | controls | set(free))
+
+
 def model_tag(P: int, S: int) -> str:
     """Filesystem-safe id for a geometry (e.g. 'p16-s12')."""
     return f"p{P}-s{S}"
@@ -190,9 +251,11 @@ def background(generator: str, n: int, seed: int) -> np.ndarray:
             params = {"J": 5, "l_syn": m, "fs": FS, "jitter": 1e-4, "P": 16}
             gen = sg.runKernelSynth(params, seed, tmp)
         elif generator == "tsmixup":
-            # light-TSMixup spec, identical to the one used by hypotheses.py and the probing notebook
+            # light-TSMixup spec. The source pool is the frequency pool of `tsmixup_pool`, so the
+            # background covers the analysed band instead of the three low-frequency sources the
+            # earlier `synthetic` mode supplied.
             params = {"K": 10, "alpha": 1.5, "l_min": m, "l_max": m, "fs": FS, "P": 16,
-                      "t_lengths": [m // 2, m, m]}
+                      "data_mode": "frequencies", "pool_freqs": tsmixup_pool()}
             gen = sg.runTSMixup(params, seed, tmp)
         else:
             raise ValueError(f"unknown generator {generator!r}; expected one of {GENERATORS}")

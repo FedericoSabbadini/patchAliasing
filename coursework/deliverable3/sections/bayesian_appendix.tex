@@ -8,7 +8,7 @@ Three diagnostics are preregistered and gate interpretation. $\hat R<1.01$ measu
 
 Where two formulations compete they are compared by leave-one-out cross-validation. The quantity read is the difference in expected log pointwise predictive density, $\mathrm{elpd\_diff}$, with its standard error $\mathrm{dse}$; a difference smaller than twice its standard error is reported as inconclusive rather than rounded into a decision, so that a nominal ranking is not mistaken for evidence.
 
-\subsection{Model A, the behavioural reading of $H1$}
+\subsection{Model A, the behavioural reading (H1)}
 
 Model~A is fitted to the paired contrast of \autoref{eq:d2contrast},
 
@@ -42,7 +42,7 @@ Two configuration-level covariates enter that population mean, and they are esti
 
 The estimand is $\bar\beta$, reported as $e^{\bar\beta}$: the multiplicative change in forecast amplitude recovery at a candidate frequency relative to its controls. The overlap slope $\delta_O$ of that same population mean is a second estimand of the same fit, and it carries $M1$; it is stated in full at the end of this appendix.
 
-\subsection{Model B, the representational reading of $H1$}
+\subsection{Model B, the representational reading (H1)}
 
 Model~B replaces the forecast with a measurement of the internal state. At each candidate frequency $f_c$, examples are drawn at $f_c-1$\,Hz and $f_c+1$\,Hz, the representation is captured, and a linear probe is charged the prequential description length of the labels\autocite{voitaInformationTheoreticProbingMinimum2020}: the data are split into successive chunks, each chunk encoded by a probe trained only on the chunks before it, and the cost accumulated in bits. A probe that memorises noise pays for itself and gains nothing, which is why description length is preferred to accuracy. The reading is direct: at a frequency whose neighbourhood has become linearly indistinguishable in representation space, the labels cost more bits.
 
@@ -61,7 +61,7 @@ A codelength is strictly positive, right-skewed and has a variance that grows wi
 
 The scope of the probe task is deliberately narrow. The seven hierarchical band tasks used in the exploratory sweep of \nameref{sec:five} each summarise hundreds of frequencies in one codelength, so the lock indicator has nothing to attach to; they are retained as a descriptive cross-check of overall decodability and are not fitted by any Bayesian model.
 
-\subsection{Model C, $H2$}
+\subsection{Model C, the phase reading (H2)}
 
 Model~C is Model~A on the sign-reversed, per-phase response $y_i = \log(R_{\text{ctrl},i}+0.01)-\log(R_{\text{lock},i}+0.01)$, positive when the candidate is worse. The configuration-level covariates are dropped, because $H2$ is not a question about the design axes, and the phase circle is cut into eight equal slices, each given its own offset:
 
@@ -78,7 +78,7 @@ The estimand $\sigma_\phi$ is the spread of the eight offsets and reduces the hy
 
 Both Model~A and Model~C are written non-centred, $u=\sigma_u z$ with $z\sim\mathcal N(0,1)$, which is the same distribution but gives the sampler a geometry without the funnel that appears when a group scale is small --- which is exactly what is expected here if $H2$ holds.
 
-\subsection{Model D1, the location of the sites}
+\subsection{Model D1, the location of the sites (H3)}
 
 The measurement is the token collapse $z_g(f)$: the input patches of one context are embedded, and the standard deviation of those embeddings across patches is averaged over the embedding dimensions. It is exactly zero when consecutive patches embed to the same vector, which is the degeneracy the stride condition predicts, and it is read before any transformer block, so it measures the tokenisation and not what the network subsequently does with it. Each curve is normalised by its own off-grid median, so that dip depth is comparable across geometries and signal families.
 
@@ -95,7 +95,7 @@ The fit is a regression of the log profile on two indicator labels,
 
 where a frequency counts as on a grid when its distance to the nearest member of that comb is within tolerance. The logarithm makes the labels multiplicative on the per-geometry off-grid level $\alpha_g$, so $\theta_S$ and $\theta_P$ are depths relative to that level rather than absolute values, and geometries whose dispersion sits at different scales remain comparable. Four labellings are fitted to the same profiles and compared by LOO --- stride only, patch only, both, neither --- and the comparison is meaningful only because the sweep grid is the union over every geometry, so each labelling is scored where its rival predicts a dip as well as where it does. It is identified only because the design contains configurations with $S \nmid P$: on the $P=S$ diagonal the two combs coincide by construction and no amount of data can separate them.
 
-\subsection{Model D2, the movement of the sites}
+\subsection{Model D2, the movement of the sites (H3a, H3b)}
 
 Where D1 says where the dips sit, D2 asks whether they move. Sites are detected on each swept profile, adjacent detections are merged so that one dip straddling two grid points is not counted twice, and each site is assigned to the branch that predicts it; sites predicted by both branches are set aside, because $\mathcal F_{\mathrm{lock}}$ is a union and the union of two combs has two interlaced spacings rather than one. The fundamental of each branch, the lowest of its detected sites, is then regressed on the spacing that branch predicts:
 
@@ -112,7 +112,7 @@ The slope $\kappa_F$ is the estimand: measured spacing per unit of predicted spa
 
 Both the fundamental and the median gap between successive sites are fitted. With three or four sites in band a single spurious detection inserts a short interval and flips the median, to which the fundamental is immune, so a disagreement between the two is itself informative about the stability of the detection.
 
-\subsection{Model A$'$, the mitigation claim $M1$}
+\subsection{Model A$'$, the mitigation claim (M1)}
 
 $M1$ claims that the deficit Model~A measures is smaller where consecutive patches overlap more. It is not a separate fit. It is the configuration level of \autoref{eq:appA:model} read as an estimand, so the posterior that decides it is drawn from the same chains, on the same rows, as the posterior for $\bar\beta$; the prime in Model~A$'$ marks a reading of Model~A and not a second model. Written on its own, that level is
 

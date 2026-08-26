@@ -2,7 +2,7 @@
 
 \medskip 
 
-Light TSMixup is a controlled probing variant of the TSMixup augmentation described in the Chronos data-generation procedure\autocite{ansariChronosLearningLanguage2024}. The original algorithm samples subsequences from a collection of real training datasets, applies mean scaling to each sampled series, draws mixing coefficients from a symmetric Dirichlet distribution and returns their convex combination. The variant used here preserves that stochastic mixing structure and replaces the real dataset collection with a pool of sinusoidal sources of known frequency, so that every generated series remains a superposition of known components and no loss measured at a predicted site can be attributed to unknown spectral content in the background.
+Light TSMixup is a variant of the TSMixup augmentation described in the Chronos data-generation procedure\autocite{ansariChronosLearningLanguage2024}. The original algorithm samples subsequences from a collection of real training datasets, applies mean scaling to each sampled series, draws mixing coefficients from a symmetric Dirichlet distribution and returns their convex combination. The variant used here preserves that stochastic mixing structure and replaces the real dataset collection with a pool of sinusoidal sources of known frequency, so that every generated series remains a superposition of known components and no loss measured at a predicted site can be attributed to unknown spectral content in the background.
 
 \subsection{The source pool}
 

@@ -7,6 +7,60 @@ The two figures below are the descriptive pass that precedes the Bayesian analys
     \label{fig:allReconstruction}
 \end{figure*}
 
+\subsection{Planned extension: scope}
+
+Two additions are planned to this appendix. The first extends the behavioural reading of
+\autoref{fig:allReconstruction} from the five geometries of the initial design to the fifteen of
+\autoref{tab:hfModels}, so that the descriptive pass covers the same grid the inferential stage is
+fitted on. The second is a direct spectral comparison between the signal supplied as context and
+the signal the model returns, carried out on the three signal families of \nameref{sec:five}: a
+pure tone, a Light TSMixup background and a KernelSynth background.
+
+The comparison is run on the geometry $P=16$, $S=16$. That is the geometry of the published
+Chronos-Bolt tokeniser, so the reading concerns the configuration a deployment would actually meet,
+and since $P=S$ the two branches of $\mathcal F_{\mathrm{lock}}$ coincide in a single comb at
+multiples of $f_s/16$, which leaves one predicted set to mark rather than two interlaced ones.
+
+Its purpose is motivation rather than test. Light TSMixup and KernelSynth are the two synthetic
+generators of the Chronos data-generation procedure, so a loss observed on them cannot be answered
+with the objection that the probe is out of distribution; and the extent of that loss is what makes
+the question the models of \nameref{sec:four} are built to decide worth asking in the first place.
+
+\subsection{Planned extension: protocol}
+
+For each signal family one realisation is produced at the probing length, the context of $480$
+samples is supplied to the model, and the forecast of $64$ samples is retained at the median
+quantile. Three spectra are then computed under the same window and the same mean removal: the
+context, the true continuation over the $64$ samples that follow it, and the forecast over those
+same $64$ samples. For the families built from sinusoidal sources the generating frequencies are
+known by construction and are marked together with the candidate set $\mathcal F_{\mathrm{lock}}$ of
+the geometry. The comparison of record is the forecast against the true continuation, since those
+two share a window and therefore a frequency resolution; the context spectrum is reported beside
+them as a statement of what entered the model, at its own finer resolution.
+
+\subsection{Planned extension: what it can and cannot show}
+
+Three limits fix what may be read off the comparison, and each is a property of the measurement
+rather than of the model. A $64$-sample window at $f_s=512$\,Hz resolves $8$\,Hz, so the comb of the
+reference geometry falls on bins but a candidate and its controls at $f_k\pm\delta$ do not separate:
+the picture can show loss, not the paired contrast the models estimate. The forecast retained is a
+median quantile, and a conditional median is smoother than a sample path, so part of any
+high-frequency attenuation belongs to the point forecast rather than to the tokenisation; the
+matched triplet used in the body cancels that term, a raw spectrum does not. And KernelSynth draws
+are broadband and non-stationary, so their spectra carry no lines to read against: that family
+speaks to loss in general, while any site-level reading rests on Light TSMixup, whose components are
+known one by one.
+
+The comparison is therefore descriptive. It is evidence of frequency information loss, not evidence
+of structural aliasing, and it is placed here so that the body may point to it as motivation without
+any hypothesis resting on it.
+
+% ------------------------------------------------------------------------------------------
+% TO DO, once the figures are produced: insert them above and add the closing paragraph that
+% states what the comparison showed on each of the three families. Keep the claim at the level
+% of information loss; nothing here may be read as evidence of structural aliasing.
+% ------------------------------------------------------------------------------------------
+
 \begin{figure*}[!p]
     \centering
     \includegraphics[width=0.98\textwidth]{figures/FIG_ALL_spectral_recovery.png}

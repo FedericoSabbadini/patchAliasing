@@ -41,6 +41,7 @@ class TSMixupGenerator:
                  t_lengths=None,
                  data_mode: str = "synthetic",
                  data_dir=None,
+                 pool_freqs=None,
                  seed: int = 3,
                  output_dir: str = "./signals",
                  inject: Optional[List[dict]] = None,
@@ -54,6 +55,7 @@ class TSMixupGenerator:
         self.t_lengths  = t_lengths or [500, 600, 700, 400, 550]
         self.data_mode  = data_mode
         self.data_dir   = data_dir
+        self.pool_freqs = list(pool_freqs) if pool_freqs is not None else None
         self.output_dir = Path(output_dir)
         self.rng        = np.random.default_rng(seed)
         self.P          = P
@@ -105,6 +107,14 @@ class TSMixupGenerator:
     #  Dataset construction                                                #
     # ------------------------------------------------------------------ #
     def _build_datasets(self) -> List[np.ndarray]:
+        if self.data_mode == "frequencies":
+            # One unit-amplitude sinusoid per pool frequency, on the sample grid of fs. The pool
+            # is supplied by the caller (probe_lib.tsmixup_pool) so that the design owns it.
+            if not self.pool_freqs:
+                raise ValueError("data_mode='frequencies' requires a non-empty pool_freqs")
+            T = int(self.l_max)
+            t = np.arange(T) / self.fs
+            return [np.sin(2 * np.pi * f * t) for f in self.pool_freqs]
         if self.data_mode == "synthetic":
             return [
                 np.sin(np.linspace(0, 5 * np.pi * (i + 1), T))
