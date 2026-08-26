@@ -1,20 +1,115 @@
-The two figures below are the descriptive pass that precedes the Bayesian analysis, run on pure sinusoids swept from $2$ to $250$\,Hz in one-hertz steps at $f_s=512$\,Hz over the five geometries of the initial design. They are reported here rather than in the body because neither is a hypothesis test: both average over phase, use a single signal family, and carry no statement of uncertainty. Their role is to show that the phenomenon the models of \nameref{sec:four} are built to measure is present in the raw sweep. The summary statistics read off them are given in \nameref{sec:seven}.
+This appendix holds the descriptive pass that precedes the Bayesian analysis. It covers the fifteen
+geometries of \autoref{tab:hfModels}, five per page, and each row is one geometry read twice: on the
+left what the model outputs, on the right what its internal state retains. It is reported here
+rather than in the body because none of it is a hypothesis test. Both readings average over phase,
+both use a single signal family, and neither carries a statement of uncertainty; their role is to
+show that the phenomenon the models of \nameref{sec:four} are built to measure is present in the raw
+sweep, and the summary statistics read off them are given in \nameref{sec:seven}.
+
+\subsection{How the pages are produced}
+
+The measurement is a sweep of pure sinusoids from $2$ to $250$\,Hz in one-hertz steps at
+$f_s=512$\,Hz. Every geometry is loaded in turn, measured, and released, and the context supplied to
+each is about $512$ samples snapped down to a whole number of strides, so that no geometry is fed a
+partial patch. Both readings are computed from the same swept frequencies, which is what allows a
+row to be read across.
+
+The left column is behavioural. The tone is given as context, the model's median forecast is
+appended to that context and the model re-invoked, and the loop continues until a window of $512$
+samples has been generated; the dominant frequency is then read as the largest magnitude of the
+discrete Fourier transform of that window once its mean is removed, and averaged over four
+non-redundant starting phases. Two properties of that procedure matter for reading the panel. The
+recursion is imposed from outside and is not Chronos-Bolt's own generation mode, which emits its
+whole horizon in one step, so a curve that degrades along the sweep is partly the model reading its
+own output. And the rollout length fixes the resolution: $512$ samples at $512$\,Hz give one-hertz
+bins, so a dominant frequency is placed to within a hertz and no finer.
+
+The right column is representational. At each swept frequency the internal state is captured at the
+output quantile head, and a linear probe is trained on it and scored by cross-validation. Eight
+tasks are scored per geometry: seven band tasks, each asking which half of a frequency band a tone
+belongs to, and one local task asking whether a tone at $f-1$\,Hz can be told from one at
+$f+1$\,Hz. The band tasks are cross-validated with folds grouped by frequency, so a probe cannot
+score by memorising individual frequencies rather than learning the boundary; the local task cannot
+be grouped that way, since its two classes are two frequencies, and holds out phases instead. Ten
+phases per frequency are used here against the four of the rollout, because a probe needs examples
+where the forecast needs only an average.
+
+Both quantities are archived as parquet beside the figures, so a page can be redrawn without
+re-running the models, and the notebook reuses them when they exist.
+
+\subsection{What the pages show}
+
+On the left, a point on the dotted diagonal is a tone rebuilt at the frequency it was given at. A
+flat segment is a set of distinct inputs collapsing onto one output, which is loss of
+distinguishability rather than of amplitude. A jump is a tone the model produces that was never
+supplied. The shaded band is one standard deviation over the starting phases, so a wide band at a
+frequency means the answer depends on where in its cycle the tone began.
+
+On the right, each cell is one swept frequency and its colour is the probe's accuracy there: green
+at or above $0.9$, amber through the middle, red below $0.6$, which is close to chance on a
+two-class task. Grey marks a frequency no task covers, which is a statement about the design and not
+about the model. The dashed verticals on both sides are the predicted candidates
+$\mathcal F_{\mathrm{lock}}$ of that geometry, drawn from $(f_s,P,S)$ and not fitted to anything.
+
+The two columns answer different questions and are meant to be read together. A frequency off the
+diagonal on the left but still green on the right lost the tone somewhere between the representation
+and the output, not at the tokenisation. A red cell is the stronger condition: the internal state
+itself no longer separates that frequency from its neighbour. Neither reading is evidence of
+structural aliasing on its own, since neither is paired against controls and neither carries an
+interval; that is what the models of \nameref{sec:four} are for.
 
 \begin{figure*}[!p]
     \centering
-    \includegraphics[width=0.92\textwidth]{figures/FIG_ALL_reconstruction.png}
-    \caption{Behavioural reading. Each panel plots, for one geometry, the dominant frequency of the recursive multi-step forecast against the frequency of the tone supplied as context, averaged over the non-redundant starting phases with one standard deviation shaded. The tone is given as context, the model's median forecast is appended to that context and the model re-invoked, and the loop continues until a full window has been generated; the dominant frequency is then read as the largest magnitude of the discrete Fourier transform after the mean is removed. The recursion is imposed by this procedure and is not the model's own generation mode, since Chronos-Bolt emits its whole horizon in one step. A point on the dotted diagonal is a tone rebuilt correctly; a flat segment is a set of distinct inputs collapsing onto one output; a jump is a tone the model rebuilds that was never supplied. Dashed verticals are the predicted candidates $\mathcal F_{\mathrm{lock}}$ of that geometry. The reading is behavioural and records what the model outputs, not what its representation retains.}
-    \label{fig:allReconstruction}
+    \IfFileExists{figures/FIG_E1_page1.png}
+        {\includegraphics[width=0.96\textwidth]{figures/FIG_E1_page1.png}}
+        {\fbox{\parbox{0.9\textwidth}{\centering\vspace{3cm}FIG\_E1\_page1.png not yet copied into
+         \texttt{figures/}\vspace{3cm}}}}
+    \caption{Reconstruction and probe sweep, page 1 of 3: geometries p8-s8, p16-s8, p16-s12,
+    p16-s16 and p24-s8. Each row is one geometry. Left, the dominant frequency of the generated
+    window against the frequency supplied as context, averaged over four starting phases with one
+    standard deviation shaded, and the dotted diagonal marking a tone rebuilt correctly. Right, the
+    accuracy of a linear probe on the internal state at each swept frequency, one strip per task,
+    with the local $f\pm1$\,Hz task last. Dashed verticals are that geometry's own predicted
+    candidates. This page carries the two non-overlapping baselines, p8-s8 and p16-s16, beside the
+    two geometries that share $S=8$ with different patch sizes.}
+    \label{fig:sweepPage1}
+\end{figure*}
+
+\begin{figure*}[!p]
+    \centering
+    \IfFileExists{figures/FIG_E1_page2.png}
+        {\includegraphics[width=0.96\textwidth]{figures/FIG_E1_page2.png}}
+        {\fbox{\parbox{0.9\textwidth}{\centering\vspace{3cm}FIG\_E1\_page2.png not yet copied into
+         \texttt{figures/}\vspace{3cm}}}}
+    \caption{Page 2 of 3: geometries p24-s12, p24-s16, p24-s20, p24-s24 and p32-s8, read as
+    \autoref{fig:sweepPage1}. The first four hold the patch size at $P=24$ and shorten the stride
+    from $24$ to $12$, so the stride comb $c f_s/S$ moves across the band while the patch comb
+    $k f_s/P$ stays where it is: this is the series on which the two branches of
+    $\mathcal F_{\mathrm{lock}}$ can be told apart by eye, and p24-s16 and p24-s20 are among the
+    six runs with $S \nmid P$ on which the branch estimates of \nameref{sec:four} rest.}
+    \label{fig:sweepPage2}
+\end{figure*}
+
+\begin{figure*}[!p]
+    \centering
+    \IfFileExists{figures/FIG_E1_page3.png}
+        {\includegraphics[width=0.96\textwidth]{figures/FIG_E1_page3.png}}
+        {\fbox{\parbox{0.9\textwidth}{\centering\vspace{3cm}FIG\_E1\_page3.png not yet copied into
+         \texttt{figures/}\vspace{3cm}}}}
+    \caption{Page 3 of 3: geometries p32-s12, p32-s16, p32-s20, p32-s24 and p32-s32, read as
+    \autoref{fig:sweepPage1}. The patch size is held at $P=32$, the widest of the design, so the
+    patch comb is the densest and the overlap ratio runs from $0.62$ down to $0$ within one page.
+    Read against page 2 at equal stride, the difference between the two pages is a difference of
+    patch size alone, which is the comparison the covariate $\log P$ of \autoref{eq:d2mitigation}
+    is fitted to.}
+    \label{fig:sweepPage3}
 \end{figure*}
 
 \subsection{Planned extension: scope}
 
-Two additions are planned to this appendix. The first extends the behavioural reading of
-\autoref{fig:allReconstruction} from the five geometries of the initial design to the fifteen of
-\autoref{tab:hfModels}, so that the descriptive pass covers the same grid the inferential stage is
-fitted on. The second is a direct spectral comparison between the signal supplied as context and
-the signal the model returns, carried out on the three signal families of \nameref{sec:five}: a
-pure tone, a Light TSMixup background and a KernelSynth background.
+A second addition is planned to this appendix: a direct spectral comparison between the signal
+supplied as context and the signal the model returns, carried out on the signal families of
+\nameref{sec:five}, a Light TSMixup background and a KernelSynth background.
 
 The comparison is run on the geometry $P=16$, $S=16$. That is the geometry of the published
 Chronos-Bolt tokeniser, so the reading concerns the configuration a deployment would actually meet,
@@ -30,13 +125,14 @@ the question the models of \nameref{sec:four} are built to decide worth asking i
 
 For each signal family one realisation is produced at the probing length, the context of $480$
 samples is supplied to the model, and the forecast of $64$ samples is retained at the median
-quantile. Three spectra are then computed under the same window and the same mean removal: the
-context, the true continuation over the $64$ samples that follow it, and the forecast over those
-same $64$ samples. For the families built from sinusoidal sources the generating frequencies are
-known by construction and are marked together with the candidate set $\mathcal F_{\mathrm{lock}}$ of
-the geometry. The comparison of record is the forecast against the true continuation, since those
-two share a window and therefore a frequency resolution; the context spectrum is reported beside
-them as a statement of what entered the model, at its own finer resolution.
+quantile. The real signal is then cut to the same $64$ samples that follow the context, so the two
+sides of every figure cover the same instants at the same resolution. Amplitudes are fitted by least
+squares at known frequencies rather than read off bins, which keeps them unbiased at the non-integer
+frequencies the source pool contains, and the transforms are evaluated on a one-hertz grid by zero
+padding, which places a peak finely without adding resolving power. A component may also be planted
+on one of the geometry's own lock frequencies before the signal is given to the model, at an
+amplitude above the strongest component already present, so that the input certainly carries energy
+at a predicted site.
 
 \subsection{Planned extension: what it can and cannot show}
 
@@ -56,14 +152,7 @@ of structural aliasing, and it is placed here so that the body may point to it a
 any hypothesis resting on it.
 
 % ------------------------------------------------------------------------------------------
-% TO DO, once the figures are produced: insert them above and add the closing paragraph that
-% states what the comparison showed on each of the three families. Keep the claim at the level
-% of information loss; nothing here may be read as evidence of structural aliasing.
+% TO DO, once the decomposition figures are produced: insert them here with their captions and
+% add the closing paragraph that states what the comparison showed on each family. Keep the
+% claim at the level of information loss; nothing here may be read as evidence of aliasing.
 % ------------------------------------------------------------------------------------------
-
-\begin{figure*}[!p]
-    \centering
-    \includegraphics[width=0.98\textwidth]{figures/FIG_ALL_spectral_recovery.png}
-    \caption{Representational reading. Each strip is one geometry, and each cell one swept frequency, coloured by the cross-validated accuracy of a linear probe trained on the internal state at the output quantile head. The task is local and of constant difficulty at every frequency, whether a tone at $f-1$\,Hz can be separated from one at $f+1$\,Hz, and it holds out phases rather than frequencies, so no cell is inflated by a probe memorising individual frequencies. Green is accuracy at or above $0.9$, amber between $0.6$ and $0.9$, red below $0.6$, which is close to chance on a two-class task; grey marks a frequency the task does not cover, which is a statement about the design and not about the model. Dashed verticals are the predicted candidates of that geometry. Read against \autoref{fig:allReconstruction}, a frequency that is off the diagonal but still green has lost the tone at the projection rather than at the tokenisation; a red cell is the stronger condition that structural aliasing predicts.}
-    \label{fig:allSpectralRecovery}
-\end{figure*}
