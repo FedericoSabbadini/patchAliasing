@@ -1,6 +1,12 @@
 Testing the hypotheses of \nameref{sec:four} requires a design in which the two branches of $\mathcal F_{\mathrm{lock}}$ can be told apart, signals whose frequency content is known by construction, and an order of execution in which nothing that decides a hypothesis is chosen after the data have been seen.
 
-Since any change to $P$ or $S$ requires retraining due to modification of the weight matrix and to internal representation respectively when P and S are varied. The design is a grid of variants trained from scratch, configurations with $S>P$ are excluded by construction.
+\subsubsection{Patch geometries}
+
+Chronos-Bolt-Tiny is distributed with the standard geometry $P=S=16$. Studying only that point would show how the published configuration behaves, but not whether a blind spot is specific to it or follows the tokenisation parameters that generate it. The design therefore varies $P$ and $S$ to observe Chronos beyond the standard configuration. At fixed $P$, changing $S$ varies the overlap and the spacing of the stride family; at fixed $S$, changing $P$ varies the patch width and the spacing of the patch family. The $P=S$ runs provide contiguous, non-overlapping baselines at different temporal resolutions. Configurations with $S>P$ are excluded because their gaps discard input samples and would confound tokenisation geometry with data loss.
+
+\subsubsection{Retraining}
+
+Every geometry, including the $P=S=16$ baseline, is trained from scratch. Changing $P$ changes the input dimension of the first patch-projection block, while changing $S$ changes the patch sequence on which the inter-patch dynamics are learned; reusing the published weights would therefore leave the variants on unequal training histories. Only the official Chronos-Bolt-Tiny architectural configuration is loaded, after which $(P,S)$ is overridden before random initialisation and the data, optimiser, budget and seed are held fixed across runs. The complete construction, streaming-data and optimisation procedure is given in \autoref{sec:appRetraining}.
 
 \input{tables/hfModels.tex}
 
