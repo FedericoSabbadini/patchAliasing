@@ -1,0 +1,32 @@
+\begin{table}[H]
+    \centering
+    \small
+    \setlength{\tabcolsep}{5pt}
+    \begin{tabular}{@{}llrrr@{}}
+        \toprule
+        \textbf{Task} & \textbf{Level} & \textbf{Band [Hz]} & \textbf{Boundary [Hz]} & \textbf{Width [Hz]} \\
+        \midrule
+        \texttt{Mid} & 1 & $2$--$250$   & $126$ & $248$ \\
+        \addlinespace[2pt]
+        \texttt{L}   & 2 & $2$--$126$   & $64$  & $124$ \\
+        \texttt{H}   & 2 & $127$--$250$ & $188$ & $123$ \\
+        \addlinespace[2pt]
+        \texttt{LL}  & 3 & $2$--$64$    & $33$  & $62$ \\
+        \texttt{LH}  & 3 & $65$--$126$  & $95$  & $61$ \\
+        \texttt{HL}  & 3 & $127$--$188$ & $157$ & $61$ \\
+        \texttt{HH}  & 3 & $189$--$250$ & $219$ & $61$ \\
+        \bottomrule
+    \end{tabular}
+    \caption{The seven hierarchical band-classification tasks, after Pagani et
+    al.\autocite{paganiPreliminaryInsightsChronos2026} and carried unchanged from Deliverable~1, as
+    implemented in \texttt{probe\_lib.BAND\_TASKS}. Each task is one binary question: given the
+    internal state at a tone, does that tone lie below or above the boundary of its band. Three
+    levels of split resolve eight buckets with seven questions, so the family reads a frequency by
+    successive halving rather than by a single classification, and the level fixes how demanding
+    the question is: \texttt{Mid} separates two halves of the whole analysed range, while the third
+    level asks the same of a $61$\,Hz window. A geometry that answers level~1 and fails level~3 has
+    retained the coarse position of a tone and lost its fine position, which is a different
+    statement from losing the tone. The boundaries partition $2$--$250$\,Hz and are held fixed
+    across geometries so a row may be read across the design.}
+    \label{tab:bandTasks}
+\end{table}
