@@ -28,7 +28,7 @@ The right column is representational. At each swept frequency the internal state
 output quantile head, and a linear probe is trained on it and scored by cross-validation. Eight
 tasks are scored per geometry: the seven hierarchical band tasks of
 \autoref{tab:bandTasks}, after Pagani et al.\autocite{paganiPreliminaryInsightsChronos2026} and
-carried unchanged from the earlier deliverables, each asking which half of a frequency band a tone
+unchanged from the probing methodology used throughout, each asking which half of a frequency band a tone
 belongs to, and one local task asking whether a tone at $f-1$\,Hz can be told from one at
 $f+1$\,Hz. The band tasks are cross-validated with folds grouped by frequency, so a probe cannot
 score by memorising individual frequencies rather than learning the boundary; the local task cannot
@@ -66,10 +66,7 @@ interval; that is what the models of \nameref{sec:four} are for.
 
 \begin{figure*}[!p]
     \centering
-    \IfFileExists{figures/FIG_E1_page1.png}
-        {\includegraphics[width=0.96\textwidth]{figures/FIG_E1_page1.png}}
-        {\fbox{\parbox{0.9\textwidth}{\centering\vspace{3cm}FIG\_E1\_page1.png not yet copied into
-         \texttt{figures/}\vspace{3cm}}}}
+    \includegraphics[width=0.96\textwidth]{figures/FIG_E1_page1.png}
     \caption{Reconstruction and probe sweep, page 1 of 3: geometries p8-s8, p16-s8, p16-s12,
     p16-s16 and p24-s8. Each row is one geometry. Left, the dominant frequency of the generated
     window against the frequency supplied as context, averaged over four starting phases, drawn as
@@ -87,10 +84,7 @@ interval; that is what the models of \nameref{sec:four} are for.
 
 \begin{figure*}[!p]
     \centering
-    \IfFileExists{figures/FIG_E1_page2.png}
-        {\includegraphics[width=0.96\textwidth]{figures/FIG_E1_page2.png}}
-        {\fbox{\parbox{0.9\textwidth}{\centering\vspace{3cm}FIG\_E1\_page2.png not yet copied into
-         \texttt{figures/}\vspace{3cm}}}}
+    \includegraphics[width=0.96\textwidth]{figures/FIG_E1_page2.png}
     \caption{Page 2 of 3: geometries p24-s12, p24-s16, p24-s20, p24-s24 and p32-s8, read as \autoref{fig:sweepPage1}, the
     pale red band again being $\pm1$ standard deviation of the dominant frequency over the four
     starting phases. The first four hold the patch size at $P=24$ and shorten the stride
@@ -103,10 +97,7 @@ interval; that is what the models of \nameref{sec:four} are for.
 
 \begin{figure*}[!p]
     \centering
-    \IfFileExists{figures/FIG_E1_page3.png}
-        {\includegraphics[width=0.96\textwidth]{figures/FIG_E1_page3.png}}
-        {\fbox{\parbox{0.9\textwidth}{\centering\vspace{3cm}FIG\_E1\_page3.png not yet copied into
-         \texttt{figures/}\vspace{3cm}}}}
+    \includegraphics[width=0.96\textwidth]{figures/FIG_E1_page3.png}
     \caption{Page 3 of 3: geometries p32-s12, p32-s16, p32-s20, p32-s24 and p32-s32, read as \autoref{fig:sweepPage1}, the
     pale red band again being $\pm1$ standard deviation of the dominant frequency over the four
     starting phases. The patch size is held at $P=32$, the widest of the design, so the
@@ -117,54 +108,101 @@ interval; that is what the models of \nameref{sec:four} are for.
     \label{fig:sweepPage3}
 \end{figure*}
 
-\subsection{Planned extension: scope}
+\subsection{The decomposition on generated signals}
 
-A second addition is planned to this appendix: a direct spectral comparison between the signal
-supplied as context and the signal the model returns, carried out on the signal families of
-\nameref{sec:five}, a Light TSMixup background and a KernelSynth background.
+The pages above sweep pure tones. This second group asks the same question of the two generator
+families of \nameref{sec:five}, on the geometry $P=S=16$, so that the reading concerns the
+configuration a deployment would meet and the two branches of $\mathcal F_{\mathrm{lock}}$ coincide
+in a single comb at multiples of $f_s/16$. The method is stated in \nameref{sec:six}; what follows
+is only what is needed to read the panels.
 
-The comparison is run on the geometry $P=16$, $S=16$. That is the geometry of the published
-Chronos-Bolt tokeniser, so the reading concerns the configuration a deployment would actually meet,
-and since $P=S$ the two branches of $\mathcal F_{\mathrm{lock}}$ coincide in a single comb at
-multiples of $f_s/16$, which leaves one predicted set to mark rather than two interlaced ones.
+Each run draws one realisation, supplies its first $480$ samples as context, and keeps the
+$64$-sample horizon at the median quantile. The real signal is cut to the same $64$ samples that
+follow the context, so both sides cover the same instants at the same resolution and a difference
+between them is not a difference of window. Two seeds are shown per family, which is not a sample
+in any statistical sense: they are there so that a feature of one draw is not read as a property of
+the generator.
 
-Its purpose is motivation rather than test. Light TSMixup and KernelSynth are the two synthetic
-generators of the Chronos data-generation procedure, so a loss observed on them cannot be answered
-with the objection that the probe is out of distribution; and the extent of that loss is what makes
-the question the models of \nameref{sec:four} are built to decide worth asking in the first place.
+Two frequency spacings appear in these pages and they are not the same quantity. The transforms are
+evaluated on a one-hertz grid, which is the spacing of the plotted curve and is obtained by zero
+padding; it lets a peak be located at, say, $6$\,Hz rather than snapped to a multiple of the native
+spacing. The native spacing is $f_s/N = 512/64 = 8$\,Hz, fixed by the $125$\,ms the horizon covers,
+and no amount of zero padding improves it. Interpolation places a peak finely; it does not separate
+two peaks. Two components one hertz apart therefore appear as one line however fine the grid, and
+the panel titles that read \emph{resolving power $8.0$\,Hz} refer to this second quantity: read them
+as \emph{$64$ samples, native $\Delta f = 8.0$\,Hz, plotted on a $1$\,Hz zero-padded grid}. A
+$512$-sample rollout would bring the native spacing to one hertz as well, at the cost of feeding the
+model its own output.
 
-\subsection{Planned extension: protocol}
+Each panel title carries the frequency of the component in hertz, whether that frequency lies on
+$\mathcal F_{\mathrm{lock}}$, and the fitted amplitude $A$; a component whose fit spans fewer than
+one and a half cycles of the window is marked, since below that an amplitude and a phase cannot be
+told apart. On the prediction side a line is drawn only if it reaches $45\%$ of the strongest
+component of the prediction itself, so the panels show what builds the returned signal rather than
+every line a peak search returns.
 
-For each signal family one realisation is produced at the probing length, the context of $480$
-samples is supplied to the model, and the forecast of $64$ samples is retained at the median
-quantile. The real signal is then cut to the same $64$ samples that follow the context, so the two
-sides of every figure cover the same instants at the same resolution. Amplitudes are fitted by least
-squares at known frequencies rather than read off bins, which keeps them unbiased at the non-integer
-frequencies the source pool contains, and the transforms are evaluated on a one-hertz grid by zero
-padding, which places a peak finely without adding resolving power. A component may also be planted
-on one of the geometry's own lock frequencies before the signal is given to the model, at an
-amplitude above the strongest component already present, so that the input certainly carries energy
-at a predicted site.
+\begin{figure*}[p]
+    \centering
+    \includegraphics[width=0.97\textwidth,height=0.44\textheight,keepaspectratio]{figures/FIG_E3_tsmixup_p16-s16_main_components_seed17.png}
+    \par\vspace{6pt}
+    \includegraphics[width=0.97\textwidth,height=0.30\textheight,keepaspectratio]{figures/FIG_E4_tsmixup_p16-s16_spectra_seed17.png}
+    \caption{Light TSMixup, seed 17, on the retrained $P=S=16$ geometry, in two panels that are two readings of
+one draw. \emph{Above}, the components. On the left the realisation supplied as context and the
+frequencies it was built from, which the generator records rather than the transform recovering
+them; on the right the $64$-sample horizon the model returned and its own strongest lines, fitted by
+least squares at the frequencies a peak search proposed. The two columns are separate
+decompositions and a row does not pair them: what matters is which frequencies survive into the
+right column and at what amplitude, and each column carries its own vertical scale. \emph{Below},
+the transforms those lines were read off, Hann-windowed, one-sided and scaled so a pure tone of
+amplitude $A$ peaks near $A$. Dashed verticals are $\mathcal F_{\mathrm{lock}}$ for this geometry,
+green verticals mark the frequencies the generator drew, markers are the lines the search returned,
+and the dashed horizontal on the prediction spectrum is the $45\%$ amplitude cut below which a line
+is not carried into the panel above.}
+    \label{fig:decompTS17}
+\end{figure*}
 
-\subsection{Planned extension: what it can and cannot show}
+\begin{figure*}[p]
+    \centering
+    \includegraphics[width=0.97\textwidth,height=0.44\textheight,keepaspectratio]{figures/FIG_E3_tsmixup_p16-s16_main_components_seed85.png}
+    \par\vspace{6pt}
+    \includegraphics[width=0.97\textwidth,height=0.30\textheight,keepaspectratio]{figures/FIG_E4_tsmixup_p16-s16_spectra_seed85.png}
+    \caption{Light TSMixup, seed 85, read as \autoref{fig:decompTS17}. A second draw of the same generator under
+the same settings, shown so that a feature of one realisation is not mistaken for a property of the
+family.}
+    \label{fig:decompTS85}
+\end{figure*}
 
-Three limits fix what may be read off the comparison, and each is a property of the measurement
-rather than of the model. A $64$-sample window at $f_s=512$\,Hz resolves $8$\,Hz, so the comb of the
-reference geometry falls on bins but a candidate and its controls at $f_k\pm\delta$ do not separate:
-the picture can show loss, not the paired contrast the models estimate. The forecast retained is a
-median quantile, and a conditional median is smoother than a sample path, so part of any
-high-frequency attenuation belongs to the point forecast rather than to the tokenisation; the
-matched triplet used in the body cancels that term, a raw spectrum does not. And KernelSynth draws
-are broadband and non-stationary, so their spectra carry no lines to read against: that family
-speaks to loss in general, while any site-level reading rests on Light TSMixup, whose components are
-known one by one.
+\begin{figure*}[p]
+    \centering
+    \includegraphics[width=0.97\textwidth,height=0.44\textheight,keepaspectratio]{figures/FIG_E3_kernelsynth_p16-s16_main_components_seed2.png}
+    \par\vspace{6pt}
+    \includegraphics[width=0.97\textwidth,height=0.30\textheight,keepaspectratio]{figures/FIG_E4_kernelsynth_p16-s16_spectra_seed2.png}
+    \caption{KernelSynth, seed 2, read as \autoref{fig:decompTS17} with one difference that runs through both
+panels: a KernelSynth draw is a Gaussian-process realisation and carries no frequencies the
+generator can name, so the left column above holds the strongest lines of the transform rather than
+a list of sources, and the spectrum below carries no green verticals. Any site-level reading
+therefore rests on Light TSMixup, and this family speaks to loss in general. The kernels drawn are
+printed in the parameter strip beneath the upper panel.}
+    \label{fig:decompKS2}
+\end{figure*}
 
-The comparison is therefore descriptive. It is evidence of frequency information loss, not evidence
-of structural aliasing, and it is placed here so that the body may point to it as motivation without
-any hypothesis resting on it.
+\begin{figure*}[p]
+    \centering
+    \includegraphics[width=0.97\textwidth,height=0.44\textheight,keepaspectratio]{figures/FIG_E3_kernelsynth_p16-s16_main_components_seed33.png}
+    \par\vspace{6pt}
+    \includegraphics[width=0.97\textwidth,height=0.30\textheight,keepaspectratio]{figures/FIG_E4_kernelsynth_p16-s16_spectra_seed33.png}
+    \caption{KernelSynth, seed 33, read as \autoref{fig:decompKS2}.}
+    \label{fig:decompKS33}
+\end{figure*}
 
-% ------------------------------------------------------------------------------------------
-% TO DO, once the decomposition figures are produced: insert them here with their captions and
-% add the closing paragraph that states what the comparison showed on each family. Keep the
-% claim at the level of information loss; nothing here may be read as evidence of aliasing.
-% ------------------------------------------------------------------------------------------
+\subsection{What the decomposition shows}
+
+\textcolor{red}{\textbf{Placeholder, to be replaced once the figures above have been read.} This
+subsection states what the four pages show and nothing more: which of the drawn Light TSMixup
+components survive into the horizon and at what fraction of their input amplitude, whether the
+losses fall on the comb of the reference geometry or elsewhere, whether the two seeds of a family
+agree, and whether the KernelSynth pages show the same attenuation on a broadband input as the
+Light TSMixup pages show on a sparse one. It closes on the limit already stated: a $64$-sample
+horizon separates nothing finer than $8$\,Hz, so a candidate and its controls at $f_k\pm\delta$ fall
+in one line and these pages can show loss without showing the paired contrast the models of
+\nameref{sec:four} estimate. Nothing here may be read as evidence of structural aliasing.}
