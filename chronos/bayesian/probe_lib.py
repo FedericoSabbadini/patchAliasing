@@ -26,6 +26,7 @@ unit-variance generator background at SNR = 4.
 from __future__ import annotations
 
 import sys
+import json
 from math import gcd
 from pathlib import Path
 
@@ -40,6 +41,8 @@ _SYNTHETIC = _CHRONOS / "data" / "synthetic"
 for _p in (_HERE, _SYNTHETIC):
     if str(_p) not in sys.path:
         sys.path.insert(0, str(_p))
+
+import checkpointing as cp
 
 # --------------------------------------------------------------------------------- #
 #  Fixed experimental setup (deliverable convention, do not change without changing the .tex)
@@ -216,6 +219,7 @@ def model_tag(P: int, S: int) -> str:
 #  1. Signals: generator backgrounds + injected tone
 # --------------------------------------------------------------------------------- #
 _bg_cache: dict[tuple[str, int], np.ndarray] = {}
+_bg_meta: dict[tuple[str, int], dict] = {}
 
 # Every background is drawn ONCE at this length and sliced to whatever a caller asks for.
 # Drawing separately per length would not give nested signals: length is a generator parameter,
@@ -231,7 +235,35 @@ def make_tone(f: float, phase: float = 0.0, n: int = CTX, amp: float = 1.0) -> n
     return (amp * np.sin(2 * np.pi * f * t + phase)).astype(np.float32)
 
 
-def background(generator: str, n: int, seed: int) -> np.ndarray:
+def _background_recipe(generator: str, length: int) -> dict:
+    """Canonical generator recipe included in the run fingerprint and signal archive."""
+    if generator == "kernelsynth":
+        return {
+            "generator": generator,
+            "algorithm_version": "deliverable3-v1",
+            "J": 5,
+            "l_syn": int(length),
+            "fs": FS,
+            "jitter": 1e-4,
+            "P": 16,
+        }
+    if generator == "tsmixup":
+        return {
+            "generator": generator,
+            "algorithm_version": "light-tsmixup-deliverable3-v1",
+            "K": 10,
+            "alpha": 1.5,
+            "l_min": int(length),
+            "l_max": int(length),
+            "fs": FS,
+            "P": 16,
+            "data_mode": "frequencies",
+            "pool_frequencies_sha256": cp.fingerprint(tsmixup_pool()),
+        }
+    raise ValueError(f"unknown generator {generator!r}; expected one of {GENERATORS}")
+
+
+def background(generator: str, n: int, seed: int, max_attempts: int = 8) -> np.ndarray:
     """The first `n` samples of one unit-variance background realisation.
 
     `generator` is "tsmixup" or "kernelsynth", the two corpora named in the deliverable's Data
@@ -264,10 +296,25 @@ def background(generator: str, n: int, seed: int) -> np.ndarray:
         else:
             raise ValueError(f"unknown generator {generator!r}; expected one of {GENERATORS}")
 
-        x = np.asarray(gen.generate(), float).ravel()[:m]
-        sd = x.std()
-        x = (x / sd) if sd > 1e-8 else x              # unit variance, so TONE_SNR is a real SNR
+        x = None
+        for attempt in range(1, max_attempts + 1):
+            candidate = np.asarray(gen.generate(), float).ravel()[:m]
+            sd = float(np.std(candidate))
+            if len(candidate) == m and np.isfinite(candidate).all() and sd > 1e-8:
+                x = candidate
+                break
+        if x is None:
+            raise RuntimeError(
+                f"{generator} seed {seed} produced no finite, non-degenerate draw in "
+                f"{max_attempts} attempts")
+        x = x - float(np.mean(x))
+        x = x / float(np.std(x))                       # TONE_SNR is a literal amplitude ratio
         _bg_cache[key] = x.astype(np.float32)
+        _bg_meta[key] = {
+            "attempt": attempt,
+            "recipe": _background_recipe(generator, m),
+            "kernel_expression": list(getattr(gen, "last_kernels", [])),
+        }
 
     out = _bg_cache[key]
     if n > len(out):
@@ -284,6 +331,47 @@ def background_pool(generator: str, n_bg: int, length: int = CTX + PRED,
     separately drawn signal.
     """
     return [background(generator, length, seed0 + i) for i in range(n_bg)]
+
+
+def background_pool_quality(signals: list[np.ndarray]) -> dict:
+    """Quantify the minimum data-quality conditions needed before a pool can enter inference."""
+    if not signals:
+        return {"quality_ok": False, "reason": "empty pool"}
+    X = np.stack([np.asarray(x, float) for x in signals])
+    finite = bool(np.isfinite(X).all())
+    means = np.mean(X, axis=1)
+    stds = np.std(X, axis=1)
+    hashes = {cp.fingerprint(np.asarray(x, np.float32).tolist()) for x in X}
+    unique = len(hashes)
+    if len(X) > 1:
+        correlations = np.corrcoef(X)
+        upper = np.abs(correlations[np.triu_indices(len(X), 1)])
+        max_abs_corr = float(np.nanmax(upper))
+    else:
+        max_abs_corr = 0.0
+    singular = np.linalg.svd(X, compute_uv=False)
+    energy = singular ** 2
+    effective_rank = float((energy.sum() ** 2) / max(float(np.sum(energy ** 2)), 1e-12))
+    minimum_rank = min(3, len(X))
+    quality_ok = bool(
+        finite
+        and np.max(np.abs(means)) <= 1e-5
+        and np.max(np.abs(stds - 1.0)) <= 1e-5
+        and unique == len(X)
+        and max_abs_corr < 0.999999
+        and effective_rank >= minimum_rank - 1e-6
+    )
+    return {
+        "quality_ok": quality_ok,
+        "finite": finite,
+        "max_abs_mean": float(np.max(np.abs(means))),
+        "max_abs_std_error": float(np.max(np.abs(stds - 1.0))),
+        "unique_draws": unique,
+        "n_draws": len(X),
+        "max_abs_pairwise_correlation": max_abs_corr,
+        "effective_rank": effective_rank,
+        "minimum_effective_rank": minimum_rank,
+    }
 
 def save_signal_pool(out_dir, generators=GENERATORS, n_bg: int = 6,
                      seed0: int = 10_000) -> "object":
@@ -304,16 +392,64 @@ def save_signal_pool(out_dir, generators=GENERATORS, n_bg: int = 6,
 
     out = Path(out_dir) / "signals"
     out.mkdir(parents=True, exist_ok=True)
+    index_path = out / "signals_index.parquet"
+    expected = {(gen, i, seed0 + i) for gen in generators for i in range(n_bg)}
+
+    # Reuse only a complete archive whose recipe and per-file hashes still match.  A rejected
+    # archive is regenerated below; individual files are replaced atomically.
+    if index_path.is_file():
+        try:
+            old = pd.read_parquet(index_path)
+            required = {"generator", "bg_id", "seed", "file", "sha256", "recipe_sha256"}
+            if required.issubset(old.columns):
+                observed = set(zip(old["generator"], old["bg_id"], old["seed"]))
+                recipes_ok = all(
+                    row.recipe_sha256 == cp.fingerprint(_background_recipe(row.generator, CANON_LEN))
+                    for row in old.itertuples()
+                )
+                files_ok = all(
+                    (out / row.file).is_file() and cp.sha256_file(out / row.file) == row.sha256
+                    for row in old.itertuples()
+                )
+                if observed == expected and recipes_ok and files_ok:
+                    for row in old.itertuples():
+                        x = np.load(out / row.file, allow_pickle=False)
+                        _bg_cache[(row.generator, int(row.seed))] = np.asarray(x, np.float32)
+                    return old
+        except (OSError, ValueError, KeyError, AttributeError):
+            pass
+
     rows = []
+    pool_quality = {}
     for gen in generators:
-        for i, x in enumerate(background_pool(gen, n_bg, CANON_LEN, seed0)):
+        pool = background_pool(gen, n_bg, CANON_LEN, seed0)
+        quality = background_pool_quality(pool)
+        if not quality["quality_ok"]:
+            raise ValueError(f"{gen} background pool failed quality gate: {quality}")
+        pool_quality[gen] = quality
+        for i, x in enumerate(pool):
             name = f"background_{gen}_bg{i}.npy"
-            np.save(out / name, x)
+            cp.atomic_npy(out / name, x)
+            recipe = _background_recipe(gen, CANON_LEN)
+            draw_meta = _bg_meta.get((gen, seed0 + i), {})
             rows.append(dict(kind="background", generator=gen, bg_id=i, seed=seed0 + i,
-                             n=len(x), std=float(x.std()), file=name))
+                             n=len(x), mean=float(x.mean()), std=float(x.std()), file=name,
+                             sha256=cp.sha256_file(out / name),
+                             recipe_sha256=cp.fingerprint(recipe),
+                             recipe_json=json.dumps(recipe, sort_keys=True),
+                             attempt=int(draw_meta.get("attempt", 1)),
+                             kernel_expression=json.dumps(draw_meta.get("kernel_expression", [])),
+                             pool_max_abs_corr=quality["max_abs_pairwise_correlation"],
+                             pool_effective_rank=quality["effective_rank"],
+                             pool_quality_ok=quality["quality_ok"]))
 
     meta = pd.DataFrame(rows)
-    meta.to_parquet(out / "signals_index.parquet", index=False)
+    cp.atomic_parquet(index_path, meta)
+    cp.atomic_json(out / "signals_manifest.json", {
+        "schema_version": 1,
+        "pool_quality": pool_quality,
+        "index_sha256": cp.sha256_file(index_path),
+    })
     return meta
 
 
@@ -378,6 +514,30 @@ def lock_family(f: float, P: int, S: int, tol: float = 1e-6) -> str:
     is_s = any(abs(f - x) < tol for x in stride_locks(S))
     is_p = any(abs(f - x) < tol for x in patch_nulls(P))
     return "both" if (is_s and is_p) else ("stride" if is_s else ("patch" if is_p else "none"))
+
+
+def assign_site_family(f: float, P: int, S: int, tol_hz: float = 1.5,
+                       ambiguity_hz: float = 0.25) -> tuple[str, float]:
+    """Assign an estimated minimum to the nearest predicted grid at sweep resolution.
+
+    Detected minima are merged means and need not equal an analytic grid member to machine
+    precision.  A site compatible with both branches is marked ``both`` and set aside by D2, as
+    required by Deliverable 3.
+    """
+    stride = np.asarray(stride_locks(S), dtype=float)
+    patch = np.asarray(patch_nulls(P), dtype=float)
+    ds = float(np.min(np.abs(stride - f))) if len(stride) else np.inf
+    dp = float(np.min(np.abs(patch - f))) if len(patch) else np.inf
+    near_s, near_p = ds <= tol_hz, dp <= tol_hz
+    if near_s and near_p and (abs(ds - dp) <= ambiguity_hz or max(ds, dp) <= ambiguity_hz):
+        return "both", min(ds, dp)
+    if near_s and (not near_p or ds + ambiguity_hz < dp):
+        return "stride", ds
+    if near_p and (not near_s or dp + ambiguity_hz < ds):
+        return "patch", dp
+    if near_s and near_p:
+        return ("stride", ds) if ds < dp else ("patch", dp)
+    return "none", min(ds, dp)
 
 
 def union_grid(models: list[tuple[int, int]] = None, step: float = 1.0,
@@ -463,7 +623,12 @@ def load_checkpoint(P: int, S: int, device: str = "cpu", pipeline_cls=None):
         return pipeline_cls.from_pretrained(str(ck), device_map=device), f"p{P}-s{S} (local {ck.name})"
     sub = f"p{P}-s{S}-seed42"
     try:
-        pipe = pipeline_cls.from_pretrained(ml.SWEEP_REPO, subfolder=sub, device_map=device)
+        pipe = pipeline_cls.from_pretrained(
+            ml.SWEEP_REPO,
+            subfolder=sub,
+            revision=ml.SWEEP_REVISION,
+            device_map=device,
+        )
     except Exception as e:
         pend = "" if (P, S) in MODELS_ALL else " It is not one of probe_lib.MODELS_ALL."
         raise RuntimeError(
@@ -487,6 +652,8 @@ class Probe:
         self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
         self.batch_size = batch_size
         self.pipe, self.label = load_checkpoint(P, S, device=self.device)
+        import model_loader as ml
+        self.checkpoint_identity = ml.checkpoint_identity(P, S)
 
         cfg = self.pipe.model.config.chronos_config
         self.P = int(cfg["input_patch_size"])
@@ -507,8 +674,11 @@ class Probe:
                        + ["output_reg", "output_head"])
 
         if (self.P, self.S) != (P, S):
-            print(f"WARNING: requested (P={P}, S={S}) but the loaded checkpoint is "
-                  f"(P={self.P}, S={self.S})")
+            raise ValueError(
+                f"requested checkpoint p{P}-s{S}, loaded metadata says p{self.P}-s{self.S}")
+        if self.pred_len != PRED:
+            raise ValueError(
+                f"checkpoint p{P}-s{S} has prediction_length={self.pred_len}, expected {PRED}")
 
     # ---------------------------------------------------------------------- #
     def close(self) -> None:
@@ -791,7 +961,7 @@ def site_summary(sites: list[float]) -> dict:
         return {"n_sites": 0, "f1": np.nan, "delta_hat": np.nan}
     if len(sites) == 1:
         # a single in-band site is its own fundamental; the spacing is unidentified from differences
-        return {"n_sites": 1, "f1": float(sites[0]), "delta_hat": float(sites[0])}
+        return {"n_sites": 1, "f1": float(sites[0]), "delta_hat": np.nan}
     diffs = np.diff(sites)
     return {"n_sites": len(sites), "f1": float(sites[0]), "delta_hat": float(np.median(diffs))}
 
