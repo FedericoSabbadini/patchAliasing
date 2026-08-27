@@ -58,8 +58,8 @@ SEED = 42
 
 # The geometries of tab:patchStride: every (P, S) on the sweep repository with S >= 8. All are
 # retrained from scratch under the same budget; the published amazon/chronos-bolt-tiny checkpoint
-# is NOT part of the design (deliverable2.tex, "Models and signals"). The S <= 5 runs are excluded,
-# matching deliverable1.tex: their stride-lock class has too few in-band members to carry a local
+# is NOT part of the design (Deliverable 3, "Models and signals"). The S <= 5 runs are excluded:
+# their stride-lock class has too few in-band members to carry a local
 # H1 contrast.
 #
 # S | P  decides whether a geometry can separate the two branches at all: when the stride divides
@@ -104,17 +104,20 @@ MODELS: list[tuple[int, int]] = [(P, S) for P, S in MODELS_ALL if S not in EXCLU
 # context divisible by 28 as well is 1680, which no longer fits the probing convention. p32-s28 is
 # therefore collected descriptively but not fitted, and the deliverable records the exclusion.
 BAYES_MODELS: list[tuple[int, int]] = [(P, S) for (P, S) in MODELS if CTX % S == 0]
+DELIVERABLE3_MODELS: tuple[tuple[int, int], ...] = tuple(BAYES_MODELS)
 
-# Optional runtime override, so a local-only subset can be run without editing this file or the
-# notebook: PATCHALIASING_MODELS="p16-s12,p16-s8,p8-s8,p24-s24" restricts MODELS to those tags.
-# Combined with HF_HUB_OFFLINE=1 (which model_loader honours) this drives a fully
-# offline run on the local checkpoints alone.
+# Optional session override.  It never mutates the frozen Deliverable 3 registry used by manifests
+# and union grids; it only chooses which subset this runtime collects next.
 import os as _os
 _only = _os.environ.get("PATCHALIASING_MODELS", "").strip()
 if _only:
     _tags = {t.strip() for t in _only.split(",") if t.strip()}
-    MODELS = [(P, S) for (P, S) in MODELS_ALL if f"p{P}-s{S}" in _tags and S not in EXCLUDE_S]
-BAYES_MODELS = [(P, S) for (P, S) in MODELS if CTX % S == 0]
+    SESSION_MODELS = [(P, S) for P, S in DELIVERABLE3_MODELS if f"p{P}-s{S}" in _tags]
+    unknown = _tags - {f"p{P}-s{S}" for P, S in DELIVERABLE3_MODELS}
+    if unknown:
+        raise ValueError(f"PATCHALIASING_MODELS contains non-Deliverable-3 tags: {sorted(unknown)}")
+else:
+    SESSION_MODELS = list(DELIVERABLE3_MODELS)
 
 
 def design_gaps(models: list[tuple[int, int]] | None = None) -> list[str]:
@@ -125,7 +128,7 @@ def design_gaps(models: list[tuple[int, int]] | None = None) -> list[str]:
     frequency at which a loss is attributable to the stride branch alone, and the H3a estimand is
     fitted on whatever happens to be left.
     """
-    models = models or MODELS
+    models = list(BAYES_MODELS if models is None else models)
     out = []
     so = [(P, S) for (P, S) in models if P % S != 0]
     if not so:
@@ -141,7 +144,7 @@ def design_gaps(models: list[tuple[int, int]] | None = None) -> list[str]:
     ov = {round((P - S) / P, 3) for P, S in models}
     if len(ov) < 3:
         out.append(f"only {len(ov)} distinct overlap values: delta_O (M1) rests on a short axis.")
-    pend = [m for m in MODELS_ALL if m not in models]
+    pend = [m for m in DELIVERABLE3_MODELS if m not in models]
     if pend:
         out.append("not yet trained: " + ", ".join(model_tag(P, S) for P, S in pend))
     return out
@@ -577,9 +580,9 @@ def controls_are_clean(fk: float, delta: float, P: int, S: int, guard: float = 1
 
 def control_offset(P: int, S: int, fk: float | None = None, guard: float = 1.0,
                    step: float = 0.05) -> float:
-    """Control distance for a lock site, per deliverable2.tex, "What enters the inference".
+    """Control distance for a lock site, per Deliverable 3, "What enters the inference".
 
-    Deliverable 1 fixed delta = 0.25 * fs / S, a quarter of the stride-lock spacing. That rule is
+    The original fixed delta = 0.25 * fs / S, a quarter of the stride-lock spacing. That rule is
     defined from the stride alone and therefore cannot see the patch grid, and at P=16, S=12 it is
     exactly one third of the patch-null spacing fs/P: every stride-only site then has one control
     sitting on a patch null, and the site is discarded. All four of them are, which is the whole of
@@ -590,7 +593,7 @@ def control_offset(P: int, S: int, fk: float | None = None, guard: float = 1.0,
     the design (at every other geometry the default offset is already clean) and recovers the four
     sites at p16-s12.
 
-    `fk=None` returns the Deliverable 1 default, for the sensitivity comparison.
+    `fk=None` returns the original default, for the sensitivity comparison.
     """
     d0 = 0.25 * FS / S
     if fk is None:

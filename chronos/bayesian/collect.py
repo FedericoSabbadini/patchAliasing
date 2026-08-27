@@ -64,7 +64,7 @@ class Config:
 
     #, contrasts (H1 behavioural / H2),
     n_phase_contrast: int = 10      # phase offsets per lock; the S_f cap of Pagani et al. Eq. 6
-    n_bg: int = 100                 # background draws per generator. Deliverable 1 specifies 100
+    n_bg: int = 100                 # background draws per generator. Deliverable 3 specifies 100
                                     # TSMixup and 100 KernelSynth signals; these are those signals,
                                     # and they are also the u_background levels of Eq. (9).
     generators: tuple[str, ...] = pl.GENERATORS
@@ -122,9 +122,9 @@ def collect_contrasts(probe: "pl.Probe", cfg: Config) -> pd.DataFrame:
     """
     P, S = probe.P, probe.S
 
-    # Per-site control offset (deliverable2.tex, "What enters the inference"): the largest offset
+    # Per-site control offset (Deliverable 3, "What enters the inference"): the largest offset
     # not exceeding 0.25*fs/S that keeps BOTH controls clear of BOTH grids. A site is dropped only
-    # if no such offset exists. The Deliverable 1 rule fixed the offset at 0.25*fs/S; being defined
+    # if no such offset exists. The original rule fixed the offset at 0.25*fs/S; being defined
     # from the stride alone it cannot see the patch grid, and at P=16,S=12 it lands one control of
     # every stride-only site on a patch null, discarding all four.
     offsets = {f: pl.control_offset(P, S, f) for f in pl.f_lock(P, S)}
@@ -404,20 +404,170 @@ def _shard(out: Path, table: str, tag: str) -> Path:
     return out / "raw" / f"{table}__{tag}.parquet"
 
 
-def collect_model(P: int, S: int, out: Path, cfg: Config, force: bool = False) -> None:
-    """Collect every table for one geometry, skipping shards that already exist."""
+def _expected_raw_tables(cfg: Config) -> tuple[str, ...]:
+    return RAW_TABLES if cfg.band_tasks else tuple(t for t in RAW_TABLES if t != "mdl_bandtasks")
+
+
+def _package_versions() -> dict[str, str | None]:
+    versions: dict[str, str | None] = {}
+    for package in ("numpy", "pandas", "pyarrow", "torch", "chronos-forecasting"):
+        try:
+            versions[package] = importlib_metadata.version(package)
+        except importlib_metadata.PackageNotFoundError:
+            versions[package] = None
+    return versions
+
+
+def _design_payload(cfg: Config, planned_models: list[tuple[int, int]]) -> dict:
+    design = asdict(cfg)
+    # Batching and device affect throughput, not the observations.  Every inferential knob remains
+    # in the fingerprint; changing one requires a fresh run namespace.
+    design.pop("batch_size", None)
+    design.pop("device", None)
+    sources = [
+        Path(__file__).resolve(),
+        Path(pl.__file__).resolve(),
+        Path(ml.__file__).resolve(),
+        Path(pl.__file__).resolve().parent.parent / "data" / "synthetic" / "generators"
+        / "kernelsynth_generator.py",
+    ]
+    return {
+        "manifest_schema_version": MANIFEST_SCHEMA_VERSION,
+        "deliverable": "coursework/deliverable3",
+        "reportable": not cfg.smoke,
+        "config": design,
+        "planned_models": [pl.model_tag(P, S) for P, S in planned_models],
+        "checkpoints": {
+            pl.model_tag(P, S): ml.checkpoint_identity(P, S) for P, S in planned_models
+        },
+        "source_sha256": {str(path.relative_to(Path(__file__).resolve().parents[2])): cp.sha256_file(path)
+                          for path in sources},
+        "package_versions": _package_versions(),
+    }
+
+
+def _manifest_path(out: Path) -> Path:
+    return Path(out) / MANIFEST_NAME
+
+
+def _load_or_create_manifest(
+    out: Path, cfg: Config, planned_models: list[tuple[int, int]]
+) -> dict:
+    payload = _design_payload(cfg, planned_models)
+    design_fingerprint = cp.fingerprint(payload)
+    path = _manifest_path(out)
+    if path.is_file():
+        manifest = json.loads(path.read_text(encoding="utf-8"))
+        if manifest.get("schema_version") != MANIFEST_SCHEMA_VERSION:
+            raise ValueError(f"unsupported manifest schema in {path}")
+        if manifest.get("design_fingerprint") != design_fingerprint:
+            raise ValueError(
+                "collection manifest does not match this design/source/checkpoint state; "
+                "use a new RUN_ID/output directory")
+        return manifest
+
+    orphaned = list((out / "raw").glob("*.parquet")) if (out / "raw").exists() else []
+    if orphaned:
+        raise ValueError(
+            f"found {len(orphaned)} raw shard(s) without {MANIFEST_NAME}; use a new output "
+            "directory or explicitly remove the orphaned run")
+    now = datetime.now(timezone.utc).isoformat()
+    manifest = {
+        "schema_version": MANIFEST_SCHEMA_VERSION,
+        "design_fingerprint": design_fingerprint,
+        "design": payload,
+        "status": "partial",
+        "created_utc": now,
+        "updated_utc": now,
+        "shards": {},
+        "merged": {},
+    }
+    cp.atomic_json(path, manifest)
+    return manifest
+
+
+_REQUIRED_COLUMNS = {
+    "contrasts": {"model", "P", "S", "generator", "R_lock", "R_lo", "R_hi", "d", "live"},
+    "mdl_cells": {"model", "P", "S", "stage", "is_locked", "L_bits"},
+    "mdl_bandtasks": {"model", "P", "S", "stage", "task", "L_bits"},
+    "collapse": {"model", "P", "S", "mode", "rep", "f", "z", "z_norm"},
+    "sites": {"model", "P", "S", "mode", "rep", "branch", "n_sites", "f1", "delta_hat"},
+}
+
+
+def _validate_frame(frame: pd.DataFrame, table: str, tag: str | None = None) -> None:
+    if table not in _REQUIRED_COLUMNS:
+        raise ValueError(f"unknown table {table!r}")
+    missing = _REQUIRED_COLUMNS[table] - set(frame.columns)
+    if missing:
+        raise ValueError(f"{table} missing columns {sorted(missing)}")
+    if frame.empty:
+        raise ValueError(f"{table} is empty")
+    if tag is not None and set(frame["model"].astype(str)) != {tag}:
+        raise ValueError(f"{table} shard for {tag} contains models {sorted(frame['model'].unique())}")
+    finite_columns = {
+        "contrasts": ("R_lock", "R_lo", "R_hi", "d"),
+        "mdl_cells": ("L_bits",),
+        "mdl_bandtasks": ("L_bits",),
+        "collapse": ("f", "z", "z_norm"),
+        "sites": ("n_sites",),
+    }[table]
+    for column in finite_columns:
+        if not np.isfinite(pd.to_numeric(frame[column], errors="coerce")).all():
+            raise ValueError(f"{table}.{column} contains non-finite values")
+
+
+def _validate_shard(path: Path, table: str, tag: str, entry: dict) -> pd.DataFrame:
+    if not path.is_file():
+        raise ValueError(f"manifest lists missing shard {path}")
+    observed_hash = cp.sha256_file(path)
+    if observed_hash != entry.get("sha256"):
+        raise ValueError(f"hash mismatch for {path}; refuse to resume mixed/corrupt data")
+    frame = pd.read_parquet(path)
+    _validate_frame(frame, table, tag)
+    if len(frame) != int(entry.get("rows", -1)):
+        raise ValueError(f"row-count mismatch for {path}")
+    return frame
+
+
+def collect_model(
+    P: int,
+    S: int,
+    out: Path,
+    cfg: Config,
+    manifest: dict,
+    force: bool = False,
+    probe_factory=None,
+) -> None:
+    """Collect one geometry, recording each atomic shard in the run manifest."""
     tag = pl.model_tag(P, S)
-    wanted = [t for t in TABLES if t != "sites"]
-    missing = [t for t in wanted if force or not _shard(out, t, tag).exists()]
-    if not cfg.band_tasks and "mdl_bandtasks" in missing:
-        missing.remove("mdl_bandtasks")
+    wanted = list(_expected_raw_tables(cfg))
+    missing: list[str] = []
+    for table in wanted:
+        path = _shard(out, table, tag)
+        key = f"{table}__{tag}"
+        entry = manifest["shards"].get(key)
+        if force:
+            missing.append(table)
+        elif entry is None:
+            if path.exists():
+                raise ValueError(f"untracked shard {path}; rerun this geometry with force=True")
+            missing.append(table)
+        else:
+            _validate_shard(path, table, tag, entry)
     if not missing:
-        print(f"  {tag}: all shards present, skipping (model not loaded)")
+        print(f"  {tag}: all manifest-validated shards present, skipping model load")
         return
 
+    factory = pl.Probe if probe_factory is None else probe_factory
     print(f"  {tag}: collecting {missing}")
-    probe = pl.Probe(P, S, device=cfg.device, batch_size=cfg.batch_size)
+    probe = factory(P, S, device=cfg.device, batch_size=cfg.batch_size)
     print(f"    loaded {probe.label}  (P={probe.P}, S={probe.S}, device={probe.device})")
+    expected_identity = manifest["design"]["checkpoints"][tag]["identity_sha256"]
+    actual_identity = getattr(probe, "checkpoint_identity", ml.checkpoint_identity(P, S))
+    if actual_identity.get("identity_sha256") != expected_identity:
+        probe.close()
+        raise ValueError(f"checkpoint identity changed while loading {tag}")
     try:
         builders = {
             "contrasts": lambda: collect_contrasts(probe, cfg),
@@ -426,94 +576,241 @@ def collect_model(P: int, S: int, out: Path, cfg: Config, force: bool = False) -
             "collapse": lambda: collect_collapse(probe, cfg),
         }
         for table in missing:
-            df = builders[table]()
+            frame = builders[table]()
+            _validate_frame(frame, table, tag)
             path = _shard(out, table, tag)
-            path.parent.mkdir(parents=True, exist_ok=True)
-            df.to_parquet(path, index=False)
-            print(f"    {table}: {len(df):>6d} rows -> {path.name}")
+            cp.atomic_parquet(path, frame)
+            key = f"{table}__{tag}"
+            manifest["shards"][key] = {
+                "file": str(path.relative_to(out)),
+                "sha256": cp.sha256_file(path),
+                "rows": len(frame),
+                "columns": list(frame.columns),
+                "checkpoint_identity_sha256": expected_identity,
+            }
+            manifest["status"] = "partial"
+            manifest.pop("last_error", None)
+            manifest["updated_utc"] = datetime.now(timezone.utc).isoformat()
+            cp.atomic_json(_manifest_path(out), manifest)
+            print(f"    {table}: {len(frame):>6d} rows -> {path.name}")
+    except Exception as exc:
+        manifest["status"] = "failed"
+        manifest["last_error"] = f"{type(exc).__name__}: {exc}"
+        manifest["updated_utc"] = datetime.now(timezone.utc).isoformat()
+        cp.atomic_json(_manifest_path(out), manifest)
+        raise
     finally:
         probe.close()
 
 
-def merge(out: Path, cfg: Config) -> dict[str, pd.DataFrame]:
-    """Concatenate the per-model shards, derive `sites`, and check the design is identifiable."""
+def check_design(
+    tables: dict[str, pd.DataFrame],
+    expected_models: list[tuple[int, int]] | None = None,
+    cfg: Config | None = None,
+) -> dict:
+    """Fail closed on incomplete/non-identifiable inputs before any posterior is sampled."""
+    cfg = cfg or Config()
+    expected_models = expected_models or pl.BAYES_MODELS
+    expected_tags = {pl.model_tag(P, S) for P, S in expected_models}
+    failures: list[str] = []
+    summary: dict[str, object] = {"expected_models": sorted(expected_tags)}
+    print("\n  design check")
+
+    required_tables = set(_expected_raw_tables(cfg)) | {"sites"}
+    missing_tables = required_tables - set(tables)
+    if missing_tables:
+        failures.append(f"missing tables: {sorted(missing_tables)}")
+
+    for table, frame in tables.items():
+        _validate_frame(frame, table)
+        observed = set(frame["model"].astype(str))
+        if table in required_tables and observed != expected_tags:
+            failures.append(
+                f"{table} model coverage mismatch: missing={sorted(expected_tags - observed)}, "
+                f"extra={sorted(observed - expected_tags)}")
+
+    if "contrasts" in tables:
+        contrasts = tables["contrasts"]
+        for model, group in contrasts.groupby("model"):
+            n_live = int(group["live"].astype(bool).sum())
+            print(f"    contrasts {model:<9s} rows={len(group):>5d} live={n_live:>5d} "
+                  f"locks={group['f_lock'].nunique():>3d} phases={group['phase_idx'].nunique():>3d} "
+                  f"generators={group['generator'].nunique()}")
+            if n_live == 0:
+                failures.append(f"{model}: no live contrast triplet")
+            if set(group["generator"]) != set(cfg.generators):
+                failures.append(f"{model}: generator coverage mismatch in contrasts")
+
+    if "mdl_cells" in tables:
+        for model, group in tables["mdl_cells"].groupby("model"):
+            n1 = int((group["is_locked"] == 1).sum())
+            n0 = int((group["is_locked"] == 0).sum())
+            print(f"    mdl_cells {model:<9s} locked={n1:>5d} unlocked={n0:>5d}")
+            if n1 == 0 or n0 == 0:
+                failures.append(f"{model}: theta_lock NOT IDENTIFIED (one IsLocked level empty)")
+
+    if "collapse" in tables:
+        for model, group in tables["collapse"].groupby("model"):
+            if set(group["mode"]) != set(cfg.collapse_modes):
+                failures.append(f"{model}: collapse-mode coverage mismatch")
+
+    if "sites" in tables:
+        mean_sites = tables["sites"][tables["sites"].rep == -1]
+        for _, row in mean_sites.iterrows():
+            print(f"    sites     {row['model']:<9s} mode={row['mode']:<11s} "
+                  f"branch={row['branch']:<6s} n={int(row['n_sites']):>3d} "
+                  f"f1={row['f1']:.2f} delta_hat={row['delta_hat']:.2f}")
+        generated = mean_sites[mean_sites["mode"].isin(cfg.generators)]
+        totals = generated.groupby("branch")["n_sites"].sum()
+        identification = {
+            branch: {
+                "unambiguous_sites": int(totals.get(branch, 0)),
+                "identified": int(totals.get(branch, 0)) >= cfg.min_d2_sites,
+            }
+            for branch in ("stride", "patch")
+        }
+        summary["d2_identification"] = identification
+
+    summary["failures"] = failures
+    summary["ok"] = not failures
+    print("  design check:", "PASS" if not failures else "FAIL, do not sample on this data")
+    if failures:
+        raise ValueError("design validation failed: " + "; ".join(failures))
+    return summary
+
+
+def merge(
+    out: Path,
+    cfg: Config,
+    planned_models: list[tuple[int, int]] | None = None,
+    allow_partial: bool = False,
+    manifest: dict | None = None,
+) -> dict[str, pd.DataFrame]:
+    """Merge only exact manifest-listed shards; stale glob matches are never included."""
+    out = Path(out)
+    planned_models = list(pl.BAYES_MODELS if planned_models is None else planned_models)
+    manifest = manifest or _load_or_create_manifest(out, cfg, planned_models)
+    wanted_tables = _expected_raw_tables(cfg)
+
+    complete_models: list[tuple[int, int]] = []
+    for P, S in planned_models:
+        tag = pl.model_tag(P, S)
+        if all(f"{table}__{tag}" in manifest["shards"] for table in wanted_tables):
+            complete_models.append((P, S))
+    missing_models = [m for m in planned_models if m not in complete_models]
+    if missing_models and not allow_partial:
+        raise ValueError(
+            "collection is incomplete; missing complete shard sets for "
+            + ", ".join(pl.model_tag(P, S) for P, S in missing_models))
+    if not complete_models:
+        raise ValueError("no geometry has a complete, manifest-tracked shard set")
+
     merged: dict[str, pd.DataFrame] = {}
-    for table in TABLES:
-        if table == "sites":
-            continue
-        shards = sorted((out / "raw").glob(f"{table}__*.parquet"))
-        if not shards:
-            continue
-        df = pd.concat([pd.read_parquet(p) for p in shards], ignore_index=True)
-        merged[table] = df
-        df.to_parquet(out / f"02_{table}.parquet", index=False)
+    for table in wanted_tables:
+        frames = []
+        for P, S in complete_models:
+            tag = pl.model_tag(P, S)
+            key = f"{table}__{tag}"
+            frames.append(_validate_shard(_shard(out, table, tag), table, tag,
+                                          manifest["shards"][key]))
+        frame = pd.concat(frames, ignore_index=True)
+        merged[table] = frame
+        target = out / f"02_{table}.parquet"
+        cp.atomic_parquet(target, frame)
+        manifest["merged"][table] = {
+            "file": target.name,
+            "sha256": cp.sha256_file(target),
+            "rows": len(frame),
+        }
 
-    if "collapse" in merged:
-        sites = derive_sites(merged["collapse"])
-        merged["sites"] = sites
-        sites.to_parquet(out / "02_sites.parquet", index=False)
+    sites = derive_sites(merged["collapse"], cfg)
+    _validate_frame(sites, "sites")
+    merged["sites"] = sites
+    sites_target = out / "02_sites.parquet"
+    cp.atomic_parquet(sites_target, sites)
+    manifest["merged"]["sites"] = {
+        "file": sites_target.name,
+        "sha256": cp.sha256_file(sites_target),
+        "rows": len(sites),
+    }
 
-    check_design(merged)
+    design_summary = check_design(merged, complete_models, cfg)
+    manifest["design_check"] = design_summary
+    manifest["status"] = "complete" if not missing_models else "partial"
+    manifest.pop("last_error", None)
+    manifest["updated_utc"] = datetime.now(timezone.utc).isoformat()
+    cp.atomic_json(_manifest_path(out), manifest)
     return merged
 
 
-def check_design(tables: dict[str, pd.DataFrame]) -> None:
-    """Refuse to hand the notebook a design in which an effect cannot be estimated.
-
-    An earlier attempt in this project fitted a lock-vs-control effect on 80 control windows and
-    ZERO locked windows: the likelihood carried no information and the posterior simply reprinted
-    the prior. The cheapest guard against repeating that is to assert, before any sampling, that
-    every contrast has both of its controls and that both IsLocked levels are populated per model.
-    """
-    print("\n  design check")
-    ok = True
-    if "contrasts" in tables:
-        c = tables["contrasts"]
-        for model, g in c.groupby("model"):
-            n_live = int(g["live"].sum())
-            print(f"    contrasts {model:<9s} rows={len(g):>5d} live={n_live:>5d} "
-                  f"locks={g['f_lock'].nunique():>3d} phases={g['phase_idx'].nunique():>3d} "
-                  f"generators={g['generator'].nunique()}")
-            if g[["R_lock", "R_lo", "R_hi"]].isna().any().any():
-                print(f"      !! {model}: incomplete triplets (NaN recovery)")
-                ok = False
-    if "mdl_cells" in tables:
-        m = tables["mdl_cells"]
-        for model, g in m.groupby("model"):
-            n1 = int((g["is_locked"] == 1).sum())
-            n0 = int((g["is_locked"] == 0).sum())
-            print(f"    mdl_cells {model:<9s} locked={n1:>5d} unlocked={n0:>5d}")
-            if n1 == 0 or n0 == 0:
-                print(f"      !! {model}: theta_lock is NOT identified (one IsLocked level empty)")
-                ok = False
-    if "sites" in tables:
-        s = tables["sites"][tables["sites"].rep == -1]
-        for _, r in s.iterrows():
-            print(f"    sites     {r['model']:<9s} mode={r['mode']:<11s} n={int(r['n_sites']):>3d} "
-                  f"f1={r['f1']:.2f} delta_hat={r['delta_hat']:.2f}  (fs/S={pl.FS / r['S']:.2f})")
-    print("  design check:", "PASS" if ok else "FAIL, do not sample on this data")
+def load_collection(
+    out: Path | str,
+    cfg: Config | None = None,
+    planned_models: list[tuple[int, int]] | None = None,
+    require_complete: bool = True,
+) -> dict[str, pd.DataFrame]:
+    """Load merged tables only after manifest, hashes, coverage and design gates pass."""
+    out = Path(out)
+    cfg = cfg or Config()
+    planned_models = list(pl.BAYES_MODELS if planned_models is None else planned_models)
+    manifest = _load_or_create_manifest(out, cfg, planned_models)
+    if require_complete and manifest.get("status") != "complete":
+        raise ValueError(f"run manifest status is {manifest.get('status')!r}, expected 'complete'")
+    tables: dict[str, pd.DataFrame] = {}
+    for table in (*_expected_raw_tables(cfg), "sites"):
+        entry = manifest.get("merged", {}).get(table)
+        if entry is None:
+            raise ValueError(f"manifest has no merged {table} table")
+        path = out / entry["file"]
+        if not path.is_file() or cp.sha256_file(path) != entry.get("sha256"):
+            raise ValueError(f"merged {table} file is missing or has a hash mismatch")
+        frame = pd.read_parquet(path)
+        _validate_frame(frame, table)
+        tables[table] = frame
+    expected = planned_models if require_complete else [
+        (int(group.P.iloc[0]), int(group.S.iloc[0]))
+        for _, group in tables["contrasts"].groupby("model")
+    ]
+    check_design(tables, expected, cfg)
+    return tables
 
 
-def collect_all(out: Path | str, models: list[tuple[int, int]] | None = None,
-                cfg: Config | None = None, force: bool = False) -> dict[str, pd.DataFrame]:
-    """Collect every table for every geometry and return the merged tables."""
+def collect_all(
+    out: Path | str,
+    models: list[tuple[int, int]] | None = None,
+    cfg: Config | None = None,
+    force: bool = False,
+    planned_models: list[tuple[int, int]] | None = None,
+    allow_partial: bool = False,
+    probe_factory=None,
+) -> dict[str, pd.DataFrame]:
+    """Collect a session subset against one frozen fifteen-model design."""
     out = Path(out)
     out.mkdir(parents=True, exist_ok=True)
     cfg = cfg or Config()
-    models = models or pl.BAYES_MODELS
-    print(f"collecting into {out}  |  {'SMOKE' if cfg.smoke else 'FULL'} design  |  "
-          f"{len(models)} geometries")
+    planned_models = list(pl.BAYES_MODELS if planned_models is None else planned_models)
+    models = list(planned_models if models is None else models)
+    if not set(models).issubset(set(planned_models)):
+        raise ValueError("session models must be a subset of the frozen planned model registry")
+    if set(models) != set(planned_models) and not allow_partial:
+        raise ValueError("a model subset requires allow_partial=True and cannot be reportable yet")
+    manifest = _load_or_create_manifest(out, cfg, planned_models)
+    print(f"collecting into {out}  |  {'SMOKE (NON-REPORTABLE)' if cfg.smoke else 'FULL'} "
+          f"design  |  session {len(models)}/{len(planned_models)} geometries")
 
-    # Archive the generated signals themselves. Every number downstream is computed from these
-    # backgrounds, so they are written to disk rather than left in an in-memory cache; a reader
-    # who has only the tables cannot regenerate the inputs, and KernelSynth in particular is a
-    # random GP draw that is only reproducible given its seed.
     meta = pl.save_signal_pool(out, generators=cfg.generators,
                                n_bg=max(cfg.n_bg, cfg.mdl_n_bg, cfg.collapse_reps))
-    print(f"  archived {len(meta)} signals -> {out / 'signals'}")
-    for (P, S) in models:
-        collect_model(P, S, out, cfg, force=force)
-    return merge(out, cfg)
+    index_path = out / "signals" / "signals_index.parquet"
+    manifest["signals"] = {
+        "file": str(index_path.relative_to(out)),
+        "sha256": cp.sha256_file(index_path),
+        "rows": len(meta),
+    }
+    cp.atomic_json(_manifest_path(out), manifest)
+    print(f"  archived/validated {len(meta)} signals -> {out / 'signals'}")
+    for P, S in models:
+        collect_model(P, S, out, cfg, manifest, force=force, probe_factory=probe_factory)
+    return merge(out, cfg, planned_models, allow_partial=allow_partial, manifest=manifest)
 
 
 # --------------------------------------------------------------------------------- #
@@ -521,7 +818,8 @@ def main(argv: list[str]) -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--out", default="bayes_data", help="output directory")
-    ap.add_argument("--models", nargs="*", default=None, help="p{P}-s{S} tags (default: all five)")
+    ap.add_argument("--models", nargs="*", default=None,
+                    help="session p{P}-s{S} tags (default: all 15 Deliverable 3 models)")
     ap.add_argument("--smoke", action="store_true", help="tiny grids, for a pipeline check")
     ap.add_argument("--force", action="store_true", help="recompute shards that already exist")
     ap.add_argument("--no-band-tasks", action="store_true", help="skip the descriptive band tasks")
@@ -547,9 +845,10 @@ def main(argv: list[str]) -> int:
 
     out = Path(args.out)
     if args.merge_only:
-        merge(out, cfg)
+        merge(out, cfg, pl.BAYES_MODELS, allow_partial=args.models is not None)
     else:
-        collect_all(out, models, cfg, force=args.force)
+        collect_all(out, models, cfg, force=args.force,
+                    planned_models=pl.BAYES_MODELS, allow_partial=args.models is not None)
     return 0
 
 
