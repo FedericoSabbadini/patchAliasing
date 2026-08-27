@@ -1,7 +1,7 @@
 """
 collect.py, Part 2 of the Bayesian workflow: let Chronos make the observations.
 
-This is the *only* place where a model is run. It turns the five Chronos-Bolt geometries into five
+This is the *only* place where a model is run. It turns the fifteen Deliverable 3 geometries into
 tidy tables that the Bayesian notebook then treats as plain data, so Parts 1 and 3-5 of the
 notebook need neither a GPU nor the `chronos` package.
 
@@ -14,10 +14,11 @@ notebook need neither a GPU nor the `chronos` package.
     collapse         Model D1 (H3 location)                    Site-Geometry Analysis, Eq. (12)
     sites            Model D2 (H3 movement)                    Site-Geometry Analysis, Eq. (13)
 
-Everything is sharded per geometry under `<out>/raw/`, so an interrupted run resumes at model
-granularity: a shard that already exists is not recomputed and its model is never loaded.
+Everything is sharded per geometry under `<out>/raw/`.  Atomic files and a design/checkpoint
+manifest make resume fail closed: a shard is reused only when its hash, schema, design fingerprint
+and immutable checkpoint identity all match.
 
-    python -m collect --out ./bayes_data                 # all five geometries, full design
+    python -m collect --out ./bayes_data                 # all 15 geometries, full design
     python -m collect --out ./bayes_data --smoke         # tiny grid, minutes not tens of minutes
     python -m collect --out ./bayes_data --models p16-s16 p8-s8
     python -m collect --out ./bayes_data --force         # ignore existing shards
@@ -25,8 +26,11 @@ granularity: a shard that already exists is not recomputed and its model is neve
 from __future__ import annotations
 
 import argparse
+import json
 import sys
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass
+from datetime import datetime, timezone
+from importlib import metadata as importlib_metadata
 from pathlib import Path
 
 import numpy as np
@@ -34,8 +38,13 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import probe_lib as pl
+import checkpointing as cp
+import model_loader as ml
 
 TABLES = ("contrasts", "mdl_cells", "mdl_bandtasks", "collapse", "sites")
+RAW_TABLES = ("contrasts", "mdl_cells", "mdl_bandtasks", "collapse")
+MANIFEST_NAME = "collection_manifest.json"
+MANIFEST_SCHEMA_VERSION = 1
 
 
 # --------------------------------------------------------------------------------- #
@@ -76,6 +85,10 @@ class Config:
     collapse_step: float = 1.0      # uniform part of the union grid [Hz]
     collapse_reps: int = 3          # phase (and background) replicates per frequency
     collapse_modes: tuple[str, ...] = ("pure", "tsmixup", "kernelsynth")
+    site_merge_tol_hz: float = 1.5
+    site_assignment_tol_hz: float = 1.5
+    site_ambiguity_hz: float = 0.25
+    min_d2_sites: int = 10          # Deliverable 3 identification bar, per branch
 
     seed: int = pl.SEED
 
@@ -326,10 +339,10 @@ def collect_collapse(probe: "pl.Probe", cfg: Config) -> pd.DataFrame:
     return out
 
 
-def derive_sites(collapse: pd.DataFrame) -> pd.DataFrame:
+def derive_sites(collapse: pd.DataFrame, cfg: Config | None = None) -> pd.DataFrame:
     """Detected collapse sites, split by branch, for the H3 movement models.
 
-    deliverable2.tex, H3: "Every detected dip is assigned to the branch that predicts it, and sites
+    Deliverable 3, H3: "Every detected dip is assigned to the branch that predicts it, and sites
     belonging to both are set aside. The fundamental of branch F is then compared with the spacing
     that branch predicts." A row is therefore (geometry, signal mode, replicate, BRANCH) and it
     carries the fundamental of that branch only. A single pooled spacing would be meaningless:
@@ -338,6 +351,7 @@ def derive_sites(collapse: pd.DataFrame) -> pd.DataFrame:
     Sites are detected per replicate (giving the model its residual variance) and once more on the
     replicate-averaged curve, recorded as rep = -1.
     """
+    cfg = cfg or Config()
     rows = []
     for (model, mode), g in collapse.groupby(["model", "mode"]):
         P, S = int(g["P"].iloc[0]), int(g["S"].iloc[0])
@@ -348,24 +362,38 @@ def derive_sites(collapse: pd.DataFrame) -> pd.DataFrame:
             sub = sub.sort_values("f")
             sites = pl.detect_collapse_sites(sub["f"].to_numpy(), sub["z"].to_numpy(),
                                              pure=(mode == "pure"))
-            sites = pl.merge_adjacent(sites)
+            sites = pl.merge_adjacent(sites, tol=cfg.site_merge_tol_hz)
 
             # assign every detected site to the branch that predicts it; "both" is set aside
             by_branch: dict[str, list[float]] = {"stride": [], "patch": []}
             n_both = 0
+            n_unassigned = 0
+            assignment_residuals: dict[str, list[float]] = {"stride": [], "patch": []}
             for s in sites:
-                fam = pl.lock_family(s, P, S)
+                fam, residual = pl.assign_site_family(
+                    s,
+                    P,
+                    S,
+                    tol_hz=cfg.site_assignment_tol_hz,
+                    ambiguity_hz=cfg.site_ambiguity_hz,
+                )
                 if fam == "both":
                     n_both += 1
                 elif fam in by_branch:
                     by_branch[fam].append(s)
+                    assignment_residuals[fam].append(residual)
+                else:
+                    n_unassigned += 1
 
             for branch, members in by_branch.items():
                 rows.append(dict(model=model, P=P, S=S, mode=mode, rep=int(rep),
                                  branch=branch,
                                  predicted_spacing=pl.FS / (S if branch == "stride" else P),
                                  sites=" ".join(f"{s:.3f}" for s in members),
-                                 n_ambiguous=n_both, **pl.site_summary(members)))
+                                 n_ambiguous=n_both, n_unassigned=n_unassigned,
+                                 max_assignment_error=(max(assignment_residuals[branch])
+                                                       if assignment_residuals[branch] else np.nan),
+                                 **pl.site_summary(members)))
     return pd.DataFrame(rows)
 
 

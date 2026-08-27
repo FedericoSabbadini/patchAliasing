@@ -58,6 +58,10 @@ AWS_PERIODS = [
     4, 26, 52, 4, 6, 12, 4, 4*10, 10
 ]
 
+# Increment this whenever the stochastic construction changes.  The Bayesian collector records
+# the value next to every archived draw so a resumed run cannot silently mix generator recipes.
+ALGORITHM_VERSION = "deliverable3-v1"
+
 
 class KernelSynthGenerator:
     """KernelSynth: sample from a composite GP prior, with optional multi-tone injection."""
@@ -129,7 +133,10 @@ class KernelSynthGenerator:
     def _build_kernel_bank(self) -> list:
         periodic = [
             (f"Periodic(period={p})",
-             (lambda p=p: lambda t, tp: _k_periodic(t, tp, periodicity=p))())
+             # Deliverable 3 expresses the AWS periods relative to the generated support:
+             # k_Per(x,x') uses p/l_syn while x is on linspace(0, 1, l_syn).
+             (lambda p=p: lambda t, tp: _k_periodic(
+                 t, tp, periodicity=p / self.l_syn))())
             for p in AWS_PERIODS
         ]
         return [
@@ -153,7 +160,10 @@ class KernelSynthGenerator:
     # ------------------------------------------------------------------ #
     def generate(self) -> np.ndarray:
         while True:
-            t = np.arange(self.l_syn) / self.fs
+            # KernelSynth Algorithm 1 in Deliverable 3 constructs the covariance on a normalised
+            # support.  Keep a separate physical-time grid for optional sinusoid injection.
+            t = np.linspace(0.0, 1.0, self.l_syn)
+            t_physical = np.arange(self.l_syn) / self.fs
             j = self.rng.integers(1, self.J + 1)
             chosen = [
                 self.kernel_bank[i]
@@ -176,7 +186,7 @@ class KernelSynthGenerator:
                 continue
 
             self.last_kernels = names
-            return self._apply_injection(signal, t)
+            return self._apply_injection(signal, t_physical)
 
     # ------------------------------------------------------------------ #
     #  Naming — 12-significant-digit precision to preserve round-trip      #
@@ -208,6 +218,7 @@ class KernelSynthGenerator:
             inj_out = [{**c, "cpp": self.cpp_of(c["freq_hz"])} for c in self.inject]
         return {
             "generator": "KernelSynth",
+            "algorithm_version": ALGORITHM_VERSION,
             "J":       self.J,
             "l_syn":   self.l_syn,
             "fs":      self.fs,
