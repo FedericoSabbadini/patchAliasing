@@ -258,49 +258,7 @@ Here daylight abbreviates \{\valueof{ClearSky}, \valueof{PartialCloud}, \valueof
 
 \begin{figure}[H]
 \centering
-\begin{tikzpicture}[
-	flow/.style={-{Latex[length=2mm]}, semithick},
-	dashedflow/.style={-{Latex[length=2mm]}, semithick, dashed},
-	start/.style={ellipse, draw, semithick, align=center, font=\scriptsize,
-		text width=2.8cm, minimum height=8mm, inner sep=2pt},
-	gate/.style={ellipse, draw, align=center, font=\scriptsize,
-		text width=3.15cm, minimum height=10mm, inner sep=2pt},
-	action/.style={draw, rounded corners=6pt, align=center, font=\scriptsize,
-		text width=3.25cm, minimum height=11mm, inner sep=3pt},
-	leaf/.style={draw, rounded corners=6pt, align=center, font=\scriptsize,
-		text width=2.65cm, minimum height=19mm, inner sep=3pt},
-	edgelabel/.style={font=\scriptsize, fill=white, inner sep=1pt}
-]
-\node[start] (cycle) at (0,0) {Synchronized control cycle};
-\node[gate] (safeq) at (0,-1.45) {Safe trigger?\\Sensor fault, inverter trip, or structural aliasing};
-\node[action] (safe) at (-5.0,-1.45) {\textbf{SafeMode}\\Battery Hold; Grid$\to$Load when observed. Trip: Isolate PV; otherwise PV remains connected.};
-\node[gate] (partialq) at (0,-3.15) {$C_O=$ PartiallyObservable?};
-\node[action] (conservative) at (5.0,-3.15) {\textbf{ConservativeMode}\\Low confidence; reduced battery cap; target/reserve bounds.};
-\node[gate] (rampq) at (0,-4.85) {Valid RampEvent in NormalMode?};
-\node[gate] (signq) at (-4.5,-6.55) {Ramp sign};
-\node[gate] (ordinary) at (3.0,-6.55) {Ordinary load-first router\\Context, balance, and SoC};
-
-\node[leaf] (positive) at (-6.4,-9.35) {\textbf{Positive ramp}\\PV$\to$Load; surplus PV$\to$Battery up to maximum; residual PV$\to$Grid.};
-\node[leaf] (negative) at (-3.2,-9.35) {\textbf{Negative ramp}\\Load first; optional Battery$\to$Grid only toward a valid positive export reference.};
-\node[leaf] (surplus) at (0,-9.35) {\textbf{Day surplus}\\PV$\to$Load; PV$\to$Battery to target; residual PV$\to$Grid.};
-\node[leaf] (deficit) at (3.2,-9.35) {\textbf{Day deficit}\\PV$\to$Load; Battery$\to$Load to reserve; Grid$\to$Load residual.};
-\node[leaf] (night) at (6.4,-9.35) {\textbf{Night}\\Battery/Grid$\to$Load; below reserve, Grid$\to$Load first, then Grid$\to$Battery.};
-
-\draw[flow] (cycle) -- (safeq);
-\draw[flow] (safeq.west) -- node[edgelabel, above] {yes} (safe.east);
-\draw[flow] (safeq) -- node[edgelabel, right] {no} (partialq);
-\draw[flow] (partialq.east) -- node[edgelabel, above] {yes} (conservative.west);
-\draw[flow] (partialq) -- node[edgelabel, right] {no} (rampq);
-\draw[flow] (rampq) -| node[edgelabel, near start, above] {yes} (signq);
-\draw[flow] (rampq) -| node[edgelabel, near start, above] {no} (ordinary);
-\draw[dashedflow] (conservative.south) |- node[edgelabel, near start, right] {ordinary bounds} (ordinary.east);
-\draw[flow] (signq) -- node[edgelabel, left] {$r_t>r_{\max}$} (positive);
-\draw[flow] (signq) -- node[edgelabel, right] {$r_t<-r_{\max}$} (negative);
-\draw[flow] (ordinary) -- node[edgelabel, above, sloped] {surplus} (surplus);
-\draw[flow] (ordinary) -- node[edgelabel, right] {deficit} (deficit);
-\draw[flow] (ordinary) -- node[edgelabel, above, sloped] {night} (night);
-\end{tikzpicture}
-\caption{Load-first routing decision tree. Elliptical bubbles are ordered gates; rounded bubbles are terminal policies. Safe and conservative decisions precede the normal-mode ramp override, while the ordinary router covers daylight surplus, daylight deficit, and nighttime operation.}
+\includegraphics[width=\textwidth]{figures/routing.png}
 \label{fig:routing-policy}
 \end{figure}
 
