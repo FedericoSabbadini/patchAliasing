@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import ast
+import os
 import sys
 import tempfile
 import unittest
@@ -9,6 +11,11 @@ from unittest import mock
 
 import numpy as np
 import pandas as pd
+
+try:
+    import nbformat
+except ModuleNotFoundError:
+    nbformat = None
 
 
 BAYES_DIR = Path(__file__).resolve().parents[1]
@@ -23,6 +30,12 @@ import collect
 import model_loader as ml
 import probe_lib as pl
 from kernelsynth_generator import AWS_PERIODS, KernelSynthGenerator, _k_periodic
+
+os.environ.setdefault("PYTENSOR_FLAGS", "cxx=")
+try:
+    import pymc as pm
+except ModuleNotFoundError:
+    pm = None
 
 
 class KernelSynthContractTests(unittest.TestCase):
@@ -42,6 +55,20 @@ class KernelSynthContractTests(unittest.TestCase):
         self.assertTrue(pl.background_pool_quality(distinct)["quality_ok"])
         duplicated = [distinct[0], distinct[0].copy(), distinct[2]]
         self.assertFalse(pl.background_pool_quality(duplicated)["quality_ok"])
+
+    def test_signal_archive_is_hashed_and_reused(self):
+        t = np.linspace(0, 2 * np.pi, pl.CANON_LEN, endpoint=False)
+        pool = [np.sin(t), np.cos(t), np.sin(2 * t)]
+        pool = [np.asarray((x - x.mean()) / x.std(), np.float32) for x in pool]
+        with tempfile.TemporaryDirectory() as temporary:
+            with mock.patch.object(pl, "background_pool", return_value=pool):
+                first = pl.save_signal_pool(temporary, generators=("tsmixup",), n_bg=3)
+            self.assertTrue(first["pool_quality_ok"].all())
+            for row in first.itertuples():
+                self.assertEqual(cp.sha256_file(Path(temporary) / "signals" / row.file), row.sha256)
+            with mock.patch.object(pl, "background_pool", side_effect=AssertionError("regenerated")):
+                second = pl.save_signal_pool(temporary, generators=("tsmixup",), n_bg=3)
+            self.assertEqual(len(second), 3)
 
 
 class CheckpointContractTests(unittest.TestCase):
@@ -191,6 +218,91 @@ class BayesianGateTests(unittest.TestCase):
             bc.identified_branches(sites, minimum_sites=10),
             {"stride": False, "patch": True},
         )
+
+
+class NotebookContractTests(unittest.TestCase):
+    @unittest.skipUnless(nbformat is not None, "nbformat not active")
+    def test_notebook_is_structurally_valid_and_fail_closed(self):
+        notebook_path = BAYES_DIR / "bayesian_analysis.ipynb"
+        notebook = nbformat.read(notebook_path, as_version=4)
+        nbformat.validate(notebook)
+        self.assertEqual(len(notebook.cells), len({cell.id for cell in notebook.cells}))
+        text = "\n".join(cell.source for cell in notebook.cells)
+        for index, cell in enumerate(notebook.cells):
+            if cell.cell_type == "code":
+                ast.parse(cell.source, filename=f"cell-{index}")
+                self.assertIsNone(cell.execution_count)
+                self.assertEqual(cell.outputs, [])
+        self.assertNotIn("\ufffd", text)
+        self.assertNotIn("az.compare(", text)
+        self.assertNotIn("delta_O < 0", text)
+        self.assertNotIn("pl.BAYES_MODELS", text)
+        for required in (
+            "DELIVERABLE3_MODELS",
+            "collect.load_collection",
+            "require_complete=True",
+            "delta_O > 0",
+            "bc.loo_compare",
+            "RECOVERY_VERSION",
+            "PPC_VERSION",
+            "SENSITIVITY_VERSION",
+            "NOT REPORTABLE",
+            "NOT IDENTIFIED",
+        ):
+            self.assertIn(required, text)
+
+    def test_frozen_deliverable3_registry_has_fifteen_models(self):
+        self.assertEqual(len(pl.DELIVERABLE3_MODELS), 15)
+        self.assertEqual(len(pl.BAYES_MODELS), 21)
+        self.assertTrue(set(pl.DELIVERABLE3_MODELS).issubset(pl.BAYES_MODELS))
+        self.assertTrue(all(pl.CTX % stride == 0 for _, stride in pl.DELIVERABLE3_MODELS))
+
+    @unittest.skipUnless(pm is not None, "locked PyMC environment not active")
+    def test_all_notebook_model_factories_build_in_locked_pymc(self):
+        notebook = json.loads((BAYES_DIR / "bayesian_analysis.ipynb").read_text(encoding="utf-8"))
+        model_cell_source = "".join(notebook["cells"][40]["source"])
+        namespace = {
+            "np": np, "pd": pd, "pm": pm, "pl": pl,
+            "PRIOR_SCALE": 0.5, "NU": 4, "CFG": collect.Config.smoke_cfg(),
+            "SEED": 42, "DRAWS": 20, "TUNE": 20, "CHAINS": 2,
+            "TARGET_ACCEPT": 0.9, "NUTS_BACKEND": "pymc",
+        }
+        exec(model_cell_source, namespace)
+
+        contrast = pd.DataFrame({
+            "model": ["p16-s12", "p16-s12", "p16-s16", "p16-s16"],
+            "P": [16] * 4, "S": [12, 12, 16, 16], "overlap": [.25, .25, 0, 0],
+            "f_lock": [32., 42.667, 32., 64.], "generator": ["tsmixup"] * 4,
+            "bg_id": [0, 1, 0, 1], "phase": [0., 1., 2., 3.],
+            "d": [-.4, -.3, -.2, -.1], "y_deficit": [.4, .3, .2, .1],
+        })
+        mdl = pd.DataFrame({
+            "model": ["p16-s12", "p16-s12", "p16-s16", "p16-s16"],
+            "stage": ["enc_0", "enc_1", "enc_0", "enc_1"],
+            "is_locked": [0, 1, 0, 1], "L_bits": [20., 25., 22., 28.],
+        })
+        collapse = pd.DataFrame({
+            "model": ["p16-s12"] * 3 + ["p16-s16"] * 3,
+            "P": [16] * 6, "S": [12] * 3 + [16] * 3,
+            "f": [30., 32., 42.667, 30., 32., 64.],
+            "z_norm": [1., .5, .4, 1., .3, .4],
+        })
+        movement = pd.DataFrame({
+            "branch": ["stride", "stride", "patch", "patch"],
+            "f1": [42.7, 32.1, 32.0, 21.4], "delta_hat": [42.6, 32., 32., 21.3],
+            "predicted_spacing": [pl.FS / 12, pl.FS / 16, pl.FS / 16, pl.FS / 24],
+        })
+
+        models = [
+            namespace["model_A_contrast"](contrast),
+            namespace["model_B_codelength"](mdl),
+            namespace["model_C_phase"](contrast),
+            namespace["model_D1_sites"](collapse, "both"),
+            namespace["model_D2_movement"](movement, "stride"),
+            namespace["model_D2_movement"](movement, "patch"),
+        ]
+        for model in models:
+            self.assertGreater(len(model.named_vars), 0)
 
 
 if __name__ == "__main__":

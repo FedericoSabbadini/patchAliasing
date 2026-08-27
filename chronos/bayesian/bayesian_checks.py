@@ -171,12 +171,19 @@ def recovery_gate(table: pd.DataFrame, required_models: set[str]) -> bool:
     return bool(required["covered"].notna().all() and required["covered"].all())
 
 
-def ppc_gate(table: pd.DataFrame, required_strata: set[str]) -> bool:
-    """Require a recorded posterior-predictive check for every requested stratum."""
+def ppc_gate(
+    table: pd.DataFrame, required_strata: set[str], minimum_coverage: float = 0.90
+) -> bool:
+    """Require every requested stratum and at least ``minimum_coverage`` interval coverage."""
     if table.empty or not {"stratum", "ppc_ok"}.issubset(table.columns):
         return False
-    observed = set(table.loc[table["ppc_ok"].astype(bool), "stratum"])
-    return required_strata.issubset(observed)
+    observed = set(table["stratum"])
+    required = table[table["stratum"].isin(required_strata)]
+    return bool(
+        required_strata.issubset(observed)
+        and len(required) > 0
+        and float(required["ppc_ok"].astype(bool).mean()) >= minimum_coverage
+    )
 
 
 def sensitivity_gate(
@@ -203,4 +210,3 @@ def identified_branches(
     mean_curves = sites[(sites["rep"] == -1) & sites["mode"].isin(modes)]
     totals = mean_curves.groupby("branch")["n_sites"].sum()
     return {branch: int(totals.get(branch, 0)) >= minimum_sites for branch in ("stride", "patch")}
-

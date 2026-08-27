@@ -564,7 +564,9 @@ def collect_model(
     probe = factory(P, S, device=cfg.device, batch_size=cfg.batch_size)
     print(f"    loaded {probe.label}  (P={probe.P}, S={probe.S}, device={probe.device})")
     expected_identity = manifest["design"]["checkpoints"][tag]["identity_sha256"]
-    actual_identity = getattr(probe, "checkpoint_identity", ml.checkpoint_identity(P, S))
+    actual_identity = getattr(probe, "checkpoint_identity", None)
+    if actual_identity is None:
+        actual_identity = ml.checkpoint_identity(P, S)
     if actual_identity.get("identity_sha256") != expected_identity:
         probe.close()
         raise ValueError(f"checkpoint identity changed while loading {tag}")
@@ -610,7 +612,7 @@ def check_design(
 ) -> dict:
     """Fail closed on incomplete/non-identifiable inputs before any posterior is sampled."""
     cfg = cfg or Config()
-    expected_models = expected_models or pl.BAYES_MODELS
+    expected_models = expected_models or list(pl.DELIVERABLE3_MODELS)
     expected_tags = {pl.model_tag(P, S) for P, S in expected_models}
     failures: list[str] = []
     summary: dict[str, object] = {"expected_models": sorted(expected_tags)}
@@ -688,7 +690,7 @@ def merge(
 ) -> dict[str, pd.DataFrame]:
     """Merge only exact manifest-listed shards; stale glob matches are never included."""
     out = Path(out)
-    planned_models = list(pl.BAYES_MODELS if planned_models is None else planned_models)
+    planned_models = list(pl.DELIVERABLE3_MODELS if planned_models is None else planned_models)
     manifest = manifest or _load_or_create_manifest(out, cfg, planned_models)
     wanted_tables = _expected_raw_tables(cfg)
 
@@ -752,7 +754,7 @@ def load_collection(
     """Load merged tables only after manifest, hashes, coverage and design gates pass."""
     out = Path(out)
     cfg = cfg or Config()
-    planned_models = list(pl.BAYES_MODELS if planned_models is None else planned_models)
+    planned_models = list(pl.DELIVERABLE3_MODELS if planned_models is None else planned_models)
     manifest = _load_or_create_manifest(out, cfg, planned_models)
     if require_complete and manifest.get("status") != "complete":
         raise ValueError(f"run manifest status is {manifest.get('status')!r}, expected 'complete'")
@@ -788,7 +790,7 @@ def collect_all(
     out = Path(out)
     out.mkdir(parents=True, exist_ok=True)
     cfg = cfg or Config()
-    planned_models = list(pl.BAYES_MODELS if planned_models is None else planned_models)
+    planned_models = list(pl.DELIVERABLE3_MODELS if planned_models is None else planned_models)
     models = list(planned_models if models is None else models)
     if not set(models).issubset(set(planned_models)):
         raise ValueError("session models must be a subset of the frozen planned model registry")
@@ -798,9 +800,14 @@ def collect_all(
     print(f"collecting into {out}  |  {'SMOKE (NON-REPORTABLE)' if cfg.smoke else 'FULL'} "
           f"design  |  session {len(models)}/{len(planned_models)} geometries")
 
+    index_path = out / "signals" / "signals_index.parquet"
+    signal_entry = manifest.get("signals")
+    if index_path.exists() != (signal_entry is not None):
+        raise ValueError("untracked or missing signal archive; use a new output directory")
+    if signal_entry is not None and cp.sha256_file(index_path) != signal_entry.get("sha256"):
+        raise ValueError("signal index hash mismatch; refuse to resume altered inputs")
     meta = pl.save_signal_pool(out, generators=cfg.generators,
                                n_bg=max(cfg.n_bg, cfg.mdl_n_bg, cfg.collapse_reps))
-    index_path = out / "signals" / "signals_index.parquet"
     manifest["signals"] = {
         "file": str(index_path.relative_to(out)),
         "sha256": cp.sha256_file(index_path),
@@ -837,18 +844,20 @@ def main(argv: list[str]) -> int:
         cfg.batch_size = args.batch_size
 
     wanted = set(args.models) if args.models else None
-    models = [(P, S) for (P, S) in pl.BAYES_MODELS if wanted is None or pl.model_tag(P, S) in wanted]
+    models = [(P, S) for (P, S) in pl.DELIVERABLE3_MODELS
+              if wanted is None or pl.model_tag(P, S) in wanted]
     if not models:
         print(f"no geometry matched {args.models}; available: "
-              f"{[pl.model_tag(P, S) for P, S in pl.BAYES_MODELS]}")
+              f"{[pl.model_tag(P, S) for P, S in pl.DELIVERABLE3_MODELS]}")
         return 1
 
     out = Path(args.out)
     if args.merge_only:
-        merge(out, cfg, pl.BAYES_MODELS, allow_partial=args.models is not None)
+        merge(out, cfg, list(pl.DELIVERABLE3_MODELS), allow_partial=args.models is not None)
     else:
         collect_all(out, models, cfg, force=args.force,
-                    planned_models=pl.BAYES_MODELS, allow_partial=args.models is not None)
+                    planned_models=list(pl.DELIVERABLE3_MODELS),
+                    allow_partial=args.models is not None)
     return 0
 
 

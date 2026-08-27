@@ -50,7 +50,7 @@ import checkpointing as cp
 FS = 512                    # sampling frequency [Hz]; Nyquist = 256 Hz
 CTX = 480                   # context length. Divisible by every stride used by the Bayesian design
                             # (8/12/15/16/20/24/32) so the patch grid is exact and no internal
-                            # padding fakes a collapse. S=28 is the one exception: see BAYES_MODELS.
+                            # padding fakes a collapse. S=28 is excluded: see DELIVERABLE3_MODELS.
 PRED = 64                   # forecast horizon (Chronos-Bolt's native prediction_length)
 BAND = (2.0, 250.0)         # analysis band, strictly inside Nyquist
 TONE_SNR = 4.0              # tone amplitude over a unit-variance background (probing convention)
@@ -87,24 +87,23 @@ MODELS_ALL: list[tuple[int, int]] = [
     (32, 16),   # O=0.500   S|P
     (32, 20),   # O=0.375   S∤P    ( 8 stride-only)
     (32, 24),   # O=0.250   S∤P    ( 8 stride-only)
-    (32, 28),   # O=0.125   S∤P    (12 stride-only)  -- CTX % 28 != 0, see BAYES_MODELS
+    (32, 28),   # O=0.125   S∤P    (12 stride-only) -- excluded from DELIVERABLE3_MODELS
     (32, 32),   # O=0.000   S|P
 ]
 
-# Exclude certain stride values. S4 and S5 are excluded by the deliverable's design (their
-# stride-lock class has too few in-band members to carry a local H1 contrast); S15 and S28 do not
-# divide the 480-sample probing context. What remains is the fifteen-geometry design of
-# tab:hfModels, and that is the set every reported result is fitted on.
+# Exclude certain stride values from Deliverable 3. S4 and S5 are excluded by its design; S15 and
+# S28 do not divide the 480-sample context. What remains is the fifteen-geometry design of
+# tab:hfModels, and that is the set every result in bayesian_analysis.ipynb is fitted on.
 EXCLUDE_S: set[int] = {4, 5, 15, 28}
-MODELS: list[tuple[int, int]] = [(P, S) for P, S in MODELS_ALL if S not in EXCLUDE_S]
 
-# The subset the Bayesian analysis fits. The context has to close on a whole number of strides,
-# otherwise the last patch is internally padded and the padding, not the geometry, produces the
-# collapse. CTX = 480 satisfies this for every stride except 28 (480 = 17*28 + 4); the smallest
-# context divisible by 28 as well is 1680, which no longer fits the probing convention. p32-s28 is
-# therefore collected descriptively but not fitted, and the deliverable records the exclusion.
-BAYES_MODELS: list[tuple[int, int]] = [(P, S) for (P, S) in MODELS if CTX % S == 0]
-DELIVERABLE3_MODELS: tuple[tuple[int, int], ...] = tuple(BAYES_MODELS)
+# Legacy H1 fixed-offset sensitivity has a separately approved 21-checkpoint population (all
+# context-closing geometries). Keep this public name for that notebook's frozen compatibility.
+BAYES_MODELS: list[tuple[int, int]] = [(P, S) for P, S in MODELS_ALL if CTX % S == 0]
+
+# The authoritative population for coursework/deliverable3 and this full Bayesian workflow.
+DELIVERABLE3_MODELS: tuple[tuple[int, int], ...] = tuple(
+    (P, S) for P, S in MODELS_ALL if S not in EXCLUDE_S and CTX % S == 0)
+MODELS: list[tuple[int, int]] = list(DELIVERABLE3_MODELS)
 
 # Optional session override.  It never mutates the frozen Deliverable 3 registry used by manifests
 # and union grids; it only chooses which subset this runtime collects next.
@@ -128,7 +127,7 @@ def design_gaps(models: list[tuple[int, int]] | None = None) -> list[str]:
     frequency at which a loss is attributable to the stride branch alone, and the H3a estimand is
     fitted on whatever happens to be left.
     """
-    models = list(BAYES_MODELS if models is None else models)
+    models = list(DELIVERABLE3_MODELS if models is None else models)
     out = []
     so = [(P, S) for (P, S) in models if P % S != 0]
     if not so:
@@ -355,7 +354,10 @@ def background_pool_quality(signals: list[np.ndarray]) -> dict:
     singular = np.linalg.svd(X, compute_uv=False)
     energy = singular ** 2
     effective_rank = float((energy.sum() ** 2) / max(float(np.sum(energy ** 2)), 1e-12))
-    minimum_rank = min(3, len(X))
+    # Three random finite-length draws are not exactly orthogonal, so requiring rank 3.000 would
+    # reject healthy pools.  Eighty percent of the first three dimensions still rejects a
+    # near-one-dimensional pool; duplicates and near-perfect pairs are gated separately below.
+    minimum_rank = 0.8 * min(3, len(X))
     quality_ok = bool(
         finite
         and np.max(np.abs(means)) <= 1e-5
@@ -415,10 +417,24 @@ def save_signal_pool(out_dir, generators=GENERATORS, n_bg: int = 6,
                     for row in old.itertuples()
                 )
                 if observed == expected and recipes_ok and files_ok:
+                    loaded: dict[str, list[tuple[int, int, np.ndarray]]] = {
+                        generator: [] for generator in generators
+                    }
                     for row in old.itertuples():
                         x = np.load(out / row.file, allow_pickle=False)
-                        _bg_cache[(row.generator, int(row.seed))] = np.asarray(x, np.float32)
-                    return old
+                        loaded[row.generator].append((int(row.bg_id), int(row.seed),
+                                                      np.asarray(x, np.float32)))
+                    quality_ok = all(
+                        background_pool_quality(
+                            [item[2] for item in sorted(draws, key=lambda item: item[0])]
+                        )["quality_ok"]
+                        for draws in loaded.values()
+                    )
+                    if quality_ok:
+                        for generator, draws in loaded.items():
+                            for _, seed, x in draws:
+                                _bg_cache[(generator, seed)] = x
+                        return old
         except (OSError, ValueError, KeyError, AttributeError):
             pass
 
