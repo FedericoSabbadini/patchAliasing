@@ -61,7 +61,8 @@ SEED = 42
 #
 # S | P  decides whether a geometry can separate the two branches at all: when the stride divides
 # the patch, every stride lock c*fs/S is also a patch null k*fs/P with k = c*P/S, so the geometry
-# yields no stride-only site. Ten of the nineteen have S ∤ P; between them they carry 68 sites.
+# yields no stride-only site. Six of the fifteen retained geometries have S ∤ P, and the
+# stride-only sites of the design rest on those six.
 MODELS_ALL: list[tuple[int, int]] = [
     (8, 4),     # O=0.500   S|P    included on user request (S=4; deliverable excludes it by design)
     (8, 5),     # O=0.375   S∤P    included on user request (S=5; deliverable excludes it by design)
@@ -87,8 +88,11 @@ MODELS_ALL: list[tuple[int, int]] = [
     (32, 32),   # O=0.000   S|P
 ]
 
-# Exclude certain stride values: S5, S15, S28 are not used
-EXCLUDE_S: set[int] = {5, 15, 28}
+# Exclude certain stride values. S4 and S5 are excluded by the deliverable's design (their
+# stride-lock class has too few in-band members to carry a local H1 contrast); S15 and S28 do not
+# divide the 480-sample probing context. What remains is the fifteen-geometry design of
+# tab:hfModels, and that is the set every reported result is fitted on.
+EXCLUDE_S: set[int] = {4, 5, 15, 28}
 MODELS: list[tuple[int, int]] = [(P, S) for P, S in MODELS_ALL if S not in EXCLUDE_S]
 
 # The subset the Bayesian analysis fits. The context has to close on a whole number of strides,
@@ -147,20 +151,14 @@ GENERATORS = ("tsmixup", "kernelsynth")   # the deliverable's two synthetic corp
 # --------------------------------------------------------------------------------- #
 TSMIXUP_POOL_N_FREE = 150      # non-integer, non-candidate frequencies added to the pool
 TSMIXUP_POOL_GUARD = 0.2       # [Hz] minimum distance of a "free" frequency from any candidate
-TSMIXUP_POOL_FMAX = 150.0      # [Hz] upper limit of the SOURCE POOL, which is not the analysed
-                               # band: candidates and controls are still defined over BAND, and
-                               # above this the background simply carries no energy, equally for
-                               # a candidate and for its controls
-
 
 def tsmixup_pool(n_free: int = TSMIXUP_POOL_N_FREE, guard: float = TSMIXUP_POOL_GUARD,
                  models=None) -> list[float]:
     """The frequencies of the Light TSMixup source pool, in Hz.
 
     Three groups:
-      1. every integer frequency from BAND[0] up to TSMIXUP_POOL_FMAX, so the pool covers that
-         stretch uniformly and a candidate site is not represented differently from the controls
-         that flank it;
+      1. every integer frequency of BAND, so the pool covers the analysed band uniformly and
+         a candidate site is not represented differently from the controls that flank it;
       2. the members of F_lock that are NOT integers, which group 1 cannot reach: they come from
          the geometries whose S or P is 12, 20 or 24, where fs/D is not a whole number of Hz;
       3. the control frequencies f_k +/- delta of every candidate of every geometry, so that the
@@ -175,7 +173,7 @@ def tsmixup_pool(n_free: int = TSMIXUP_POOL_N_FREE, guard: float = TSMIXUP_POOL_
     """
     models = models or MODELS
     lo = BAND[0]
-    hi = min(BAND[1], TSMIXUP_POOL_FMAX)       # the pool stops here; the analysed band does not
+    hi = BAND[1]
 
     lock = set()
     for P, S in models:

@@ -93,6 +93,14 @@ The second question is whether the dips move, and Model~D2 answers it, since \au
 
 The slope $\kappa_F$ is the estimand, measured spacing per unit of predicted spacing, and the residual scatter $\sigma_F$ is given the floor $\Delta f$, the sweep step, because a spacing read off a discrete grid is no more precise than one step. $\kappa_F=1$ denotes a branch that tracks its own arithmetic, and any other value refutes that branch. Identification here is a property of the design and not of the model, since $\kappa_S$ requires a series holding $P$ fixed while $S$ varies and $\kappa_P$ the converse; \autoref{tab:hfModels} supplies both.
 
+P4a, 199 words
+
+
+
+
+
+Identification is not symmetric between the two branches, and the condition is worth stating before the fits rather than after. A detected site informs $\kappa_S$ only if it can be attributed to the stride branch alone, that is if it lies on $\mathcal F_S \setminus \mathcal F_P$, and informs $\kappa_P$ only on $\mathcal F_P \setminus \mathcal F_S$; a site in the intersection is consistent with either fundamental and is set aside. The design controls the first of these directly, since the six runs with $S \nmid P$ carry stride sites that no patch harmonic reaches, but it does not control the second, because the patch comb is the coarser of the two over the analysed band and much of it coincides with the stride comb. The number of attributable sites per branch is therefore an outcome of the sweep and not of the grid. Each branch is reported as \emph{not identified} rather than as a null result when fewer than ten unambiguous sites survive across the design, a bar fixed here with the thresholds of \autoref{tab:bayesDecisions}; a branch that clears it is decided by its own rule, and a branch that does not is reported with the count that disqualified it.
+
 \subsection{The mitigation claim}
 
 $M1$ is not a separate model but the configuration level of Model~A promoted to an estimand. It asserts that raising the overlap $O$ reduces the deficit, and is therefore read off the population line of \autoref{eq:d2hier},

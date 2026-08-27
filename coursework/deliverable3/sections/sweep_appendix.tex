@@ -26,7 +26,9 @@ bins, so a dominant frequency is placed to within a hertz and no finer.
 
 The right column is representational. At each swept frequency the internal state is captured at the
 output quantile head, and a linear probe is trained on it and scored by cross-validation. Eight
-tasks are scored per geometry: seven band tasks, each asking which half of a frequency band a tone
+tasks are scored per geometry: the seven hierarchical band tasks of
+\autoref{tab:bandTasks}, after Pagani et al.\autocite{paganiPreliminaryInsightsChronos2026} and
+carried unchanged from the earlier deliverables, each asking which half of a frequency band a tone
 belongs to, and one local task asking whether a tone at $f-1$\,Hz can be told from one at
 $f+1$\,Hz. The band tasks are cross-validated with folds grouped by frequency, so a probe cannot
 score by memorising individual frequencies rather than learning the boundary; the local task cannot
@@ -36,6 +38,10 @@ where the forecast needs only an average.
 
 Both quantities are archived as parquet beside the figures, so a page can be redrawn without
 re-running the models, and the notebook reuses them when they exist.
+
+\input{tables/bandTasks.tex}
+
+The sweep and the inferential stage share the band $2$--$250$\,Hz. That matters for the tasks of \autoref{tab:bandTasks}, which partition it: narrowing the range for either reading would truncate three of the seven and leave the family no longer a partition of what is measured.
 
 \subsection{What the pages show}
 
@@ -66,8 +72,12 @@ interval; that is what the models of \nameref{sec:four} are for.
          \texttt{figures/}\vspace{3cm}}}}
     \caption{Reconstruction and probe sweep, page 1 of 3: geometries p8-s8, p16-s8, p16-s12,
     p16-s16 and p24-s8. Each row is one geometry. Left, the dominant frequency of the generated
-    window against the frequency supplied as context, averaged over four starting phases with one
-    standard deviation shaded, and the dotted diagonal marking a tone rebuilt correctly. Right, the
+    window against the frequency supplied as context, averaged over four starting phases, drawn as
+    the solid red curve. The pale red band around it is $\pm1$ standard deviation of that dominant
+    frequency across the four phases, measured on the vertical axis and therefore in hertz: a wide
+    band at a swept frequency means the frequency the model returns depends on where in its cycle
+    the tone began, and a band that collapses to the curve means the reading is phase-independent
+    there. The dotted diagonal marks a tone rebuilt correctly. Right, the
     accuracy of a linear probe on the internal state at each swept frequency, one strip per task,
     with the local $f\pm1$\,Hz task last. Dashed verticals are that geometry's own predicted
     candidates. This page carries the two non-overlapping baselines, p8-s8 and p16-s16, beside the
@@ -81,8 +91,9 @@ interval; that is what the models of \nameref{sec:four} are for.
         {\includegraphics[width=0.96\textwidth]{figures/FIG_E1_page2.png}}
         {\fbox{\parbox{0.9\textwidth}{\centering\vspace{3cm}FIG\_E1\_page2.png not yet copied into
          \texttt{figures/}\vspace{3cm}}}}
-    \caption{Page 2 of 3: geometries p24-s12, p24-s16, p24-s20, p24-s24 and p32-s8, read as
-    \autoref{fig:sweepPage1}. The first four hold the patch size at $P=24$ and shorten the stride
+    \caption{Page 2 of 3: geometries p24-s12, p24-s16, p24-s20, p24-s24 and p32-s8, read as \autoref{fig:sweepPage1}, the
+    pale red band again being $\pm1$ standard deviation of the dominant frequency over the four
+    starting phases. The first four hold the patch size at $P=24$ and shorten the stride
     from $24$ to $12$, so the stride comb $c f_s/S$ moves across the band while the patch comb
     $k f_s/P$ stays where it is: this is the series on which the two branches of
     $\mathcal F_{\mathrm{lock}}$ can be told apart by eye, and p24-s16 and p24-s20 are among the
@@ -96,8 +107,9 @@ interval; that is what the models of \nameref{sec:four} are for.
         {\includegraphics[width=0.96\textwidth]{figures/FIG_E1_page3.png}}
         {\fbox{\parbox{0.9\textwidth}{\centering\vspace{3cm}FIG\_E1\_page3.png not yet copied into
          \texttt{figures/}\vspace{3cm}}}}
-    \caption{Page 3 of 3: geometries p32-s12, p32-s16, p32-s20, p32-s24 and p32-s32, read as
-    \autoref{fig:sweepPage1}. The patch size is held at $P=32$, the widest of the design, so the
+    \caption{Page 3 of 3: geometries p32-s12, p32-s16, p32-s20, p32-s24 and p32-s32, read as \autoref{fig:sweepPage1}, the
+    pale red band again being $\pm1$ standard deviation of the dominant frequency over the four
+    starting phases. The patch size is held at $P=32$, the widest of the design, so the
     patch comb is the densest and the overlap ratio runs from $0.62$ down to $0$ within one page.
     Read against page 2 at equal stride, the difference between the two pages is a difference of
     patch size alone, which is the comparison the covariate $\log P$ of \autoref{eq:d2mitigation}
