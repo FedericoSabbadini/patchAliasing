@@ -6,7 +6,10 @@ The measurement is a sweep of pure sinusoids from $2$ to $250$\,Hz in one-hertz 
 
 The left column is behavioural. The tone is given as context, the model's median forecast is appended to that context and the model re-invoked, and the loop continues until a window of $512$ samples has been generated; the dominant frequency is then read as the largest magnitude of the discrete Fourier transform of that window once its mean is removed, and averaged over four non-redundant starting phases. Two properties of that procedure matter for reading the panel. The recursion is imposed from outside and is not Chronos-Bolt's own generation mode, which emits its whole horizon in one step, so a curve that degrades along the sweep is partly the model reading its own output. And the rollout length fixes the resolution: $512$ samples at $512$\,Hz give one-hertz bins, so a dominant frequency is placed to within a hertz and no finer.
 
-The right column is representational. At each swept frequency the internal state is captured at the output quantile head, and a linear probe is trained on it and scored by cross-validation. Eight tasks are scored per geometry: the seven hierarchical band tasks of \autoref{tab:bandTasks}, after Pagani et al.\autocite{paganiPreliminaryInsightsChronos2026} and unchanged from the probing methodology used throughout, each asking which half of a frequency band a tone belongs to, and one local task asking whether a tone at $f-1$\,Hz can be told from one at $f+1$\,Hz. The band tasks are cross-validated with folds grouped by frequency, so a probe cannot score by memorising individual frequencies rather than learning the boundary; the local task cannot be grouped that way, since its two classes are two frequencies, and holds out phases instead. Ten phases per frequency are used here against the four of the rollout, because a probe needs examples where the forecast needs only an average.
+The right column is representational. At each swept frequency the internal state is captured at the output quantile head, and a linear probe is trained on it and scored by cross-validation. Eight tasks are scored per geometry: the seven hierarchical band tasks of \autoref{tab:bandTasks}, after Pagani et al.\autocite{paganiPreliminaryInsightsChronos2026} and unchanged from the probing methodology used throughout, each asking which half of a frequency band a tone belongs to, and one local task asking whether a tone at $f-1$\,Hz can be told from one at $f+1$\,Hz. The band tasks are cross-validated with folds grouped by frequency, so a probe cannot
+score by memorising individual frequencies rather than learning the boundary; the local task cannot be grouped that way, since its two classes are two frequencies, and holds out phases instead. Ten
+phases per frequency are used here against the four of the rollout, because a probe needs examples
+where the forecast needs only an average.
 
 Both quantities are archived as parquet beside the figures, so a page can be redrawn without
 re-running the models, and the notebook reuses them when they exist.
@@ -14,6 +17,8 @@ re-running the models, and the notebook reuses them when they exist.
 The sweep and the inferential stage share the band $2$--$250$\,Hz. That matters for the tasks of \autoref{tab:bandTasks}, which partition it: narrowing the range for either reading would truncate three of the seven and leave the family no longer a partition of what is measured.
 
 \subsection{What is shown for each geometry}
+
+For each geometry shown in \autoref{fig:sweepPage1,fig:sweepPage2,fig:sweepPage3} two figures are drawn, one on the left and one on the right, and each is read independently. The left is a reconstruction of the generated window, the right a sweep of the internal state.
 
 On the left, a point on the dotted diagonal is a tone rebuilt at the frequency it was given at. A
 flat segment is a set of distinct inputs collapsing onto one output, which is loss of
@@ -164,15 +169,3 @@ printed in the parameter strip beneath the upper panel.}
     \caption{KernelSynth, seed 33, read as \autoref{fig:decompKS2}.}
     \label{fig:decompKS33}
 \end{figure*}
-
-\subsection{What the decomposition shows}
-
-\textcolor{red}{\textbf{Placeholder, to be replaced once the figures above have been read.} This
-subsection states what the four pages show and nothing more: which of the drawn Light TSMixup
-components survive into the horizon and at what fraction of their input amplitude, whether the
-losses fall on the comb of the reference geometry or elsewhere, whether the two seeds of a family
-agree, and whether the KernelSynth pages show the same attenuation on a broadband input as the
-Light TSMixup pages show on a sparse one. It closes on the limit already stated: a $64$-sample
-horizon separates nothing finer than $8$\,Hz, so a candidate and its controls at $f_k\pm\delta$ fall
-in one line and these pages can show loss without showing the paired contrast the models of
-\nameref{sec:four} estimate. Nothing here may be read as evidence of structural aliasing.}
