@@ -2,7 +2,7 @@ This appendix gives a high-level view of the training workflow, from selecting a
 
 \subsection{Model construction}
 
-The script obtains the architectural configuration of Chronos-Bolt-tiny \autocite{AmazonChronosbolttinyHugging2025,FastAccurateZeroshot2024a}, but does not load its pretrained weights. It preserves the encoder and decoder dimensions, attention heads and layer counts, fixes the context and prediction lengths at $2048$ and $64$ samples, and retains the nine forecast quantiles from $0.1$ to $0.9$. Before instantiation it replaces \texttt{input\_patch\_size} by $P$ and \texttt{input\_patch\_stride} by $S$. The standard $P=S=16$ model is therefore retrained under the same budget rather than represented by the larger published checkpoint.
+The script obtains the architectural configuration of Chronos-Bolt-Tiny \autocite{AmazonChronosbolttinyHugging2025,FastAccurateZeroshot2024a}, but does not load its pretrained weights. It preserves the encoder and decoder dimensions, attention heads and layer counts, fixes the context and prediction lengths at $2048$ and $64$ samples, and retains the nine forecast quantiles from $0.1$ to $0.9$. Before instantiation it replaces \texttt{input\_patch\_size} by $P$ and \texttt{input\_patch\_stride} by $S$. The standard $P=S=16$ model is therefore retrained under the same budget rather than represented by the larger published checkpoint.
 
 \subsection{Streaming training data}
 

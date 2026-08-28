@@ -2,7 +2,7 @@ The techniques of this report are built to be used by an agent rather than read 
 
 \subsection{Represent}
 
-Patch size, stride and the derived overlap ratio are recorded as properties of each \pv{PatchedRepresentation}. Since one signal may be evaluated under several geometries, a potential frequency-specific loss of observability attaches to the signal-configuration pair rather than to Chronos in the abstract, which is the distinction \nameref{sec:two} insists on and the reason the same checkpoint can be safe for one plant and not for another. From $(f_s,P,S)$ alone, \autoref{eq:locking-candidate} enumerates the candidate set by arithmetic: no experiment is needed to know \emph{where} to look, and a reasoner holding the configuration can list the sites of a geometry it has never seen measured.
+Each \pv{PatchedRepresentation} records its patch size, stride and derived overlap ratio. Since one signal may be evaluated under several geometries, a potential frequency-specific loss of observability attaches to the signal-configuration pair, not to Chronos-Bolt-Tiny alone. This is the distinction \nameref{sec:two} insists on and the reason the same checkpoint can be safe for one plant and not for another. From $(f_s,P,S)$ alone, \autoref{eq:locking-candidate} enumerates the candidate set by arithmetic: no experiment is needed to know \emph{where} to look, and a reasoner holding the configuration can list the sites of a geometry it has never seen measured.
 
 \subsection{Monitor}
 

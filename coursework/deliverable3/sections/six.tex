@@ -2,7 +2,7 @@ Testing the hypotheses of \nameref{sec:four} requires a design in which the two 
 
 \subsubsection{Patch geometries}
 
-Chronos-Bolt-Tiny is distributed with the standard geometry $P=S=16$. Studying only that point would show how the published configuration behaves, but not whether a blind spot is specific to it or follows the tokenisation parameters that generate it. The design therefore varies $P$ and $S$ to observe Chronos beyond the standard configuration. At fixed $P$, changing $S$ varies the overlap and the spacing of the stride family; at fixed $S$, changing $P$ varies the patch width and the spacing of the patch family. The $P=S$ runs provide contiguous, non-overlapping baselines at different temporal resolutions. Configurations with $S>P$ are excluded because their gaps discard input samples and would confound tokenisation geometry with data loss.
+Chronos-Bolt-Tiny is distributed with the standard geometry $P=S=16$. Studying only that point would show how the published configuration behaves, but not whether a blind spot is specific to it or follows the tokenisation parameters that generate it. The design therefore varies $P$ and $S$ to observe Chronos-Bolt-Tiny beyond the standard configuration. At fixed $P$, changing $S$ varies the overlap and the spacing of the stride family; at fixed $S$, changing $P$ varies the patch width and the spacing of the patch family. The $P=S$ runs provide contiguous, non-overlapping baselines at different temporal resolutions. Configurations with $S>P$ are excluded because their gaps discard input samples and would confound tokenisation geometry with data loss.
 
 \subsubsection{Retraining}
 
@@ -34,7 +34,7 @@ A third descriptive reading uses generated signals. One realisation is forecast 
 \begin{figure}[h]
     \centering
     \includegraphics[width=\textwidth]{figures/FIG_E4_tsmixup_p16-s16_spectra_seed2.png}
-    \caption{Input and forecast spectra for one Light TSMixup realisation under the reference geometry $P=S=16$ and seed~2. The upper panel shows the generator-recorded input lines; the lower shows peaks recovered from the Chronos forecast. Dashed vertical lines mark the predicted lock frequencies, and the horizontal threshold marks the spectral cut used to retain forecast peaks.}
+    \caption{Input and forecast spectra for one Light TSMixup realisation under the reference geometry $P=S=16$ and seed~2. The upper panel shows the generator-recorded input lines; the lower shows peaks recovered from the Chronos-Bolt-Tiny forecast. Dashed vertical lines mark the predicted lock frequencies, and the horizontal threshold marks the spectral cut used to retain forecast peaks.}
     \label{fig:TSM16-16}
 \end{figure}
 
