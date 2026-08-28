@@ -259,6 +259,15 @@ Here daylight abbreviates \{\valueof{ClearSky}, \valueof{PartialCloud}, \valueof
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{figures/routing.png}
+\caption{The routing policy as a priority scan. The mode of \autoref{eq:mode-selection} is read
+first, so a safe-mode cycle never reaches the ordinary branches; the ramp branch is available only
+in \valueof{NormalMode}, and the conservative branch rejoins the ordinary load-first router under
+its reduced cap. Below that the surplus and deficit of \autoref{eq:surplus-deficit} decide which
+of the seven admissible routes of \autoref{eq:routes} a cycle issues, always serving the internal
+load before charging the battery or exporting. A cycle issues a route only for a strictly positive
+transfer and may issue several co-mode decisions, and every setpoint is clipped to the state of
+charge, the capacity and the charge and discharge limits; \autoref{tab:routing} states the
+boundary cases this diagram compresses.}
 \label{fig:routing-policy}
 \end{figure}
 
