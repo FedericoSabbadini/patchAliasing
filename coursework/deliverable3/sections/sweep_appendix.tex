@@ -1,47 +1,19 @@
-This appendix holds the descriptive pass that precedes the Bayesian analysis. It covers the fifteen
-geometries of \autoref{tab:hfModels}, five per page, and each row is one geometry read twice: on the
-left what the model outputs, on the right what its internal state retains. It is reported here
-rather than in the body because none of it is a hypothesis test. Both readings average over phase,
-both use a single signal family, and neither carries a statement of uncertainty; their role is to
-show that the phenomenon the models of \nameref{sec:four} are built to measure is present in the raw
-sweep, and the summary statistics read off them are given in \nameref{sec:seven}.
+This appendix holds the descriptive pass that precedes the Bayesian analysis. It covers the fifteen geometries of \autoref{tab:hfModels}, five per page, and each row is one geometry read twice: on the left what the model outputs, on the right what its internal state retains. It is reported here rather than in the body because none of it is a hypothesis test. Both readings average over phase, both use a single signal family, and neither carries a statement of uncertainty; their role is to show that the phenomenon the models of \nameref{sec:four} are built to measure is present in the raw sweep, and on the signals constructed with the generators of signals \nameref{sec:five}. A summary of the observed information is given in \nameref{sec:seven}.
 
-\subsection{How the pages are produced}
+\subsection{How the sweeps are produced}
 
-The measurement is a sweep of pure sinusoids from $2$ to $250$\,Hz in one-hertz steps at
-$f_s=512$\,Hz. Every geometry is loaded in turn, measured, and released, and the context supplied to
-each is about $512$ samples snapped down to a whole number of strides, so that no geometry is fed a
-partial patch. Both readings are computed from the same swept frequencies, which is what allows a
-row to be read across.
+The measurement is a sweep of pure sinusoids from $2$ to $250$\,Hz in one-hertz steps at $f_s=512$\,Hz. Every geometry is loaded in turn, measured, and released, and the context supplied to each is about $512$ samples snapped down to a whole number of strides, so that no geometry is fed a partial patch. Both readings are computed from the same swept frequencies, which is what allows a row to be read across.
 
-The left column is behavioural. The tone is given as context, the model's median forecast is
-appended to that context and the model re-invoked, and the loop continues until a window of $512$
-samples has been generated; the dominant frequency is then read as the largest magnitude of the
-discrete Fourier transform of that window once its mean is removed, and averaged over four
-non-redundant starting phases. Two properties of that procedure matter for reading the panel. The
-recursion is imposed from outside and is not Chronos-Bolt's own generation mode, which emits its
-whole horizon in one step, so a curve that degrades along the sweep is partly the model reading its
-own output. And the rollout length fixes the resolution: $512$ samples at $512$\,Hz give one-hertz
-bins, so a dominant frequency is placed to within a hertz and no finer.
+The left column is behavioural. The tone is given as context, the model's median forecast is appended to that context and the model re-invoked, and the loop continues until a window of $512$ samples has been generated; the dominant frequency is then read as the largest magnitude of the discrete Fourier transform of that window once its mean is removed, and averaged over four non-redundant starting phases. Two properties of that procedure matter for reading the panel. The recursion is imposed from outside and is not Chronos-Bolt's own generation mode, which emits its whole horizon in one step, so a curve that degrades along the sweep is partly the model reading its own output. And the rollout length fixes the resolution: $512$ samples at $512$\,Hz give one-hertz bins, so a dominant frequency is placed to within a hertz and no finer.
 
-The right column is representational. At each swept frequency the internal state is captured at the
-output quantile head, and a linear probe is trained on it and scored by cross-validation. Eight
-tasks are scored per geometry: the seven hierarchical band tasks of
-\autoref{tab:bandTasks}, after Pagani et al.\autocite{paganiPreliminaryInsightsChronos2026} and
-unchanged from the probing methodology used throughout, each asking which half of a frequency band a tone
-belongs to, and one local task asking whether a tone at $f-1$\,Hz can be told from one at
-$f+1$\,Hz. The band tasks are cross-validated with folds grouped by frequency, so a probe cannot
-score by memorising individual frequencies rather than learning the boundary; the local task cannot
-be grouped that way, since its two classes are two frequencies, and holds out phases instead. Ten
-phases per frequency are used here against the four of the rollout, because a probe needs examples
-where the forecast needs only an average.
+The right column is representational. At each swept frequency the internal state is captured at the output quantile head, and a linear probe is trained on it and scored by cross-validation. Eight tasks are scored per geometry: the seven hierarchical band tasks of \autoref{tab:bandTasks}, after Pagani et al.\autocite{paganiPreliminaryInsightsChronos2026} and unchanged from the probing methodology used throughout, each asking which half of a frequency band a tone belongs to, and one local task asking whether a tone at $f-1$\,Hz can be told from one at $f+1$\,Hz. The band tasks are cross-validated with folds grouped by frequency, so a probe cannot score by memorising individual frequencies rather than learning the boundary; the local task cannot be grouped that way, since its two classes are two frequencies, and holds out phases instead. Ten phases per frequency are used here against the four of the rollout, because a probe needs examples where the forecast needs only an average.
 
 Both quantities are archived as parquet beside the figures, so a page can be redrawn without
 re-running the models, and the notebook reuses them when they exist.
 
 The sweep and the inferential stage share the band $2$--$250$\,Hz. That matters for the tasks of \autoref{tab:bandTasks}, which partition it: narrowing the range for either reading would truncate three of the seven and leave the family no longer a partition of what is measured.
 
-\subsection{What the pages show}
+\subsection{What is shown for each geometry}
 
 On the left, a point on the dotted diagonal is a tone rebuilt at the frequency it was given at. A
 flat segment is a set of distinct inputs collapsing onto one output, which is loss of
