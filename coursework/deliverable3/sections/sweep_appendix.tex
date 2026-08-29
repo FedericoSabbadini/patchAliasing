@@ -11,8 +11,8 @@ score by memorising individual frequencies rather than learning the boundary; th
 phases per frequency are used here against the four of the rollout, because a probe needs examples
 where the forecast needs only an average.
 
-Both quantities are archived as parquet beside the figures, so a page can be redrawn without
-re-running the models, and the notebook reuses them when they exist.
+Both quantities are archived beside the figures, so a page can be redrawn without re-running the
+models, and an archived measurement is reused whenever it is already present.
 
 The sweep and the inferential stage share the band $2$--$250$\,Hz. That matters for the tasks of \autoref{tab:bandTasks}, which partition it: narrowing the range for either reading would truncate three of the seven and leave the family no longer a partition of what is measured.
 
@@ -94,9 +94,9 @@ is only what is needed to read the panels.
 Each run draws one realisation, supplies its first $480$ samples as context, and keeps the
 $64$-sample horizon at the median quantile. The real signal is cut to the same $64$ samples that
 follow the context, so both sides cover the same instants at the same resolution and a difference
-between them is not a difference of window. Two seeds are shown per family, which is not a sample
-in any statistical sense: they are there so that a feature of one draw is not read as a property of
-the generator.
+between them is not a difference of window. Two seeds per family are shown here, and a third Light
+TSMixup draw appears in \nameref{sec:six}; none of them is a sample in any statistical sense. They
+are there so that a feature of one draw is not read as a property of the generator.
 
 Two frequency spacings appear in these pages and they are not the same quantity. The transforms are
 evaluated on a one-hertz grid, which is the spacing of the plotted curve and is obtained by zero
@@ -112,7 +112,7 @@ model its own output.
 Each panel title carries the frequency of the component in hertz, whether that frequency lies on
 $\mathcal F_{\mathrm{lock}}$, and the fitted amplitude $A$; a component whose fit spans fewer than
 one and a half cycles of the window is marked, since below that an amplitude and a phase cannot be
-told apart. On the prediction side a line is drawn only if it reaches $45\%$ of the strongest
+told apart. On the prediction side a line is drawn only if it reaches $35\%$ of the strongest
 component of the prediction itself, so the panels show what builds the returned signal rather than
 every line a peak search returns.
 
@@ -131,7 +131,7 @@ right column and at what amplitude, and each column carries its own vertical sca
 the transforms those lines were read off, Hann-windowed, one-sided and scaled so a pure tone of
 amplitude $A$ peaks near $A$. Dashed verticals are $\mathcal F_{\mathrm{lock}}$ for this geometry,
 green verticals mark the frequencies the generator drew, markers are the lines the search returned,
-and the dashed horizontal on the prediction spectrum is the $45\%$ amplitude cut below which a line
+and the dashed horizontal on the prediction spectrum is the $35\%$ amplitude cut below which a line
 is not carried into the panel above.}
     \label{fig:decompTS17}
 \end{figure*}
@@ -169,3 +169,33 @@ printed in the parameter strip beneath the upper panel.}
     \caption{KernelSynth, seed 33, read as \autoref{fig:decompKS2}.}
     \label{fig:decompKS33}
 \end{figure*}
+
+\FloatBarrier
+\subsection{What the pages show}
+
+Three things are visible on the sweep pages and hold across all fifteen geometries. The
+reconstruction curve follows the diagonal only over a low part of the band and departs from it well
+before the Nyquist limit; above that departure the returned dominant frequency is mostly a
+low-frequency value unrelated to the input, punctuated by isolated excursions. There is a broad
+plateau in the upper middle of the band on which many distinct inputs return one and the same
+output, which is the flat segment described above and is a loss of distinguishability rather than of
+amplitude. And the phase band is widest exactly on that plateau, so where the reading is worst it is
+also least stable across the starting phase.
+
+The probe strips do not follow that pattern. Over most of the band, and for most of the eight tasks,
+the accuracy stays at or above $0.9$, including at frequencies the reconstruction no longer rebuilds
+correctly. Yellow and red cells occur, and cluster at the low end of the band and near some task
+boundaries, but they are the exception. Read across a row, the common case is therefore a frequency
+that the internal state still separates from its neighbour and that the generated output no longer
+places correctly, which locates the loss after the representation rather than at the tokenisation.
+
+The decomposition pages show the same asymmetry on richer signals. A draw whose strongest source
+sits high in the band can return a forecast built from its lower components alone, with the high
+line absent from the prediction spectrum altogether, while the surviving line is placed within a
+hertz or two of the frequency the generator drew. Two cautions belong with that observation. The
+dropped components do not sit only on the comb, so what these pages show is at least in part an
+attenuation that increases with frequency rather than a signature of the two branches; and the
+horizon is a median quantile, which is smoother than a sample path, so some of the attenuation
+belongs to the readout rather than to the model.
+
+None of this is evidence for or against the hypotheses of \nameref{sec:four}. What these Figures establish is that there is something to measure and that the two readings disagree in a specific direction; the paired design described in \nameref{sec:six} and the fits reported in \nameref{sec:seven} are what decide whether the disagreement is located at $\mathcal F_{\mathrm{lock}}$.

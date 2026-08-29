@@ -1,31 +1,43 @@
-\begin{table}[!b]
+\begin{table}[!htbp]
     \centering
-    \footnotesize
-    \begin{tabular}{@{}llll@{}}
+    \small
+    \setlength{\tabcolsep}{5pt}
+    \begin{tabular}{@{}lllp{4.1cm}@{}}
         \toprule
-        \textbf{Parameter} & \textbf{Adopted} & \textbf{Chronos official} & \textbf{Max / constraint} \\
+        \textbf{Parameter} & \textbf{This work} & \textbf{Published value} & \textbf{Note} \\
         \midrule
-        \multicolumn{4}{@{}l}{\textit{Architecture (fixed, from Chronos-Bolt-Tiny)}}\\
-        \texttt{context\_length}    & 2048 & 2048 & Chronos-Bolt-Tiny \\
-        \texttt{prediction\_length} & 64   & 64   & Chronos-Bolt-Tiny \\
-        quantile levels             & 9    & 9    & Chronos-Bolt-Tiny \\
+        \multicolumn{4}{@{}l}{\textit{Tokenisation geometry, the only swept parameter}}\\
+        Patch size $P$              & $8,16,24,32$            & $16$        & the fifteen pairs are listed in \autoref{tab:hfModels} \\
+        Stride $S$                  & $8$ to $32$, $S\le P$   & $16$        & $S>P$ excluded: its gaps would discard samples \\
+        Training seed               & $42$                    & ---         & one seed, shared by every run \\
+        \midrule
+        \multicolumn{4}{@{}l}{\textit{Architecture, taken unchanged from the released configuration}}\\
+        Context length              & $2048$ samples          & $2048$      & \\
+        Forecast horizon            & $64$ samples            & $64$        & emitted in a single forward pass \\
+        Quantile levels             & $9$, from $0.1$ to $0.9$& $9$         & \\
+        Widths, heads, layer counts & as released             & as released & \\
+        Initial weights             & random                  & pretrained  & no released weight is reused \\
+        \midrule
+        \multicolumn{4}{@{}l}{\textit{Training data}}\\
+        Corpora                     & TSMixup $10$M and KernelSynth $1$M series & same & read as streams, not materialised \\
+        Mixing ratio                & $9{:}1$                 & $9{:}1$     & TSMixup to KernelSynth \\
+        Shuffle buffer              & $10{,}000$ windows      & $100{,}000$ & \textbf{departure}: keeps the stream from stalling \\
+        Minimum observed past       & $60$ samples            & $60$        & required before the horizon \\
+        Series discarded above      & $90\%$ missing          & $90\%$      & \\
+        Injected missingness        & uniform on $[0,0.2]$    & same        & masked, and excluded from the loss \\
+        Windows drawn per series    & $1$                     & $1$         & one admissible split point \\
         \midrule
         \multicolumn{4}{@{}l}{\textit{Optimisation}}\\
-        \texttt{batch\_size}     & 32        & 32        & VRAM 8\,GB \\
-        \texttt{max\_steps}      & 100\,000  & 200\,000  & compute budget \\
-        \texttt{learning\_rate}  & $10^{-3}$ & $10^{-3}$ & --- \\
-        scheduler / warmup       & linear / 0 & linear / 0 & --- \\
-        \texttt{weight\_decay}   & 0.0       & 0.0       & --- \\
-        \texttt{grad\_clip\_norm}& 1.0       & 1.0       & --- \\
-        optimiser / precision    & AdamW (fused) / fp32+TF32 & --- \\
-        \midrule
-        \multicolumn{4}{@{}l}{\textit{Data pipeline}}\\
-        corpora (streaming)      & \multicolumn{2}{l}{TSMixup 10M + KernelSynth 1M} & official \\
-        mixing ratio             & 9:1       & 9:1       & --- \\
-        \texttt{shuffle\_buffer} & 10\,000   & 100\,000  & streaming timeout \\
-        \texttt{min\_past} / \texttt{max\_missing} / \texttt{drop\_prob} & 60 / 0.9 / 0.2 & --- \\
+        Gradient updates            & $100{,}000$             & $200{,}000$ & \textbf{departure}: single-device compute budget \\
+        Batch size                  & $32$ windows            & $32$        & \\
+        Optimiser                   & AdamW                   & AdamW       & \\
+        Learning rate               & $10^{-3}$               & $10^{-3}$   & \\
+        Schedule, warmup            & linear to zero, none    & same        & \\
+        Weight decay                & $0$                     & $0$         & \\
+        Gradient-norm clip          & $1.0$                   & $1.0$       & \\
+        Numerical precision         & single                  & ---         & reduced-precision matrix products where the device offers them \\
         \bottomrule
     \end{tabular}
-    \caption{Training hyperparameters: adopted value, official Chronos recipe (\texttt{chronos-t5-tiny}), and usable maximum / constraint. Only $(P,S)$, the step budget ($100$k vs.\ $200$k) and the shuffle buffer ($10$k vs.\ $100$k) depart from the official values, to fit the single-GPU budget.}
+    \caption{Every setting under which the fifteen models of \autoref{tab:hfModels} were trained. The middle column is what this study used; the right-hand column is the corresponding value in the published Chronos recipe, taken from the released Chronos-Bolt-Tiny configuration for the architecture rows and from the published training recipe for the data and optimisation rows, with a dash where no published counterpart exists. Three entries differ from it. The patch geometry is the object of the study. The step budget and the shuffle buffer are reductions made to fit the available compute and to keep a streamed corpus from stalling; both apply identically to all fifteen runs, so neither can favour or penalise a particular $(P,S)$. Everything else is the published value.}
     \label{tab:trainParams}
 \end{table}
