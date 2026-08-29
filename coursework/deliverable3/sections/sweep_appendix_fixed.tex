@@ -1,0 +1,215 @@
+This appendix holds the descriptive pass that precedes the Bayesian analysis. It covers the fifteen geometries of \autoref{tab:hfModels}, five per page, and each row is one geometry read twice: on the left what the model outputs, on the right what its internal state retains. It is reported here rather than in the body because none of it is a hypothesis test. Both readings average over phase, both use a single signal family, and neither carries a statement of uncertainty; their role is to show that the phenomenon the models of \nameref{sec:four} are built to measure is present in the raw sweep, and on the signals constructed with the generators of signals \nameref{sec:five}. A summary of the observed information is given in \nameref{sec:seven}.
+
+\subsection{How the sweeps are produced}
+
+The measurement is a sweep of pure sinusoids from $2$ to $250$\,Hz in one-hertz steps at $f_s=512$\,Hz. Every geometry is loaded in turn, measured, and released, and the context supplied to each is about $512$ samples snapped down to a whole number of strides, so that no geometry is fed a partial patch. Both readings are computed from the same swept frequencies, which is what allows a row to be read across.
+
+The left column is behavioural. The tone is given as context, the model's median forecast is appended to that context and the model re-invoked, and the loop continues until a window of $512$ samples has been generated; the dominant frequency is then read as the largest magnitude of the discrete Fourier transform of that window once its mean is removed, and averaged over four non-redundant starting phases. Two properties of that procedure matter for reading the panel. The recursion is imposed from outside and is not Chronos-Bolt-Tiny's own generation mode, which emits its whole horizon in one step, so a curve that degrades along the sweep is partly the model reading its own output. And the rollout length fixes the resolution: $512$ samples at $512$\,Hz give one-hertz bins, so a dominant frequency is placed to within a hertz and no finer.
+
+The right column is representational. At each swept frequency the internal state is captured at the output quantile head, and a linear probe is trained on it and scored by cross-validation. Eight tasks are scored per geometry: the seven hierarchical band tasks of \autoref{tab:bandTasks}, after Pagani et al.\autocite{paganiPreliminaryInsightsChronos2026} and unchanged from the probing methodology used throughout, each asking which half of a frequency band a tone belongs to, and one local task asking whether a tone at $f-1$\,Hz can be told from one at $f+1$\,Hz. The band tasks are cross-validated with folds grouped by frequency, so a probe cannot
+score by memorising individual frequencies rather than learning the boundary; the local task cannot be grouped that way, since its two classes are two frequencies, and holds out phases instead. Ten
+phases per frequency are used here against the four of the rollout, because a probe needs examples
+where the forecast needs only an average.
+
+Both quantities are archived beside the figures, so a page can be redrawn without re-running the
+models, and an archived measurement is reused whenever it is already present.
+
+The sweep and the inferential stage share the band $2$--$250$\,Hz. That matters for the tasks of \autoref{tab:bandTasks}, which partition it: narrowing the range for either reading would truncate three of the seven and leave the family no longer a partition of what is measured.
+
+\subsection{What is shown for each geometry}
+
+For each geometry shown in Figures~\ref{fig:sweepPage1}, \ref{fig:sweepPage2} and~\ref{fig:sweepPage3}, two figures are drawn, one on the left and one on the right, and each is read independently. The left is a reconstruction of the generated window, the right a sweep of the internal state.
+
+On the left, a point on the dotted diagonal is a tone rebuilt at the frequency it was given at. A
+flat segment is a set of distinct inputs collapsing onto one output, which is loss of
+distinguishability rather than of amplitude. A jump is a tone the model produces that was never
+supplied. The shaded band is one standard deviation over the starting phases, so a wide band at a
+frequency means the answer depends on where in its cycle the tone began.
+
+On the right, each cell is one swept frequency and its colour is the probe's accuracy there: green
+at or above $0.9$, amber through the middle, red below $0.6$, which is close to chance on a
+two-class task. Grey marks a frequency no task covers, which is a statement about the design and not
+about the model. The dashed verticals on both sides are the predicted candidates
+$\mathcal F_{\mathrm{lock}}$ of that geometry, drawn from $(f_s,P,S)$ and not fitted to anything.
+
+The two columns answer different questions and are meant to be read together. A frequency off the
+diagonal on the left but still green on the right lost the tone somewhere between the representation
+and the output, not at the tokenisation. A red cell is the stronger condition: the internal state
+itself no longer separates that frequency from its neighbour. Neither reading is evidence of
+structural aliasing on its own, since neither is paired against controls and neither carries an
+interval; that is what the models of \nameref{sec:four} are for.
+
+\begin{figure*}[!p]
+    \centering
+    \includegraphics[width=0.96\textwidth]{figures/FIG_E1_page1.png}
+    \caption{Reconstruction and probe sweep, page 1 of 3: geometries p8-s8, p16-s8, p16-s12,
+    p16-s16 and p24-s8. Each row is one geometry. Left, the dominant frequency of the generated
+    window against the frequency supplied as context, averaged over four starting phases, drawn as
+    the solid red curve. The pale red band around it is $\pm1$ standard deviation of that dominant
+    frequency across the four phases, measured on the vertical axis and therefore in hertz: a wide
+    band at a swept frequency means the frequency the model returns depends on where in its cycle
+    the tone began, and a band that collapses to the curve means the reading is phase-independent
+    there. The dotted diagonal marks a tone rebuilt correctly. Right, the
+    accuracy of a linear probe on the internal state at each swept frequency, one strip per task,
+    with the local $f\pm1$\,Hz task last. Dashed verticals are that geometry's own predicted
+    candidates. This page carries the two non-overlapping baselines, p8-s8 and p16-s16, beside the
+    two geometries that share $S=8$ with different patch sizes.}
+    \label{fig:sweepPage1}
+\end{figure*}
+
+\begin{figure*}[!p]
+    \centering
+    \includegraphics[width=0.96\textwidth]{figures/FIG_E1_page2.png}
+    \caption{Page 2 of 3: geometries p24-s12, p24-s16, p24-s20, p24-s24 and p32-s8, read as \autoref{fig:sweepPage1}, the
+    pale red band again being $\pm1$ standard deviation of the dominant frequency over the four
+    starting phases. The first four hold the patch size at $P=24$ and shorten the stride
+    from $24$ to $12$, so the stride comb $c f_s/S$ moves across the band while the patch comb
+    $k f_s/P$ stays where it is: this is the series on which the two branches of
+    $\mathcal F_{\mathrm{lock}}$ can be told apart by eye, and p24-s16 and p24-s20 are among the
+    six runs with $S \nmid P$ on which the branch estimates of \nameref{sec:four} rest.}
+    \label{fig:sweepPage2}
+\end{figure*}
+
+\begin{figure*}[!p]
+    \centering
+    \includegraphics[width=0.96\textwidth]{figures/FIG_E1_page3.png}
+    \caption{Page 3 of 3: geometries p32-s12, p32-s16, p32-s20, p32-s24 and p32-s32, read as \autoref{fig:sweepPage1}, the
+    pale red band again being $\pm1$ standard deviation of the dominant frequency over the four
+    starting phases. The patch size is held at $P=32$, the widest of the design, so the
+    patch comb is the densest and the overlap ratio runs from $0.62$ down to $0$ within one page.
+    Read against page 2 at equal stride, the difference between the two pages is a difference of
+    patch size alone, which is the comparison the covariate $\log P$ of \autoref{eq:d2mitigation}
+    is fitted to.}
+    \label{fig:sweepPage3}
+\end{figure*}
+
+\subsection{The decomposition on generated signals}
+
+The pages above sweep pure tones. This second group asks the same question of the two generator
+families of \nameref{sec:five}, on the geometry $P=S=16$, so that the reading concerns the
+configuration a deployment would meet and the two branches of $\mathcal F_{\mathrm{lock}}$ coincide
+in a single comb at multiples of $f_s/16$. The method is stated in \nameref{sec:six}; what follows
+is only what is needed to read the panels.
+
+Each run draws one realisation, supplies its first $480$ samples as context, and keeps the
+$64$-sample horizon at the median quantile. The real signal is cut to the same $64$ samples that
+follow the context, so both sides cover the same instants at the same resolution and a difference
+between them is not a difference of window. Two seeds per family are shown here, and a third Light
+TSMixup draw appears in \nameref{sec:six}; none of them is a sample in any statistical sense. They
+are there so that a feature of one draw is not read as a property of the generator.
+
+Two frequency spacings appear in these pages and they are not the same quantity. The transforms are
+evaluated on a one-hertz grid, which is the spacing of the plotted curve and is obtained by zero
+padding; it lets a peak be located at, say, $6$\,Hz rather than snapped to a multiple of the native
+spacing. The native spacing is $f_s/N = 512/64 = 8$\,Hz, fixed by the $125$\,ms the horizon covers,
+and no amount of zero padding improves it. Interpolation places a peak finely; it does not separate
+two peaks. Two components one hertz apart therefore appear as one line however fine the grid, and
+the panel titles that read \emph{resolving power $8.0$\,Hz} refer to this second quantity: read them
+as \emph{$64$ samples, native $\Delta f = 8.0$\,Hz, plotted on a $1$\,Hz zero-padded grid}. A
+$512$-sample rollout would bring the native spacing to one hertz as well, at the cost of feeding the
+model its own output.
+
+Each panel title carries the frequency of the component in hertz, whether that frequency lies on
+$\mathcal F_{\mathrm{lock}}$, and the fitted amplitude $A$; a component whose fit spans fewer than
+one and a half cycles of the window is marked, since below that an amplitude and a phase cannot be
+told apart. On the prediction side a line is drawn only if it reaches $35\%$ of the strongest
+component of the prediction itself, so the panels show what builds the returned signal rather than
+every line a peak search returns.
+
+\begin{figure*}[p]
+    \centering
+    \includegraphics[width=0.97\textwidth,height=0.44\textheight,keepaspectratio]{figures/FIG_E3_tsmixup_p16-s16_main_components_seed17.png}
+    \par\vspace{6pt}
+    \includegraphics[width=0.97\textwidth,height=0.30\textheight,keepaspectratio]{figures/FIG_E4_tsmixup_p16-s16_spectra_seed17.png}
+    \caption{Light TSMixup, seed 17, on the retrained $P=S=16$ geometry, in two panels that are two readings of
+one draw. \emph{Above}, the components. On the left the realisation supplied as context and the
+frequencies it was built from, which the generator records rather than the transform recovering
+them; on the right the $64$-sample horizon the model returned and its own strongest lines, fitted by
+least squares at the frequencies a peak search proposed. The two columns are separate
+decompositions and a row does not pair them: what matters is which frequencies survive into the
+right column and at what amplitude, and each column carries its own vertical scale. \emph{Below},
+the transforms those lines were read off, Hann-windowed, one-sided and scaled so a pure tone of
+amplitude $A$ peaks near $A$. Dashed verticals are $\mathcal F_{\mathrm{lock}}$ for this geometry,
+green verticals mark the frequencies the generator drew, markers are the lines the search returned,
+and the dashed horizontal on the prediction spectrum is the $35\%$ amplitude cut below which a line
+is not carried into the panel above.}
+    \label{fig:decompTS17}
+\end{figure*}
+
+\begin{figure*}[p]
+    \centering
+    \includegraphics[width=0.97\textwidth,height=0.44\textheight,keepaspectratio]{figures/FIG_E3_tsmixup_p16-s16_main_components_seed85.png}
+    \par\vspace{6pt}
+    \includegraphics[width=0.97\textwidth,height=0.30\textheight,keepaspectratio]{figures/FIG_E4_tsmixup_p16-s16_spectra_seed85.png}
+    \caption{Light TSMixup, seed 85, read as \autoref{fig:decompTS17}. A second draw of the same generator under
+the same settings, shown so that a feature of one realisation is not mistaken for a property of the
+family.}
+    \label{fig:decompTS85}
+\end{figure*}
+
+\begin{figure*}[p]
+    \centering
+    \includegraphics[width=0.97\textwidth,height=0.44\textheight,keepaspectratio]{figures/FIG_E3_kernelsynth_p16-s16_main_components_seed2.png}
+    \par\vspace{6pt}
+    \includegraphics[width=0.97\textwidth,height=0.30\textheight,keepaspectratio]{figures/FIG_E4_kernelsynth_p16-s16_spectra_seed2.png}
+    \caption{KernelSynth, seed 2, read as \autoref{fig:decompTS17} with one difference that runs through both
+panels: a KernelSynth draw is a Gaussian-process realisation and carries no frequencies the
+generator can name, so the left column above holds the strongest lines of the transform rather than
+a list of sources, and the spectrum below carries no green verticals. Any site-level reading
+therefore rests on Light TSMixup, and this family speaks to loss in general. The kernels drawn are
+printed in the parameter strip beneath the upper panel.}
+    \label{fig:decompKS2}
+\end{figure*}
+
+\begin{figure*}[p]
+    \centering
+    \includegraphics[width=0.97\textwidth,height=0.44\textheight,keepaspectratio]{figures/FIG_E3_kernelsynth_p16-s16_main_components_seed33.png}
+    \par\vspace{6pt}
+    \includegraphics[width=0.97\textwidth,height=0.30\textheight,keepaspectratio]{figures/FIG_E4_kernelsynth_p16-s16_spectra_seed33.png}
+    \caption{KernelSynth, seed 33, read as \autoref{fig:decompKS2}.}
+    \label{fig:decompKS33}
+\end{figure*}
+
+\FloatBarrier
+\subsection{What the pages show}
+
+Three things are visible on the sweep pages and hold across all fifteen geometries. The
+reconstruction curve follows the diagonal only over a low part of the band and departs from it well
+before the Nyquist limit; above that departure the returned dominant frequency is mostly a
+low-frequency value unrelated to the input, punctuated by isolated excursions. There is a broad
+plateau in the upper middle of the band on which many distinct inputs return one and the same
+output, which is the flat segment described above and is a loss of distinguishability rather than of
+amplitude. And the phase band is widest exactly on that plateau, so where the reading is worst it is
+also least stable across the starting phase.
+
+The probe strips do not follow that pattern. Over most of the band, and for most of the eight tasks,
+the accuracy stays at or above $0.9$, including at frequencies the reconstruction no longer rebuilds
+correctly. Amber and red cells occur, and cluster at the low end of the band and near some task
+boundaries, but they are the exception. Read across a row, the common case is therefore a frequency
+that the internal state still separates from its neighbour and that the generated output no longer
+places correctly, which locates the loss after the representation rather than at the tokenisation.
+
+The decomposition pages show the same asymmetry on richer signals. A draw whose strongest source
+sits high in the band can return a forecast built from its lower components alone, with the high
+line absent from the prediction spectrum altogether, while the surviving line is placed within a
+hertz or two of the frequency the generator drew. Two cautions belong with that observation. The
+dropped components do not sit only on the comb, so what these pages show is at least in part an
+attenuation that increases with frequency rather than a signature of the two branches; and the
+horizon is a median quantile, which is smoother than a sample path, so some of the attenuation
+belongs to the readout rather than to the model.
+
+None of this is evidence for or against the hypotheses of \nameref{sec:four}, and the reason is
+arithmetic rather than editorial. The horizon is $64$ samples, so its native spacing is $8$\,Hz: a
+candidate and the controls placed either side of it fall inside a single bin of these panels and
+cannot be told apart here at all. Averaging over phase removes the very quantity Model~C is fitted
+to, and no panel carries an interval. What these pages establish is that there is something to
+measure and that the two readings disagree in a specific direction; the paired design of
+\nameref{sec:six} and the fits of \nameref{sec:seven} are what decide whether the disagreement is
+located at $\mathcal F_{\mathrm{lock}}$.
+
+\textcolor{red}{Placeholder, to be written once the fits are in: state here whether the departures
+visible above coincide with the dashed candidates once the paired contrast is estimated, or whether
+they are the frequency-dependent attenuation the second caution describes. If the branch estimates
+of Model~D2 identify, say which of these pages carries the clearest example of a stride-derived and
+of a patch-derived site, and name the geometry and the frequency. If a branch does not identify,
+say so here rather than leaving the reader to infer it from the figures.}
