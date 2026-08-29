@@ -2,7 +2,7 @@
     \centering
     \small
     \setlength{\tabcolsep}{4pt}
-    \begin{tabular}{@{}llrl@{}}
+    \begin{tabular}{@{}llrp{4.7cm}@{}}
         \toprule
         \textbf{Claim} & \textbf{Rule} & \textbf{Prior} & \textbf{Reads as} \\
         \midrule
@@ -11,11 +11,12 @@
         $H1$ repr.\ supported  & $\Pr(\theta_{\mathrm{lock}} > \log 1.2 \mid D) \ge 0.95$   & $0.36$ & at least $20\%$ more code \\
         $H1$ repr.\ refuted    & $\Pr(|\theta_{\mathrm{lock}}| < \log 1.1 \mid D) \ge 0.95$ & $0.15$ & any expansion is under $10\%$ \\
         $H2$ supported & $\Pr(\sigma_\phi < \log 1.1 \mid D) \ge 0.95$ & $0.30$ & phase moves the deficit by under $10\%$ \\
-        $H3$ location  & two-label fit wins LOO, $\theta_S,\theta_P<0$ & ---    & dips sit on both predicted grids \\
-        $H3a$, $H3b$   & $\Pr(|\kappa_F - 1| < 0.1 \mid D) \ge 0.95$   & $0.05$ & that branch tracks its own parameter \\
-        $M1$ supported & $\Pr(\delta_O > 0 \mid D) \ge 0.95$, overlap wins LOO & $0.50$ & overlap reduces the deficit \\
+        $H3$ location  & two-label fit wins LOO, $\theta_S,\theta_P<0$ & \text{n/a} & deterministic dips sit on both predicted grids \\
+        D2 identified  & at least $10$ unambiguous sites for branch $F$ & \text{n/a} & otherwise report \emph{not identified} \\
+        $H3a$, $H3b$   & $\Pr(|\kappa_F - 1| < 0.1 \mid D) \ge 0.95$   & $0.05$ & identified branch tracks its own parameter \\
+        $M1$ supported & $\Pr(\delta_O > 0 \mid D) \ge 0.95$, overlap wins LOO & $0.50$ & overlap is associated with a smaller deficit \\
         \bottomrule
     \end{tabular}
-    \caption{Decision rules. \textbf{Prior} is the probability each rule already scored under the priors of \autoref{tab:bayesPriors}: a posterior counts as evidence only in as much as it has moved away from that value. A claim is supported at $0.95$, refuted at $0.05$, and otherwise inconclusive. The level each rule is read at is part of the rule: the behav. rows are decided on the forecast recovery ratio of Model~A, the repr. rows on the probing codelength of Model~B, $H2$ and $M1$ on the same forecast contrast as Model~A, and $H3$ with its two branches on the token dispersion of Models~D1 and~D2, which is representational and read before any transformer block. The two $H1$ pairs are one hypothesis at two levels and are not required to agree; a discrepancy between them is a result. Every rule is stated on the orientation of the response its model is fitted to: $\bar\beta$ and $\delta_O$ on the contrast $d$ of \autoref{eq:d2contrast}, where attenuation is negative and a mitigation is therefore positive, and $\sigma_\phi$ on the sign-reversed deficit $y=-d$ of \autoref{eq:d2phase}, where it is a spread and carries no sign.}
+    \caption{Preregistered decision rules. \textbf{Prior} records the probability that each probabilistic rule receives under the priors of \autoref{tab:bayesPriors}; it is a calibration reference, not an empirical verdict. A claim is supported at $0.95$, refuted at $0.05$, and otherwise inconclusive. The D2 identification gate is applied before either branch rule: fewer than ten unambiguous sites yields \emph{not identified}, not a null result. Models~A and~B address learned behavioural and representational failure. Models~D1 and~D2 address deterministic localisation and movement only. Every signed rule follows the orientation of its fitted response: $\bar\beta$ and $\delta_O$ use the contrast $d$ of \autoref{eq:d2contrast}, while $\sigma_\phi$ uses the spread of the sign-reversed deficit in \autoref{eq:d2phase}.}
     \label{tab:bayesDecisions}
 \end{table}
