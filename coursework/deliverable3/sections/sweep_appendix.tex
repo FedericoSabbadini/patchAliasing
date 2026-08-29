@@ -2,11 +2,33 @@ This appendix holds the descriptive pass that precedes the Bayesian analysis. It
 
 \subsection{How the sweeps are produced}
 
-The measurement is a sweep of pure sinusoids from $2$ to $250$\,Hz in one-hertz steps at $f_s=512$\,Hz. Every geometry is loaded in turn, measured, and released, and the context supplied to each is about $512$ samples snapped down to a whole number of strides, so that no geometry is fed a partial patch. Both readings are computed from the same swept frequencies, which is what allows a row to be read across.
+The measurement is a sweep of pure sinusoids from $2$ to $250$\,Hz in one-hertz steps at
+$f_s=512$\,Hz. Every geometry is loaded in turn, measured, and released, and the context supplied to
+each is $512$ samples snapped down to a whole number of strides: $L=512$ for $S\in\{8,16,32\}$,
+$504$ for $S\in\{12,24\}$ and $500$ for $S=20$. Two consequences follow from that choice and are
+stated here rather than left to be inferred. The input transform spacing is $f_s/L$, so it is
+exactly $1$\,Hz only for the first group and $1.0159$ or $1.0240$\,Hz for the others, which means an
+integer tone completes a whole number of cycles in the context for three of the six strides and not
+for the other three; the resulting leakage differs by geometry and is a property of the measurement,
+not of the model. The rollout, by contrast, is always $512$ samples long, so the output bin against
+which a dominant frequency is read is exactly $1$\,Hz for every geometry. Snapping to a whole number
+of strides does not by itself tile the context exactly, which requires $(L-P)\bmod S=0$; the
+terminal remainder is carried into no token, exactly as in \nameref{sec:six}. Both readings are computed from the same swept frequencies, which is what allows a row to be read across.
 
-The left column is behavioural. The tone is given as context, the model's median forecast is appended to that context and the model re-invoked, and the loop continues until a window of $512$ samples has been generated; the dominant frequency is then read as the largest magnitude of the discrete Fourier transform of that window once its mean is removed, and averaged over four non-redundant starting phases. Two properties of that procedure matter for reading the panel. The recursion is imposed from outside and is not Chronos-Bolt-Tiny's own generation mode, which emits its whole horizon in one step, so a curve that degrades along the sweep is partly the model reading its own output. And the rollout length fixes the resolution: $512$ samples at $512$\,Hz give one-hertz bins, so a dominant frequency is placed to within a hertz and no finer.
+The left column is behavioural. The tone is given as context, the model's median forecast is appended to that context and the model re-invoked, and the loop continues until a window of $512$ samples has been generated; the dominant frequency is then read as the largest magnitude of the discrete Fourier transform of that window once its mean is removed, and averaged over four non-redundant starting phases. Two properties of that procedure matter for reading the panel. The recursion is imposed from outside and is not Chronos-Bolt-Tiny's own generation mode, which emits its whole horizon in one step, so a curve that degrades along the sweep is partly the model reading its own output: the error of
+each step enters the context of the next, and accumulates. The single-pass forecast the model was
+trained to emit is not affected by this and is reported separately, on the decomposition pages
+below, which read the native $64$-sample horizon rather than a rollout. And the rollout length fixes the resolution: $512$ samples at $512$\,Hz give one-hertz bins, so a dominant frequency is placed to within a hertz and no finer.
 
-The right column is representational. At each swept frequency the internal state is captured at the output quantile head, and a linear probe is trained on it and scored by cross-validation. Eight tasks are scored per geometry: the seven hierarchical band tasks of \autoref{tab:bandTasks}, after Pagani et al.\autocite{paganiPreliminaryInsightsChronos2026} and unchanged from the probing methodology used throughout, each asking which half of a frequency band a tone belongs to, and one local task asking whether a tone at $f-1$\,Hz can be told from one at $f+1$\,Hz. The band tasks are cross-validated with folds grouped by frequency, so a probe cannot
+The right column is representational. At each swept frequency the internal state is captured at the
+output quantile head, standardised and projected onto its leading twenty principal components, and a
+logistic regression is trained on that projection and scored by cross-validation. Both the
+standardisation and the projection are fitted inside each training fold, so nothing leaks across a
+split. Two limitations follow and neither is removable within this design. The reduction is
+unsupervised, so a direction of low variance that nevertheless carries the frequency can be
+discarded before the probe sees it; and what is scored is what remains linearly decodable from the
+retained subspace, which is a lower bound on what the state holds rather than a measure of it. A red
+cell is therefore evidence that the frequency is not easily readable, not proof that it is absent. Eight tasks are scored per geometry: the seven hierarchical band tasks of \autoref{tab:bandTasks}, after Pagani et al.\autocite{paganiPreliminaryInsightsChronos2026} and unchanged from the probing methodology used throughout, each asking which half of a frequency band a tone belongs to, and one local task asking whether a tone at $f-1$\,Hz can be told from one at $f+1$\,Hz. The band tasks are cross-validated with folds grouped by frequency, so a probe cannot
 score by memorising individual frequencies rather than learning the boundary; the local task cannot be grouped that way, since its two classes are two frequencies, and holds out phases instead. Ten
 phases per frequency are used here against the four of the rollout, because a probe needs examples
 where the forecast needs only an average.
@@ -21,8 +43,9 @@ The sweep and the inferential stage share the band $2$--$250$\,Hz. That matters 
 For each geometry shown in Figures~\ref{fig:sweepPage1}, \ref{fig:sweepPage2} and~\ref{fig:sweepPage3}, two figures are drawn, one on the left and one on the right, and each is read independently. The left is a reconstruction of the generated window, the right a sweep of the internal state.
 
 On the left, a point on the dotted diagonal is a tone rebuilt at the frequency it was given at. A
-flat segment is a set of distinct inputs collapsing onto one output, which is loss of
-distinguishability rather than of amplitude. A jump is a tone the model produces that was never
+flat segment indicates that distinct input frequencies produce rollouts whose estimated dominant
+frequencies fall in the same bin, which is loss of distinguishability rather than of amplitude, and
+which does not by itself mean the two rollouts are alike in amplitude or phase. A jump is a tone the model produces that was never
 supplied. The shaded band is one standard deviation over the starting phases, so a wide band at a
 frequency means the answer depends on where in its cycle the tone began.
 
@@ -178,8 +201,8 @@ reconstruction curve follows the diagonal only over a low part of the band and d
 before the Nyquist limit; above that departure the returned dominant frequency is mostly a
 low-frequency value unrelated to the input, punctuated by isolated excursions. There is a broad
 plateau in the upper middle of the band on which many distinct inputs return one and the same
-output, which is the flat segment described above and is a loss of distinguishability rather than of
-amplitude. And the phase band is widest exactly on that plateau, so where the reading is worst it is
+dominant bin, which is the flat segment described above and is a loss of distinguishability rather
+than of amplitude. And the phase band is widest exactly on that plateau, so where the reading is worst it is
 also least stable across the starting phase.
 
 The probe strips do not follow that pattern. Over most of the band, and for most of the eight tasks,

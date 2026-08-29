@@ -1,30 +1,30 @@
 \begin{table*}[!t]
     \centering
     \small
-    \begin{tabular}{@{}ccccccccc@{}}
+    \begin{tabular}{@{}cccccccccc@{}}
         \toprule
-        \textbf{Run} & \textbf{Patch ($P$)} & \textbf{Stride ($S$)} & \textbf{Overlap ($O$)} & \textbf{Tokens} & $L_{\mathrm{tok}}$ & $r$ & $S \mid P$ & $P \mid S$ \\
+        \textbf{Run} & \textbf{Patch ($P$)} & \textbf{Stride ($S$)} & \textbf{Overlap ($O$)} & \textbf{Tokens} & $L$ & $L_{\mathrm{tok}}$ & $r$ & $S \mid P$ & $P \mid S$ \\
         \midrule
-        $1$ & $8$ & $8$ & $0.00$ & $256$ & $480$ & $0$ & yes & yes \\
+        $1$ & $8$ & $8$ & $0.00$ & $256$ & $480$ & $480$ & $0$ & yes & yes \\
         \midrule
-        $2$ & $16$ & $8$ & $0.50$ & $255$ & $480$ & $0$ & yes & \textbf{no} \\
-        $3$ & $16$ & $12$ & $0.25$ & $170$ & $472$ & $\mathbf{8}$ & \textbf{no} & \textbf{no} \\
-        $4$ & $16$ & $16$ & $0.00$ & $128$ & $480$ & $0$ & yes & yes \\
+        $2$ & $16$ & $8$ & $0.50$ & $255$ & $480$ & $480$ & $0$ & yes & \textbf{no} \\
+        $3$ & $16$ & $12$ & $0.25$ & $170$ & $480$ & $472$ & $\mathbf{8}$ & \textbf{no} & \textbf{no} \\
+        $4$ & $16$ & $16$ & $0.00$ & $128$ & $480$ & $480$ & $0$ & yes & yes \\
         \midrule
-        $5$ & $24$ & $8$ & $0.67$ & $254$ & $480$ & $0$ & yes & \textbf{no} \\
-        $6$ & $24$ & $12$ & $0.50$ & $169$ & $480$ & $0$ & yes & \textbf{no} \\
-        $7$ & $24$ & $16$ & $0.33$ & $127$ & $472$ & $\mathbf{8}$ & \textbf{no} & \textbf{no} \\
-        $8$ & $24$ & $20$ & $0.17$ & $102$ & $464$ & $\mathbf{16}$ & \textbf{no} & \textbf{no} \\
-        $9$ & $24$ & $24$ & $0.00$ & $85$ & $480$ & $0$ & yes & yes \\
+        $5$ & $24$ & $8$ & $0.67$ & $256$ & $480$ & $480$ & $0$ & yes & \textbf{no} \\
+        $6$ & $24$ & $12$ & $0.50$ & $171$ & $480$ & $480$ & $0$ & yes & \textbf{no} \\
+        $7$ & $24$ & $16$ & $0.33$ & $128$ & $480$ & $472$ & $\mathbf{8}$ & \textbf{no} & \textbf{no} \\
+        $8$ & $24$ & $20$ & $0.17$ & $103$ & $480$ & $464$ & $\mathbf{16}$ & \textbf{no} & \textbf{no} \\
+        $9$ & $24$ & $24$ & $0.00$ & $86$ & $480$ & $480$ & $0$ & yes & yes \\
         \midrule
-        $10$ & $32$ & $8$ & $0.75$ & $253$ & $480$ & $0$ & yes & \textbf{no} \\
-        $11$ & $32$ & $12$ & $0.62$ & $169$ & $476$ & $\mathbf{4}$ & \textbf{no} & \textbf{no} \\
-        $12$ & $32$ & $16$ & $0.50$ & $127$ & $480$ & $0$ & yes & \textbf{no} \\
-        $13$ & $32$ & $20$ & $0.38$ & $101$ & $472$ & $\mathbf{8}$ & \textbf{no} & \textbf{no} \\
-        $14$ & $32$ & $24$ & $0.25$ & $85$ & $464$ & $\mathbf{16}$ & \textbf{no} & \textbf{no} \\
-        $15$ & $32$ & $32$ & $0.00$ & $64$ & $480$ & $0$ & yes & yes \\
+        $10$ & $32$ & $8$ & $0.75$ & $253$ & $480$ & $480$ & $0$ & yes & \textbf{no} \\
+        $11$ & $32$ & $12$ & $0.62$ & $169$ & $480$ & $476$ & $\mathbf{4}$ & \textbf{no} & \textbf{no} \\
+        $12$ & $32$ & $16$ & $0.50$ & $127$ & $480$ & $480$ & $0$ & yes & \textbf{no} \\
+        $13$ & $32$ & $20$ & $0.38$ & $101$ & $480$ & $472$ & $\mathbf{8}$ & \textbf{no} & \textbf{no} \\
+        $14$ & $32$ & $24$ & $0.25$ & $85$ & $480$ & $464$ & $\mathbf{16}$ & \textbf{no} & \textbf{no} \\
+        $15$ & $32$ & $32$ & $0.00$ & $64$ & $480$ & $480$ & $0$ & yes & yes \\
         \bottomrule
     \end{tabular}
-    \caption{The fifteen configurations carried into the analysis, with the overlap ratio $O$ of \autoref{eq:overlap} and the number of patch tokens at the $2048$-sample training context. $L_{\mathrm{tok}}$ is the part of the $480$-sample analysis context that the patch grid actually spans, and $r$ the terminal remainder that is carried into no token; $r=0$ exactly when $S \mid P$, so the six geometries on which the stride-branch estimates rest are also the six whose context is truncated. All are trained from scratch under the same $100$k-step budget and from the same seed ($42$); the published Chronos-Bolt-Tiny checkpoint is not used. The last two columns are the divisibility conditions that decide what a geometry can attribute: $S \mid P$ means every stride site $c f_s/S$ is also a patch site $k f_s/P$, so the geometry yields no stride-only frequency, and $P \mid S$ is the converse. Both hold exactly when $P=S$, where the two branches are the same set of frequencies and nothing can be attributed to either alone.}
+    \caption{The fifteen configurations carried into the analysis, with the overlap ratio $O$ of \autoref{eq:overlap} and the number of patch tokens at the $2048$-sample training context, where the five $P=24$ geometries are left-padded to $2064$ because $2048$ is not a multiple of their patch size. $L$ is the context supplied at analysis time, the same for every geometry; $L_{\mathrm{tok}}$ is the part of it that the patch grid actually spans, and $r$ the terminal remainder that is carried into no token; $r=0$ exactly when $S \mid P$, so the six geometries on which the stride-branch estimates rest are also the six whose context is truncated. All are trained from scratch under the same $100$k-step budget and from the same seed ($42$); the published Chronos-Bolt-Tiny checkpoint is not used. The last two columns are the divisibility conditions that decide what a geometry can attribute: $S \mid P$ means every stride site $c f_s/S$ is also a patch site $k f_s/P$, so the geometry yields no stride-only frequency, and $P \mid S$ is the converse. Both hold exactly when $P=S$, where the two branches are the same set of frequencies and nothing can be attributed to either alone.}
     \label{tab:hfModels}
 \end{table*}
