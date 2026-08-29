@@ -1,0 +1,22 @@
+\begin{table}[!t]
+    \centering
+    \small
+    \setlength{\tabcolsep}{4pt}
+    \begin{tabular}{@{}llrl@{}}
+        \toprule
+        \textbf{Claim} & \textbf{Rule} & \textbf{Prior} & \textbf{Reads as} \\
+        \midrule
+        $H1$ behav.\ supported & $\Pr(\bar\beta < \log 0.8 \mid D) \ge 0.95$   & $0.34$ & at least $20\%$ attenuation \\
+        $H1$ behav.\ refuted   & $\Pr(|\bar\beta| < \log 1.1 \mid D) \ge 0.95$ & $0.14$ & any effect is under $10\%$ \\
+        $H1$ repr.\ supported  & $\Pr(\theta_{\mathrm{lock}} > \log 1.2 \mid D) \ge 0.95$   & $0.36$ & at least $20\%$ more code \\
+        $H1$ repr.\ refuted    & $\Pr(|\theta_{\mathrm{lock}}| < \log 1.1 \mid D) \ge 0.95$ & $0.15$ & any expansion is under $10\%$ \\
+        $H2$ supported & $\Pr(\sigma_\phi < \log 1.1 \mid D) \ge 0.95$ & $0.30$ & phase moves the deficit by under $10\%$ \\
+        $H3$ location  & two-label fit wins LOO, $\theta_S,\theta_P<0$ & \text{n/a} & deterministic dips sit on both predicted grids \\
+        D2 identified  & at least $10$ unambiguous sites for branch $F$ & \text{n/a} & otherwise report \emph{not identified} \\
+        $H3a$, $H3b$   & $\Pr(|\kappa_F - 1| < 0.1 \mid D) \ge 0.95$   & $0.05$ & identified branch tracks its own parameter \\
+        $M1$ supported & $\Pr(\delta_O > 0 \mid D) \ge 0.95$, overlap wins LOO & $0.50$ & overlap is associated with a smaller deficit \\
+        \bottomrule
+    \end{tabular}
+    \caption{Preregistered decision rules. \textbf{Prior} records the probability that each probabilistic rule receives under the priors of \autoref{tab:bayesPriors}; it is a calibration reference, not an empirical verdict. A claim is supported at $0.95$, refuted at $0.05$, and otherwise inconclusive. The D2 identification gate is applied before either branch rule: fewer than ten unambiguous sites yields \emph{not identified}, not a null result. Models~A and~B address learned behavioural and representational failure. Models~D1 and~D2 address deterministic localisation and movement only. Every signed rule follows the orientation of its fitted response: $\bar\beta$ and $\delta_O$ use the contrast $d$ of \autoref{eq:d2contrast}, while $\sigma_\phi$ uses the spread of the sign-reversed deficit in \autoref{eq:d2phase}.}
+    \label{tab:bayesDecisions}
+\end{table}

@@ -1,0 +1,284 @@
+Consider a continuous-time periodic signal sampled uniformly at sampling frequency $f_s$, yielding the discrete-time sequence $x[n]$. We isolate a fundamental harmonic component and model it as
+
+\begin{equation}
+\label{eq:sinusoid}
+x[n]
+=
+\sin\!\left(
+2\pi\frac{f}{f_s}n+\phi
+\right),
+\end{equation}
+
+where $f$ denotes the signal frequency satisfying the Nyquist criterion $f < \frac{f_s}{2}$, and $\phi\in[0,2\pi)$ is an arbitrary phase offset.
+
+Phase-locking occurs when the structural phase profile of the signal repeats exactly under a translational shift equal to the stride $S$. Evaluating a stride translation yields
+
+\begin{equation}
+\label{eq:stride_translation}
+x[n+S]
+=
+\sin\!\left(
+2\pi\frac{f}{f_s}(n+S)+\phi
+\right)
+=
+\sin\!\left(
+2\pi\frac{f}{f_s}n
++
+2\pi\frac{fS}{f_s}
++
+\phi
+\right).
+\end{equation}
+
+For exact alignment between the signal and the tokenization operator, the phase accumulation over one stride must correspond to an integer number of $2\pi$-periods
+
+\begin{equation}
+\label{eq:phase_boundary}
+2\pi\frac{fS}{f_s}
+=
+2\pi c,
+\qquad
+c\in\mathbb{N}^{+}.
+\end{equation}
+
+As a result, the signal exhibits exact stride-period translational invariance
+
+\begin{equation}
+\label{eq:stride_translation_invariance}
+x[n+S]
+=
+\sin\!\left(
+2\pi\frac{f}{f_s}n
++
+2\pi c
++
+\phi
+\right)
+=
+\sin\!\left(
+2\pi\frac{f}{f_s}n
++\phi
+\right)
+=
+x[n].
+\end{equation}
+
+Applying the same derivation to a translation of one patch size $P$ yields
+
+\begin{equation}
+\label{eq:phase_boundary_2}
+2\pi\frac{fP}{f_s}
+=
+2\pi k,
+\qquad
+k\in\mathbb{N}^{+}.
+\end{equation}
+
+This condition implies exact patch-period translational invariance,
+
+\begin{equation}
+\label{eq:patch_translation_invariance}
+x[n+P]
+=
+x[n].
+\end{equation}
+
+Solving \autoref{eq:phase_boundary} and \autoref{eq:phase_boundary_2} for $f$ yields two distinct phase-locking frequency families,
+
+\begin{equation}
+\label{eq:branches}
+\mathcal{F}_{S}
+=
+\left\{
+c\frac{f_s}{S}
+\right\}_{c\in\mathbb{N}^{+}},
+\qquad
+\mathcal{F}_{P}
+=
+\left\{
+k\frac{f_s}{P}
+\right\}_{k\in\mathbb{N}^{+}}.
+\end{equation}
+
+Each family is a comb, that is an evenly spaced set of frequencies, of spacing $f_s/S$ and $f_s/P$ respectively. Using the two families in \autoref{eq:branches}, the phase-locking frequency class $\mathcal{F}_{\mathrm{lock}}$ is defined as
+
+\begin{equation}
+\label{eq:flock_set}
+\mathcal F_{\mathrm{lock}}
+=
+\left\{
+f\in\mathbb{R}^{+}
+\;\middle|\;
+f\in\mathcal{F}_{S}\cup\mathcal{F}_{P},
+\;
+f<\frac{f_s}{2}
+\right\}.
+\end{equation}
+
+It is convenient to express both conditions in units that do not depend on the sampling rate. Introducing the cycles-per-stride and cycles-per-patch ratios
+
+\begin{equation}
+\label{eq:cpp}
+\mathrm{cps}
+=
+\frac{f S}{f_s},
+\qquad
+\mathrm{cpp}
+=
+\frac{f P}{f_s},
+\end{equation}
+
+\autoref{eq:phase_boundary} and \autoref{eq:phase_boundary_2} read simply $\mathrm{cps}\in\mathbb{N}^{+}$ and $\mathrm{cpp}\in\mathbb{N}^{+}$: $\mathcal{F}_{\mathrm{lock}}$ is the set of frequencies completing a whole number of cycles within one stride or within one patch. This normalisation makes the two branches directly comparable across geometries and across sampling rates.
+
+Neither branch is restricted to sinusoidal signals. Both conditions generalise to an arbitrary discrete-time signal invariant under a translation equal to the stride or to the patch,
+
+\begin{equation}
+\label{eq:general_periodicity}
+x[n+S]
+=
+x[n]
+\qquad\text{or}\qquad
+x[n+P]
+=
+x[n],
+\qquad
+\forall n,
+\end{equation}
+
+but only the first bears on consecutive patches. Tokens begin at multiples of the stride, so the step from token $k$ to token $k+j$ is a shift of $jS$ samples. Substituting \autoref{eq:element_def} and reducing by the stride condition at $j=1$ gives
+
+\begin{equation}
+\label{eq:collapse_S}
+\mathbf{t}_{k+1}[m]
+=
+x[(k+1)S+m]
+=
+x[kS+m+S]
+=
+x[kS+m]
+=
+\mathbf{t}_k[m],
+\end{equation}
+
+and since this holds for every component,
+
+\begin{equation}
+\label{eq:token_collapse}
+\mathbf{t}_{k+1}
+=
+\mathbf{t}_k.
+\end{equation}
+
+Here and below, for positive integers $A$ and $B$, the notation $A\mid B$ means that $A$ divides $B$, namely $B=qA$ for some $q\in\mathbb{N}^{+}$, whereas $A\nmid B$ means that $A$ does not divide $B$.
+
+The patch condition reduces the same shift only when $P$ divides $jS$. At $j=1$ that requires $P \mid S$, which under $S\le P$ occurs only at $S=P$, so consecutive tokens are left distinct. It does hold at the smallest $j$ for which $P \mid jS$, namely $j = P/\gcd(P,S)$; since $S/\gcd(P,S)\in\mathbb{N}^{+}$, repeated application of patch-periodicity one period at a time gives
+
+\begin{equation}
+\label{eq:collapse_P}
+\begin{aligned}
+\mathbf{t}_{k+j}[m]
+&=
+x[(k+j)S+m]
+\\
+&=
+x[kS+m+jS]
+\\
+&=
+x\!\left[kS+m+\frac{S}{\gcd(P,S)}P\right]
+\\
+&=
+x[kS+m+iP],
+&& i\in\mathbb{N}^{+}
+\\
+&=
+x[kS+m]
+\\
+&=
+\mathbf{t}_k[m],
+\end{aligned}
+\end{equation}
+
+and therefore
+
+\begin{equation}
+\label{eq:token_period_P}
+\mathbf{t}_{k+j}
+=
+\mathbf{t}_k.
+\end{equation}
+
+Patch-periodicity thus makes tokens equal as well, but at a spacing of $j$ rather than between neighbours. The two conditions coincide on consecutive patches only in the non-overlapping geometry, where $j=1$.
+
+\subsection{Analysis of Structural Redundancies and Invariances}
+
+ Whenever $S\le P$, every sample of the input appears in at least one token and can be read back from it: taking $k=\lfloor n/S\rfloor$ and $m = n \bmod S \le S-1 \le P-1$ in \autoref{eq:element_def} gives
+
+\begin{equation}
+\label{eq:reconstruction}
+x[n]
+=
+\mathbf{t}_{\lfloor n/S\rfloor}\!\left[n \bmod S\right],
+\qquad
+S\le P.
+\end{equation}
+
+Complete raw patching with $S\le P$ is therefore injective: the token sequence determines the signal, and no frequency below Nyquist is destroyed by tokenization itself. Everything that follows concerns redundancy in the token sequence rather than loss of information, the single exception being the $S>P$ regime, where the operator does discard samples.
+
+\subsubsection{Case 1: Equal Patch Size and Stride ($P=S$)}
+When patches are contiguous and non-overlapping the two branches coincide, $\mathcal{F}_{S}=\mathcal{F}_{P}$, and $j=P/\gcd(P,P)=1$, so \autoref{eq:token_period_P} collapses onto \autoref{eq:token_collapse}. This is the only geometry in which both conditions act on consecutive patches, and every locked frequency then gives
+
+\begin{equation}
+\mathbf{t}_k
+=
+\mathbf{t}_0,
+\qquad
+\forall k.
+\end{equation}
+
+\subsubsection{Case 2: Overlapping Windows ($S<P$)}
+When the stride is smaller than the patch size consecutive windows share samples, and the fraction of a patch they share is the overlap ratio
+
+\begin{equation}
+\label{eq:overlap}
+O
+=
+\frac{P-S}{P}
+\in
+[0,1),
+\end{equation}
+
+which is $0$ for contiguous patches and approaches $1$ as the stride shortens.
+
+In this regime the two branches separate. Since $f_s/S>f_s/P$, the stride comb is the sparser of the two. The derivation of \autoref{eq:collapse_S} makes no use of the relation between $P$ and $S$, so at $f\in\mathcal{F}_{S}$ consecutive tokens are still exactly equal.
+
+\subsubsection{Case 3: Disjoint Windows ($S>P$)}
+\label{sec:disjoint}
+When the stride exceeds the patch size the windows leave $S-P$ unobserved samples between consecutive patches, and \autoref{eq:reconstruction} fails: $\mathcal{T}_{P,S}$ is non-injective for every $f$, since signals differing only on the gaps share a token sequence. The loss is one of discarded samples rather than of tokenization geometry, so these configurations are excluded by construction from the experimental design.
+
+\subsubsection{Structural Aliasing as a Representation-Level Property}
+$\mathcal{F}_{S}$ collects the stride-lock candidates, at which
+consecutive raw tokens repeat. $\mathcal{F}_{P}$ collects the frequencies whose
+period divides the patch, at which the sequence repeats every $P/\gcd(P,S)$ tokens
+consecutive patches coincide exactly on $\mathcal{F}_{S}$, which for $S \mid P$ lies wholly inside $\mathcal{F}_{P}$.
+Their union $\mathcal{F}_{\mathrm{lock}}$ is therefore a statement about
+candidate geometry, not a proof of aliasing: for $S\le P$ the raw token
+sequence remains a lossless encoding of the input at every one of these
+frequencies, so none of the translations derived above is by itself evidence
+that two distinct signals become indistinguishable to the model.
+
+Structural aliasing is the separate, representation-level proposition that a
+model trained on such sequences nevertheless fails to make those frequencies
+readable from its internal state. It is treated here as an emergent and
+falsifiable property of the trained
+representations\autocite{paganiPreliminaryInsightsChronos2026}, diagnosed by
+readability rather than by a distance between raw tokens: it is present when
+the frequency of the signal can no longer be recovered from the internal state
+at a locked frequency as well as it can at neighbouring, non-locked ones. It is
+accordingly a property of the learned representation rather than of the
+operator, and one that can only be established empirically, with
+$\mathcal{F}_{\mathrm{lock}}$ supplying the candidate frequencies at which to
+look. The hypotheses that test it are formulated in \nameref{sec:four}.
+
+Observability is used in that sense throughout this report: not injectivity of
+$\mathcal{T}_{P,S}$, which \autoref{eq:reconstruction} settles, but readability
+of a frequency from the state the model builds.
