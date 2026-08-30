@@ -32,6 +32,7 @@
 \renewcommand*{\sectionautorefname}{Section}
 \renewcommand*{\subsectionautorefname}{Section}
 \renewcommand*{\subsubsectionautorefname}{Section}
+\titleformat{\section}[block]{\Large\bfseries\raggedright}{\thesection}{0.5em}{}[] % section titles flush left
 \titleformat{\subsubsection}[runin]{\bfseries}{\thesubsubsection}{5pt}{}[] % show the subsubsection number
 
 \usepackage{float} % enables the [H] float specifier to pin figures/tables in place
@@ -105,7 +106,7 @@
 \begin{document}
 \maketitle
 
-\section{Time-Series Forecasting}\label{sec:introduction}
+\section*{Time-Series Forecasting}\label{sec:introduction}
 \input{sections/introduction}
 
 \section{Patch-Based Tokenisation: a Formal Description}\label{sec:one}
@@ -148,7 +149,7 @@
 \begingroup
 \let\section\subsection
 \let\subsection\subsubsection
-\input{sections/ontology_appendix}
+\input{sections/ontology_appendix.tex}
 \endgroup
 
 \newpage

@@ -1,13 +1,13 @@
 Time-series forecasting is a fundamental time-series analysis task in which a model learns temporal dependencies and dynamic patterns linking past observations to future data in order to predict future values or trends\autocite{wangDeepTimeSeries2026}.
 
-\subsection{Evolution of Forecasting Methodologies}
+\subsection*{Evolution of Forecasting Methodologies}
 Classical time-series analysis relies on statistical models such as AutoRegressive Integrated Moving Average (ARIMA) and Exponential Smoothing (ETS). These models are simple and interpretable, but their assumptions of linearity and stationarity can limit their ability to capture nonlinear relationships and evolving data\autocite{wangDeepTimeSeries2026}.
 
 Deep learning models relax these constraints by learning nonlinear temporal representations directly from data. Recurrent neural networks process sequential dependencies through recurrent hidden states, whereas Transformers use self-attention to capture long-range temporal relationships, but attention scales quadratically with sequence length. Patch-based Transformer architectures then group neighbouring observations into tokens, reducing sequence length and giving attention access to local temporal structure\autocite{wangDeepTimeSeries2026}.
 
-Time-series foundation models sit at the end of this line. Chronos treats time-series values as discrete tokens obtained by scaling and quantisation\autocite{ansariChronosLearningLanguage2024}; its successor Chronos-Bolt-Tiny replaces quantisation with the patching scheme above and a direct multi-quantile head\autocite{ansariChronosLearningLanguage2024a,FastAccurateZeroshot2024a,AmazonChronosbolttinyHugging2025}. Patching is therefore not an incidental implementation detail, but the design choice that makes this class of models practical at scale.
+Time-series foundation models sit at the end of this line. Chronos treats time-series values as discrete tokens obtained by scaling and quantisation\autocite{ansariChronosLearningLanguage2024}; its successor Chronos-Bolt replaces quantisation with the patching scheme above and a direct multi-quantile head\autocite{ansariChronosLearningLanguage2024a,FastAccurateZeroshot2024a,AmazonChronosbolttinyHugging2025}. Patching is therefore not an incidental implementation detail, but the design choice that makes this class of models practical at scale.
 
-\subsection{Classic Aliasing}
+\subsection*{Classic Aliasing}
 Whatever the architecture downstream, predictive fidelity is bounded by the digital representation of the signal. The governing limit is the Nyquist-Shannon sampling theorem: a band-limited continuous-time signal is perfectly reconstructible only if sampled uniformly at a rate $f_s$ strictly greater than twice its highest frequency component $f_{\max}$,
 
 \begin{equation}
@@ -17,7 +17,7 @@ f_s > 2f_{\max}.
 
 The threshold $f_N = f_s/2$ is the Nyquist frequency. When the criterion is violated by an insufficient sampling rate or a missing anti-aliasing filter, components above $f_N$ fold back into the lower spectrum and become indistinguishable from genuine low-frequency content, an irreversible acquisition-time loss known as \textit{aliasing}, whereas satisfying \autoref{eq:nyquist_criterion} is conventionally treated as sufficient for a discrete sequence to represent its source faithfully.
 
-\subsection{Application Domain and Scope}
-The reference setting is a designed scenario: a photovoltaic array supplying an internal load, a local storage battery and the external grid, with a control agent performing load balancing, battery dispatch, state monitoring and anomaly detection on short-horizon forecasts. Measured photovoltaic and weather telemetry are taken from the SolarTech Lab dataset\autocite{levaPhotovoltaicPowerWeather2020}; the concepts, states and relations of the scenario are formalised as an OWL2 ontology in \nameref{sec:three}.% \autoref once `unnumberedsections` is removed from main.tex
+\subsection*{Application Domain and Scope}
+The reference setting is a designed scenario: a photovoltaic array supplying an internal load, a local storage battery and the external grid, with a control agent performing load balancing, battery dispatch, state monitoring and anomaly detection on short-horizon forecasts. Measured photovoltaic and weather telemetry are taken from the SolarTech Lab dataset\autocite{levaPhotovoltaicPowerWeather2020}; the concepts, states and relations of the scenario are formalised as an OWL2 ontology in \autoref{sec:three}.% \autoref once `unnumberedsections` is removed from main.tex
 
 The target architecture is Chronos-Bolt-Tiny, with default patch size $P=16$, stride $S=16$, context window $T=2048$, four encoder and four decoder blocks, and a direct quantile projection head. The objective is to test the assumption that such a model preserves the frequency content of Nyquist-compliant signals, and to characterise how $f_s$, $P$ and $S$ interact in determining when it does not.
