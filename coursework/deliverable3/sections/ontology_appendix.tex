@@ -29,7 +29,7 @@ All terms denote non-negative magnitudes; import and export are therefore kept s
 
 \section{Purpose and Scope}
 
-The ontology provides the smallest semantic layer needed to represent the physical boundary, validated observations, environmental context, three selected anomalies, and the effect of the tokenization over model observability. It does not model individual machines, market prices, dispatch optimisation, grid faults, or a deployed real-time controller. Load demand, battery state of charge (SoC), asset limits, and the optional grid-exchange reference are asserted because they are not present in the photovoltaic telemetry dataset.
+The ontology provides the smallest semantic layer needed to represent the physical boundary, validated observations, environmental context, three selected anomalies, and the effect of the tokenisation over model observability. It does not model individual machines, market prices, dispatch optimisation, grid faults, or a deployed real-time controller. Load demand, battery state of charge (SoC), asset limits, and the optional grid-exchange reference are asserted because they are not present in the photovoltaic telemetry dataset.
 
 The environmental states are operational generation proxies, not meteorological diagnoses. Likewise, the routing rules describe a deterministic conceptual policy rather than the central experimental contribution. Structural aliasing remains an empirically tested property of a signal-representation pair.
 
@@ -93,8 +93,7 @@ A valid patched representation satisfies $P\geq1$ and $1\leq S\leq P$, and store
 \subsection{Environmental generation context}
 
 Let $g_0<g_1<g_2$ be site-configurable tilted-irradiance thresholds and let $G_t$ denote the validated value of $G_{\mathrm{tilt}}$ at time $t$. The active generation context is
-\begin{equation}
-\label{eq:generation-context}
+\begin{equation*}
 Z_G(G_t)=
 \begin{cases}
 \valueof{Nighttime}, & G_t\leq g_0,\\
@@ -102,16 +101,15 @@ Z_G(G_t)=
 \valueof{PartialCloud}, & g_1\leq G_t<g_2,\\
 \valueof{ClearSky}, & G_t\geq g_2.
 \end{cases}
-\end{equation}
+\end{equation*}
 Values $g_0=0$, $g_1=150$, and $g_2=800\ \mathrm{W\,m^{-2}}$ are retained only as an illustrative configuration compatible with the current coursework. They are not universal meteorological boundaries. In particular, low irradiance can also be caused by solar position; the four values must therefore be read as generation-context proxies rather than certain weather diagnoses.
 
 \subsection{Anomaly detection and precedence}
 
 Let $v_P(t)$, $v_G(t)$, $v_s(t)$, and $v_L(t)$ denote the validity of PV power, tilted irradiance, battery SoC, and aggregate load demand. The control-critical validity predicate is
-\begin{equation}
-\label{eq:validity}
+\begin{equation*}
 V_t=v_P(t)\wedge v_G(t)\wedge v_s(t)\wedge v_L(t).
-\end{equation}
+\end{equation*}
 If $V_t$ is false, no physical anomaly or forecast-driven route is inferred from that observation. A valid irradiance value may still support a descriptive generation context, but the operational validator asserts \valueof{SensorMalfunction} and the cycle proceeds directly to safe-mode selection. Within a validated cycle, absence of the three listed anomaly values is interpreted locally as ``none detected''; this is a scoped closed-world policy, not a global OWL assumption.
 The signed ramp rate, measured in watts per second when $\Delta t$ is expressed in seconds, is
 \begin{equation}
@@ -151,12 +149,11 @@ No numerical value is inherited for $r_{\max}$ because it must be calibrated aft
 \subsection{Signal observability and structural aliasing}
 
 For a signal frequency $f$, sampling frequency $f_s$, patch size $P$, and stride $S$, define a stride-lock ratio and a patch-periodicity ratio
-\begin{equation}
+\begin{equation*}
 \rho_S=\frac{fS}{f_s},
 \qquad
 \rho_P=\frac{fP}{f_s}.
-\label{eq:locking-ratio}
-\end{equation}
+\end{equation*}
 A stride phase-lock candidate $L_S$ and a within-patch repetition candidate $L_P$ are
 \begin{equation}
 \begin{aligned}
@@ -180,7 +177,7 @@ R=\left[\Pr\!\left(\Delta_{\mathrm{loss}}(q)\leq\delta\mid D\right)\geq\tau\righ
 Because $\tau>1/2$, $Y$ and $R$ cannot both hold for the same assessment. The assessment interface receives the offline evidence produced by the Bayesian analysis of this report (see \autoref{sec:appBayes}): a local amplitude-recovery contrast with a heavy-tailed Student-$t_4$ likelihood and a Gamma regression with log link for non-negative prequential-MDL codelength. These are evidence fields, not universal ontology thresholds. Unless that inference satisfies the predeclared criterion, no instance may be asserted as \valueof{StructurallyAliased}.
 
 The three observability values are assigned as follows:
-\begin{equation}
+\begin{equation*}
 Z_O=
 \begin{cases}
 \valueof{StructurallyAliased}, & X,\\
@@ -188,17 +185,15 @@ Z_O=
 \valueof{PartiallyObservable}, & \neg X\wedge\neg R,
 \end{cases}
 \qquad X=Z\wedge Y.
-\label{eq:observability-state}
-\end{equation}
+\end{equation*}
 \valueof{Observable} therefore means that positive evidence shows the tested representation preserves the task-relevant information within tolerance $\delta$. It does not mean global observability of the physical system, nor does it merely mean that aliasing was not found. Candidate geometry may still be \valueof{Observable} when the experiment demonstrates preservation. \valueof{PartiallyObservable} is the epistemic fallback: preservation has not been certified, while structural aliasing has not been confirmed. It includes a candidate with inconclusive evidence, an unfinished test, a credible interval crossing the decision threshold, conflicting metrics, or no preservation evidence. The term means partially trusted, not that a fixed fraction of samples or sensors is visible.
 
 H1 compares each candidate frequency with matched nearby non-candidate controls and predicts higher MDL codelength or lower amplitude recovery; absent or non-localized loss refutes H1. H2 tests whether the loss at a candidate frequency remains approximately stable across sampled phase offsets; systematic phase dependence refutes that hypothesis. H3 tests whether candidate degradation sites move proportionally to $1/S$ or $1/P$ when the corresponding parameter varies. These hypotheses contribute controlled evidence to $D$, but remain falsifiable experimental factors rather than ontology subclasses or automatic action rules. Sensor validity is modeled separately as an anomaly and never relabels a model representation as structurally aliased.
 
 When an experimental generator provides a phase $\phi$ in radians, the corresponding temporal offset is converted before storage:
-\begin{equation}
+\begin{equation*}
 o_{\mathrm{samples}}=\frac{\phi f_s}{2\pi f}.
-\label{eq:phase-conversion}
-\end{equation}
+\end{equation*}
 Neither $\phi$ nor $o_{\mathrm{samples}}$ is compared directly with stride to infer an anomaly.
 
 The semantic propagation path is explicit:

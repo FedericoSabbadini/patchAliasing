@@ -50,12 +50,11 @@ Ten states are probed per geometry: the encoder $[\mathrm{REG}]$ token after eac
 
 The fit is
 
-\begin{equation}
-\label{eq:appB:model}
+\begin{equation*}
 L_i \sim \text{Gamma}\!\left(r,\ r/\mu_i\right),
 \qquad
 \log \mu_i = \alpha_0 + \theta_{\mathrm{lock}}\,\mathrm{IsLocked}_i + s_{\text{st}[i]} + g_{\text{geo}[i]}.
-\end{equation}
+\end{equation*}
 
 A codelength is strictly positive, right-skewed and has a variance that grows with its mean, which is what the Gamma likelihood with a log link is for; $r$ is its shape and carries the dispersion. The log link makes $\theta_{\mathrm{lock}}$ multiplicative, so $e^{\theta_{\mathrm{lock}}}$ is the factor by which the cost of the labels expands at a candidate frequency. The offsets $s_{\text{st}}$ and $g_{\text{geo}}$ are zero-mean and absorb the level differences between probe stages and between geometries, which run to several-fold and would otherwise be attributed to the lock indicator. The unadjusted form, without those offsets, is fitted alongside and compared by LOO, so the blocking decision is reported rather than assumed.
 
@@ -65,14 +64,13 @@ The scope of the probe task is deliberately narrow. The seven hierarchical band 
 
 Model~C is Model~A on the sign-reversed, per-phase response $y_i = \log(R_{\text{ctrl},i}+0.01)-\log(R_{\text{lock},i}+0.01)$, positive when the candidate is worse. The configuration-level covariates are dropped, because $H2$ is not a question about the design axes, and the phase circle is cut into eight equal slices, each given its own offset:
 
-\begin{equation}
-\label{eq:appC:model}
+\begin{equation*}
 y_i \sim \text{Student-}t_4(\mu_i,\ \sigma),
 \qquad
 \mu_i = \beta_{c[i]} + u_{k[i]} + u_{b[i]} + u_{p[i]},
 \qquad
 u_p \sim \mathcal{N}(0, \sigma_\phi).
-\end{equation}
+\end{equation*}
 
 The estimand $\sigma_\phi$ is the spread of the eight offsets and reduces the hypothesis to one number. Slices are preferred to a fitted sinusoidal or polynomial term because they assume nothing about the shape a phase dependence might take: any systematic pattern across the circle, of whatever form, widens the spread. Two readings are reported and can disagree, which is itself informative. The magnitude reading is $\Pr(\sigma_\phi<\log 1.1)$, whether phase dependence is practically negligible; the evidential reading is the LOO comparison against the same model with $u_p$ removed, whether allowing phase to matter predicts held-out data better. A small but consistently detected dependence would show a low equivalence probability together with a LOO preference for the phase model.
 
@@ -86,12 +84,11 @@ Three signal modes are swept. On a pure sinusoid the collapse is exact and $z$ r
 
 The fit is a regression of the log profile on two indicator labels,
 
-\begin{equation}
-\label{eq:appD1:model}
+\begin{equation*}
 \log z_g(f) \sim \mathcal{N}\!\left(
 \alpha_g + \theta_S \cdot \text{OnStrideGrid} + \theta_P \cdot \text{OnPatchGrid},\ \sigma
 \right),
-\end{equation}
+\end{equation*}
 
 where a frequency counts as on a grid when its distance to the nearest member of that comb is within tolerance. The logarithm makes the labels multiplicative on the per-geometry off-grid level $\alpha_g$, so $\theta_S$ and $\theta_P$ are depths relative to that level rather than absolute values, and geometries whose dispersion sits at different scales remain comparable. Four labellings are fitted to the same profiles and compared by LOO --- stride only, patch only, both, neither --- and the comparison is meaningful only because the sweep grid is the union over every geometry, so each labelling is scored where its rival predicts a dip as well as where it does. It is identified only because the design contains configurations with $S \nmid P$: on the $P=S$ diagonal the two combs coincide by construction and no amount of data can separate them.
 
@@ -99,14 +96,13 @@ where a frequency counts as on a grid when its distance to the nearest member of
 
 Where D1 says where the dips sit, D2 asks whether they move. Sites are detected on each swept profile, adjacent detections are merged so that one dip straddling two grid points is not counted twice, and each site is assigned to the branch that predicts it; sites predicted by both branches are set aside, because $\mathcal F_{\mathrm{lock}}$ is a union and the union of two combs has two interlaced spacings rather than one. The fundamental of each branch, the lowest of its detected sites, is then regressed on the spacing that branch predicts:
 
-\begin{equation}
-\label{eq:appD2:model}
+\begin{equation*}
 \hat f^{\,F}_{1,g} \sim \mathcal{N}\!\left(
 \kappa_F \,\Delta^F_g,\ \sqrt{\sigma_F^2+\Delta f^2}
 \right),
 \qquad
 \Delta^S_g=\frac{f_s}{S_g}, \quad \Delta^P_g=\frac{f_s}{P_g}.
-\end{equation}
+\end{equation*}
 
 The slope $\kappa_F$ is the estimand: measured spacing per unit of predicted spacing, so $\kappa_F=1$ is a branch that tracks its own arithmetic one for one, and its prior is centred on $0$, no relationship, so the hypothesis has to be earned from the data. The residual carries the floor $\Delta f$, the sweep step, because a spacing read off a discrete grid is no more precise than one step; without it, sites landing exactly on the prediction drive $\sigma_F$ to zero and the posterior develops a funnel the sampler cannot traverse. With the floor, a near-zero $\sigma_F$ is a result rather than a sampler failure.
 

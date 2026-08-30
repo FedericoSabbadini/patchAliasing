@@ -1,9 +1,6 @@
-Let $\mathbf{x} = \{x[n]\}_{n \in \mathbb{N}}$, with $\mathbb{N}=\{0,1,\ldots\}$, be a discrete-time signal representing the input time series. We define the patch-based tokenization operator $\mathcal{T}_{P,S}$ with patch size $P \in \mathbb{N}^{+}$ and stride $S \in \mathbb{N}^{+}$ as a mapping that transforms the signal $\mathbf{x}$ into a sequence of vector-valued tokens $\mathbf{T}=\{\mathbf{t}_k\}_{k\in\mathbb{N}}$, where each token $\mathbf{t}_k\in\mathbb{R}^{P}$.
+Let $\mathbf{x} = \{x[n]\}_{n \in \mathbb{N}}$, with $\mathbb{N}=\{0,1,\ldots\}$, be a discrete-time signal representing the input time series. Defining the patch-based tokenisation operator $\mathcal{T}_{P,S}$, with patch size $P \in \mathbb{N}^{+}$ and stride $S \in \mathbb{N}^{+}$, as a mapping that transforms the signal $\mathbf{x}$ into a sequence of vector-valued tokens $\mathbf{T}=\{\mathbf{t}_k\}_{k\in\mathbb{N}}$ with $\mathbf{t}_k\in\mathbb{R}^{P}$, the $k$-th token is
 
-The $k$-th token is defined as
-
-\begin{equation}
-\label{eq:token_def}
+\begin{equation*}
 \mathbf{t}_k
 =
 \mathcal{T}_{P,S}(\mathbf{x})[k]
@@ -14,7 +11,7 @@ x[kS+1] \\
 \vdots \\
 x[kS+P-1]
 \end{bmatrix}.
-\end{equation}
+\end{equation*}
 
 Using element-wise indexing notation,
 

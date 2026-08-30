@@ -1,10 +1,10 @@
-Testing the hypotheses of \nameref{sec:four} requires a design in which the two branches of $\mathcal F_{\mathrm{lock}}$ can be told apart, signals whose frequency content is known by construction, and an order of execution in which nothing that decides a hypothesis is chosen after the data have been seen.
+Testing the hypotheses of \autoref{sec:four} requires a design in which the two branches of $\mathcal F_{\mathrm{lock}}$ can be told apart, signals whose frequency content is known by construction, and an order of execution in which nothing that decides a hypothesis is chosen after the data have been seen.
 
-\subsubsection{Patch geometries}
+\subsection{Patch geometries}
 
 Chronos-Bolt-Tiny is distributed with the standard geometry $P=S=16$. Studying only that point would show how the published configuration behaves, but not whether a blind spot follows the tokenisation parameters that generate it. The design therefore varies both: at fixed $P$, changing $S$ moves the overlap and the stride spacing; at fixed $S$, changing $P$ moves the patch width and the patch spacing, with the $P=S$ runs as contiguous baselines at different temporal resolutions. Configurations with $S>P$ are excluded, since their gaps discard input samples and would confound geometry with data loss.
 
-\subsubsection{Retraining}
+\subsection{Retraining}
 
 Every geometry, the baseline included, is trained from scratch: changing $P$ changes the input width of the first patch projection and changing $S$ the token sequence on which inter-patch dynamics are learned, so reusing the published weights would leave the variants on unequal training histories. Only the architectural configuration is taken from the published model; $(P,S)$ is overridden before random initialisation, and data, optimiser, budget and seed are held fixed. \autoref{sec:appRetraining} gives the construction, the streaming data and the optimisation.
 
