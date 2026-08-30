@@ -83,8 +83,8 @@ padding; it lets a peak be located at, say, $6$\,Hz rather than snapped to a mul
 spacing. The native spacing is $f_s/N = 512/64 = 8$\,Hz, fixed by the $125$\,ms the horizon covers,
 and no amount of zero padding improves it. Interpolation places a peak finely; it does not separate
 two peaks. Two components one hertz apart therefore appear as one line however fine the grid, and
-the panel titles that read \emph{resolving power $8.0$\,Hz} refer to this second quantity: read them
-as \emph{$64$ samples, native $\Delta f = 8.0$\,Hz, plotted on a $1$\,Hz zero-padded grid}. A
+the panel titles that read ``resolving power $8.0$\,Hz'' refer to this second quantity: read them
+as ``$64$ samples, native $\Delta f = 8.0$\,Hz, plotted on a $1$\,Hz zero-padded grid''. A
 $512$-sample rollout would bring the native spacing to one hertz as well, at the cost of feeding the
 model its own output.
 
@@ -174,12 +174,12 @@ None of this is evidence for or against the hypotheses of \autoref{sec:four}. Wh
     \par\vspace{6pt}
     \includegraphics[width=0.97\textwidth,height=0.30\textheight,keepaspectratio]{figures/FIG_E4_tsmixup_p16-s16_spectra_seed17.png}
     \caption{Light TSMixup, seed 17, on the retrained $P=S=16$ geometry, in two panels that are two readings of
-one draw. \emph{Above}, the components. On the left the realisation supplied as context and the
+one draw. Above, the components. On the left the realisation supplied as context and the
 frequencies it was built from, which the generator records rather than the transform recovering
 them; on the right the $64$-sample horizon the model returned and its own strongest lines, fitted by
 least squares at the frequencies a peak search proposed. The two columns are separate
 decompositions and a row does not pair them: what matters is which frequencies survive into the
-right column and at what amplitude, and each column carries its own vertical scale. \emph{Below},
+right column and at what amplitude, and each column carries its own vertical scale. Below,
 the transforms those lines were read off, Hann-windowed, one-sided and scaled so a pure tone of
 amplitude $A$ peaks near $A$. Dashed verticals are $\mathcal F_{\mathrm{lock}}$ for this geometry,
 green verticals mark the frequencies the generator drew, markers are the lines the search returned,
