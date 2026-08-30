@@ -1,4 +1,4 @@
-This appendix states in full the five models summarised in \nameref{sec:four}, together with the reading of Model~A that carries the mitigation claim $M1$. For each, what follows gives what it measures, how the measurement is constructed, and what every parameter of it means. The equations are repeated here so that the appendix can be read on its own; the correspondence between claims, models, estimands and probing tables is the one given by \autoref{tab:bayesModels} in that section, and is not tabulated again here.
+This appendix states in full the five models summarised in \autoref{sec:four}, together with the reading of Model~A that carries the mitigation claim $M1$. For each, what follows gives what it measures, how the measurement is constructed, and what every parameter of it means. The equations are repeated here so that the appendix can be read on its own; the correspondence between claims, models, estimands and probing tables is the one given by \autoref{tab:bayesModels} in that section, and is not tabulated again here.
 
 \subsection{Sampling and diagnostics}
 
@@ -59,7 +59,7 @@ L_i \sim \text{Gamma}\!\left(r,\ r/\mu_i\right),
 
 A codelength is strictly positive, right-skewed and has a variance that grows with its mean, which is what the Gamma likelihood with a log link is for; $r$ is its shape and carries the dispersion. The log link makes $\theta_{\mathrm{lock}}$ multiplicative, so $e^{\theta_{\mathrm{lock}}}$ is the factor by which the cost of the labels expands at a candidate frequency. The offsets $s_{\text{st}}$ and $g_{\text{geo}}$ are zero-mean and absorb the level differences between probe stages and between geometries, which run to several-fold and would otherwise be attributed to the lock indicator. The unadjusted form, without those offsets, is fitted alongside and compared by LOO, so the blocking decision is reported rather than assumed.
 
-The scope of the probe task is deliberately narrow. The seven hierarchical band tasks used in the exploratory sweep of \nameref{sec:five} each summarise hundreds of frequencies in one codelength, so the lock indicator has nothing to attach to; they are retained as a descriptive cross-check of overall decodability and are not fitted by any Bayesian model.
+The scope of the probe task is deliberately narrow. The seven hierarchical band tasks used in the exploratory sweep of \autoref{sec:five} each summarise hundreds of frequencies in one codelength, so the lock indicator has nothing to attach to; they are retained as a descriptive cross-check of overall decodability and are not fitted by any Bayesian model.
 
 \subsection{Model C, the phase reading (H2)}
 
@@ -138,7 +138,7 @@ One limit is worth stating explicitly, since it bounds what $M1$ can license. Th
 \subsection{Two limitations of the collected design}
 
 Neither of the following is a property of the estimators, and both are reported rather than adjusted
-for. The first is the truncated context of \nameref{sec:six}. Every geometry receives $480$ samples,
+for. The first is the truncated context of \autoref{sec:six}. Every geometry receives $480$ samples,
 and the patch grid spans only $P+S\lfloor(480-P)/S\rfloor$ of them, so the last $r=(480-P)\bmod S$
 enter no token; $r$ is zero exactly when $S \mid P$, and reaches sixteen samples on two geometries.
 The truncation is constant within a geometry and identical for a candidate and its two controls,

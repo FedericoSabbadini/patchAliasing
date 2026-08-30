@@ -1,43 +1,56 @@
 \begin{table}[!htbp]
     \centering
-    \small
+    \footnotesize
     \setlength{\tabcolsep}{4pt}
-    \begin{tabular}{@{}p{3.4cm}p{4.2cm}p{2.1cm}p{5.5cm}@{}}
+    \begin{tabular}{@{}p{3.6cm}p{4.4cm}p{2.2cm}p{5.0cm}@{}}
         \toprule
-        \textbf{Parameter} & \textbf{This work} & \textbf{Published value} & \textbf{Note} \\
+        \multicolumn{4}{@{}l}{\textit{Tokenisation geometry (the swept parameters)}}\\
+        \textbf{Parameter} & \textbf{Adopted} & \textbf{Published} & \textbf{Constraint / note} \\
         \midrule
-        \multicolumn{4}{@{}l}{\textit{Tokenisation geometry, the only swept parameter}}\\
-        Patch size $P$              & $8,16,24,32$            & $16$        & the fifteen pairs are listed in \autoref{tab:hfModels} \\
-        Stride $S$                  & $8$ to $32$, $S\le P$   & $16$        & $S>P$ excluded: its gaps would discard samples \\
-        Training seed               & $42$                    & ---         & one seed, shared by every run \\
+        Patch size $P$              & $8$, $16$, $24$, $32$              & $16$                & swept; the pairs are in \autoref{tab:hfModels} \\
+        Stride $S$                  & $8$, $12$, $16$, $20$, $24$, $32$  & $16$                & swept, subject to $S\le P$ \\
+        Geometries trained          & $15$                               & $1$                 & one checkpoint per $(P,S)$ \\
+        Training seed               & $42$                               & ---                 & one seed, shared by every run \\
+        \addlinespace[12pt]
+        \midrule[\heavyrulewidth]
+        \addlinespace[3pt]
+        \multicolumn{4}{@{}l}{\textit{Architecture (fixed, from Chronos-Bolt-Tiny)}}\\
+        \textbf{Parameter} & \textbf{Adopted} & \textbf{Published} & \textbf{Constraint / note} \\
         \midrule
-        \multicolumn{4}{@{}l}{\textit{Architecture, taken unchanged from the released configuration}}\\
-        Context length              & $2048$ samples          & $2048$      & \\
-        Forecast horizon            & $64$ samples            & $64$        & emitted in a single forward pass \\
-        Quantile levels             & $9$, from $0.1$ to $0.9$& $9$         & \\
-        Widths, heads, layer counts & as released             & as released & \\
-        Initial weights             & random                  & pretrained  & no released weight is reused \\
+        Context length              & $2048$ samples                     & $2048$              & as released \\
+        Prediction length           & $64$ samples                       & $64$                & as released \\
+        Quantile levels             & $9$, from $0.1$ to $0.9$           & $9$                 & as released \\
+        Widths, heads, layers       & as released                        & as released         & only $(P,S)$ is overridden \\
+        Initial weights             & random                             & pretrained          & every geometry trained from scratch \\
+        \addlinespace[12pt]
+        \midrule[\heavyrulewidth]
+        \addlinespace[3pt]
+        \multicolumn{4}{@{}l}{\textit{Data pipeline}}\\
+        \textbf{Parameter} & \textbf{Adopted} & \textbf{Published} & \textbf{Constraint / note} \\
         \midrule
-        \multicolumn{4}{@{}l}{\textit{Training data}}\\
-        Corpora                     & TSMixup $10$M and KernelSynth $1$M series & same & read as streams, not materialised \\
-        Mixing ratio                & $9{:}1$                 & $9{:}1$     & TSMixup to KernelSynth \\
-        Shuffle buffer              & $10{,}000$ windows      & $100{,}000$ & \textbf{departure}: keeps the stream from stalling \\
-        Minimum observed past       & $60$ samples            & $60$        & required before the horizon \\
-        Series discarded above      & $90\%$ missing          & $90\%$      & \\
-        Injected missingness        & uniform on $[0,0.2]$    & same        & masked, and excluded from the loss \\
-        Windows drawn per series    & $1$                     & $1$         & one admissible split point \\
-        \midrule
+        Corpora (streamed)          & TSMixup $10$M, KernelSynth $1$M    & same                & public Chronos collection \\
+        Mixing ratio                & $9{:}1$                            & $9{:}1$             & TSMixup to KernelSynth \\
+        Shuffle buffer              & $10{,}000$                         & $100{,}000$         & \textbf{departure}: streaming throughput \\
+        Minimum observed past       & $60$ samples                       & $60$                & required before the horizon \\
+        Maximum missing per series  & $0.9$                              & $0.9$               & series above this are discarded \\
+        Injected missing rate       & $\mathcal U(0,0.2)$                & $\mathcal U(0,0.2)$ & masked, excluded from the loss \\
+        Windows per series          & $1$                                & $1$                 & one admissible split point \\
+        \addlinespace[12pt]
+        \midrule[\heavyrulewidth]
+        \addlinespace[3pt]
         \multicolumn{4}{@{}l}{\textit{Optimisation}}\\
-        Gradient updates            & $100{,}000$             & $200{,}000$ & \textbf{departure}: single-device compute budget \\
-        Batch size                  & $32$ windows            & $32$        & \\
-        Optimiser                   & AdamW                   & AdamW       & \\
-        Learning rate               & $10^{-3}$               & $10^{-3}$   & \\
-        Schedule, warmup            & linear to zero, none    & same        & \\
-        Weight decay                & $0$                     & $0$         & \\
-        Gradient-norm clip          & $1.0$                   & $1.0$       & \\
-        Numerical precision         & single                  & ---         & reduced-precision matrix products where the device offers them \\
+        \textbf{Parameter} & \textbf{Adopted} & \textbf{Published} & \textbf{Constraint / note} \\
+        \midrule
+        Gradient updates            & $100{,}000$                        & $200{,}000$         & \textbf{departure}: compute budget \\
+        Batch size                  & $32$ windows                       & $32$                & --- \\
+        Optimiser                   & AdamW                              & AdamW               & --- \\
+        Learning rate               & $10^{-3}$                          & $10^{-3}$           & --- \\
+        Scheduler / warmup          & linear to zero / none              & linear / none       & --- \\
+        Weight decay                & $0.0$                              & $0.0$               & --- \\
+        Gradient-norm clip          & $1.0$                              & $1.0$               & --- \\
+        Numerical precision         & single                             & ---                 & reduced-precision matrix products where available \\
         \bottomrule
     \end{tabular}
-    \caption{Every setting under which the fifteen models of \autoref{tab:hfModels} were trained. The middle column is what this study used; the right-hand column is the corresponding value in the published Chronos recipe, taken from the released Chronos-Bolt-Tiny configuration for the architecture rows and from the published training recipe for the data and optimisation rows, with a dash where no published counterpart exists. Three entries differ from it. The patch geometry is the object of the study. The step budget and the shuffle buffer are reductions made to fit the available compute and to keep a streamed corpus from stalling; both apply identically to all fifteen runs, so neither can favour or penalise a particular $(P,S)$. Everything else is the published value.}
+    \caption{Training parameters: the value adopted for every retrained geometry, the corresponding value in the published Chronos recipe, and the constraint behind it. The architecture rows are the released Chronos-Bolt-Tiny configuration; the data and optimisation rows follow the published training recipe. Only three entries depart from it: the patch geometry, which is the object of the study, and the step budget and shuffle buffer, both reduced to fit the available compute and to keep a streamed corpus from stalling. The latter two apply identically to all fifteen runs, so neither can favour or penalise a particular $(P,S)$.}
     \label{tab:trainParams}
 \end{table}
