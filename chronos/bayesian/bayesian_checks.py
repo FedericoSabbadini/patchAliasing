@@ -20,7 +20,11 @@ POSTERIOR_CUTOFF = 0.95
 
 def fit_diagnostics(name: str, idata: Any, az_module: Any) -> dict[str, Any]:
     """Evaluate the convergence gate specified in Deliverable 3."""
-    summary = az_module.summary(idata, kind="diagnostics")
+    summary = az_module.summary(
+    idata,
+    kind="diagnostics",
+    round_to="none",
+    )
     max_rhat = float(np.nanmax(summary["r_hat"]))
     min_bulk = float(np.nanmin(summary["ess_bulk"]))
     min_tail = float(np.nanmin(summary["ess_tail"]))
