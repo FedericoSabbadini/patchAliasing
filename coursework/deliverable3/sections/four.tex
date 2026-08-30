@@ -1,21 +1,20 @@
-Bayesian statistics represents uncertainty about unknown quantities through probability distributions and updates prior beliefs when data are observed\autocite{murphyProbabilisticMachineLearning2023}. It is used here because the hypotheses concern the magnitude and uncertainty of structural aliasing effects, not point estimates alone: posterior distributions quantify evidence for attenuation, phase independence and parameter-tracking against predeclared decision thresholds. The candidate set $\mathcal F_{\mathrm{lock}}$ of \autoref{sec:two} is arithmetic and holds for any model.
-\subsection{The hypotheses}
-
+Bayesian statistics represents uncertainty about unknown quantities through probability distributions and updates prior beliefs when data are observed\autocite{murphyProbabilisticMachineLearning2023}. It is used here because the hypotheses concern the magnitude and uncertainty of structural aliasing effects: posterior distributions quantify evidence for attenuation, phase independence and parameter-tracking against predeclared decision thresholds. The candidate set $\mathcal F_{\mathrm{lock}}$ of \autoref{eq:flock} is arithmetic and holds for any model.
 Three claims are carried into the analysis, each stated so that a particular posterior refutes it.
-\subsubsection{Frequency-dependent blind spots (H1)}
-At a candidate frequency $f_k\in\mathcal F_{\mathrm{lock}}$ the model retains less of the signal than at the two neighbouring control frequencies $f_k\pm\delta$, which are not themselves candidates. The claim has two readings that need not agree: a behavioural one, in which the forecast rebuilds the tone less faithfully, and a representational one, in which the frequency becomes harder to read out of the internal state. A loss that is absent, or not localised on the candidate set, refutes $H1$. Phase-locking is treated here as a necessary but not sufficient condition for the specific geometry-induced structural aliasing this study hypothesises: nothing in the design excludes that distinct signals acquire near-identical learned representations for reasons unrelated to $\mathcal F_{\mathrm{lock}}$, and no claim is made about frequencies outside it.
-
-\subsubsection{Independence from temporal alignment (H2)}
-The magnitude of that loss is a property of the alignment between the signal period and the tokenisation grid, not of the point in its cycle at which the signal is observed. A deficit varying systematically with the starting phase refutes H2.
-
-\subsubsection{Parametric dependence of blind spot sites (H3)}
-Because $\mathcal F_{\mathrm{lock}}$ is a union, the claim splits in two, one per branch, with $c,k\in\mathbb{N}^{+}$ the harmonic indices of \autoref{sec:two}. $H3a$: at fixed $P$, the sites at $f=c\,f_s/S$ move proportionally to $1/S$. $H3b$: at fixed $S$, the sites at $f=k\,f_s/P$ move proportionally to $1/P$. A site that stays put while the parameter supposed to generate it is varied refutes its branch.
 
 \input{tables/bayesPriors.tex}
 
 \input{tables/bayesModels.tex}
 
 \autoref{tab:bayesPriors} gives every prior with its role, \autoref{tab:bayesModels} pairs each claim with the model that decides it, its estimand, the value the claim predicts and the table of measurements it is fitted to, and \autoref{sec:appBayes} states each model in full. Every effect prior is centred on no effect, and its scale is varied over the sensitivity ladder $\{0.25,0.5,1.0\}$, sceptical, primary and wide, so that a conclusion resting on the choice of scale rather than on the data is detected as such.
+
+\subsubsection*{Frequency-dependent blind spots (H1)}
+At a candidate frequency $f_k\in\mathcal F_{\mathrm{lock}}$ the model retains less of the signal than at the two neighbouring control frequencies $f_k\pm\delta$, which are not themselves candidates. The claim has two readings that need not agree: a behavioural one, in which the forecast rebuilds the tone less faithfully, and a representational one, in which the frequency becomes harder to read out of the internal state. A loss that is absent, or not localised on the candidate set, refutes $H1$. Phase-locking is treated here as a necessary but not sufficient condition for the specific geometry-induced structural aliasing this study hypothesises: nothing in the design excludes that distinct signals acquire near-identical learned representations for reasons unrelated to $\mathcal F_{\mathrm{lock}}$, and no claim is made about frequencies outside it.
+
+\subsubsection*{Independence from temporal alignment (H2)}
+The magnitude of that loss is a property of the alignment between the signal period and the tokenisation grid, not of the point in its cycle at which the signal is observed. A deficit varying systematically with the starting phase refutes H2.
+
+\subsubsection*{Parametric dependence of blind spot sites (H3)}
+Because $\mathcal F_{\mathrm{lock}}$ is a union, the claim splits in two, one per branch, with $c,k\in\mathbb{N}^{+}$ the harmonic indices of \autoref{eq:branches}. $H3a$: at fixed $P$, the sites at $f=c\,f_s/S$ move proportionally to $1/S$. $H3b$: at fixed $S$, the sites at $f=k\,f_s/P$ move proportionally to $1/P$. A site that stays put while the parameter supposed to generate it is varied refutes its branch.
 
 \subsection{H1}
 

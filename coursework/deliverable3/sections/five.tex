@@ -1,17 +1,17 @@
 Four kinds of signal appear in this study. Three are synthetic and are what the models are probed with, each serving a different purpose rather than being a variant of the others; the fourth is the real telemetry of the application domain.
 
-\subsection{Single-harmonic sinusoid}
+\subsection*{Single-harmonic sinusoid}
 
-It is the primitive the design rests on: frequency and phase are exact, so a locked frequency produces exactly the degeneracy derived in \autoref{sec:two} and no background content can be blamed for a loss observed at a predicted site. $x(t)=A\sin(2\pi f t+\phi)$, sampled at $f_s$.
+It is the primitive the design rests on: frequency and phase are exact, so a locked frequency produces exactly the degeneracy of \autoref{eq:token_collapse} and no background content can be blamed for a loss observed at a predicted site. It takes the form $x(t)=A\sin(2\pi f t+\phi)$, sampled at $f_s$.
 
-\subsection{Light TSMixup}
+\subsection*{Light TSMixup}
 
 A controlled probing variant of the mixup augmentation used to train Chronos\autocite{ansariChronosLearningLanguage2024}, in which the real source datasets of the original are replaced by a pool of sinusoids. It tests whether the effect survives when the tone is embedded in a multi-component signal whose composition is still fully known. Its pseudocode and parameters are given in \autoref{sec:appB}.
 
-\subsection{KernelSynth}
+\subsection*{KernelSynth}
 
 The Gaussian-process generator of the same training recipe\autocite{ansariChronosLearningLanguage2024}. Its output carries trends and broadband content as well as periodicity, so it tests whether the effect survives in signals resembling the corpus the model was trained on rather than the probe used to measure it. Its pseudocode, kernel bank and parameters are given in \autoref{sec:appC}.
 
-\subsection{Photovoltaic telemetry}
+\subsection*{Photovoltaic telemetry}
 
 The measured power and weather series of the SolarTech Lab dataset\autocite{levaPhotovoltaicPowerWeather2020} that define the application domain.
