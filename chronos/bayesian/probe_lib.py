@@ -21,7 +21,7 @@ needs. Every method here takes a stack of contexts `[B, CTX]` and returns `[B, .
 
 Conventions are kept bit-identical to the rest of the project so the numbers remain comparable:
 fs = 512 Hz, context = 480 samples, horizon = 64, band = [2, 250] Hz, and a tone injected on a
-unit-variance generator background at SNR = 4.
+unit-variance generator background at SNR = 1.
 """
 from __future__ import annotations
 
@@ -53,7 +53,16 @@ CTX = 480                   # context length. Divisible by every stride used by 
                             # padding fakes a collapse. S=28 is excluded: see DELIVERABLE3_MODELS.
 PRED = 64                   # forecast horizon (Chronos-Bolt's native prediction_length)
 BAND = (2.0, 250.0)         # analysis band, strictly inside Nyquist
-TONE_SNR = 4.0              # tone amplitude over a unit-variance background (probing convention)
+TONE_SNR = 1.0              # tone amplitude over a unit-variance background (probing convention)
+                            # Lowered from 4.0. The recovery R = A_pred/A_true fits A_true on the
+                            # TRUE continuation, so it already measures the fraction of whatever
+                            # amplitude is present at f that survives, whatever its origin; the
+                            # constant sets how far the injected tone stands above the corpus's own
+                            # component there, measured at 0.082 (TSMixup) and 0.121 (KernelSynth).
+                            # At 4.0 the tone was 33 to 49 times that and the background was a
+                            # backdrop; at 1.0 it is 8 to 12 times, and the amplitude estimate over
+                            # the 64-step horizon still carries a relative error of 17.7%, needing
+                            # 78 observations per site against the ~2000 the design collects.
 SEED = 42
 
 # The geometries of tab:patchStride: every (P, S) on the sweep repository with S >= 8. All are
