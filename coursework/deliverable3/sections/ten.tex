@@ -1,30 +1,28 @@
 The forecaster is not a standalone artefact. It sits inside a control loop in which its output drives battery dispatch and curtailment on a photovoltaic micro-grid, so a forecasting failure can become a control failure, and the property tested in this report has to be read as a security property and not only as an accuracy one. The NIST AI Risk Management Framework\autocite{tabassiArtificialIntelligenceRisk2023} is the reference adopted for that reading: it separates the trustworthiness characteristics evidenced here, validity and reliability, security and resilience, from the governance functions that turn evidence into a control, and it asks that known limitations be mapped, measured and managed rather than merely disclosed.
 
-\subsection{The limitation is a weakness before it is a vulnerability}
-
-Phase-locking is deterministic, attacker-independent and present at deployment time. It is not introduced by an adversary and it is not a defect in the training data; it is a consequence of the tokenisation geometry. The candidate set follows from the configuration $(f_s,P,S)$ alone. Structural aliasing is the phenomenon that may then appear in the learned representation, and phase-locking set bounds where the model can be blind.
+Phase-locking is deterministic, attacker-independent and present at deployment time. It is not introduced by an adversary and it is not a defect in the training data; it is a consequence of the tokenisation geometry. The candidate set follows from the configuration $(f_s,P,S)$ alone. Structural aliasing is the phenomenon that may then appear in the learned representation, and phase-locking set possible sites where the model can be blind.
 
 An adversary therefore needs no model access, no query budget and no knowledge of the training corpus, but only knowledge of the chosen forecaster to find $F_{lock}$. In the taxonomy of adversarial machine learning\autocite{vassilevAdversarialMachineLearning2024} this places the weakness with the availability violations rather than with integrity or privacy, and it places the attack outside the white-box assumption.
 
 A weakness becomes a vulnerability only when someone can reach it. For the leading threat model, adversarial masking, the five elements are the following. 
 
-\subsubsection{Adversary capabilities}
+\subsubsection*{Adversary capabilities}
 
-No model access of any kind and no knowledge of the training corpus, only the ability to drive a periodic load on the plant, which an inverter switching schedule or a switchable load already provides.
+No model access of any kind and no knowledge of the training corpus, only the ability to drive a periodic load on the photovoltaic plant, which an inverter switching schedule or a switchable load already provides.
 
-\subsubsection{Attack surface}
+\subsubsection*{Attack surface}
 
 The raw telemetry stream before tokenisation, reached by acting on the physical process or on the data path.
 
-\subsubsection{Manipulation of telemetry}
+\subsubsection*{Manipulation of telemetry}
 
 A small periodic component at a candidate frequency, which is legitimate plant behaviour and survives any plausibility check on the raw signal.
 
-\subsubsection{Operational consequence}
+\subsubsection*{Operational consequence}
 
 The component is present in the plant and under-represented in the model, so dispatch and curtailment are decided on an incomplete picture, and a detector reading the forecast residual is looking through the same tokeniser that lost it.
 
-\subsubsection{Residual risk}
+\subsubsection*{Residual risk}
 
 Considering the overlapping mitigation that thins the stride branch alone, the patch branch remains at every deployed configuration.
 
@@ -40,7 +38,7 @@ What does not wait on a fit is the geometry. The candidate set is closed-form in
 
 \subsection{Threat models beyond the adversarial one}
 
-The framework asks for systematic vulnerability, not only for attacks, and the more likely exposure has no adversary in it. On one-minute telemetry, the arithmetic of \nameref{sec:two} puts the patch branch of a $P{=}16$ tokeniser at periods of $16/k$ minutes, that is at $16$, $8$, $5.3$, $4$, $3.2$, $2.7$ and $2.3$ minutes. Those are the timescales of inverter duty cycling, of maximum-power-point dither and of cloud-shadow transients: ordinary plant behaviour, not an attack, sitting on frequencies the tokeniser is least able to represent. A monitoring system built on such a forecaster would be systematically less sensitive there, permanently and for reasons no operational log would reveal. That is $T2$, and it is why the candidate set belongs in the deployment documentation of such a system.
+The framework asks for systematic vulnerability, not only for attacks, and the more likely exposure has no adversary in it. On one-minute telemetry, the arithmetic of \autoref{eq:branches} puts the patch branch of a $P{=}16$ tokeniser at periods of $16/k$ minutes, that is at $16$, $8$, $5.3$, $4$, $3.2$, $2.7$ and $2.3$ minutes. Those are the timescales of inverter duty cycling, of maximum-power-point dither and of cloud-shadow transients: ordinary plant behaviour, not an attack, sitting on frequencies the tokeniser is least able to represent. A monitoring system built on such a forecaster would be systematically less sensitive there, permanently and for reasons no operational log would reveal. That is $T2$, and it is why the candidate set belongs in the deployment documentation of such a system.
 
 The third exposure is governance rather than signal processing. Because the blind set is a function of configuration, a change that no one would route through a security review, a resampling of telemetry from one minute to thirty seconds, a swap of checkpoint, a patch size chosen for latency, relocates it. $H3a$ is the claim that would make this tractable: the relocation is predicted in closed form by $f_s/S$, and if the sites follow that prediction, recomputing the candidate set after a configuration change is arithmetic rather than re-measurement.
 
@@ -48,6 +46,6 @@ The third exposure is governance rather than signal processing. Because the blin
 
 Two controls in this design are real. Detection has to be placed before tokenisation, on the raw telemetry, because anything placed after it inherits the blind spot it is meant to guard; a spectral monitor on the raw stream, evaluated on the enumerated candidate set, is inexpensive precisely because that set is closed-form. And the semantic layer of \autoref{sec:appendixA} degrades actuation rather than failing silently: an assessment that is merely \valueof{PartiallyObservable} reduces the battery cap and lowers decision confidence, so uncertainty about the representation reaches the actuator instead of being resolved by assumption. That is the resilience the framework asks for, and it is the part of the design that does not depend on how the behavioural claim resolves.
 
-One control cannot be credited, and the report is more useful for saying so. The pre-registered mitigation of \nameref{sec:eight}, increased patch overlap, is not established: its rule has two legs, both fixed in advance, and neither has been evaluated. The arithmetic bounds it in any case, since overlap moves the stride branch and leaves the patch branch untouched, so even a mitigation established on this design would be partial by construction. An operator who raises the overlap ratio and records the risk as mitigated has bought a false assurance, which is $T4$ and the reason it is carried at high residual exposure.
+One control cannot be credited, and the report is more useful for saying so. The pre-registered mitigation of \autoref{sec:eight}, increased patch overlap, is not established: its rule has two legs, both fixed in advance, and neither has been evaluated. The arithmetic bounds it in any case, since overlap moves the stride branch and leaves the patch branch untouched, so even a mitigation established on this design would be partial by construction. An operator who raises the overlap ratio and records the risk as mitigated has bought a false assurance, which is $T4$ and the reason it is carried at high residual exposure.
 
 The conclusion this section can carry today is narrower than the one it could have asserted and better founded than one it could have assumed. Structural aliasing in a patch-based forecaster is a configuration-determined, attacker-independent weakness whose location is derivable in closed form rather than conjectured. Whether that geometry carries a measurable representational cost, and whether such a cost propagates to the forecast, are the two questions the fits decide, and until they do neither is claimed here. What the arithmetic settles on its own is that the exposure is concentrated in the patch branch, that the pre-registered mitigation cannot reach it whatever the fit returns, and that it cannot be managed inside the model. It has to be managed around it: by choosing the geometry against the known spectral content of the plant, by monitoring the raw signal upstream of the tokeniser, and by treating the candidate set as a deployment parameter that is recomputed whenever the configuration it derives from changes.
