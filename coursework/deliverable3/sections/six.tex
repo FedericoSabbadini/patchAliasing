@@ -14,7 +14,7 @@ In \autoref{tab:hfModels} the two parameters vary independently, which is what l
 
 \subsection{Analysis design}
 
-Synthetic signals are sampled at $f_s=512$\,Hz and analysed over $[2,250]$\,Hz, strictly inside the Nyquist limit, whereas the telemetry is recorded once per minute, so absolute frequencies are not comparable in hertz. The transferable quantity is dimensionless: a candidate completes a whole number of cycles within one stride or one patch, so $\mathrm{cpp}=k$ corresponds, for a one-minute series with $P=16$, to a period of $16/k$ minutes. A single seed controls all stochastic generation and trains every geometry, so the design does not separate a geometry from the instance trained at it, and a small effect could be seed-dependent.
+Synthetic signals are sampled at $f_s=512$\,Hz and analysed over $[2,250]$\,Hz, strictly inside the Nyquist limit, whereas the telemetry is recorded once per minute, so absolute frequencies are not comparable in hertz. The transferable quantity is dimensionless: a candidate completes a whole number of cycles within one stride or one patch, so $\mathrm{cpp}=k$ corresponds, for a one-minute series with $P=16$, to a period of $16/k$ minutes. A single seed controls all stochastic generation, and one model is trained per geometry, so instance-to-instance variation is never measured and a small difference between configurations cannot be ascribed to geometry alone.
 
 \subsubsection{Exploratory frequency sweep}
 
