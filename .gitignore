@@ -246,3 +246,4 @@ chronos/bayesian/results/**/signals/
 
 # Temporary files
 tmp
+*.zip
