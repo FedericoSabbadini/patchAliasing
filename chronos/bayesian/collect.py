@@ -70,6 +70,10 @@ class Config:
     generators: tuple[str, ...] = pl.GENERATORS
 
     #, frequency-local MDL cells (H1 representational),
+    #, localisation estimator (H1 behavioural / H2),
+    fhat_topk: int = pl.FHAT_TOPK      # peaks retained per arm; set by the Part 2 Delta x K sweep
+    fhat_tol_hz: float = pl.FHAT_TOL_HZ
+
     mdl_delta_f: float = 1.0        # the +/- offset of the two tones the probe must separate [Hz]
     mdl_n_per_class: int = 40       # examples per class in a cell (so 2 * 40 = 80 rows per probe)
     mdl_n_phase: int = 10
@@ -89,6 +93,7 @@ class Config:
     site_assignment_tol_hz: float = 1.5
     site_ambiguity_hz: float = 0.25
     min_d2_sites: int = 10          # Deliverable 3 identification bar, per branch
+    min_sites_per_geometry: int = 2 # candidate sites that must survive the ceiling, per geometry
 
     seed: int = pl.SEED
 
@@ -109,7 +114,18 @@ class Config:
 #  1. contrasts, the matched (f_k, f_k - delta, f_k + delta) triplets
 # --------------------------------------------------------------------------------- #
 def collect_contrasts(probe: "pl.Probe", cfg: Config) -> pd.DataFrame:
-    """The paired local contrast d of deliverable Eq. (8), with the phase index RETAINED.
+    """The localisation indicator h of deliverable Eq. (8), ONE ROW PER ARM.
+
+    The response is whether the forecast rebuilt the frequency the arm carries:
+    h = 1[|f_hat - f| <= 1 Hz], with f_hat the dominant frequency of the median forecast over the
+    horizon (`pl.dominant_freq`). Models A and C are Bernoulli fits on h with a lock indicator, so
+    the three arms of a triplet are three OBSERVATIONS rather than one contrast; this table is
+    therefore long where it used to be wide, and carries `role`, `f` and `is_lock` per row.
+
+    Nothing is discarded. An arm whose forecast rebuilds nothing measurable returns h = 0, which is
+    a reading and not a degenerate one, so the old `live` filter and the epsilon stabiliser that
+    kept a log-ratio finite are both gone. R is retained per arm because `pl.Probe.measure` gets it
+    from the same forward pass at no extra cost, but no model is fitted to it.
 
     Design (deliverable Local Contrast Analysis): each lock frequency f_k in F_lock is paired with
     two controls at f_k +/- 0.25 fs/S. The three signals of a triplet share the SAME background
@@ -146,42 +162,35 @@ def collect_contrasts(probe: "pl.Probe", cfg: Config) -> pd.DataFrame:
                         futures.append(full[pl.CTX:])
                         freqs.append(f)
                         meta.append(dict(generator=gen, bg_id=bg_id, f_lock=fk, delta=d_fk,
-                                         phase_idx=ph_idx, phase=float(ph), role=role))
+                                         phase_idx=ph_idx, phase=float(ph), role=role,
+                                         f=float(f)))
 
     if not contexts:
         return pd.DataFrame()
 
-    R, dphase = probe.recovery(np.stack(contexts), np.stack(futures), np.array(freqs))
+    # one forward pass, three readings; the indicator is the response, R is descriptive
+    R, dphase, f_hat, f_hat_truth = probe.measure(
+        np.stack(contexts), np.stack(futures), np.array(freqs), k=cfg.fhat_topk)
 
-    # fold the three roles of each triplet back into one row
-    long = pd.DataFrame(meta)
-    long["R"] = R
-    long["dphase"] = dphase
-    key = ["generator", "bg_id", "f_lock", "delta", "phase_idx"]
-    wide = long.pivot_table(index=key + ["phase"], columns="role",
-                            values="R", aggfunc="first").reset_index()
-    ph_lock = (long[long.role == "lock"].set_index(key)["dphase"])
-    wide = wide.join(ph_lock.rename("dphase_lock"), on=key)
+    out = pd.DataFrame(meta)
+    out["R"] = R
+    out["dphase"] = dphase
+    out["f_hat"] = f_hat[:, 0]                   # strongest peak, for description
+    out["h"] = pl.localisation_hit(f_hat, out["f"].to_numpy(float), tol=cfg.fhat_tol_hz)
+    # the same estimator on the TRUE continuation: where this misses, the instrument failed on
+    # that row and it carries no evidence about the model. Part 5 fits with and without the
+    # conditioning and reports the LOO comparison rather than assuming which scope is right.
+    out["h_truth"] = pl.localisation_hit(f_hat_truth, out["f"].to_numpy(float), tol=cfg.fhat_tol_hz)
+    out["is_lock"] = (out["role"] == "lock").astype(np.int8)
 
-    eps = 0.01                                   # the deliverable's stabiliser, so log(0) cannot occur
-    log_lock = np.log(wide["lock"] + eps)
-    log_ctrl = 0.5 * (np.log(wide["lo"] + eps) + np.log(wide["hi"] + eps))
-    wide["d"] = log_lock - log_ctrl              # Eq. (8): d < 0 means localized attenuation
-    wide["y_deficit"] = -wide["d"]               # Eq. (11): the same measurement, sign-flipped
-    wide["R_ctrl"] = 0.5 * (wide["lo"] + wide["hi"])
-    wide = wide.rename(columns={"lock": "R_lock", "lo": "R_lo", "hi": "R_hi"})
-
-    wide["model"] = probe.tag
-    wide["P"], wide["S"] = P, S
-    wide["overlap"] = (P - S) / P                # O_c of Eq. (9)
-    wide["cpp"] = wide["f_lock"] * P / pl.FS     # cycles per patch
-    wide["family"] = [pl.lock_family(f, P, S) for f in wide["f_lock"]]
-    # "live" = there is recoverable signal on at least one side; where nothing is recovered on
-    # either side the contrast is a ratio of two noise floors and carries no information about H1.
-    wide["live"] = wide[["R_lock", "R_lo", "R_hi"]].max(axis=1) > 0.05
-    return wide[["model", "P", "S", "overlap", "generator", "bg_id", "f_lock", "family", "cpp",
-                 "delta", "phase_idx", "phase", "R_lock", "R_lo", "R_hi", "R_ctrl",
-                 "dphase_lock", "d", "y_deficit", "live"]]
+    out["model"] = probe.tag
+    out["P"], out["S"] = P, S
+    out["overlap"] = (P - S) / P                 # O_c of Eq. (9)
+    out["cpp"] = out["f_lock"] * P / pl.FS       # cycles per patch
+    out["family"] = [pl.lock_family(f, P, S) for f in out["f_lock"]]
+    return out[["model", "P", "S", "overlap", "generator", "bg_id", "f_lock", "family", "cpp",
+                "delta", "phase_idx", "phase", "role", "f", "is_lock", "R", "dphase",
+                "f_hat", "h", "h_truth"]]
 
 
 # --------------------------------------------------------------------------------- #
@@ -487,7 +496,8 @@ def _load_or_create_manifest(
 
 
 _REQUIRED_COLUMNS = {
-    "contrasts": {"model", "P", "S", "generator", "R_lock", "R_lo", "R_hi", "d", "live"},
+    "contrasts": {"model", "P", "S", "generator", "f_lock", "role", "f", "is_lock",
+                  "f_hat", "h", "h_truth"},
     "mdl_cells": {"model", "P", "S", "stage", "is_locked", "L_bits"},
     "mdl_bandtasks": {"model", "P", "S", "stage", "task", "L_bits"},
     "collapse": {"model", "P", "S", "mode", "rep", "f", "z", "z_norm"},
@@ -506,7 +516,7 @@ def _validate_frame(frame: pd.DataFrame, table: str, tag: str | None = None) -> 
     if tag is not None and set(frame["model"].astype(str)) != {tag}:
         raise ValueError(f"{table} shard for {tag} contains models {sorted(frame['model'].unique())}")
     finite_columns = {
-        "contrasts": ("R_lock", "R_lo", "R_hi", "d"),
+        "contrasts": ("f", "f_hat", "h", "h_truth"),
         "mdl_cells": ("L_bits",),
         "mdl_bandtasks": ("L_bits",),
         "collapse": ("f", "z", "z_norm"),
@@ -634,12 +644,30 @@ def check_design(
     if "contrasts" in tables:
         contrasts = tables["contrasts"]
         for model, group in contrasts.groupby("model"):
-            n_live = int(group["live"].astype(bool).sum())
-            print(f"    contrasts {model:<9s} rows={len(group):>5d} live={n_live:>5d} "
+            # Both levels of the lock indicator must be present and neither response level may be
+            # empty: a geometry whose arms all hit, or all miss, identifies no gamma at all.
+            n_lock = int((group["is_lock"] == 1).sum())
+            n_ctrl = int((group["is_lock"] == 0).sum())
+            hit_rate = float(group["h"].mean())
+            print(f"    contrasts {model:<9s} rows={len(group):>6d} lock={n_lock:>5d} "
+                  f"ctrl={n_ctrl:>5d} hit={hit_rate:>5.3f} "
                   f"locks={group['f_lock'].nunique():>3d} phases={group['phase_idx'].nunique():>3d} "
                   f"generators={group['generator'].nunique()}")
-            if n_live == 0:
-                failures.append(f"{model}: no live contrast triplet")
+            if n_lock == 0 or n_ctrl == 0:
+                failures.append(f"{model}: gamma NOT IDENTIFIED (one IsLock level empty)")
+            if group["h"].nunique() < 2:
+                failures.append(f"{model}: localisation indicator is constant at {hit_rate:.0f}")
+            # Survival is a per-geometry property, not a global one. P=S=8 has only three lock
+            # sites in band, so a low ceiling can reduce it to about one while the pooled table
+            # still looks healthy. A geometry contributing one site contributes a beta_c that is
+            # one number, and M1 is a regression over those numbers.
+            surviving = int(group.loc[group["is_lock"] == 1, "h_truth"].astype(bool).sum() and
+                            group.loc[group["h_truth"].astype(bool) & (group["is_lock"] == 1),
+                                      "f_lock"].nunique())
+            if surviving < cfg.min_sites_per_geometry:
+                failures.append(f"{model}: only {surviving} candidate site(s) survive the "
+                                f"instrument ceiling, below the bar of "
+                                f"{cfg.min_sites_per_geometry}")
             if set(group["generator"]) != set(cfg.generators):
                 failures.append(f"{model}: generator coverage mismatch in contrasts")
 

@@ -53,7 +53,10 @@ CTX = 480                   # context length. Divisible by every stride used by 
                             # padding fakes a collapse. S=28 is excluded: see DELIVERABLE3_MODELS.
 PRED = 64                   # forecast horizon (Chronos-Bolt's native prediction_length)
 BAND = (2.0, 250.0)         # analysis band, strictly inside Nyquist
-TONE_SNR = 1.0              # tone amplitude over a unit-variance background (probing convention)
+FHAT_NFFT = 8192            # zero-padded FFT length for `dominant_freqs`; see its docstring
+FHAT_TOPK = 3               # peaks retained per arm; set by the Delta x K sweep of Part 2
+FHAT_TOL_HZ = 1.0           # Delta of Eq. (8)
+TONE_SNR = 1.25             # tone amplitude over a unit-variance background (probing convention)
                             # Lowered from 4.0. The recovery R = A_pred/A_true fits A_true on the
                             # TRUE continuation, so it already measures the fraction of whatever
                             # amplitude is present at f that survives, whatever its origin; the
@@ -516,6 +519,77 @@ def fit_amp_phase(y: np.ndarray, t: np.ndarray, f: float) -> tuple[float, float]
     return float(np.hypot(a, b)), float(np.arctan2(b, a))
 
 
+def dominant_freqs(y: np.ndarray, k: int = FHAT_TOPK, nfft: int = FHAT_NFFT,
+                   band: tuple[float, float] = BAND) -> np.ndarray:
+    """The `k` strongest spectral peaks of each row of `y`, strongest first. [N, T] -> [N, k].
+
+    Rectangular window, zero-padded, peaks ranked by height. Five properties are load-bearing, and
+    each of them silently invalidates the response if it is dropped.
+
+    1. `y` MUST be the forecast horizon alone, never context+horizon. The context carries the true
+       tone by construction, so a transform over both would score a hit for every arm.
+    2. The mean is removed first. Over a window this short the DC component otherwise wins outright.
+    3. The search is confined to `band`, for the same reason at the other end.
+    4. Zero-padding to `nfft` is what makes the 1 Hz tolerance attainable. The horizon is 64 samples
+       at fs=512, so the natural bin spacing is 8 Hz and an argmax on the unpadded transform can
+       only return a multiple of 8. Under that estimator |fhat - f| <= 1 would hold only where the
+       arm's own frequency lies within 1 Hz of a multiple of 8: true for every candidate of a P=16
+       geometry (fs/P = 32) and for 3 of 11 at P=24. The indicator would then be reading bin
+       alignment, a deterministic function of P, confounded exactly with delta_P. Padding to 8192
+       puts the search grid at 0.0625 Hz and removes it.
+    5. `k > 1` is the point of the estimator, not a relaxation of it. The claim under test is that
+       the tone is among the strongest components the forecast rebuilds, not that it is the single
+       strongest; on a corpus whose own energy sits low in the band, the global argmax is beaten by
+       the background on most arms, which caps the measurement rather than measuring the model.
+       Part 2 sweeps Delta x k and picks the pair maximising ceiling - floor.
+
+    Peaks are local maxima at least fs/N apart, that being the resolution a rectangular window of N
+    samples actually has: closer maxima are one lobe, not two. Rows with fewer than `k` peaks are
+    padded with NaN, which `localisation_hit` ignores.
+    """
+    from scipy.signal import find_peaks
+
+    y = np.atleast_2d(np.asarray(y, dtype=float))
+    y = y - y.mean(axis=1, keepdims=True)                    # (2)
+    spectrum = np.abs(np.fft.rfft(y, n=nfft, axis=1))        # (4)
+    grid = np.fft.rfftfreq(nfft, d=1.0 / FS)
+    keep = (grid >= band[0]) & (grid <= band[1])             # (3)
+    grid, spectrum = grid[keep], spectrum[:, keep]
+
+    separation = max(1, int(round(nfft / y.shape[1])))       # fs/N in grid points
+    out = np.full((len(spectrum), k), np.nan)
+    for i, row in enumerate(spectrum):
+        peaks, _ = find_peaks(row, distance=separation)
+        if peaks.size == 0:
+            peaks = np.array([int(np.argmax(row))])
+        strongest = peaks[np.argsort(row[peaks])[::-1][:k]]
+        out[i, :strongest.size] = grid[strongest]
+    return out
+
+
+def dominant_freq(y: np.ndarray, nfft: int = FHAT_NFFT,
+                  band: tuple[float, float] = BAND) -> np.ndarray:
+    """The single strongest peak per row: `dominant_freqs` at k=1, kept for descriptive use."""
+    return dominant_freqs(y, k=1, nfft=nfft, band=band)[:, 0]
+
+
+def localisation_hit(f_hat: np.ndarray, f: np.ndarray, tol: float = FHAT_TOL_HZ) -> np.ndarray:
+    """The indicator h of Eq. (8): is the arm's own frequency among the retained peaks?
+
+    `f_hat` is [N] or [N, k]. A hit is any retained peak within `tol` of `f`, so k enters the
+    definition of the response and must be reported with it. `tol` is Delta = 1 Hz, smaller than
+    the control offset at every geometry of tab:hfModels, so the three arms of a triplet cannot
+    claim one another's hits.
+    """
+    peaks = np.atleast_2d(np.asarray(f_hat, dtype=float))
+    if peaks.shape[0] == 1 and len(np.shape(f_hat)) == 1:
+        peaks = peaks.T
+    target = np.asarray(f, dtype=float).reshape(-1, 1)
+    gap = np.abs(peaks - target)
+    gap = np.where(np.isnan(gap), np.inf, gap)
+    return (gap.min(axis=1) <= tol).astype(np.int8)
+
+
 # --------------------------------------------------------------------------------- #
 #  2. Lock geometry ,  F_lock = {c*fs/S} union {k*fs/P}   (deliverable Eq. 7)
 # --------------------------------------------------------------------------------- #
@@ -757,6 +831,45 @@ class Probe:
             R[i] = a_hat / max(a_true, 1e-9)
             dphase[i] = np.degrees(abs(np.angle(np.exp(1j * (ph_hat - ph_true)))))
         return R, dphase
+
+    # ---------------------------------------------------------------------- #
+    def localise(self, contexts: np.ndarray) -> np.ndarray:
+        """Dominant frequency of the median forecast, per context. [N, CTX] -> [N].
+
+        The transform runs on the PRED-sample horizon only, which is all `forecast` returns; see
+        `dominant_freq` for why feeding it the context as well would destroy the measurement.
+        """
+        return dominant_freqs(self.forecast(contexts))
+
+    # ---------------------------------------------------------------------- #
+    def measure(self, contexts: np.ndarray, futures: np.ndarray, freqs: np.ndarray,
+                k: int = FHAT_TOPK
+                ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+        """One forward pass, three readings: (R, dphase, f_hat, f_hat_truth).
+
+        Chronos is the whole cost of collection, so they share a single call to `forecast` rather
+        than paying for it three times. R is retained because it costs nothing and keeps the
+        amplitude reading available for descriptive use; the response Models A and C are fitted to
+        is the indicator.
+
+        `f_hat_truth` is the same estimator run on the TRUE continuation, which the caller already
+        holds. It costs no forecast and it is what makes the instrument auditable: where the truth
+        itself misses, the tone is not the measurable content of that window and the row carries no
+        evidence about the model. The ceiling this defines is not uniform over the design - it
+        depends on where the arm sits relative to the corpus's own energy, and candidate
+        frequencies are c*fs/S and k*fs/P - so it varies with the design axes and confounds delta_O
+        and delta_P. gamma survives it, being a within-triplet contrast; M1 does not.
+        """
+        preds = self.forecast(contexts)
+        t_fut = np.arange(CTX, CTX + preds.shape[1]) / FS
+        R = np.empty(len(preds))
+        dphase = np.empty(len(preds))
+        for i, f in enumerate(np.asarray(freqs, float)):
+            a_hat, ph_hat = fit_amp_phase(preds[i], t_fut, f)
+            a_true, ph_true = fit_amp_phase(np.asarray(futures[i], float), t_fut, f)
+            R[i] = a_hat / max(a_true, 1e-9)
+            dphase[i] = np.degrees(abs(np.angle(np.exp(1j * (ph_hat - ph_true)))))
+        return R, dphase, dominant_freqs(preds, k=k), dominant_freqs(np.asarray(futures, float), k=k)
 
     # ---------------------------------------------------------------------- #
     def collapse(self, contexts: np.ndarray) -> np.ndarray:
