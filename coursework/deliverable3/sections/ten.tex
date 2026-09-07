@@ -25,7 +25,7 @@ The five elements of the adversarial-masking threat model\autocite{vassilevAdver
     \item \emph{Attack surface}: the raw telemetry stream before tokenisation, reached by acting on the physical process or on the data path.
     \item \emph{Manipulation of telemetry}: a small periodic component at a candidate frequency, which is legitimate plant behaviour and survives any plausibility check on the raw signal.
     \item \emph{Operational consequence}: the component is present in the plant and under-represented in the model, so dispatch and curtailment are decided on an incomplete picture, and a detector reading the forecast residual is looking through the same tokeniser that lost it.
-    \item \emph{Residual risk}: considering the overlapping mitigation that thins the stride branch alone, the patch branch remains at every deployed configuration. Considering the overlapping mitigation that thins the patch brach, and consequently the stride branch ($S \le P$), the candidate set is relocated but not removed.
+    \item \emph{Residual risk}: considering the overlapping mitigation that thins the stride branch alone, the patch branch remains at every deployed configuration. Considering the overlapping mitigation that thins the patch branch, and consequently the stride branch ($S \le P$), the candidate set is relocated but not removed.
 \end{itemize}
 
 This is the adversarial masking row of \autoref{tab:riskRegister}, carried at high residual: no control available to an operator closes it, since a spectral monitor placed after tokenisation would inherit the very blind spot the attacker exploits.

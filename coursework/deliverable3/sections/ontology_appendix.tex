@@ -37,7 +37,7 @@ The environmental states are operational generation proxies, not meteorological 
 
 \subsection{Core classes and closed vocabularies}
 
-\autoref{tab:classes} defines the compact class interface. The four asset subclasses form a disjoint union; the \pv{PVSystem} contains exactly one asset of each type and it is managed by a control agent. Closed operational vocabularies are represented as named individuals rather than deeper class hierarchies.
+\autoref{tab:classes} defines the compact class interface. The four asset subclasses form a disjoint union; the \pv{PVSystem} contains exactly one asset of each type and it is managed by a control agent. Closed operational vocabularies are represented as named individuals rather than deeper class hierarchies. Reading down its rows shows the design decision the rest of the appendix rests on: the physical plant, the observation, the model configuration and the assessment are separate classes rather than attributes of one another, so a tokenisation geometry is an object the reasoner can quantify over instead of a parameter buried in a checkpoint. The closed vocabularies matter for the same reason. Because each is a fixed set of named individuals, a rule may enumerate its cases exhaustively and a state outside the vocabulary is a modelling error rather than a silently admitted value.
 
 \input{tables/ontClasses.tex}
 
@@ -78,7 +78,7 @@ OWL's open-world semantics do not by themselves validate that endpoint types mat
 
 \subsection{Data properties and units}
 
-\autoref{tab:data} groups the quantitative data properties by their owning class and encodes measurement units in their names.
+\autoref{tab:data} groups the quantitative data properties by their owning class and encodes measurement units in their names, which is what keeps a value from being read at the wrong scale once it leaves the ontology. Its rows separate three kinds of quantity that the control layer treats differently: measured environmental evidence, asserted or simulated plant state, and the optional grid reference. Each control-critical entry in the table carries its own validity flag rather than sharing one, so a stale irradiance reading and a stale state of charge disable different branches of the router. The units in the property names are not decoration either, since the routing rules of \autoref{tab:routing} compare quantities across classes and an unnamed unit would make those comparisons unverifiable.
 
 The synchronized observation combines the measured photovoltaic and environmental variables with asserted or simulated battery, load, and grid-reference values. The control-critical quantities are PV power $P_{\mathrm{pv}}$, tilted irradiance $G_{\mathrm{tilt}}$, normalized battery state of charge $s\in[0,1]$, and aggregate load demand $P_{\mathrm{load}}\geq0$. Each has a separate validity flag derived from presence, finiteness, freshness, and a configured physical range. Horizontal irradiance, air temperature, wind speed, and wind direction remain environmental evidence but do not independently block the controller. The signed \pv{gridExchangeReferenceW} is optional, with positive values denoting export; it is usable only when present, finite, and fresh.
 
@@ -249,7 +249,7 @@ P_{\mathrm{sur}}=(P_{\mathrm{pv}}-P_{\mathrm{load}})^{+},
 P_{\mathrm{def}}=(P_{\mathrm{load}}-P_{\mathrm{pv}})^{+}.
 \end{equation}
 Here daylight abbreviates \{\valueof{ClearSky}, \valueof{PartialCloud}, \valueof{Overcast}\}. A cycle issues a route only for a strictly positive transfer and may issue several co-mode decisions. All setpoints are clipped to SoC, capacity, and charge/discharge limits.
-\autoref{fig:routing-policy} shows the priority scan and \autoref{tab:routing} states its boundary cases. The conservative branch rejoins the ordinary load-first router under its reduced cap. The ramp branch is available only in \valueof{NormalMode}.
+\autoref{fig:routing-policy} shows the priority scan as a single pass: the modes are tested in a fixed order, the first that matches issues its routes, and no later branch can override an earlier one, which is what makes the policy deterministic rather than a set of competing preferences. The conservative branch rejoins the ordinary load-first router under its reduced cap, so degrading authority narrows the same policy instead of substituting a different one, and the ramp branch is available only in \valueof{NormalMode}. \autoref{tab:routing} states the boundary cases the figure cannot show, each row pairing a triggering condition with the routes it admits and the guard that blocks it: a daylight deficit, a negative ramp with no usable reference, and the cases where a missing, stale or non-finite value forces the conservative path.
 
 \begin{figure}[H]
 \centering
