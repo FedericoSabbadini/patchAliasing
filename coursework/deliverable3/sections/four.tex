@@ -1,4 +1,4 @@
-Bayesian statistics represents uncertainty about unknown quantities through probability distributions and updates prior beliefs when data are observed\autocite{murphyProbabilisticMachineLearning2023}. It is used here because the hypotheses concern the magnitude and uncertainty of structural aliasing effects: posterior distributions quantify evidence for attenuation, phase independence and parameter-tracking against predeclared decision thresholds. The candidate set $\mathcal F_{\mathrm{lock}}$ of \autoref{eq:flock} is arithmetic and holds for any model.
+Bayesian statistics represents uncertainty about unknown quantities through probability distributions and updates prior beliefs when data are observed\autocite{murphyProbabilisticMachineLearning2023}. It is used here because the hypotheses concern the magnitude and uncertainty of structural aliasing effects: posterior distributions quantify evidence for a localisation loss, phase independence and parameter-tracking against predeclared decision thresholds. The candidate set $\mathcal F_{\mathrm{lock}}$ of \autoref{eq:flock} is arithmetic and holds for any model.
 Three claims are carried into the analysis, each stated so that a particular posterior refutes it.
 
 \input{tables/bayesPriors.tex}
@@ -8,35 +8,37 @@ Three claims are carried into the analysis, each stated so that a particular pos
 \autoref{tab:bayesPriors} gives every prior with its role, \autoref{tab:bayesModels} pairs each claim with the model that decides it, its estimand, the value the claim predicts and the table of measurements it is fitted to, and \autoref{sec:appBayes} states each model in full. Every effect prior is centred on no effect, and its scale is varied over the sensitivity ladder $\{0.25,0.5,1.0\}$, sceptical, primary and wide, so that a conclusion resting on the choice of scale rather than on the data is detected as such.
 
 \subsubsection*{Frequency-dependent blind spots (H1)}
-At a candidate frequency $f_k\in\mathcal F_{\mathrm{lock}}$ the model retains less of the signal than at the two neighbouring control frequencies $f_k\pm\delta$, which are not themselves candidates. The claim has two readings that need not agree: a behavioural one, in which the forecast rebuilds the tone less faithfully, and a representational one, in which the frequency becomes harder to read out of the internal state. A loss that is absent, or not localised on the candidate set, refutes $H1$. Phase-locking is treated here as a necessary but not sufficient condition for the specific geometry-induced structural aliasing this study hypothesises: nothing in the design excludes that distinct signals acquire near-identical learned representations for reasons unrelated to $\mathcal F_{\mathrm{lock}}$, and no claim is made about frequencies outside it.
+At a candidate frequency $f_k\in\mathcal F_{\mathrm{lock}}$ the model retains less of the signal than at the two neighbouring control frequencies $f_k\pm\delta$, which are not themselves candidates. The claim has two readings that need not agree: a behavioural one, in which the forecast no longer rebuilds the tone at the frequency it was given, and a representational one, in which the frequency becomes harder to read out of the internal state. A loss that is absent, or not localised on the candidate set, refutes $H1$. Phase-locking is treated here as a necessary but not sufficient condition for the specific geometry-induced structural aliasing this study hypothesises: nothing in the design excludes that distinct signals acquire near-identical learned representations for reasons unrelated to $\mathcal F_{\mathrm{lock}}$, and no claim is made about frequencies outside it.
 
 \subsubsection*{Independence from temporal alignment (H2)}
-The magnitude of that loss is a property of the alignment between the signal period and the tokenisation grid, not of the point in its cycle at which the signal is observed. A deficit varying systematically with the starting phase refutes H2.
+The magnitude of that loss is a property of the alignment between the signal period and the tokenisation grid, not of the point in its cycle at which the signal is observed. A loss varying systematically with the starting phase refutes $H2$.
 
 \subsubsection*{Parametric dependence of blind spot sites (H3)}
 Because $\mathcal F_{\mathrm{lock}}$ is a union, the claim splits in two, one per branch, with $c,k\in\mathbb{N}^{+}$ the harmonic indices of \autoref{eq:branches}. $H3a$: at fixed $P$, the sites at $f=c\,f_s/S$ move proportionally to $1/S$. $H3b$: at fixed $S$, the sites at $f=k\,f_s/P$ move proportionally to $1/P$. A site that stays put while the parameter supposed to generate it is varied refutes its branch.
 
 \subsection{H1}
 
-The behavioural measurement is the forecast amplitude recovery $R=A_{\text{pred}}/A_{\text{true}}$, the amplitude of the tone in the forecast divided by its true amplitude. It is collected in matched triplets: each candidate $f_k$ with its two controls, all three sharing the same background realisation and the same phase, which is what makes the contrast paired. Writing $R_k$ for the recovery at the candidate and $R_{\pm}$ for the recoveries at $f_k\pm\delta$, the contrast is
+The behavioural measurement is the frequency the forecast rebuilds. From the median forecast over the horizon the dominant reconstructed frequency $\hat f$ is estimated, and an arm is scored by whether that estimate lands on the frequency the arm carries, within a tolerance $\Delta$ that admits a small error rather than demanding an exact match. It is collected in matched triplets: each candidate $f_k$ with its two controls, all three sharing the same background realisation and the same phase, so that only the frequency changes. Writing $f$ for the frequency an arm carries, the response is
 
 \begin{equation}
 \label{eq:d2contrast}
-d = \log(R_k + 0.01) - \tfrac{1}{2}\left[\log(R_- + 0.01) + \log(R_+ + 0.01)\right].
+h = \mathbf{1}\!\left[\ \bigl|\hat f - f\bigr| \le \Delta\ \right],
+\qquad
+\Delta = 1\,\mathrm{Hz}.
 \end{equation}
 
-Model~A fits it hierarchically,
+The tolerance lies well inside the control offset $\delta$, so a hit recorded at a candidate cannot have been produced by either of its controls. Model~A fits the three arms of a triplet jointly, the lock indicator carrying the effect,
 
 \begin{equation}
 \label{eq:d2hier}
-d_i \sim \text{Student-}t_4(\mu_i,\ \sigma),
+h_i \sim \mathrm{Bernoulli}(p_i),
 \quad
-\mu_i = \beta_{c[i]} + u_{k[i]} + u_{b[i]},
+\operatorname{logit} p_i = \beta_{c[i]} + \gamma\,\mathrm{IsLock}_i + u_{k[i]} + u_{b[i]},
 \quad
 \beta_c \sim \mathcal{N}\!\left(\bar\beta + \delta_O \widetilde O_c + \delta_P \widetilde{\log P}_c,\ \tau\right).
 \end{equation}
 
-$e^{\bar\beta}<1$ is the attenuation $H1$ predicts, whereas a posterior at or above $1$ says that candidate frequencies are not attenuated in the forecast and the behavioural half of $H1$ fails.
+The logit link makes the estimand multiplicative: $e^{\gamma}$ is the factor by which the odds of rebuilding the right frequency change at a candidate relative to its controls. $e^{\gamma}<1$ is the loss $H1$ predicts, whereas a posterior at or above $1$ says that candidate frequencies are rebuilt as accurately as their neighbours and the behavioural half of $H1$ fails.
 
 Model~B asks the same question of the representation through minimum description length (MDL) probing\autocite{voitaInformationTheoreticProbingMinimum2020}. At each probed frequency $f_c$ a linear probe is asked to tell a tone at $f_c-1$\,Hz from one at $f_c+1$\,Hz using a captured internal state alone, and the response $L_i$ is the prequential codelength of that sequence of labels, in bits. A codelength is positive and right-skewed with a variance growing in its mean, so the regression is
 
@@ -50,20 +52,20 @@ The log link makes the estimand multiplicative: $e^{\theta_{\mathrm{lock}}}$ is 
 
 \subsection{H2}
 
-H2 uses the same triplets with one change. Model~A pools them across phases without a phase term, so the phase is marginalised and cannot be inspected; $H2$ requires it to be kept, so the phase index is retained and the response becomes the per-phase deficit $y_i = \log(R_{\text{ctrl},i}+0.01)-\log(R_{\text{lock},i}+0.01)$, which is \autoref{eq:d2contrast} with its sign reversed and is positive when the candidate is worse. Model~C is Model~A on that response, without the configuration-level covariates, which are not what $H2$ asks about, and with the phase circle cut into eight equal slices, each given its own offset $u_p$:
+H2 uses the same triplets with one change. Model~A pools them across phases without a phase term, so the phase is marginalised and cannot be inspected; $H2$ requires it to be kept, so the phase index is retained. Model~C is Model~A on the same response, without the configuration-level covariates, which are not what $H2$ asks about, and with the phase circle cut into eight equal slices, each given its own offset $u_p$:
 
 \begin{equation}
 \label{eq:d2phase}
-y_i \sim \text{Student-}t_4(\mu_i,\ \sigma),
+h_i \sim \mathrm{Bernoulli}(p_i),
 \qquad
-\mu_i = \beta_{c[i]} + u_{k[i]} + u_{b[i]} + u_{p[i]},
+\operatorname{logit} p_i = \beta_{c[i]} + \gamma\,\mathrm{IsLock}_i + u_{k[i]} + u_{b[i]} + u_{p[i]},
 \qquad
 u_p \sim \mathcal{N}(0, \sigma_\phi).
 \end{equation}
 
-The estimand $\sigma_\phi$ is the spread of those eight offsets, which reduces the hypothesis to a single number and presupposes no shape for a possible dependence. $\sigma_\phi$ near zero means the offsets are indistinguishable and the deficit is set by the geometry alone, as $H2$ predicts, whereas a large $\sigma_\phi$ means it depends on where in its cycle the signal starts. Dropping $u_p$ gives a nested null, which is compared with the full model by leave-one-out cross-validation (LOO); the comparison separates the size of any phase effect from the evidence that one exists.
+The estimand $\sigma_\phi$ is the spread of those eight offsets, which reduces the hypothesis to a single number and presupposes no shape for a possible dependence. $\sigma_\phi$ near zero means the offsets are indistinguishable and the loss is set by the geometry alone, as $H2$ predicts, whereas a large $\sigma_\phi$ means it depends on where in its cycle the signal starts. Dropping $u_p$ gives a nested null, which is compared with the full model by leave-one-out cross-validation (LOO); the comparison separates the size of any phase effect from the evidence that one exists.
 
-One limit belongs here rather than with the results. Model~C measures the spread of the deficit on the response Model~A uses, so the two are not independent readings: where the population deficit is itself indistinguishable from zero, little remains for phase to move, and $H2$ is read conditionally.
+One limit belongs here rather than with the results. Model~C measures the spread of the same response Model~A uses, so the two are not independent readings: where the population effect is itself indistinguishable from zero, little remains for phase to move, and $H2$ is read conditionally.
 
 \subsection{H3}
 
@@ -88,19 +90,13 @@ The second question is whether the dips move, and Model~D2 answers it, since \au
 \right).
 \end{equation*}
 
-The slope $\kappa_F$ is the estimand, measured spacing per unit of predicted spacing, and the residual scatter $\sigma_F$ is given the floor $\Delta f$, the sweep step, because a spacing read off a discrete grid is no more precise than one step. $\kappa_F=1$ denotes a branch that tracks its own arithmetic, and any other value refutes that branch. Identification here is a property of the design and not of the model, since $\kappa_S$ requires a series holding $P$ fixed while $S$ varies and $\kappa_P$ the converse; \autoref{tab:hfModels} supplies both.
-
-P4a, 199 words
-
-
-
-
+The slope $\kappa_F$ is the estimand, measured spacing per unit of predicted spacing, and the residual scatter $\sigma_F$ is given the floor $\Delta f$, the sweep step, because a spacing read off a discrete grid is no more precise than one step. $\kappa_F=1$ denotes a branch that tracks its own arithmetic one for one, and a value away from one refutes that branch. Identification here is a property of the design and not of the model, since $\kappa_S$ requires a series holding $P$ fixed while $S$ varies and $\kappa_P$ the converse; \autoref{tab:hfModels} supplies both.
 
 Identification is not symmetric between the two branches, and the condition is worth stating before the fits rather than after. A detected site informs $\kappa_S$ only if it can be attributed to the stride branch alone, that is if it lies on $\mathcal F_S \setminus \mathcal F_P$, and informs $\kappa_P$ only on $\mathcal F_P \setminus \mathcal F_S$; a site in the intersection is consistent with either fundamental and is set aside. The design controls the first of these directly, since the six runs with $S \nmid P$ carry stride sites that no patch harmonic reaches, but it does not control the second, because the patch comb is the coarser of the two over the analysed band and much of it coincides with the stride comb. The number of attributable sites per branch is therefore an outcome of the sweep and not of the grid. Each branch is reported as not identified rather than as a null result when fewer than ten unambiguous sites survive across the design, a bar fixed here with the thresholds of \autoref{tab:bayesDecisions}; a branch that clears it is decided by its own rule, and a branch that does not is reported with the count that disqualified it.
 
 \subsection{The mitigation claim}
 
-$M1$ is not a separate model but the configuration level of Model~A promoted to an estimand. It asserts that raising the overlap $O$ reduces the deficit, and is therefore read off the population line of \autoref{eq:d2hier},
+$M1$ is not a separate model but the configuration level of Model~A promoted to an estimand. It asserts that raising the overlap $O$ raises the odds of rebuilding the right frequency, and is therefore read off the population line of \autoref{eq:d2hier},
 
 \begin{equation}
 \label{eq:d2mitigation}
@@ -111,7 +107,7 @@ $M1$ is not a separate model but the configuration level of Model~A promoted to 
 \widetilde{\log P}_c=\log P_c-\overline{\log P},
 \end{equation}
 
-where the tilde denotes centring on the design, which leaves $\bar\beta$ the effect at the average configuration rather than an extrapolation to $O=0$ and $P=1$. The two covariates are estimable jointly because \autoref{tab:hfModels} varies overlap and patch size independently. Model~A$'$ denotes Model~A read at this level, and the estimand is $\delta_O$, the change in the contrast $d$ of \autoref{eq:d2contrast} per unit of centred overlap. Its sign has to be read on the orientation the model is fitted on, and that orientation is $d$, which is negative when a candidate is rebuilt worse than its controls. An overlap that mitigates therefore lifts the contrast towards zero: $\delta_O>0$ is the direction $M1$ predicts, and a slope at or below zero refutes it. The claim itself does not depend on the convention, since it is the same statement that overlap reduces the deficit; only its sign flips between $d$ and the sign-reversed deficit $y=-d$ that Model~C uses, and every $\delta_O$ in this report is stated on $d$.
+where the tilde denotes centring on the design, which leaves $\bar\beta$ the baseline at the average configuration rather than an extrapolation to $O=0$ and $P=1$. The two covariates are estimable jointly because \autoref{tab:hfModels} varies overlap and patch size independently. Model~A$'$ denotes Model~A read at this level, and the estimand is $\delta_O$, the change in the log-odds of \autoref{eq:d2hier} per unit of centred overlap. An overlap that mitigates raises the odds of rebuilding the right frequency, so $\delta_O>0$ is the direction $M1$ predicts and a slope at or below zero refutes it. Every model that reads this response reads it on the same orientation, so no sign convention has to be carried between them.
 
 
 \subsection{Decisions and validation}
