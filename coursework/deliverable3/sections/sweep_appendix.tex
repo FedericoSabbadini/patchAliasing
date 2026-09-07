@@ -85,12 +85,12 @@ padding; it lets a peak be located at, say, $6$\,Hz rather than snapped to a mul
 spacing. The native spacing is $f_s/N = 512/64 = 8$\,Hz, fixed by the $125$\,ms the horizon covers,
 and no amount of zero padding improves it. Interpolation places a peak finely; it does not separate
 two peaks. Two components one hertz apart therefore appear as one line however fine the grid, and
-the panel titles that read ``resolving power $8.0$\,Hz'' refer to this second quantity: read them
+the panel titles that read ``resolving power $0.25$ cpp / $0.25$ cps'' refer to this second quantity: read them
 as ``$64$ samples, native $\Delta f = 8.0$\,Hz, plotted on a $1$\,Hz zero-padded grid''. A
 $512$-sample rollout would bring the native spacing to one hertz as well, at the cost of feeding the
 model its own output.
 
-Each panel title carries the frequency of the component in hertz, whether that frequency lies on
+Each panel title carries the frequency of the component in cpp and cps, where $\mathrm{cpp}=fP/f_s$ and $\mathrm{cps}=fS/f_s$, whether that frequency lies on
 $\mathcal F_{\mathrm{lock}}$, and the fitted amplitude $A$; a component whose fit spans fewer than
 one and a half cycles of the window is marked, since below that an amplitude and a phase cannot be
 told apart. On the prediction side a line is drawn only if it reaches $35\%$ of the strongest
@@ -130,12 +130,12 @@ None of this is evidence for or against the hypotheses of \autoref{sec:four}. Wh
 
 \begin{figure*}[!p]
     \centering
-    \includegraphics[width=0.96\textwidth]{figures/FIG_E1_page1.png}
+    \includegraphics[width=0.96\textwidth,height=0.76\textheight,keepaspectratio]{figures/FIG_E1_page1.png}
     \caption{Reconstruction and probe sweep, page 1 of 3: geometries p8-s8, p16-s8, p16-s12,
     p16-s16 and p24-s8. Each row is one geometry. Left, the dominant frequency of the generated
     window against the frequency supplied as context, averaged over four starting phases, drawn as
     the solid red curve. The pale red band around it is $\pm1$ standard deviation of that dominant
-    frequency across the four phases, measured on the vertical axis and therefore in hertz: a wide
+    frequency across the four phases, measured on the vertical axes in cpp and cps: a wide
     band at a swept frequency means the frequency the model returns depends on where in its cycle
     the tone began, and a band that collapses to the curve means the reading is phase-independent
     there. The dotted diagonal marks a tone rebuilt correctly. Right, the
@@ -148,7 +148,7 @@ None of this is evidence for or against the hypotheses of \autoref{sec:four}. Wh
 
 \begin{figure*}[!p]
     \centering
-    \includegraphics[width=0.96\textwidth]{figures/FIG_E1_page2.png}
+    \includegraphics[width=0.96\textwidth,height=0.76\textheight,keepaspectratio]{figures/FIG_E1_page2.png}
     \caption{Page 2 of 3: geometries p24-s12, p24-s16, p24-s20, p24-s24 and p32-s8, read as \autoref{fig:sweepPage1}, the
     pale red band again being $\pm1$ standard deviation of the dominant frequency over the four
     starting phases. The first four hold the patch size at $P=24$ and shorten the stride
@@ -161,7 +161,7 @@ None of this is evidence for or against the hypotheses of \autoref{sec:four}. Wh
 
 \begin{figure*}[!p]
     \centering
-    \includegraphics[width=0.96\textwidth]{figures/FIG_E1_page3.png}
+    \includegraphics[width=0.96\textwidth,height=0.76\textheight,keepaspectratio]{figures/FIG_E1_page3.png}
     \caption{Page 3 of 3: geometries p32-s12, p32-s16, p32-s20, p32-s24 and p32-s32, read as \autoref{fig:sweepPage1}, the
     pale red band again being $\pm1$ standard deviation of the dominant frequency over the four
     starting phases. The patch size is held at $P=32$, the widest of the design, so the
