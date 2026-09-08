@@ -23,6 +23,7 @@ The validation harness used the existing local FULL count table only as a model-
 | Bernoulli versus pooled Binomial likelihood | PASS |
 | Reject zero-draw, partial-draw, duplicate-coordinate, and non-finite fixtures | PASS |
 | ArviZ/NetCDF and DataTree/NetCDF round-trip fixtures | PASS |
+| ArviZ 1 compatibility constructor, including root attributes | PASS |
 | Simulated interruption during chain 3 | PASS: chains 1–2 reload; only chains 3–4 run |
 | Changed draw setting under an existing checkpoint namespace | PASS: rejected |
 | Empty sampler return | PASS: no completed checkpoint is written; partial inspection file only |
