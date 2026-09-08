@@ -31,6 +31,8 @@ The validation harness used the existing local FULL count table only as a model-
 
 The local environment emitted a PyTensor warning that no BLAS installation was available. This is an environment-performance warning, not a statistical result. A bounded one-chain FULL benchmark was stopped before it produced retained samples, so no speed-up claim is made. The actual pilot is the required performance and convergence test.
 
+A second tiny smoke fit reached NUTS initialisation but was stopped before retaining samples because another local Python process held PyTensor's shared compilation lock. This is an environment contention result, not a model failure. It does not alter the deterministic equivalence and checkpoint tests above.
+
 ## How to run
 
 Open the new notebook in Colab or VS Code and run it from a clean runtime. It starts with `RUN_MODE = "PILOT"`, `RUN_ID = "model_A2_reference64_v1"`, four chains, 2,000 warmup iterations, and 2,000 retained draws per chain. The FULL setting is 3,000 retained draws per chain with the same warmup. The notebook automatically reuses compatible measurement artifacts but never imports old posterior samples.
