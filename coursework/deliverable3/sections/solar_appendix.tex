@@ -28,14 +28,14 @@ Two checkpoints are read on the identical context: the retrained reference geome
 
 One day is read at three cuts, chosen so that the horizon covers three qualitatively different regimes of the production curve: the sunrise ramp, the midday plateau and the afternoon decline. A single cut would not distinguish a model that tracks the plant from one that repeats what it was given, because on a plateau the two behave identically.
 
-\begin{figure}[H]
+\begin{figure}[tbp]
 \centering
 \includegraphics[width=\textwidth]{figures/solar_forecast_day186_0545_both.png}
 \caption{Context and horizon at the sunrise cut. The left panel is the $2048$-sample context ending at 05:45, spanning three calendar days and showing the missing-data convention in operation: the two full production curves of the preceding days, the nights supplied as zeros, forty-four samples of short daylight gaps filled by interpolation, and only $968$ recorded measurements out of the $2048$ the model receives. The cut falls a few minutes after the plant switches on, so the last ninety minutes of context are flat at zero followed by a step to about $7$ watts. The right panel is the horizon, and at this scale the two forecasts look alike; \autoref{fig:solar0545horizon} shows that they are not.}
 \label{fig:solar0545both}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[tbp]
 \centering
 \includegraphics[width=\textwidth]{figures/solar_forecast_day186_0545_horizon.png}
 \caption{The sunrise horizon alone, at the scale of the quantity being predicted. The measurement climbs almost linearly from $9$ to $40$ watts. The published median is a horizontal line: it leaves the cut at $7$ watts and ends at $9$, having produced no ramp at all, and its $80\%$ interval is a narrow strip between roughly $5$ and $10$ watts that the measurement crosses out of within three minutes and never re-enters, so the interval contains the plant at none of the $64$ minutes. The retrained median does move, rising to about $12$ watts by the sixteenth minute, but what follows is oscillation between $7$ and $12$ rather than a continued rise. Its interval is several times wider and its upper edge tracks the measurement until roughly the thirtieth minute, which is where its $43$ of $64$ minutes of coverage are spent. Mean absolute error is $11.8$ watts for the retrained checkpoint against a bias of $-11.8$, and $13.4$ against $-13.4$ for the published one: the two coincide, so every minute is wrong in the same direction. The comparison the figure is here for is between the two intervals. The published checkpoint is the more confident of the pair, its band being the narrower by a factor of several, and it is also the further from the plant, so what that narrow band asserts is a certainty the forecast does not have; an $80\%$ interval that excludes the measurement at $64$ of $64$ minutes is not a stricter reading of the same situation but a wrong one. The retrained checkpoint is both closer to the measurement and wider, and it follows the shape of the data more nearly, so for the first half of the horizon the plant remains inside the range the model itself declared. Neither checkpoint anticipates the ramp; they differ in whether they admit it, and only the wider one leaves a controller reading the interval with a true statement to act on.}
@@ -44,21 +44,21 @@ One day is read at three cuts, chosen so that the horizon covers three qualitati
 
 The other two cuts are shown in the form that removes the movement of the production curve itself, since on the level axis a curve that changes by tens of watts inside the horizon makes two very different forecasts look equally close to it. Taking the measurement as the baseline leaves only the error, so a systematic offset appears as a block of bars on one side of the line and a merely noisy forecast alternates across it.
 
-\begin{figure}[H]
+\begin{figure}[tbp]
 \centering
-\includegraphics[width=\textwidth]{figures/solar_forecast_day186_1300_error.png}
+\includegraphics[width=\textwidth]{solar/solar_forecast_day186_1300_p16-s16_error.png}
 \caption{Distance from the plant at the midday cut, minute by minute. The measurement is the horizontal line, each bar runs from it to the median of one checkpoint, and each thin line spans that checkpoint's $80\%$ interval. The plant sits between $179$ and $190$ watts and both checkpoints track it closely, at $5.3$ watts of mean absolute error for the retrained one and $3.8$ for the published one, with both intervals containing the measurement at all $64$ minutes. Two features carry over from the sunrise cut. The error drifts with the horizon, the early minutes near zero and the last twenty biased upwards by around $10$ watts, because a flat context produces a flat forecast while the plant is in fact already declining; and the retrained intervals are the wider of the two at every minute, opening to roughly $\pm 35$ watts against $\pm 10$, on a horizon whose true movement is $10$ watts. This is the regime in which the published checkpoint is the more accurate of the pair, and also the one in which the two are hardest to tell apart.}
 \label{fig:solar1300err}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[tbp]
 \centering
 \includegraphics[width=\textwidth]{figures/solar_forecast_day186_1700_both.png}
 \caption{Context and horizon at the afternoon cut, the one cut of the three whose context carries a strong trend: the ninety minutes before it fall from about $140$ to $73$ watts. This is also the one cut at which the forecasts are not flat. Both checkpoints continue the decline, the published median from $72$ to about $36$ watts and the retrained one from $68$ to about $40$, against a plant that falls from $73$ to $24$. The direction is right and the rate is not: the two reproduce roughly two thirds and three fifths of the true slope. Set against \autoref{fig:solar0545both}, where the context held no trend and both forecasts were flat, the pair identifies what is being continued as the rate of change present in the recent context, and shows that its magnitude is understated.}
 \label{fig:solar1700both}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[tbp]
 \centering
 \includegraphics[width=\textwidth]{figures/solar_forecast_day186_1700_error.png}
 \caption{The afternoon cut in the error form, where the understated slope of \autoref{fig:solar1700both} becomes a growing one-signed excess. Both checkpoints over-predict, the excess reaches between $15$ and $20$ watts by the end of the horizon, and mean absolute error again coincides with the magnitude of the bias, $6.4$ against $+5.7$ for the retrained checkpoint and $6.9$ against $+6.7$ for the published one. Coverage separates the two as it did at sunrise, at $64$ of $64$ minutes for the retrained intervals and $19$ of $64$ for the published ones. Read with \autoref{fig:solar0545horizon} and \autoref{fig:solar1300err}, this says that the interval of the published checkpoint is calibrated for the plateau and not for the ramps.}
@@ -67,7 +67,25 @@ The other two cuts are shown in the form that removes the movement of the produc
 
 Four observations follow from the three cuts and none requires a fit. The failure mode is shared, directional, and better described as an understated rate of change than as a repeated level: where the context carries no trend the forecast is flat and the whole $33$-watt sunrise rise is missed, where it carries a strong one the forecast follows at about two thirds of the slope, and on the plateau a flat context yields a flat forecast against a plant that is already turning. The ordering of accuracy is not stable across the day, the published checkpoint being better at midday by $3.8$ watts against $5.3$ and the retrained one better on both ramps, so a comparison run at one cut would have supported either conclusion. Accuracy and honesty come apart: the published checkpoint is the more accurate at the plateau and the more overconfident everywhere else, with coverage of $0$ and $19$ of $64$ minutes on the two ramps against $43$ and $64$ for the retrained one. And the errors are largest relative to the quantity exactly where the ontology places an anomaly, since a ramp is what \autoref{eq:ramp-event} defines as \valueof{RampEvent}: at sunrise the error is of the same order as the production being predicted, against about two per cent at midday, so the interval a controller would use to decide whether a deviation is real is least trustworthy at the moment the decision matters most.
 
-\textcolor{red}{\textbf{Placeholder, for a figure not yet produced.} The three cuts above compare two checkpoints at one geometry, and the sweep contains fifteen. A single summary figure comparing the forecast behaviour of every model on this series would close the section, and it should report three quantities rather than one, because the cuts above have already shown that they do not move together: mean absolute error, the share of that error attributable to bias, and the fraction of the horizon covered by the model's own $80\%$ interval. Draw it as one panel per quantity with the models on the shared axis and the three cuts distinguished within each model, so that a configuration accurate at midday and uncovered at the ramps is visible as such rather than averaged into a single number. Two cautions belong in its caption. The fifteen retrained geometries are mutually comparable, being trained from scratch under the same budget on the same mixture, so a difference between them is a difference of tokenisation geometry; the published checkpoint is not comparable to them in the same sense and should be drawn as a separate reference rather than as a sixteenth model, since any gap to it is in the first place the corpus difference stated above. And the whole figure remains one day: if it is read across several days, say how many and report the spread across them, because a per-geometry ordering established on a single day would not survive being called a result.}
+\subsection{The same cut across the sweep}
+
+The three cuts above vary the time of day and hold the geometry fixed. The complement is to hold the cut fixed and vary the geometry, which is what the design is about: the fifteen retrained checkpoints of \autoref{tab:hfModels} differ from one another only in $(P,S)$, having been trained from scratch under the same budget on the same mixture, so a difference between them on this context is a difference of tokenisation geometry and nothing else. All fifteen are read on the identical midday context and drawn as medians alone, grouped once by patch size and once by stride. The intervals are omitted from these two figures because several overlapping bands become a single wash that hides the curves they belong to; they are in the paired figures above, where there are only two of them. The published checkpoint is not drawn here at all, since its geometry would place it inside two of these panels as though it were another member of the sweep while it differs from all of them in training corpus as well.
+
+\begin{figure}[tbp]
+\centering
+\includegraphics[width=\textwidth]{solar/solar_forecast_day186_1300_bypatch.png}
+\caption{The midday horizon for every retrained geometry, one panel per patch size and one line per stride, against the measurement. The first thing the figure establishes is scale: across the fifteen checkpoints the medians span roughly $157$ to $207$ watts on a horizon over which the plant moves only from $190$ to $178$, so the disagreement between tokenisation geometries is about four times the movement being forecast. The second is direction: almost every curve drifts upward across the sixty-four minutes while the plant declines, which is the understated rate of change of \autoref{fig:solar1700both} reappearing across fifteen configurations rather than one. The third is texture. These medians oscillate from minute to minute by several watts, where the published checkpoint at the same cut produced a nearly straight line; that is a difference of training corpus rather than of geometry, and it is visible here only because the sweep is drawn together.}
+\label{fig:solarByPatch}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\includegraphics[height=0.79\textheight,keepaspectratio]{solar/solar_forecast_day186_1300_bystride.png}
+\caption{The same fifteen forecasts split the other way, one panel per stride and one line per patch size. This is the more orderly of the two splits. Inside the stride-$12$ panel the three patch sizes are cleanly stratified and never cross, the smallest patch highest and the largest lowest across the whole horizon; the stride-$8$ and stride-$16$ panels are ordered the same way for much of it. The stride-$20$ panel reverses that order, its $P=32$ curve running fifteen to twenty watts above its $P=24$ curve throughout. Patch size therefore shifts the level of the forecast systematically within a stride, but the sign of the shift is not fixed across strides, which is a warning against reading either grouping as a monotone effect of one parameter. In the patch-size grouping of \autoref{fig:solarByPatch} no comparable ordering by stride is visible at all.}
+\label{fig:solarByStride}
+\end{figure}
+
+\textcolor{red}{\textbf{Placeholder, for the quantitative counterpart.} The two figures above are qualitative by construction: they show where the curves sit, not how the models score. The summary that would close this subsection reports three quantities per model rather than one, because the cuts have already shown that they do not move together: mean absolute error, the share of that error attributable to bias, and the fraction of the horizon covered by the model's own $80\%$ interval. One panel per quantity with the fifteen geometries on the shared axis, and the published checkpoint drawn as a separate reference rather than as a sixteenth model. Two cautions belong in its caption: the whole reading is one cut on one day, so a per-geometry ordering established here would not survive being called a result; and repeating it at the sunrise and afternoon cuts is what would show whether the ordering is a property of the geometry or of the regime.}
 
 \textcolor{red}{\textbf{Placeholder, to review and adjust.} These observations rest on three cuts of a single day and should be qualified in whatever direction further cuts take them. Two additions are cheap and worthwhile. Repeating the three cuts on two or three further days from the usable list, ideally including one overcast day whose curve is ragged rather than smooth, would settle whether the coverage failure of the published intervals is a property of ramps in general or of this day. And the upward drift seen at the plateau is either noise, if it reverses on other days, or the same understated-rate behaviour showing up on a curve that is only slightly convex, if it does not. Consider also whether the relative-error contrast, an error of the order of the signal at sunrise against two per cent at midday, belongs in \autoref{sec:ten} rather than only here.}
 
@@ -77,25 +95,25 @@ Model~B of \autoref{sec:appBayes} carries the probe stage as the zero-mean offse
 
 The profile is read from the archived per-frequency collection rather than from a new measurement, because the cells it needs already exist: one row per probe stage, candidate frequency and geometry, each carrying the codelength charged at that cell and whether the frequency is a candidate or a control. The collection is retrained-weight data built with eighty examples per cell and a context of $480$ samples, and the candidate-frequency construction is identical across the geometries it covers. It is addressed by an immutable revision and its checksum is verified before anything is drawn, so a figure here cannot silently change when the collection does. Codelengths are averaged per stage, separately for candidates and controls, with the spread across cells retained rather than discarded.
 
-\begin{figure}[H]
+\begin{figure}[tbp]
 \centering
-\includegraphics[width=\textwidth]{figures/FIG_APPENDIX_F_depth_profile.png}
+\includegraphics[width=\textwidth]{probing/FIG_APPENDIX_F_depth_profile.png}
 \caption{Mean local codelength by probe stage at the retrained reference geometry, candidate frequencies against their controls, with bands of one standard deviation across the cells behind each point. The two lines interleave across the four encoder blocks and the sign of their difference changes from stage to stage, so there is no consistent separation before the decoder is entered. From the first decoder block onwards the candidate line lies above the control line at every remaining stage, by roughly twelve bits at the first decoder block, widening to about twenty-five at the third and at the pre-projection vector, and narrowing again to about twelve at the head. The reading is that the additional cost of a candidate frequency appears in the readout rather than at or near tokenisation. The bands overlap everywhere, which is why this locates the effect and does not test it.}
 \label{fig:appFdepth}
 \end{figure}
 
 The separation could be a property of the reference geometry rather than of the design, so the same profile is repeated across every geometry in the collection. It is drawn as the candidate-minus-control gap rather than as the raw codelength, and the substitution is not cosmetic: Model~B blocks on geometry with the offset $g_{\text{geo}}$ precisely because probe levels differ several-fold between configurations, so a figure of raw levels would show that difference instead of the effect.
 
-\begin{figure}[H]
+\begin{figure}[p]
 \centering
-\includegraphics[width=0.92\textwidth]{figures/FIG_APPENDIX_F_gap_bypatch.png}
+\includegraphics[height=0.74\textheight,keepaspectratio]{probing/FIG_APPENDIX_F_gap_bypatch.png}
 \caption{The candidate-minus-control gap by probe stage, one panel per patch size and one line per stride, with a reference at zero marking no separation. Drawing the fifteen geometries on a single axis made them unreadable; split this way the comparison inside a panel is the one the design varies. Two things are visible across the whole collection. The gap is positive in $147$ of the $150$ stage-by-geometry cells, reaching $49.6$ bits at its largest, so the pattern of \autoref{fig:appFdepth} is general rather than particular to one configuration. And the only three negative cells in the entire collection belong to the reference geometry in its encoder, at $-2.4$, $-4.4$ and $-6.8$ bits, which is the trough visible in the second panel: the configuration the report reads as its reference is the one whose encoder shows the effect least. The mean gap also falls as the patch grows, from $26.7$ bits at $P=8$ through $19.6$ at $P=16$ and at $P=24$ to $10.5$ at $P=32$.}
 \label{fig:appFgapPatch}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[p]
 \centering
-\includegraphics[width=0.92\textwidth]{figures/FIG_APPENDIX_F_gap_bystride.png}
+\includegraphics[height=0.79\textheight,keepaspectratio]{probing/FIG_APPENDIX_F_gap_bystride.png}
 \caption{The same quantity split the other way, one panel per stride and one line per patch size. The two splits are not equivalent readings of one picture. Ordered by patch size the mean gap decreases monotonically, while ordered by stride it does not: $18.5$ bits at $S=8$, a maximum of $22.2$ at $S=12$, then $13.8$, $12.1$ and $16.1$, and a minimum of $8.2$ at $S=32$. Patch size therefore organises this measurement more cleanly than stride does, which is worth noting because the overlap covariate of \autoref{sec:six} is read along the stride axis at fixed patch size. Neither split makes the depth at which the gap opens stable: nine of the fifteen geometries carry a larger mean gap over the decoder and the head than over the encoder and six carry the reverse, so a single depth cannot be named for the design as a whole.}
 \label{fig:appFgapStride}
 \end{figure}
@@ -117,16 +135,16 @@ and since $n/C\le\lceil n/C\rceil<n/C+1$ the bound lies in $\left(\tfrac{C-1}{C}
 
 That the ceiling is not one is the point of the estimator rather than a defect of it. Prequential coding charges the labels together with the model that predicts them, so the receiver begins with nothing and the first chunk cannot be predicted by any probe, however perfectly the representation separates the classes. That cost belongs to the coding scheme and is irreducible; what a probe can do is drive the remaining chunks towards zero, which caps the saving at the fraction of the data that is not the first chunk. The bound is moreover a supremum that is not attained, since reaching it would require probability exactly one on every later label. The practical consequence is that a bar at $0.75$ is not three quarters of a perfect reading but ninety-four per cent of what the code allows, and the figures state the derived ceiling in their caption rather than drawing it, since a rule at that value would fall across the per-bar labels.
 
-\begin{figure}[H]
+\begin{figure}[tbp]
 \centering
-\includegraphics[width=\textwidth]{figures/FIG_SV_published_p16-s16.png}
+\includegraphics[width=0.94\textwidth]{probing/FIG_SV_published_p16-s16.png}
 \caption{Band-task space saving for the published checkpoint at the decoder states and the head. Through all four decoder blocks every one of the seven tasks sits between $0.75$ and $0.80$, within a few thousandths of the derived ceiling, so band identity is very nearly free to read from those states. At the output head the picture separates by band rather than degrading uniformly: the two lowest tasks fall to $0.336$ and $0.343$, the next two to $0.511$ and $0.571$, while the three high tasks hold at $0.727$, $0.763$ and $0.756$. The projection to the quantile head therefore discards low-frequency band identity and retains high-frequency band identity, which is consistent with the horizon resolving a grid of $f_s/64$: a component near the bottom of the range completes too few cycles inside sixty-four samples for its position to be expressible in the output at all.}
 \label{fig:svDecPublished}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[tbp]
 \centering
-\includegraphics[width=\textwidth]{figures/FIG_SV_PAIRED_p16-s16.png}
+\includegraphics[width=\textwidth]{probing/FIG_SV_PAIRED_p16-s16.png}
 \caption{The two checkpoints on the same tasks, measured in the same pass. On the left the mean over the seven tasks at each probe point, with the spread across tasks; on the right the difference at every task and stage separately. The published checkpoint is above the retrained one at every stage of the mean, and the difference is concentrated: about $0.13$ to $0.14$ across the four encoder blocks, where the published states sit near $0.77$ and the retrained ones near $0.64$, but only $0.03$ to $0.04$ through the decoder, where both are close to the ceiling. The per-cell panel shows the same asymmetry in more detail: every encoder cell is negative, most strongly on the two middle bands at $-0.28$ and $-0.27$; the decoder cells are near zero; and the output head reverses sign by band, the retrained checkpoint reading the three low tasks better by up to $0.23$ and the four high ones worse. Retraining on the synthetic mixture has therefore cost the encoder much of its general band decodability while leaving the decoder almost untouched, which is a difference of training corpus and not a statement about tokenisation.}
 \label{fig:svPaired}
 \end{figure}
