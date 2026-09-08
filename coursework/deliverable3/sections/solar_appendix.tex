@@ -88,9 +88,16 @@ The separation could be a property of the reference geometry rather than of the 
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{figures/FIG_APPENDIX_F_geometry_gap.png}
-\caption{The candidate-minus-control gap by probe stage, one line per geometry, with a reference at zero marking no separation. The gap is positive for almost every geometry at almost every stage, so the pattern of \autoref{fig:appFdepth} is general rather than particular to the reference configuration; but its size spans more than an order of magnitude, from around two bits to nearly fifty, and the depth at which it opens is not stable. Several geometries already show thirty bits or more at the first encoder block and decline through the stack, while the reference geometry is one of the few whose encoder gap is slightly negative, its candidates costing marginally less than their controls until the decoder is entered. Most geometries converge to between ten and twenty-five bits in the decoder. A single depth cannot therefore be named for the design as a whole.}
-\label{fig:appFgap}
+\includegraphics[width=0.92\textwidth]{figures/FIG_APPENDIX_F_gap_bypatch.png}
+\caption{The candidate-minus-control gap by probe stage, one panel per patch size and one line per stride, with a reference at zero marking no separation. Drawing the fifteen geometries on a single axis made them unreadable; split this way the comparison inside a panel is the one the design varies. Two things are visible across the whole collection. The gap is positive in $147$ of the $150$ stage-by-geometry cells, reaching $49.6$ bits at its largest, so the pattern of \autoref{fig:appFdepth} is general rather than particular to one configuration. And the only three negative cells in the entire collection belong to the reference geometry in its encoder, at $-2.4$, $-4.4$ and $-6.8$ bits, which is the trough visible in the second panel: the configuration the report reads as its reference is the one whose encoder shows the effect least. The mean gap also falls as the patch grows, from $26.7$ bits at $P=8$ through $19.6$ at $P=16$ and at $P=24$ to $10.5$ at $P=32$.}
+\label{fig:appFgapPatch}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.92\textwidth]{figures/FIG_APPENDIX_F_gap_bystride.png}
+\caption{The same quantity split the other way, one panel per stride and one line per patch size. The two splits are not equivalent readings of one picture. Ordered by patch size the mean gap decreases monotonically, while ordered by stride it does not: $18.5$ bits at $S=8$, a maximum of $22.2$ at $S=12$, then $13.8$, $12.1$ and $16.1$, and a minimum of $8.2$ at $S=32$. Patch size therefore organises this measurement more cleanly than stride does, which is worth noting because the overlap covariate of \autoref{sec:six} is read along the stride axis at fixed patch size. Neither split makes the depth at which the gap opens stable: nine of the fifteen geometries carry a larger mean gap over the decoder and the head than over the encoder and six carry the reverse, so a single depth cannot be named for the design as a whole.}
+\label{fig:appFgapStride}
 \end{figure}
 
 \subsection{Band identity by depth and by checkpoint}
