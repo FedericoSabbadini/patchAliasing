@@ -1,4 +1,4 @@
-Four kinds of signal appear in this study. Three are synthetic and are what the models are probed with, each serving a different purpose rather than being a variant of the others; the fourth is the real telemetry of the application domain.
+Four kinds of signal appear in this study. Three are synthetic and are what the models are probed with, each serving a different purpose rather than being a variant of the others; the fourth is the real telemetry of the application domain. This section states what each source is and why it is in the study; the appendices carry the pseudocode, the parameters and the pool composition.
 
 \subsection*{Single-harmonic sinusoid}
 
@@ -14,4 +14,4 @@ The Gaussian-process generator of the same training recipe\autocite{ansariChrono
 
 \subsection*{Photovoltaic telemetry}
 
-The measured power and weather series of the SolarTech Lab dataset\autocite{levaPhotovoltaicPowerWeather2020} that define the application domain.
+The measured series of the SolarTech Lab at Politecnico di Milano, released open access on IEEE DataPort\autocite{levaPhotovoltaicPowerWeather2020}. Six channels are recorded at one-minute resolution and timestamped in Central European Time: module power at a $30^\circ$ tilt, ambient temperature, global horizontal irradiance, global irradiance in the plane of array, wind speed and wind direction. The values are raw, with missing samples left unimputed. They supply the quantities the ontology of \autoref{sec:appendixA} names and the cadence against which the dimensionless readings of \autoref{sec:two} are interpreted. The set is the application domain of this study, not an experimental corpus: no hypothesis is tested on it.

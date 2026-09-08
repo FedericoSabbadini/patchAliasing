@@ -1,6 +1,6 @@
 \begin{table}[!htbp]
     \centering
-    \footnotesize
+\footnotesize
     \setlength{\tabcolsep}{4pt}
     \begin{tabular}{@{}p{3.6cm}p{4.4cm}p{2.2cm}p{5.0cm}@{}}
         \toprule
@@ -51,6 +51,6 @@
         Numerical precision         & single                             & ---                 & reduced-precision matrix products where available \\
         \bottomrule
     \end{tabular}
-    \caption{Training parameters: the value adopted for every retrained geometry, the corresponding value in the published Chronos recipe, and the constraint behind it. The architecture rows are the released Chronos-Bolt-Tiny configuration; the data and optimisation rows follow the published training recipe. Only three entries depart from it: the patch geometry, which is the object of the study, and the step budget and shuffle buffer, both reduced to fit the available compute and to keep a streamed corpus from stalling. The latter two apply identically to all fifteen runs, so neither can favour or penalise a particular $(P,S)$.}
+\caption{Training parameters: the value adopted for every retrained geometry, the corresponding value in the published Chronos recipe, and the constraint behind it. The architecture rows are the released Chronos-Bolt-Tiny configuration; the data and optimisation rows follow the published training recipe. Only three entries depart from it: the patch geometry, which is the object of the study, and the step budget and shuffle buffer, both reduced to fit the available compute and to keep a streamed corpus from stalling. The latter two apply identically to all fifteen runs, so neither can favour or penalise a particular $(P,S)$.}
     \label{tab:trainParams}
 \end{table}

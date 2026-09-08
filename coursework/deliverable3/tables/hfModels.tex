@@ -1,6 +1,6 @@
 \begin{table*}[!t]
     \centering
-    \small
+\small
     \begin{tabular}{@{}cccccccccc@{}}
         \toprule
         \textbf{Run} & \textbf{Patch ($P$)} & \textbf{Stride ($S$)} & \textbf{Overlap ($O$)} & \textbf{Tokens} & $L$ & $L_{\mathrm{tok}}$ & $r$ & $S \mid P$ & $P \mid S$ \\
@@ -25,6 +25,6 @@
         $15$ & $32$ & $32$ & $0.00$ & $64$ & $480$ & $480$ & $0$ & yes & yes \\
         \bottomrule
     \end{tabular}
-    \caption{The fifteen configurations carried into the analysis, with the overlap ratio $O$ of \autoref{eq:overlap} and the number of patch tokens at the $2048$-sample training context, where the five $P=24$ geometries are left-padded to $2064$ because $2048$ is not a multiple of their patch size. $L$ is the context supplied at analysis time, the same for every geometry; $L_{\mathrm{tok}}$ is the part of it that the patch grid actually spans, and $r$ the terminal remainder that is carried into no token; $r=0$ exactly when $S \mid P$, so the six geometries on which the stride-branch estimates rest are also the six whose context is truncated. All are trained from scratch under the same $100$k-step budget and from the same seed ($42$); the published Chronos-Bolt-Tiny checkpoint is not used. The last two columns are the divisibility conditions that decide what a geometry can attribute: $S \mid P$ means every stride site $c f_s/S$ is also a patch site $k f_s/P$, so the geometry yields no stride-only frequency, and $P \mid S$ is the converse. Both hold exactly when $P=S$, where the two branches are the same set of frequencies and nothing can be attributed to either alone.}
+\caption{The fifteen configurations carried into the analysis, with the overlap ratio $O$ of \autoref{eq:overlap} and the number of patch tokens at the $2048$-sample training context, where the five $P=24$ geometries are left-padded to $2064$ because $2048$ is not a multiple of their patch size. $L$ is the context supplied at analysis time, the same for every geometry; $L_{\mathrm{tok}}$ is the part of it that the patch grid actually spans, and $r$ the terminal remainder that is carried into no token; $r=0$ exactly when $S \mid P$, so the six geometries on which the stride-branch estimates rest are also the six whose context is truncated. All are trained from scratch under the same $100$k-step budget and from the same seed ($42$); the published Chronos-Bolt-Tiny checkpoint is not used. The last two columns are the divisibility conditions that decide what a geometry can attribute: $S \mid P$ means every stride site $c f_s/S$ is also a patch site $k f_s/P$, so the geometry yields no stride-only frequency, and $P \mid S$ is the converse. Both hold exactly when $P=S$, where the two branches are the same set of frequencies and nothing can be attributed to either alone.}
     \label{tab:hfModels}
 \end{table*}

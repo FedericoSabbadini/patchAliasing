@@ -1,6 +1,6 @@
 \begin{table}[H]
     \centering
-    \small
+\small
     \setlength{\tabcolsep}{5pt}
     \begin{tabular}{@{}llrrr@{}}
         \toprule
@@ -17,16 +17,6 @@
         \texttt{HH}  & 3 & $189$--$250$ & $219$ & $61$ \\
         \bottomrule
     \end{tabular}
-    \caption{The seven hierarchical band-classification tasks, after Pagani et
-    al.\autocite{paganiPreliminaryInsightsChronos2026}, with the boundaries this project has used
-    throughout. Each task is one binary question: given the
-    internal state at a tone, does that tone lie below or above the boundary of its band. Three
-    levels of split resolve eight buckets with seven questions, so the family reads a frequency by
-    successive halving rather than by a single classification, and the level fixes how demanding
-    the question is: \texttt{Mid} separates two halves of the whole analysed range, while the third
-    level asks the same of a $61$\,Hz window. A geometry that answers level~1 and fails level~3 has
-    retained the coarse position of a tone and lost its fine position, which is a different
-    statement from losing the tone. The boundaries partition $2$--$250$\,Hz and are held fixed
-    across geometries so a row may be read across the design.}
+\caption{The seven hierarchical band-classification tasks, after Pagani et al.\autocite{paganiPreliminaryInsightsChronos2026}, with the boundaries this project has used throughout. Each task is one binary question: given the internal state at a tone, does that tone lie below or above the boundary of its band. Three levels of split resolve eight buckets with seven questions, so the family reads a frequency by successive halving rather than by a single classification, and the level fixes how demanding the question is: \texttt{Mid} separates two halves of the whole analysed range, while the third level asks the same of a $61$\,Hz window. A geometry that answers level~1 and fails level~3 has retained the coarse position of a tone and lost its fine position, which is a different statement from losing the tone. The boundaries partition $2$--$250$\,Hz and are held fixed across geometries so a row may be read across the design.}
     \label{tab:bandTasks}
 \end{table}

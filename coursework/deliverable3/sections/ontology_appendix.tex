@@ -59,12 +59,9 @@ The environmental states are operational generation proxies, not meteorological 
 
 \subsubsection{Power route}
 
-\noindent\valueof{PVToInternalLoad}, \valueof{PVToBattery}, and \valueof{PVToExternalGrid};\newline
-\valueof{BatteryToInternalLoad} and \valueof{BatteryToExternalGrid};\newline
-\valueof{ExternalGridToInternalLoad} and \valueof{ExternalGridToBattery}.
+\noindent\valueof{PVToInternalLoad}, \valueof{PVToBattery}, and \valueof{PVToExternalGrid};\newline \valueof{BatteryToInternalLoad} and \valueof{BatteryToExternalGrid};\newline \valueof{ExternalGridToInternalLoad} and \valueof{ExternalGridToBattery}.
 
-Formally, each vocabulary class is an OWL-style enumeration of the listed named individuals (\texttt{oneOf}). The five vocabulary classes are pairwise disjoint, and all listed values are declared globally different (\texttt{AllDifferent}). This prevents a value such as \valueof{SafeMode} from being silently identified with \valueof{ClearSky} or \valueof{NormalMode} under open-world semantics.
-Each valid time-stamped observation has exactly one generation context. Each completed observability assessment has exactly one observability state, and each routing decision records exactly one control mode. Co-issued decisions based on the same synchronized observation must record the same mode. Anomalies are not declared mutually exclusive because, for example, an abrupt inverter trip also creates a large power change. Deterministic control is obtained through the priority rules in the closed-loop section.
+Formally, each vocabulary class is an OWL-style enumeration of the listed named individuals (\texttt{oneOf}). The five vocabulary classes are pairwise disjoint, and all listed values are declared globally different (\texttt{AllDifferent}). This prevents a value such as \valueof{SafeMode} from being silently identified with \valueof{ClearSky} or \valueof{NormalMode} under open-world semantics. Each valid time-stamped observation has exactly one generation context. Each completed observability assessment has exactly one observability state, and each routing decision records exactly one control mode. Co-issued decisions based on the same synchronized observation must record the same mode. Anomalies are not declared mutually exclusive because, for example, an abrupt inverter trip also creates a large power change. Deterministic control is obtained through the priority rules in the closed-loop section.
 
 \subsection{Object properties}
 
@@ -110,14 +107,12 @@ Let $v_P(t)$, $v_G(t)$, $v_s(t)$, and $v_L(t)$ denote the validity of PV power, 
 \begin{equation*}
 V_t=v_P(t)\wedge v_G(t)\wedge v_s(t)\wedge v_L(t).
 \end{equation*}
-If $V_t$ is false, no physical anomaly or forecast-driven route is inferred from that observation. A valid irradiance value may still support a descriptive generation context, but the operational validator asserts \valueof{SensorMalfunction} and the cycle proceeds directly to safe-mode selection. Within a validated cycle, absence of the three listed anomaly values is interpreted locally as ``none detected''; this is a scoped closed-world policy, not a global OWL assumption.
-The signed ramp rate, measured in watts per second when $\Delta t$ is expressed in seconds, is
+If $V_t$ is false, no physical anomaly or forecast-driven route is inferred from that observation. A valid irradiance value may still support a descriptive generation context, but the operational validator asserts \valueof{SensorMalfunction} and the cycle proceeds directly to safe-mode selection. Within a validated cycle, absence of the three listed anomaly values is interpreted locally as ``none detected''; this is a scoped closed-world policy, not a global OWL assumption. The signed ramp rate, measured in watts per second when $\Delta t$ is expressed in seconds, is
 \begin{equation}
 \label{eq:signed-ramp}
 r_t=\frac{P_t-P_{t-1}}{\Delta t}.
 \end{equation}
-The anomaly rules are expressed with configurable thresholds: $g_{\mathrm{trip}}$ for sufficient irradiance, $p_0$ for positive near-zero power, and $r_{\max}$ for maximum admissible ramp magnitude.
-The controller evaluates sensor validity first. A sensor malfunction therefore cannot be reinterpreted as a physical ramp or inverter trip. If a valid inverter trip also satisfies the ramp predicate, the safe response to the trip takes precedence over ramp smoothing.
+The anomaly rules are expressed with configurable thresholds: $g_{\mathrm{trip}}$ for sufficient irradiance, $p_0$ for positive near-zero power, and $r_{\max}$ for maximum admissible ramp magnitude. The controller evaluates sensor validity first. A sensor malfunction therefore cannot be reinterpreted as a physical ramp or inverter trip. If a valid inverter trip also satisfies the ramp predicate, the safe response to the trip takes precedence over ramp smoothing.
 
 \subsubsection{Sensor malfunction}
 
@@ -248,21 +243,12 @@ P_{\mathrm{sur}}=(P_{\mathrm{pv}}-P_{\mathrm{load}})^{+},
 \qquad
 P_{\mathrm{def}}=(P_{\mathrm{load}}-P_{\mathrm{pv}})^{+}.
 \end{equation}
-Here daylight abbreviates \{\valueof{ClearSky}, \valueof{PartialCloud}, \valueof{Overcast}\}. A cycle issues a route only for a strictly positive transfer and may issue several co-mode decisions. All setpoints are clipped to SoC, capacity, and charge/discharge limits.
-\autoref{fig:routing-policy} shows the priority scan as a single pass: the modes are tested in a fixed order, the first that matches issues its routes, and no later branch can override an earlier one, which is what makes the policy deterministic rather than a set of competing preferences. The conservative branch rejoins the ordinary load-first router under its reduced cap, so degrading authority narrows the same policy instead of substituting a different one, and the ramp branch is available only in \valueof{NormalMode}. \autoref{tab:routing} states the boundary cases the figure cannot show, each row pairing a triggering condition with the routes it admits and the guard that blocks it: a daylight deficit, a negative ramp with no usable reference, and the cases where a missing, stale or non-finite value forces the conservative path.
+Here daylight abbreviates \{\valueof{ClearSky}, \valueof{PartialCloud}, \valueof{Overcast}\}. A cycle issues a route only for a strictly positive transfer and may issue several co-mode decisions. All setpoints are clipped to SoC, capacity, and charge/discharge limits. \autoref{fig:routing-policy} shows the priority scan as a single pass: the modes are tested in a fixed order, the first that matches issues its routes, and no later branch can override an earlier one, which is what makes the policy deterministic rather than a set of competing preferences. The conservative branch rejoins the ordinary load-first router under its reduced cap, so degrading authority narrows the same policy instead of substituting a different one, and the ramp branch is available only in \valueof{NormalMode}. \autoref{tab:routing} states the boundary cases the figure cannot show, each row pairing a triggering condition with the routes it admits and the guard that blocks it: a daylight deficit, a negative ramp with no usable reference, and the cases where a missing, stale or non-finite value forces the conservative path.
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{figures/routing.png}
-\caption{The routing policy as a priority scan. The mode of \autoref{eq:mode-selection} is read
-first, so a safe-mode cycle never reaches the ordinary branches; the ramp branch is available only
-in \valueof{NormalMode}, and the conservative branch rejoins the ordinary load-first router under
-its reduced cap. Below that the surplus and deficit of \autoref{eq:surplus-deficit} decide which
-of the seven admissible routes of \autoref{eq:routes} a cycle issues, always serving the internal
-load before charging the battery or exporting. A cycle issues a route only for a strictly positive
-transfer and may issue several co-mode decisions, and every setpoint is clipped to the state of
-charge, the capacity and the charge and discharge limits; \autoref{tab:routing} states the
-boundary cases this diagram compresses.}
+\caption{The routing policy as a priority scan. The mode of \autoref{eq:mode-selection} is read first, so a safe-mode cycle never reaches the ordinary branches; the ramp branch is available only in \valueof{NormalMode}, and the conservative branch rejoins the ordinary load-first router under its reduced cap. Below that the surplus and deficit of \autoref{eq:surplus-deficit} decide which of the seven admissible routes of \autoref{eq:routes} a cycle issues, always serving the internal load before charging the battery or exporting. A cycle issues a route only for a strictly positive transfer and may issue several co-mode decisions, and every setpoint is clipped to the state of charge, the capacity and the charge and discharge limits; \autoref{tab:routing} states the boundary cases this diagram compresses.}
 \label{fig:routing-policy}
 \end{figure}
 

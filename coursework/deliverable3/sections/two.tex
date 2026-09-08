@@ -206,7 +206,7 @@ Patch-periodicity thus makes tokens equal as well, but at a spacing of $j$ rathe
 
 \subsection*{Analysis of Structural Redundancies and Invariances}
 
- Whenever $S\le P$, every sample of the input appears in at least one token and can be read back from it: taking \autoref{eq:element_def} with $k=\lfloor n/S\rfloor$ and $m = n \bmod S \le S-1 \le P-1$ gives
+Whenever $S\le P$, every sample of the input appears in at least one token and can be read back from it: taking \autoref{eq:element_def} with $k=\lfloor n/S\rfloor$ and $m = n \bmod S \le S-1 \le P-1$ gives
 
 \begin{equation}
 \label{eq:reconstruction}
@@ -244,17 +244,15 @@ O
 
 which is $0$ for contiguous patches and approaches $1$ as the stride shortens.
 
-In this regime the two branches separate. Since $f_s/S>f_s/P$, the stride comb is the sparser of the two. The derivation of \autoref{eq:collapse_S} makes no use of the relation between $P$ and $S$, so at $f\in\mathcal{F}_{S}$ consecutive tokens are still exactly equal. 
+In this regime the two branches separate. Since $f_s/S>f_s/P$, the stride comb is the sparser of the two. The derivation of \autoref{eq:collapse_S} makes no use of the relation between $P$ and $S$, so at $f\in\mathcal{F}_{S}$ consecutive tokens are still exactly equal.
 
 \subsubsection{Disjoint Windows ($S>P$)}
 \label{sec:disjoint}
 When the stride exceeds the patch size the windows leave $S-P$ unobserved samples between consecutive patches, and \autoref{eq:reconstruction} fails: $\mathcal{T}_{P,S}$ is non-injective for every $f$, since signals differing only on the gaps share a token sequence. The loss is one of discarded samples rather than of tokenisation geometry, so these configurations are excluded by construction from the experimental design.
 
 \subsubsection{Structural Aliasing as a Representation-Level Property}
-$\mathcal{F}_{S}$ collects the stride-lock candidates, at which consecutive raw tokens repeat. $\mathcal{F}_{P}$ collects the frequencies whose period divides the patch, at which the sequence repeats every $P/\gcd(P,S)$ tokens. Consecutive patches coincide exactly on $\mathcal{F}_{S}$, which for $S \mid P$ lies wholly inside $\mathcal{F}_{P}$.
-Their union $\mathcal{F}_{\mathrm{lock}}$ is therefore a statement about candidate geometry, not a proof of aliasing: for $S\le P$ the raw token sequence remains a lossless encoding of the input at every one of these frequencies, so none of the translations derived above is by itself evidence that two distinct signals become indistinguishable to the model.
+$\mathcal{F}_{S}$ collects the stride-lock candidates, at which consecutive raw tokens repeat. $\mathcal{F}_{P}$ collects the frequencies whose period divides the patch, at which the sequence repeats every $P/\gcd(P,S)$ tokens. Consecutive patches coincide exactly on $\mathcal{F}_{S}$, which for $S \mid P$ lies wholly inside $\mathcal{F}_{P}$. Their union $\mathcal{F}_{\mathrm{lock}}$ is therefore a statement about candidate geometry, not a proof of aliasing: for $S\le P$ the raw token sequence remains a lossless encoding of the input at every one of these frequencies, so none of the translations derived above is by itself evidence that two distinct signals become indistinguishable to the model.
 
-Structural aliasing is the separate, representation-level proposition that a model trained on such sequences nevertheless fails to make those frequencies
-readable from its internal state. It is treated here as an emergent and falsifiable property of the trained representations\autocite{paganiPreliminaryInsightsChronos2026}, diagnosed by readability rather than by a distance between raw tokens: it is present when the frequency of the signal can no longer be recovered from the internal state at a locked frequency as well as it can at neighbouring, non-locked ones. It is accordingly a property of the learned representation rather than of the operator, and one that can only be established empirically, with $\mathcal{F}_{\mathrm{lock}}$ supplying the candidate frequencies at which to look. The hypotheses that test it are formulated in \autoref{sec:four}.
+Structural aliasing is the separate, representation-level proposition that a model trained on such sequences nevertheless fails to make those frequencies readable from its internal state. It is treated here as an emergent and falsifiable property of the trained representations\autocite{paganiPreliminaryInsightsChronos2026}, diagnosed by readability rather than by a distance between raw tokens: it is present when the frequency of the signal can no longer be recovered from the internal state at a locked frequency as well as it can at neighbouring, non-locked ones. It is accordingly a property of the learned representation rather than of the operator, and one that can only be established empirically, with $\mathcal{F}_{\mathrm{lock}}$ supplying the candidate frequencies at which to look. The hypotheses that test it are formulated in \autoref{sec:four}.
 
 Observability is used in that sense throughout this report: not injectivity of $\mathcal{T}_{P,S}$, which \autoref{eq:reconstruction} settles, but readability of a frequency from the state the model builds.
