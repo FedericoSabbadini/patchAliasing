@@ -30,9 +30,23 @@ The pages above sweep pure tones. This second group asks the same question of th
 
 Each run draws one realisation, supplies its first $480$ samples as context, and keeps the $64$-sample horizon at the median quantile. The real signal is cut to the same $64$ samples that follow the context, so both sides cover the same instants at the same resolution and a difference between them is not a difference of window. Two seeds per family are shown here, and a third Light TSMixup draw appears in \autoref{sec:six}; none of them is a sample in any statistical sense. They are there so that a feature of one draw is not read as a property of the generator.
 
-Two frequency spacings appear in these pages and they are not the same quantity. The transforms are evaluated on a one-hertz grid, which is the spacing of the plotted curve and is obtained by zero padding; it lets a peak be located at, say, $6$\,Hz rather than snapped to a multiple of the native spacing. The native spacing is $f_s/N = 512/64 = 8$\,Hz, fixed by the $125$\,ms the horizon covers, and no amount of zero padding improves it. Interpolation places a peak finely; it does not separate two peaks. Two components one hertz apart therefore appear as one line however fine the grid, and the panel titles that read ``resolving power $8.0$\,Hz'' refer to this second quantity: read them as ``$64$ samples, native $\Delta f = 8.0$\,Hz, plotted on a $1$\,Hz zero-padded grid''. A $512$-sample rollout would bring the native spacing to one hertz as well, at the cost of feeding the model its own output.
+Two frequency spacings appear in these pages and they are not the same quantity. The transforms are
+evaluated on a one-hertz grid, which is the spacing of the plotted curve and is obtained by zero
+padding; it lets a peak be located at, say, $6$\,Hz rather than snapped to a multiple of the native
+spacing. The native spacing is $f_s/N = 512/64 = 8$\,Hz, fixed by the $125$\,ms the horizon covers,
+and no amount of zero padding improves it. Interpolation places a peak finely; it does not separate
+two peaks. Two components one hertz apart therefore appear as one line however fine the grid, and
+the panel titles that read ``resolving power $8.0$\,Hz'' refer to this second quantity: read them
+as ``$64$ samples, native $\Delta f = 8.0$\,Hz, plotted on a $1$\,Hz zero-padded grid''. A
+$512$-sample rollout would bring the native spacing to one hertz as well, at the cost of feeding the
+model its own output.
 
-Each panel title carries the frequency of the component in hertz, whether that frequency lies on $\mathcal F_{\mathrm{lock}}$, and the fitted amplitude $A$; a component whose fit spans fewer than one and a half cycles of the window is marked, since below that an amplitude and a phase cannot be told apart. On the prediction side a line is drawn only if it reaches $35\%$ of the strongest component of the prediction itself, so the panels show what builds the returned signal rather than every line a peak search returns.
+Each panel title carries the frequency of the component in hertz, whether that frequency lies on
+$\mathcal F_{\mathrm{lock}}$, and the fitted amplitude $A$; a component whose fit spans fewer than
+one and a half cycles of the window is marked, since below that an amplitude and a phase cannot be
+told apart. On the prediction side a line is drawn only if it reaches $35\%$ of the strongest
+component of the prediction itself, so the panels show what builds the returned signal rather than
+every line a peak search returns.
 
 \subsection{What the pages show}
 
@@ -49,21 +63,44 @@ None of this is evidence for or against the hypotheses of \autoref{sec:four}. Wh
 \begin{figure*}[!p]
     \centering
     \includegraphics[width=0.96\textwidth]{figures/FIG_E1_page1.png}
-\caption{Reconstruction and probe sweep, page 1 of 3: geometries p8-s8, p16-s8, p16-s12, p16-s16 and p24-s8. Each row is one geometry. Left, the dominant frequency of the generated window against the frequency supplied as context, averaged over four starting phases, drawn as the solid red curve. The pale red band around it is $\pm1$ standard deviation of that dominant frequency across the four phases, measured on the vertical axis and therefore in hertz: a wide band at a swept frequency means the frequency the model returns depends on where in its cycle the tone began, and a band that collapses to the curve means the reading is phase-independent there. The dotted diagonal marks a tone rebuilt correctly. Right, the accuracy of a linear probe on the internal state at each swept frequency, one strip per task, with the local $f\pm1$\,Hz task last. Dashed verticals are that geometry's own predicted candidates. This page carries the two non-overlapping baselines, p8-s8 and p16-s16, beside the two geometries that share $S=8$ with different patch sizes.}
+    \caption{Reconstruction and probe sweep, page 1 of 3: geometries p8-s8, p16-s8, p16-s12,
+    p16-s16 and p24-s8. Each row is one geometry. Left, the dominant frequency of the generated
+    window against the frequency supplied as context, averaged over four starting phases, drawn as
+    the solid red curve. The pale red band around it is $\pm1$ standard deviation of that dominant
+    frequency across the four phases, measured on the vertical axis and therefore in hertz: a wide
+    band at a swept frequency means the frequency the model returns depends on where in its cycle
+    the tone began, and a band that collapses to the curve means the reading is phase-independent
+    there. The dotted diagonal marks a tone rebuilt correctly. Right, the
+    accuracy of a linear probe on the internal state at each swept frequency, one strip per task,
+    with the local $f\pm1$\,Hz task last. Dashed verticals are that geometry's own predicted
+    candidates. This page carries the two non-overlapping baselines, p8-s8 and p16-s16, beside the
+    two geometries that share $S=8$ with different patch sizes.}
     \label{fig:sweepPage1}
 \end{figure*}
 
 \begin{figure*}[!p]
     \centering
     \includegraphics[width=0.96\textwidth]{figures/FIG_E1_page2.png}
-\caption{Page 2 of 3: geometries p24-s12, p24-s16, p24-s20, p24-s24 and p32-s8, read as \autoref{fig:sweepPage1}, the pale red band again being $\pm1$ standard deviation of the dominant frequency over the four starting phases. The first four hold the patch size at $P=24$ and shorten the stride from $24$ to $12$, so the stride comb $c f_s/S$ moves across the band while the patch comb $k f_s/P$ stays where it is: this is the series on which the two branches of $\mathcal F_{\mathrm{lock}}$ can be told apart by eye, and p24-s16 and p24-s20 are among the six runs with $S \nmid P$ on which the branch estimates of \autoref{sec:four} rest.}
+    \caption{Page 2 of 3: geometries p24-s12, p24-s16, p24-s20, p24-s24 and p32-s8, read as \autoref{fig:sweepPage1}, the
+    pale red band again being $\pm1$ standard deviation of the dominant frequency over the four
+    starting phases. The first four hold the patch size at $P=24$ and shorten the stride
+    from $24$ to $12$, so the stride comb $c f_s/S$ moves across the band while the patch comb
+    $k f_s/P$ stays where it is: this is the series on which the two branches of
+    $\mathcal F_{\mathrm{lock}}$ can be told apart by eye, and p24-s16 and p24-s20 are among the
+    six runs with $S \nmid P$ on which the branch estimates of \autoref{sec:four} rest.}
     \label{fig:sweepPage2}
 \end{figure*}
 
 \begin{figure*}[!p]
     \centering
     \includegraphics[width=0.96\textwidth]{figures/FIG_E1_page3.png}
-\caption{Page 3 of 3: geometries p32-s12, p32-s16, p32-s20, p32-s24 and p32-s32, read as \autoref{fig:sweepPage1}, the pale red band again being $\pm1$ standard deviation of the dominant frequency over the four starting phases. The patch size is held at $P=32$, the widest of the design, so the patch comb is the densest and the overlap ratio runs from $0.62$ down to $0$ within one page. Read against page 2 at equal stride, the difference between the two pages is a difference of patch size alone, which is the comparison the covariate $\log P$ of \autoref{eq:d2mitigation} is fitted to.}
+    \caption{Page 3 of 3: geometries p32-s12, p32-s16, p32-s20, p32-s24 and p32-s32, read as \autoref{fig:sweepPage1}, the
+    pale red band again being $\pm1$ standard deviation of the dominant frequency over the four
+    starting phases. The patch size is held at $P=32$, the widest of the design, so the
+    patch comb is the densest and the overlap ratio runs from $0.62$ down to $0$ within one page.
+    Read against page 2 at equal stride, the difference between the two pages is a difference of
+    patch size alone, which is the comparison the covariate $\log P$ of \autoref{eq:d2mitigation}
+    is fitted to.}
     \label{fig:sweepPage3}
 \end{figure*}
 
