@@ -1,4 +1,30 @@
-A tokeniser can destroy information that the sampler preserved, and the condition under which it does so is arithmetic. This section derives that condition in both of its forms, one governed by the stride and one by the patch, and states what their union does and does not license.
+Everything that follows rests on treating patch tokenisation as an operator rather than an implementation detail, because its degeneracies are then derivable instead of observed. This section fixes that operator and the notation the rest of the report uses for it. A tokeniser can destroy information that the sampler preserved, and the condition under which it does so is arithmetic. This section derives that condition in both of its forms, one governed by the stride and one by the patch.
+
+Let $\mathbf{x} = \{x[n]\}_{n \in \mathbb{N}}$, with $\mathbb{N}=\{0,1,\ldots\}$, be a discrete-time signal representing the input time series. Defining the patch-based tokenisation operator $\mathcal{T}_{P,S}$, with patch size $P \in \mathbb{N}^{+}$ and stride $S \in \mathbb{N}^{+}$, as a mapping that transforms the signal $\mathbf{x}$ into a sequence of vector-valued tokens $\mathbf{T}=\{\mathbf{t}_k\}_{k\in\mathbb{N}}$ with $\mathbf{t}_k\in\mathbb{R}^{P}$, the $k$-th token is
+
+\begin{equation*}
+\mathbf{t}_k
+=
+\mathcal{T}_{P,S}(\mathbf{x})[k]
+=
+\begin{bmatrix}
+x[kS] \\
+x[kS+1] \\
+\vdots \\
+x[kS+P-1]
+\end{bmatrix}.
+\end{equation*}
+
+Using element-wise indexing notation,
+
+\begin{equation}
+\label{eq:element_def}
+\mathbf{t}_k[m]
+=
+x[kS+m],
+\qquad
+m\in\{0,\ldots,P-1\}.
+\end{equation}
 
 Consider a continuous-time periodic signal sampled uniformly at sampling frequency $f_s$, yielding the discrete-time sequence $x[n]$. Isolating a fundamental harmonic component and modelling it as a single sinusoid gives
 
@@ -165,7 +191,7 @@ and since this holds for every component,
 \mathbf{t}_k.
 \end{equation}
 
-Here and below, for positive integers $A$ and $B$, the notation $A\mid B$ means that $A$ divides $B$, namely $B=qA$ for some $q\in\mathbb{N}^{+}$, whereas $A\nmid B$ means that $A$ does not divide $B$.
+Here and below, for positive integers $A$ and $B$, the notation $A\mid B$ means that $A$ divides $B$, namely $B=qA$ for some $q\in\mathbb{N}^{+}$, viceversa $A\nmid B$.
 
 The patch condition reduces the same shift only when $P$ divides $jS$. At $j=1$ that requires $P \mid S$, which under $S\le P$ occurs only at $S=P$, so consecutive tokens are left distinct. It does hold at the smallest $j$ for which $P \mid jS$, namely $j = P/\gcd(P,S)$; since $S/\gcd(P,S)\in\mathbb{N}^{+}$, repeated application of patch-periodicity one period at a time gives
 
@@ -204,9 +230,6 @@ and therefore
 
 Patch-periodicity thus makes tokens equal as well, but at a spacing of $j$ rather than between neighbours. The two conditions coincide on consecutive patches only in the non-overlapping geometry, where $j=1$.
 
-% The starred form left the subsection counter at zero, so the four cases below numbered
-% 4.0.1-4.0.4. Unstarring it restores 4.1 and 4.1.1-4.1.4. Labels are unaffected, and
-% \autoref still prints "Section" for both levels. Restore the star to revert.
 \subsection{Analysis of Structural Redundancies and Invariances}
 
 Whenever $S\le P$, every sample of the input appears in at least one token and can be read back from it: taking \autoref{eq:element_def} with $k=\lfloor n/S\rfloor$ and $m = n \bmod S \le S-1 \le P-1$ gives
@@ -222,7 +245,7 @@ S\le P.
 
 Complete raw patching with $S\le P$ is therefore injective: the token sequence determines the signal, and no frequency below Nyquist is destroyed by tokenisation itself. Everything that follows concerns redundancy in the token sequence rather than loss of information, the single exception being the $S>P$ regime, where the operator does discard samples.
 
-\subsubsection{Equal Patch Size and Stride ($P=S$)}
+\subsubsection*{Equal Patch Size and Stride ($P=S$)}
 When patches are contiguous and non-overlapping the two branches coincide, $\mathcal{F}_{S}=\mathcal{F}_{P}$, and $j=P/\gcd(P,P)=1$, so \autoref{eq:token_period_P} collapses onto \autoref{eq:token_collapse}. This is the only geometry in which both conditions act on consecutive patches, and every locked frequency then gives
 
 \begin{equation*}
@@ -233,7 +256,7 @@ When patches are contiguous and non-overlapping the two branches coincide, $\mat
 \forall k.
 \end{equation*}
 
-\subsubsection{Overlapping Windows ($S<P$)}
+\subsubsection*{Overlapping Windows ($S<P$)}
 When the stride is smaller than the patch size consecutive windows share samples, and the fraction of a patch they share is the overlap ratio
 
 \begin{equation}
@@ -249,13 +272,13 @@ which is $0$ for contiguous patches and approaches $1$ as the stride shortens.
 
 In this regime the two branches separate. Since $f_s/S>f_s/P$, the stride comb is the sparser of the two. The derivation of \autoref{eq:collapse_S} makes no use of the relation between $P$ and $S$, so at $f\in\mathcal{F}_{S}$ consecutive tokens are still exactly equal.
 
-\subsubsection{Disjoint Windows ($S>P$)}
+\subsubsection*{Disjoint Windows ($S>P$)}
 \label{sec:disjoint}
 When the stride exceeds the patch size the windows leave $S-P$ unobserved samples between consecutive patches, and \autoref{eq:reconstruction} fails: $\mathcal{T}_{P,S}$ is non-injective for every $f$, since signals differing only on the gaps share a token sequence. The loss is one of discarded samples rather than of tokenisation geometry, so these configurations are excluded by construction from the experimental design.
 
-\subsubsection{Structural Aliasing as a Representation-Level Property}
+\subsection{Structural Aliasing as a Representation-Level Property}
 $\mathcal{F}_{S}$ collects the stride-lock candidates, at which consecutive raw tokens repeat. $\mathcal{F}_{P}$ collects the frequencies whose period divides the patch, at which the sequence repeats every $P/\gcd(P,S)$ tokens. Consecutive patches coincide exactly on $\mathcal{F}_{S}$, which for $S \mid P$ lies wholly inside $\mathcal{F}_{P}$. Their union $\mathcal{F}_{\mathrm{lock}}$ is therefore a statement about candidate geometry, not a proof of aliasing: for $S\le P$ the raw token sequence remains a lossless encoding of the input at every one of these frequencies, so none of the translations derived above is by itself evidence that two distinct signals become indistinguishable to the model.
 
-Structural aliasing is the separate, representation-level proposition that a model trained on such sequences nevertheless fails to make those frequencies readable from its internal state. It is treated here as an emergent and falsifiable property of the trained representations\autocite{paganiPreliminaryInsightsChronos2026}, diagnosed by readability rather than by a distance between raw tokens: it is present when the frequency of the signal can no longer be recovered from the internal state at a locked frequency as well as it can at neighbouring, non-locked ones. It is accordingly a property of the learned representation rather than of the operator, and one that can only be established empirically, with $\mathcal{F}_{\mathrm{lock}}$ supplying the candidate frequencies at which to look. The hypotheses that test it are formulated in \autoref{sec:four}.
+Structural aliasing is the separate, representation-level proposition that a model trained on such sequences nevertheless fails to make those frequencies readable from its internal state. It is treated here as an emergent and falsifiable property of the trained representations\autocite{paganiPreliminaryInsightsChronos2026}, diagnosed by readability rather than by a distance between raw tokens: it is present when the frequency of the signal can no longer be recovered from the internal state at a locked frequency as well as it can at neighbouring, non-locked ones. It is accordingly a property of the learned representation rather than of the operator, and one that can only be established empirically, with $\mathcal{F}_{\mathrm{lock}}$ supplying the candidate frequencies at which to look. The hypotheses that test it are formalised in \autoref{sec:four}.
 
 Observability is used in that sense throughout this report: not injectivity of $\mathcal{T}_{P,S}$, which \autoref{eq:reconstruction} settles, but readability of a frequency from the state the model builds.
