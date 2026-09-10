@@ -1,0 +1,36 @@
+\begin{table}[!t]
+    \centering
+\small
+    \setlength{\tabcolsep}{5pt}
+    \begin{tabular}{@{}L{0.215\linewidth} L{0.735\linewidth}@{}}
+        \toprule
+        \textbf{Element} & \textbf{Reading for this system} \\
+        \midrule
+        Adversary capabilities & No model access of any kind and no knowledge of the training corpus, only the ability to drive a periodic load on the photovoltaic plant, which an inverter switching schedule or a switchable load already provides. \\
+        \addlinespace[3pt]
+        Attack surface & The raw telemetry stream before tokenisation, reached by acting on the physical process or on the data path. \\
+        \addlinespace[3pt]
+        Manipulation of telemetry & A small periodic component at a candidate frequency, which is legitimate plant behaviour and survives any plausibility check on the raw signal. \\
+        \addlinespace[3pt]
+        Operational consequence & The component is present in the plant and under-represented in the model, so dispatch and curtailment are decided on an incomplete picture, and a detector reading the forecast residual is looking through the same tokeniser that lost it. \\
+        \addlinespace[3pt]
+% ---------------------------------------------------------------------------------------
+% REVIEW (conformity check v24, item E1). Only this row is changed, and only in what it
+% calls the second case. Both cases are the ones intended and neither is altered
+% arithmetically. The original wording described both as "the overlapping mitigation",
+% which cannot be right for the second: raising O = 1 - S/P by shortening the stride at
+% fixed patch size leaves the patch fundamental f_s/P where it is, as Section 10 states
+% ("\mathcal{F}_P is invariant under the mitigation by construction") and Section 12.4
+% repeats ("overlap moves the stride branch and leaves the patch branch untouched").
+% Thinning the patch branch means shrinking P, a change of geometry rather than of
+% overlap, which drags S down with it once S <= P binds.
+% Accept: delete this comment and the \textcolor{red}{...} wrapper on the row below.
+% Reject: restore the original wording, kept here verbatim:
+%   Residual risk & Considering the overlapping mitigation that thins the stride branch alone, the patch branch remains at every deployed configuration. Considering the overlapping mitigation that thins the patch branch, and consequently the stride branch ($S \le P$), the candidate set is relocated but not removed. \\
+% ---------------------------------------------------------------------------------------
+        Residual risk & \textcolor{red}{The pre-registered mitigation raises overlap by shortening the stride at fixed patch size, so it thins the stride branch alone and $\mathcal{F}_{P}$ survives at every deployed configuration. Shrinking the patch instead thins $\mathcal{F}_{P}$, and with it $\mathcal{F}_{S}$ once $S \le P$ forces the stride down as well; but that raises both fundamentals rather than closing either comb, so the candidate set is relocated and thinned, not removed.} \\
+        \bottomrule
+    \end{tabular}
+\caption{The adversarial-masking threat model, read through the five elements of the NIST taxonomy of attacks on machine-learning systems\autocite{vassilevAdversarialMachineLearning2024}. The reading separates what the actor needs from what the actor changes, and both from the exposure that survives the mitigation this report pre-registers. Its distinguishing feature is the first row: the capability required is not access to the model but the ability to make the plant do something the plant is entitled to do, so nothing in the manipulation is anomalous at the point where a plausibility check would sit. \autoref{tab:riskRegister} carries this as its adversarial-masking row at high residual exposure.}
+    \label{tab:threatModel}
+\end{table}

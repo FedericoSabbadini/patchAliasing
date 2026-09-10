@@ -15,7 +15,7 @@ The magnitude of that loss is a property of the alignment between the signal per
 \subsubsection*{Parametric dependence of blind spot sites (H3)}
 Because $\mathcal F_{\mathrm{lock}}$ is a union, the claim splits in two, one per branch, with $c,k\in\mathbb{N}^{+}$ the harmonic indices of \autoref{eq:branches}. $H3a$: at fixed $P$, the sites at $f=c\,f_s/S$ move proportionally to $1/S$. $H3b$: at fixed $S$, the sites at $f=k\,f_s/P$ move proportionally to $1/P$. A site that stays put while the parameter supposed to generate it is varied refutes its branch.
 
-\subsection{H1}
+\subsection{H1: frequency-dependent blind spots}
 
 The behavioural measurement is the frequency the forecast rebuilds. From the median forecast over the horizon the dominant reconstructed frequency $\hat f$ is estimated, and an arm is scored by whether that estimate lands on the frequency the arm carries, within a tolerance $\Delta$ that admits a small error rather than demanding an exact match. It is collected in matched triplets: each candidate $f_k$ with its two controls, all three sharing the same background realisation and the same phase, so that only the frequency changes. Writing $f$ for the frequency an arm carries, the response is
 
@@ -49,7 +49,7 @@ L_i \sim \text{Gamma}\!\left(r,\ r/\mu_i\right),
 
 The log link makes the estimand multiplicative: $e^{\theta_{\mathrm{lock}}}$ is the factor by which the codelength of a candidate frequency expands. $e^{\theta_{\mathrm{lock}}}>1$ is the representational cost $H1$ predicts, while $\theta_{\mathrm{lock}}$ near zero says the frequency remains as readable at a candidate as anywhere else. The representational half of $H1$ is decided on the same footing as the behavioural one: supported at $\Pr(\theta_{\mathrm{lock}} > \log 1.2 \mid D)\ge 0.95$, refuted at $\Pr(|\theta_{\mathrm{lock}}| < \log 1.1 \mid D)\ge 0.95$, both fixed in \autoref{tab:bayesDecisions} before any posterior is inspected.
 
-\subsection{H2}
+\subsection{H2: independence from temporal alignment}
 
 H2 uses the same triplets with one change. Model~A pools them across phases without a phase term, so the phase is marginalised and cannot be inspected; $H2$ requires it to be kept, so the phase index is retained. Model~C is Model~A on the same response, without the configuration-level covariates, which are not what $H2$ asks about, and with the phase circle cut into eight equal slices, each given its own offset $u_p$:
 
@@ -62,11 +62,11 @@ h_i \sim \mathrm{Bernoulli}(p_i),
 u_p \sim \mathcal{N}(0, \sigma_\phi).
 \end{equation}
 
-The estimand $\sigma_\phi$ is the spread of those eight offsets, which reduces the hypothesis to a single number and presupposes no shape for a possible dependence. $\sigma_\phi$ near zero means the offsets are indistinguishable and the loss is set by the geometry alone, as $H2$ predicts, whereas a large $\sigma_\phi$ means it depends on where in its cycle the signal starts. Dropping $u_p$ gives a nested null, which is compared with the full model by leave-one-out cross-validation (LOO); the comparison separates the size of any phase effect from the evidence that one exists.
+The estimand $\sigma_\phi$ of \autoref{eq:d2phase} is the spread of those eight offsets, which reduces the hypothesis to a single number and presupposes no shape for a possible dependence. $\sigma_\phi$ near zero means the offsets are indistinguishable and the loss is set by the geometry alone, as $H2$ predicts, whereas a large $\sigma_\phi$ means it depends on where in its cycle the signal starts. Dropping $u_p$ gives a nested null, which is compared with the full model by leave-one-out cross-validation (LOO); the comparison separates the size of any phase effect from the evidence that one exists.
 
 One limit belongs here rather than with the results. Model~C measures the spread of the same response Model~A uses, so the two are not independent readings: where the population effect is itself indistinguishable from zero, little remains for phase to move, and $H2$ is read conditionally.
 
-\subsection{H3}
+\subsection{H3: parametric dependence of blind spot sites}
 
 Both branches are tested on the token collapse $z_g(f)$, the dispersion, in geometry $g$ and at frequency $f$, of the input-patch embeddings across the patches of one context; it is zero when consecutive patches are identical. All geometries are swept on one common grid, the union of a uniform one-hertz sweep with the predicted sites of every configuration in the design, so that no geometry is scored only where its own theory predicts a dip.
 

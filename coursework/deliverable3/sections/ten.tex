@@ -18,15 +18,11 @@ A weakness becomes a vulnerability when someone can reach it.
 
 Being phase-locking deterministic, an adversary needs no model access, no query budget and no knowledge of the training corpus, but only knowledge of the chosen forecaster to find $F_{lock}$. In the taxonomy of adversarial machine learning\autocite{vassilevAdversarialMachineLearning2024} this places the weakness with the availability violations rather than with integrity or privacy, and it places the attack outside the white-box assumption.
 
-The five elements of the adversarial-masking threat model\autocite{vassilevAdversarialMachineLearning2024} separate the actor's capability and access path from the manipulation, consequence and exposure left after the proposed mitigation.
+\autoref{tab:threatModel} reads the five elements of the adversarial-masking threat model\autocite{vassilevAdversarialMachineLearning2024}, separating the actor's capability and access path from the manipulation, consequence and exposure left after the proposed mitigation.
 
-\begin{itemize}[label={}]
-    \item \emph{Adversary capabilities}: no model access of any kind and no knowledge of the training corpus, only the ability to drive a periodic load on the photovoltaic plant, which an inverter switching schedule or a switchable load already provides. 
-    \item \emph{Attack surface}: the raw telemetry stream before tokenisation, reached by acting on the physical process or on the data path.
-    \item \emph{Manipulation of telemetry}: a small periodic component at a candidate frequency, which is legitimate plant behaviour and survives any plausibility check on the raw signal.
-    \item \emph{Operational consequence}: the component is present in the plant and under-represented in the model, so dispatch and curtailment are decided on an incomplete picture, and a detector reading the forecast residual is looking through the same tokeniser that lost it.
-    \item \emph{Residual risk}: considering the overlapping mitigation that thins the stride branch alone, the patch branch remains at every deployed configuration. Considering the overlapping mitigation that thins the patch branch, and consequently the stride branch ($S \le P$), the candidate set is relocated but not removed.
-\end{itemize}
+\input{tables/threatModel.tex}
+
+\textcolor{red}{\textbf{Proposed correction, to accept or reject.} Only the residual-risk row of \autoref{tab:threatModel} is changed, and only in what it calls the second case; the source keeps the original wording in a comment beside it. Raising $O=1-S/P$ by shortening the stride at fixed patch size leaves the patch fundamental $f_s/P$ where it is, as \autoref{sec:eight} states and as the closing subsection below repeats, so the second case is a change of patch size rather than of overlap.}
 
 This is the adversarial masking row of \autoref{tab:riskRegister}, carried at high residual: no control available to an operator closes it, since a spectral monitor placed after tokenisation would inherit the very blind spot the attacker exploits.
 
