@@ -64,16 +64,34 @@ def main():
     src[6] = src[6].replace('model_A3_local_frequency_diag_v2', 'model_A3_reduced_direct_v1')
     src[6] = src[6].replace('A3-local-baseline-lock-side-v1', 'A3-reduced-lock-side-v1')
     src[6] = src[6].replace('A3-local-frequency-diagonal-checkpoints-v2', 'A3-reduced-direct-checkpoints-v1')
+    src[6] = src[6].replace('from importlib import metadata as importlib_metadata',
+        'from importlib import metadata as importlib_metadata\nimport importlib.util')
+    src[6] = src[6].replace('PROGRESS_EVERY = 200',
+        'PROGRESS_EVERY = 200\nEARLY_REJECT_ENABLED = True\nEARLY_REJECT_AFTER = 200\nEARLY_REJECT_DIVERGENCES = 5')
     src[6] = src[6].replace('NUTS_INIT = "jitter+adapt_diag"',
         'NUTS_INIT = "jitter+adapt_diag"\n'
         '# Numba changes only the evaluator; use native compilation when unavailable.\n'
         'COMPILE_MODE = "NUMBA" if importlib.util.find_spec("numba") is not None else None')
     src[6] += '\nprint("Log-density compiler:", COMPILE_MODE or "native PyTensor")\n'
     src[14] = src[14].replace("backend='pymc', init=NUTS_INIT, analysis=ANALYSIS_FINGERPRINT)",
-                             "backend='pymc', init=NUTS_INIT, compile_mode=COMPILE_MODE, analysis=ANALYSIS_FINGERPRINT)")
+                             "backend='pymc', init=NUTS_INIT, compile_mode=COMPILE_MODE, early_reject=(EARLY_REJECT_ENABLED, EARLY_REJECT_AFTER, EARLY_REJECT_DIVERGENCES), analysis=ANALYSIS_FINGERPRINT)")
     src[14] = src[14].replace("callback=progress, progressbar=False, return_inferencedata=True,",
         "callback=progress, progressbar=False, return_inferencedata=True,\n"
         "                               compile_kwargs={'mode': COMPILE_MODE} if COMPILE_MODE else {},")
+    anchor = "                posterior_divergences[0] += int(stats.get('diverging', False))\n"
+    assert src[14].count(anchor) == 1, 'Sampling callback anchor changed'
+    src[14] = src[14].replace(anchor, anchor +
+        "                if (EARLY_REJECT_ENABLED and posterior_divergences[0] >= EARLY_REJECT_DIVERGENCES\n"
+        "                        and (iteration - tune) >= EARLY_REJECT_AFTER):\n"
+        "                    failure = dict(status='SYNTHETIC_OR_PRIMARY_EARLY_REJECTION', passed=False,\n"
+        "                                   reason='Zero-divergence criterion already violated repeatedly',\n"
+        "                                   label=label, fit_fingerprint=fit_hash, chain=int(chain_id), retained_draws=int(iteration - tune),\n"
+        "                                   divergences=int(posterior_divergences[0]), complete=False,\n"
+        "                                   reportable=False)\n"
+        "                    cp.atomic_json(OUTPUT_ROOT/'early_rejection.json', failure)\n"
+        "                    record_artifact(OUTPUT_ROOT/'early_rejection.json')\n"
+        "                    raise RuntimeError('Early rejection: repeated retained divergences; '\n"
+        "                                       'inspect early_rejection.json and do not report this fit.')\n")
     src[14] = src[14].replace("            print(f'  Sampled scalar dimensions:",
         "            if COMPILE_MODE:\n"
         "                np.testing.assert_allclose(model.compile_logp(mode=COMPILE_MODE)(point),\n"
@@ -83,7 +101,7 @@ def main():
         "                print('  Compiler logp/gradient parity: PASS', flush=True)\n"
         "            print(f'  Sampled scalar dimensions:")
     src[16] = src[16].replace('backend=NUTS_BACKEND,nuts_init=NUTS_INIT,',
-                              'backend=NUTS_BACKEND,nuts_init=NUTS_INIT,compile_mode=COMPILE_MODE,')
+                              'backend=NUTS_BACKEND,nuts_init=NUTS_INIT,compile_mode=COMPILE_MODE,early_reject=(EARLY_REJECT_ENABLED, EARLY_REJECT_AFTER, EARLY_REJECT_DIVERGENCES),')
     src[16] = src[16].replace('"numpy","scipy","pandas","pymc"', '"numpy","scipy","pandas","numba","pymc"')
     src[16] = src[16].replace('A2 global priors plus weighted-centred local baseline/lock/side',
                               'A2 global priors plus weighted-centred local lock/side; no local baseline')
@@ -109,6 +127,10 @@ max R-hat 1.00337, minimum bulk/tail ESS 2051.7/3843.3, zero divergences,
 92.68% parameter interval coverage and 615/615 fine PPC cells covered.
 These are synthetic screening results, not evidence of empirical fit or a FULL approval.
 Sparse recovery and the empirical PILOT must pass in this notebook before FULL.
+
+The sampler has a rejection-only guard: five retained divergences after 200 posterior draws
+write `early_rejection.json` and stop the current chain. This cannot accept a run early and
+does not replace the complete-chain diagnostics.
 
 CPU inference; GPU is used only for forecast collection when available. Complete-chain
 checkpoints, settings fingerprints and text progress support local VS Code and Colab.

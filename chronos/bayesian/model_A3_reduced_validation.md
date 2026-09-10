@@ -97,6 +97,12 @@ compiler; do not mix chains from the native and Numba screening runs.
 The optional early rejection rule stops after at least 200 retained iterations with at
 least five divergences. It can only reject, never accept, and never discards a failed
 chain to obtain a passing result. The notebook itself retains all completed chains.
+The notebook enables this guard by default (`EARLY_REJECT_ENABLED=True`); its settings
+are fingerprinted. Disabling it requires a fresh RUN_ID and does not relax the final
+zero-divergence gate. The command-line validation runner controls early rejection with
+`--early-reject` instead. A focused callback check verified that warmup divergences are
+excluded, both thresholds apply, the failure artifact is non-reportable, and the disable
+switch works. This check does not establish statistical convergence.
 
 Rerun the identical command and output directory to load compatible completed chains.
 Every chain uses its own deterministic seed and full warmup. An incomplete chain restarts

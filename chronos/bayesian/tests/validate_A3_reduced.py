@@ -38,6 +38,7 @@ def namespace(output, draws=2000, tune=1500, chains=4, compile_mode='NUMBA'):
              REFERENCE_HZ=64., DRAWS=draws, TUNE=tune, CHAINS=chains,
              TARGET_ACCEPT=.95, NUTS_INIT='jitter+adapt_diag',
              COMPILE_MODE=compile_mode,
+             EARLY_REJECT_ENABLED=False, EARLY_REJECT_AFTER=200, EARLY_REJECT_DIVERGENCES=5,
              MODEL_VERSION='A3-reduced-lock-side-v1', PROGRESS_EVERY=100,
              PPC_DRAWS=800, EFFECT_DRAWS=2000, RHAT_MAX=1.01,
              SUPPORT_LOG_OR=float(np.log(.8)), ROPE_LOG_OR=float(np.log(1.1)), PROB_CUTOFF=.95,
