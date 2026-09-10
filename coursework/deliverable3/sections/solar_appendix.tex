@@ -48,7 +48,7 @@ The other two cuts are shown in the form that removes the movement of the produc
 
 \begin{figure}[tbp]
 \centering
-\includegraphics[width=\textwidth]{solar/solar_forecast_day186_1300_p16-s16_error.png}
+\includegraphics[width=\textwidth]{figures/solar_forecast_day186_1300_p16-s16_error.png}
 \caption{Distance from the plant at the midday cut, minute by minute. The measurement is the horizontal line, each bar runs from it to the median of one checkpoint, and each thin line spans that checkpoint's $80\%$ interval. The plant sits between $179$ and $190$ watts and both track it closely, at $5.3$ watts of mean absolute error for the retrained checkpoint and $3.8$ for the published one, both intervals containing the measurement at all $64$ minutes. Two features carry over from sunrise. The error drifts with the horizon, the early minutes near zero and the last twenty biased upwards by around $10$ watts, because a flat context produces a flat forecast while the plant is already declining; and the retrained intervals are the wider at every minute, opening to roughly $\pm 35$ watts against $\pm 10$, on a horizon whose true movement is $10$ watts. This is the regime in which the published checkpoint is the more accurate, and also the one in which the two are hardest to tell apart.}
 \label{fig:solar1300err}
 \end{figure}
@@ -75,14 +75,14 @@ The three cuts above vary the time of day at a fixed geometry; the complement is
 
 \begin{figure}[tbp]
 \centering
-\includegraphics[width=\textwidth]{solar/solar_forecast_day186_1300_bypatch.png}
+\includegraphics[width=\textwidth]{figures/solar_forecast_day186_1300_bypatch.png}
 \caption{The midday horizon for every retrained geometry, one panel per patch size and one line per stride, against the measurement. The first thing the figure establishes is scale: across the fifteen checkpoints the medians span roughly $157$ to $207$ watts on a horizon over which the plant moves only from $190$ to $178$, so the disagreement between tokenisation geometries is about four times the movement being forecast. The second is direction: almost every curve drifts upward across the sixty-four minutes while the plant declines, which is the understated rate of change of \autoref{fig:solar1700both} reappearing across fifteen configurations rather than one. The third is texture. These medians oscillate from minute to minute by several watts, where the published checkpoint at the same cut produced a nearly straight line; that is a difference of training corpus rather than of geometry, and it is visible here only because the sweep is drawn together.}
 \label{fig:solarByPatch}
 \end{figure}
 
 \begin{figure}[p]
 \centering
-\includegraphics[height=0.79\textheight,keepaspectratio]{solar/solar_forecast_day186_1300_bystride.png}
+\includegraphics[height=0.79\textheight,keepaspectratio]{figures/solar_forecast_day186_1300_bystride.png}
 \caption{The same fifteen forecasts split the other way, one panel per stride and one line per patch size. This is the more orderly of the two splits. Inside the stride-$12$ panel the three patch sizes are cleanly stratified and never cross, the smallest patch highest and the largest lowest across the whole horizon; the stride-$8$ and stride-$16$ panels are ordered the same way for much of it. The stride-$20$ panel reverses that order, its $P=32$ curve running fifteen to twenty watts above its $P=24$ curve throughout. Patch size therefore shifts the level of the forecast systematically within a stride, but the sign of the shift is not fixed across strides, which is a warning against reading either grouping as a monotone effect of one parameter. In the patch-size grouping of \autoref{fig:solarByPatch} no comparable ordering by stride is visible at all.}
 \label{fig:solarByStride}
 \end{figure}
@@ -101,7 +101,7 @@ The profile is read from the archived per-frequency collection rather than from 
 
 \begin{figure}[tbp]
 \centering
-\includegraphics[width=\textwidth]{probing/FIG_APPENDIX_F_depth_profile.png}
+\includegraphics[width=\textwidth]{figures/FIG_APPENDIX_F_depth_profile.png}
 \caption{Mean local codelength by probe stage at the retrained reference geometry, candidate frequencies against their controls, with bands of one standard deviation across the cells behind each point. The two lines interleave across the four encoder blocks and the sign of their difference changes from stage to stage, so there is no consistent separation before the decoder is entered. From the first decoder block onwards the candidate line lies above the control line at every remaining stage, by roughly twelve bits at the first decoder block, widening to about twenty-five at the third and at the pre-projection vector, and narrowing again to about twelve at the head. The reading is that the additional cost of a candidate frequency appears in the readout rather than at or near tokenisation. The bands overlap everywhere, which is why this locates the effect and does not test it.}
 \label{fig:appFdepth}
 \end{figure}
@@ -110,14 +110,14 @@ The separation could be a property of the reference geometry rather than of the 
 
 \begin{figure}[p]
 \centering
-\includegraphics[height=0.74\textheight,keepaspectratio]{probing/FIG_APPENDIX_F_gap_bypatch.png}
+\includegraphics[height=0.74\textheight,keepaspectratio]{figures/FIG_APPENDIX_F_gap_bypatch.png}
 \caption{The candidate-minus-control gap by probe stage, one panel per patch size and one line per stride, with a reference at zero marking no separation. Drawing the fifteen geometries on a single axis made them unreadable; split this way the comparison inside a panel is the one the design varies. Two things are visible across the whole collection. The gap is positive in $147$ of the $150$ stage-by-geometry cells, reaching $49.6$ bits at its largest, so the pattern of \autoref{fig:appFdepth} is general rather than particular to one configuration. And the only three negative cells in the entire collection belong to the reference geometry in its encoder, at $-2.4$, $-4.4$ and $-6.8$ bits, which is the trough visible in the second panel: the configuration the report reads as its reference is the one whose encoder shows the effect least. The mean gap also falls as the patch grows, from $26.7$ bits at $P=8$ through $19.6$ at $P=16$ and at $P=24$ to $10.5$ at $P=32$.}
 \label{fig:appFgapPatch}
 \end{figure}
 
 \begin{figure}[p]
 \centering
-\includegraphics[height=0.79\textheight,keepaspectratio]{probing/FIG_APPENDIX_F_gap_bystride.png}
+\includegraphics[height=0.79\textheight,keepaspectratio]{figures/FIG_APPENDIX_F_gap_bystride.png}
 \caption{The same quantity split the other way, one panel per stride and one line per patch size. The two splits are not equivalent readings of one picture. Ordered by patch size the mean gap decreases monotonically, while ordered by stride it does not: $18.5$ bits at $S=8$, a maximum of $22.2$ at $S=12$, then $13.8$, $12.1$ and $16.1$, and a minimum of $8.2$ at $S=32$. Patch size therefore organises this measurement more cleanly than stride does, which is worth noting because the overlap covariate of \autoref{sec:six} is read along the stride axis at fixed patch size. Neither split makes the depth at which the gap opens stable: nine of the fifteen geometries carry a larger mean gap over the decoder and the head than over the encoder and six carry the reverse, so a single depth cannot be named for the design as a whole.}
 \label{fig:appFgapStride}
 \end{figure}
@@ -141,14 +141,14 @@ That the ceiling is not one is the point of the estimator rather than a defect o
 
 \begin{figure}[tbp]
 \centering
-\includegraphics[width=0.94\textwidth]{probing/FIG_SV_published_p16-s16.png}
+\includegraphics[width=0.94\textwidth]{figures/FIG_SV_published_p16-s16.png}
 \caption{Band-task space saving for the published checkpoint at the decoder states and the head. Through all four decoder blocks every one of the seven tasks sits between $0.75$ and $0.80$, within a few thousandths of the derived ceiling, so band identity is very nearly free to read from those states. At the output head the picture separates by band rather than degrading uniformly: the two lowest tasks fall to $0.336$ and $0.343$, the next two to $0.511$ and $0.571$, while the three high tasks hold at $0.727$, $0.763$ and $0.756$. The projection to the quantile head therefore discards low-frequency band identity and retains high-frequency band identity, which is consistent with the horizon resolving a grid of $f_s/64$: a component near the bottom of the range completes too few cycles inside sixty-four samples for its position to be expressible in the output at all.}
 \label{fig:svDecPublished}
 \end{figure}
 
 \begin{figure}[tbp]
 \centering
-\includegraphics[width=\textwidth]{probing/FIG_SV_PAIRED_p16-s16.png}
+\includegraphics[width=\textwidth]{figures/FIG_SV_PAIRED_p16-s16.png}
 \caption{The two checkpoints on the same tasks, measured in the same pass. On the left the mean over the seven tasks at each probe point, with the spread across tasks; on the right the difference at every task and stage separately. The published checkpoint is above the retrained one at every stage of the mean, and the difference is concentrated: about $0.13$ to $0.14$ across the four encoder blocks, where the published states sit near $0.77$ and the retrained ones near $0.64$, but only $0.03$ to $0.04$ through the decoder, where both are close to the ceiling. The per-cell panel adds the detail: every encoder cell is negative, most strongly on the two middle bands at $-0.28$ and $-0.27$; the decoder cells are near zero; and the output head reverses sign by band, the retrained checkpoint reading the three low tasks better by up to $0.23$ and the four high ones worse. Retraining on the synthetic mixture has cost the encoder much of its general band decodability while leaving the decoder almost untouched, which is a difference of training corpus and not a statement about tokenisation.}
 \label{fig:svPaired}
 \end{figure}

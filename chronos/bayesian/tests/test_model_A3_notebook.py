@@ -1,7 +1,7 @@
 """A3 notebook contract and bounded numerical checks; no empirical inference.
 
 Run from the repository root:
-  .venv/Scripts/python.exe -m unittest chronos.bayesian.tests.test_model_A3_notebook -v
+  .venv/Scripts/python.exe chronos/bayesian/tests/test_model_A3_notebook.py -v
 Use --smoke with this file directly for tiny actual NUTS fits and reporting cells.
 """
 import ast
@@ -41,12 +41,17 @@ def namespace():
              hashlib=hashlib, time=time, Path=Path, json=json, gc=gc, plt=plt,
              PRIOR_SCALE=.5, BASELINE_SCALE=1.5, NU=4, LOCAL_SCALE=1., SEED=42,
              REFERENCE_HZ=64., DRAWS=8, TUNE=15, CHAINS=4, TARGET_ACCEPT=.95,
-             NUTS_INIT='jitter+adapt_full', MODEL_VERSION='A3-local-baseline-lock-side-v1',
+             NUTS_INIT='jitter+adapt_diag', MODEL_VERSION='A3-local-baseline-lock-side-v1',
              ANALYSIS_FINGERPRINT='software-smoke-nonreportable', PROGRESS_EVERY=200,
              PPC_DRAWS=20, EFFECT_DRAWS=20, expit=expit, ndtr=ndtr, logit=logit, gammaln=gammaln,
              RHAT_MAX=1.01, SUPPORT_LOG_OR=float(np.log(.8)), ROPE_LOG_OR=float(np.log(1.1)), PROB_CUTOFF=.95)
     for i in (8, 12, 14):
         exec(compile(nb.cells[i].source, f'A3_cell_{i}', 'exec'), g)
+    # Exercise the notebook's actual initialization choice, not a test-only default.
+    for statement in ast.parse(nb.cells[6].source).body:
+        if (isinstance(statement, ast.Assign)
+                and any(isinstance(t, ast.Name) and t.id == 'NUTS_INIT' for t in statement.targets)):
+            g['NUTS_INIT'] = ast.literal_eval(statement.value)
     return nb, g
 
 
@@ -115,6 +120,64 @@ class A3NotebookTests(unittest.TestCase):
         self.assertIn('FULL requires a matching A3 PILOT PASS', self.nb.cells[16].source)
         self.assertIn('FINE_PPC_OK', self.nb.cells[32].source)
         self.assertIn('STRESS_RECOVERY_OK', self.nb.cells[32].source)
+        self.assertEqual(self.g['NUTS_INIT'], 'jitter+adapt_diag')
+
+    def test_diagonal_adaptation_stays_valid_at_full_pilot_dimension(self):
+        from pymc.step_methods.hmc.quadpotential import QuadPotentialDiagAdapt
+        with pm.Model() as model:
+            pm.Normal('theta', shape=663)
+            _, step = pm.init_nuts(init=self.g['NUTS_INIT'], chains=1, random_seed=981,
+                                   progressbar=False)
+        self.assertIsInstance(step.potential, QuadPotentialDiagAdapt)
+        rng = np.random.default_rng(981)
+        for _ in range(500):
+            step.potential.update(rng.normal(size=663), np.zeros(663), tune=True)
+            self.assertTrue(np.isfinite(step.potential._var).all())
+            self.assertTrue((step.potential._var > 0).all())
+            np.testing.assert_allclose(step.potential._stds**2, step.potential._var, rtol=1e-14)
+
+    def test_sampler_health_matches_energy_definition(self):
+        fixture = posterior_fixture(self.g, self.frame)
+        datasets = {name:self.g['_dataset'](fixture, name).copy(deep=True)
+                    for name in self.g['_group_names'](fixture)}
+        energy = np.array([1., 3., 2., 4., 5., 2., 1., 3.])
+        datasets['sample_stats']['energy'] = (('chain', 'draw'), energy[None,:])
+        datasets['sample_stats']['acceptance_rate'] = (('chain', 'draw'), np.full((1,8), .97))
+        datasets['sample_stats']['tree_depth'] = (('chain', 'draw'), np.arange(1,9)[None,:])
+        health = self.g['sampler_health_for'](self.g['_make_idata'](datasets))
+        self.assertAlmostEqual(health.bfmi.iloc[0], np.mean(np.diff(energy)**2)/np.var(energy,ddof=1))
+        self.assertAlmostEqual(health.acceptance_rate_mean.iloc[0], .97)
+        self.assertEqual(health.tree_depth_max.iloc[0], 8)
+        self.assertEqual(health.retained_draws.iloc[0], 8)
+
+    def test_failed_recovery_stops_before_later_fits(self):
+        nb, g = namespace()
+        with tempfile.TemporaryDirectory(dir=ROOT/'tmp') as folder:
+            run = Path(folder)
+            g.update(OUTPUT_ROOT=run, MANIFEST_PATH=run/'manifest.json', RUN_MODE='PILOT', IS_FULL=False,
+                     CORE_FINGERPRINT='recovery-gate-test', groups=self.frame, PILOT_ESS_MIN=400,
+                     RECOVERY_DRAWS=8, RECOVERY_TUNE=15, RECOVERY_MIN_COVERAGE=.8,
+                     display=lambda x:None)
+            cp.atomic_json(g['MANIFEST_PATH'], dict(analysis_fingerprint=g['ANALYSIS_FINGERPRINT'],artifacts={}))
+            fixture = posterior_fixture(g, self.frame)
+            diagnostic = dict(max_rhat=2., min_ess_bulk=4., min_ess_tail=5., divergences=0, passed=False)
+            from unittest.mock import Mock
+            fitter = Mock(return_value=fixture)
+            g.update(fit_or_load=fitter, diagnostics_for=lambda *args:(diagnostic,pd.DataFrame({'ess_bulk':[4.]})))
+            with self.assertRaisesRegex(RuntimeError, 'moderate recovery failed'):
+                exec(compile(nb.cells[22].source, 'A3_recovery_gate', 'exec'), g)
+            self.assertEqual(fitter.call_count, 1)
+            verdict = json.loads((run/'final_verdict.json').read_text())
+            self.assertFalse(verdict['pilot_route_ok'])
+            self.assertEqual(verdict['stopped_at'], 'synthetic_moderate_recovery')
+            with self.assertRaisesRegex(RuntimeError, 'recovery cell successfully'):
+                exec(compile(nb.cells[24].source, 'A3_primary_gate', 'exec'), g)
+            self.assertEqual(fitter.call_count, 1)
+            # True flags left in memory from another run must not unlock this one.
+            g.update(RECOVERY_OK=True, STRESS_RECOVERY_OK=True, RECOVERY_VALIDATED_FOR='another-run')
+            with self.assertRaisesRegex(RuntimeError, 'recovery cell successfully'):
+                exec(compile(nb.cells[24].source, 'A3_primary_gate', 'exec'), g)
+            self.assertEqual(fitter.call_count, 1)
 
     def test_projection_has_exact_weighted_gaussian_prior(self):
         sd = self.g['site_design'](self.frame)
@@ -141,6 +204,19 @@ class A3NotebookTests(unittest.TestCase):
             point['gamma_config'] += shift
             point['z_local'] += np.arange(point['z_local'].size).reshape(point['z_local'].shape)*.03
             np.testing.assert_allclose(clp(point)-blp(point), constant, atol=1e-7, rtol=1e-9)
+        # Compare the implemented likelihood with the declared linear predictor.
+        named = [cm[name] for name in ('beta','u_harm','u_bg','r_site','gamma_site','kappa_site')]
+        evaluate = cm.compile_fn(cm.replace_rvs_by_values(named), inputs=cm.value_vars,
+                                 on_unused_input='ignore', point_fn=True)
+        beta, harm, bg, r, gamma, kappa = evaluate(point)
+        ci = g['_codes'](frame.model)[0]
+        hi = g['_codes'](frame.f_lock.round(3).astype(str))[0]
+        bi = g['_codes'](frame.generator+'#'+frame.bg_id.astype(str))[0]
+        si = g['site_design'](frame)['si']
+        eta = beta[ci]+harm[hi]+bg[bi]+r[si]+gamma[si]*frame.is_lock.to_numpy()+kappa[si]*frame.side.to_numpy()
+        expected = np.sum(gammaln(frame.n_trials+1)-gammaln(frame.hits+1)-gammaln(frame.n_trials-frame.hits+1)
+                          -frame.hits*np.logaddexp(0,-eta)-(frame.n_trials-frame.hits)*np.logaddexp(0,eta))
+        np.testing.assert_allclose(cm.compile_logp(vars=cm.observed_RVs)(point), expected, atol=1e-8)
         self.assertTrue(np.isfinite(cm.compile_dlogp()(cm.initial_point())).all())
         generative = remove_value_transforms(g['model_A3_generative'](frame))
         reference = g['model_A3'](frame)
@@ -214,6 +290,21 @@ class A3NotebookTests(unittest.TestCase):
             self.assertTrue((frame.hits.between(0,frame.n_trials)).all())
             self.assertGreater(truth[truth.variable.eq('ell_site')].truth.abs().max(), .1)
 
+    def test_full_registered_design_shape_when_local_fixture_exists(self):
+        path = ROOT/'chronos/bayesian/_run/full/model_A2_localisation_bernoulli_v2/data/A_counts.parquet'
+        if not path.is_file():
+            self.skipTest('Optional local design fixture is unavailable')
+        frame = pd.read_parquet(path)
+        frame = frame[frame.bg_id < 3].copy().reset_index(drop=True)
+        sd = self.g['site_design'](frame)
+        self.assertEqual(len(sd['sites']),205)
+        self.assertEqual(3*len(sd['contrasts']),570)
+        fixture = posterior_fixture(self.g,frame)
+        fine = self.g['fine_predictive_check'](fixture,frame)
+        self.assertEqual(len(fine),615)
+        self.assertEqual(fine.n_trials.sum(),33390)
+        # Outcomes in this historical table are used only to verify partitions.
+
     def test_checkpoint_interruption_datatree_and_empty_rejection(self):
         _, g = namespace()
         fixture = posterior_fixture(g, self.frame)
@@ -255,6 +346,13 @@ class A3NotebookTests(unittest.TestCase):
                     g['fit_or_load']('resume', self.frame, draws=9)
                 with self.assertRaises(ValueError):
                     g['fit_or_load']('resume', self.frame, local_scale=2.)
+                g['NUTS_INIT'] = 'adapt_diag'
+                with self.assertRaisesRegex(ValueError, 'settings/completeness differ'):
+                    g['fit_or_load']('resume', self.frame)
+                g['NUTS_INIT'] = 'jitter+adapt_full'
+                with self.assertRaisesRegex(ValueError, 'diagonal adaptation'):
+                    g['fit_or_load']('resume', self.frame)
+                g['NUTS_INIT'] = 'jitter+adapt_diag'
             empty = g['_make_idata'](dict(posterior=fixture.posterior.isel(draw=slice(0,0)), sample_stats=fixture.sample_stats.isel(draw=slice(0,0))))
             with patch.object(pm, 'sample', return_value=empty):
                 with self.assertRaises(RuntimeError):
@@ -285,7 +383,21 @@ def actual_smoke():
         path.mkdir()
     cp.atomic_json(g['MANIFEST_PATH'], dict(analysis_fingerprint=g['ANALYSIS_FINGERPRINT'],artifacts={}))
     started = time.monotonic()
-    for i in (22,24,26,28,30,32):
+    # The production recovery gate must stop a deliberately undersized smoke.
+    try:
+        exec(compile(nb.cells[22].source, 'A3_smoke_recovery', 'exec'), g)
+    except RuntimeError as exc:
+        assert 'moderate recovery failed' in str(exc), str(exc)
+    else:
+        raise AssertionError('Eight draws cannot satisfy the recovery gate')
+    sparse, _ = g['sparse_recovery_data'](g['groups'])
+    g['fit_or_load']('synthetic_sparse_recovery_A3', sparse)
+    # Test the downstream components directly, leaving recovery flags false.
+    # Only this harness removes the already-tested guard; the notebook does not.
+    primary_body = ast.parse(nb.cells[24].source)
+    assert isinstance(primary_body.body[0], ast.If)
+    exec(compile(ast.Module(body=primary_body.body[1:],type_ignores=[]), 'A3_smoke_primary_components', 'exec'), g)
+    for i in (26,28,30,32):
         print(f'ACTUAL SOFTWARE SMOKE: cell {i}', flush=True)
         exec(compile(nb.cells[i].source, f'A3_cell_{i}', 'exec'),g)
     original = pm.sample
