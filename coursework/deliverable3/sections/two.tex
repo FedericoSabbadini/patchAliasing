@@ -1,15 +1,3 @@
-% Flattened from the merge of the old Domain Description and Agentic Deployment sections.
-% The preamble and the "Control Agent" subsection stated the same four claims twice, and
-% the subsection's copy carried the equation reference in every case, so the subsection's
-% wording was kept and the preamble's dropped. The paragraphs run in the order the
-% coursework asks the agentic question in: represent, what it costs the domain vocabulary,
-% monitor, assess and explain, act. Schema and actuation detail that \autoref{sec:appendixA}
-% already carries in its tables and equations is referenced here rather than restated.
-% Held under 550 words. Four clauses were cut to reach it and each is restorable on its
-% own: the branch-attribution point in the monitoring paragraph, "A geometric candidate
-% does not by itself establish a loss" as the topic sentence below it, "and are
-% misassigned silently" at the end of the second paragraph, and "bounded and" in the last.
-
 The ontology of \autoref{sec:appendixA} closes the loop from the signal to the agent decision by making the tokenisation geometry a first-class object rather than a property of the model: a \pv{TimeSeriesSignal} carries one \pv{PatchedRepresentation} per geometry $(P,S)$ under evaluation, each recording its patch size, stride and overlap. A frequency-specific loss of observability therefore attaches to the signal-configuration pair rather than to Chronos-Bolt-Tiny alone, so the same checkpoint can be safe for one plant and not for another. Because the lock conditions of \autoref{eq:locking-candidate} are arithmetic on those same fields, the candidate set is derivable from the knowledge base rather than hard-coded beside it: a reasoner can list the sites of a geometry never measured, and recompute them whenever the geometry or the sampling interval changes, a checkpoint change mattering only when it alters $(P,S)$.
 
 What that arithmetic reaches is the domain vocabulary, none of whose terms is read off the raw telemetry. A \valueof{RampEvent}, or a \valueof{PartialCloud} generation context, is inferred from an observation whose short-horizon forecast the agent has already trusted, so a frequency the representation cannot hold is one whose signature cannot support that inference. The exposure is selective and the arithmetic says where: on one-minute telemetry with $P=16$ the patch comb falls at periods of $16/k$ minutes, the timescales of cloud-edge crossings and inverter duty cycling, while a broadband \valueof{InverterTrip} is untouched, since no comb hides a step. The predicted failure is therefore a missed distinction rather than a wrong number: two contexts differing only at a candidate frequency collapse to one latent state.
