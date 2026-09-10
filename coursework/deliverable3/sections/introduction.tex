@@ -17,9 +17,7 @@ Patch-based tokenisation has become the default input stage of time-series found
 
 The distinction matters wherever such a model sits in a monitoring or control loop. A blind spot that follows from the configuration rather than from the data is invisible to an operator who never derived it, stable enough to be relied on by anyone who did, and unreachable by a detector placed downstream of the tokeniser. It is an engineering defect and a security property at once, and is treated here as both.
 
-\subsection*{Application Domain and Scope}
-The reference setting is a designed scenario: a photovoltaic array supplying an internal load, a local storage battery and the external grid, with a control agent performing load balancing, battery dispatch, state monitoring and anomaly detection on short-horizon forecasts. Measured photovoltaic and weather telemetry are taken from the SolarTech Lab dataset\autocite{levaPhotovoltaicPowerWeather2020}; the concepts, states and relations of the scenario are formalised as an OWL2 ontology.
-
+\subsection*{Scope}
 The target architecture is Chronos-Bolt-Tiny, with default patch size $P=16$, stride $S=16$, context window $T=2048$, four encoder and four decoder blocks, and a direct quantile projection head\autocite{AmazonChronosbolttinyHugging2025,FastAccurateZeroshot2024a}. The objective is to test the assumption that such a model preserves the frequency content of Nyquist-compliant signals, and to characterise how $f_s$, $P$ and $S$ interact in determining when it does not.
 
 \autoref{sec:one} formalises the tokenisation operator and derives the locking condition. \autoref{sec:two} fixes the semantic layer and the agent that reads it, and \autoref{sec:three} states the hypotheses the design must be able to verify. \autoref{sec:four} and \autoref{sec:five} describe the signals and the experiments, \autoref{sec:six} what they return, \autoref{sec:seven} proposes and discusses one mitigation strategy and \autoref{sec:eight} the risk assessment. Seven appendices hold the ontology, the Bayesian specifications, the generators, the retraining recipe, the exploratory sweep and the analysis of the telemetry dataset.
