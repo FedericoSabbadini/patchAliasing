@@ -60,6 +60,18 @@ twoside, % Two side traditional mode where headers and footers change between od
 \newcommand{\pv}[1]{\texttt{pv:#1}}
 \newcommand{\valueof}[1]{\textsf{#1}}
 
+% ---- float placement -------------------------------------------------------------------
+% Defaults let a page carry at most 70% floats and demand 20% text, which is what strands a
+% figure at the top of an otherwise empty page. These allow a page to be filled by a float,
+% and a float page to be accepted when it is three-quarters full.
+\renewcommand{\topfraction}{0.92}
+\renewcommand{\bottomfraction}{0.75}
+\renewcommand{\textfraction}{0.06}
+\renewcommand{\floatpagefraction}{0.72}
+\setcounter{topnumber}{3}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{4}
+
 % The ontology appendix is table-heavy, so allow LaTeX to place its floats
 % without deferring the whole queue to the end of the document.
 \renewcommand{\topfraction}{0.9}
@@ -171,7 +183,7 @@ twoside, % Two side traditional mode where headers and footers change between od
 \input{sections/sweep_appendix}
 
 \newpage
-\appendixsection{The Photovoltaic Series and the Probe by Depth}{sec:appSolar}
+\appendixsection{The Photovoltaic Series}{sec:appSolar}
 \input{sections/solar_appendix}
 
 \end{document}
