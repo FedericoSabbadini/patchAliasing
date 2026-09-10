@@ -1,56 +1,5 @@
-Testing the hypotheses of \autoref{sec:four} requires a design in which the two branches of $\mathcal F_{\mathrm{lock}}$ can be told apart, signals whose frequency content is known by construction, and an order of execution in which nothing that decides a hypothesis is chosen after the data have been seen.
+This section separates what the descriptive pass suggests from what the inferential stage decides. The first is reported here only to establish that there is something to measure; the second is reported under the rules fixed in \autoref{tab:bayesDecisions}, and returns no verdict it has not earned.
 
-Three things are deliberately outside this design. Variation between independently trained instances is not measured, since one model is trained per geometry. The photovoltaic series supplies the application domain and the semantic layer, not an experimental corpus: no hypothesis is tested on measured telemetry. And no untrained network is probed, so the claim that token collapse precedes learning rests on the arithmetic rather than on a baseline.
+Before the Bayesian estimates are reported, the pages of \autoref{sec:appSweep} provide a descriptive reading of what those models must explain. Across the retrained geometries, dominant-frequency reconstruction appears more reliable over the lower half of the analysed band, while faster inputs often return near $0$\,Hz. Within that lower half, possible holes occur near $\mathcal F_{\mathrm{lock}}$, and hierarchical band probes sometimes weaken there, although the local $f\pm1$\,Hz task remains stronger. The generated-signal examples add a second question: slow components may survive, yet their forecast amplitudes can approach the noise floor, making recovery ambiguous. These plots therefore motivate paired Bayesian analysis on generated backgrounds and frame the contrasts reported next. They are exploratory observations only, not confirmation of structural aliasing or of the preregistered hypotheses in \autoref{sec:three}.
 
-\subsection{Patch geometries}
-
-Chronos-Bolt-Tiny is distributed with the standard geometry $P=S=16$. Studying only that point would show how the published configuration behaves, but not whether a blind spot follows the tokenisation parameters that generate it. The design therefore varies both: at fixed $P$, changing $S$ moves the overlap and the stride spacing; at fixed $S$, changing $P$ moves the patch width and the patch spacing, with the $P=S$ runs as contiguous baselines at different temporal resolutions. Configurations with $S>P$ are excluded, since their gaps discard input samples and would confound geometry with data loss.
-
-\subsection{Retraining}
-
-Every geometry, the baseline included, is trained from scratch: changing $P$ changes the input width of the first patch projection and changing $S$ the token sequence on which inter-patch dynamics are learned, so reusing the published weights would leave the variants on unequal training histories. Only the architectural configuration is taken from the published model; $(P,S)$ is overridden before random initialisation, and data, optimiser, budget and seed are held fixed. \autoref{sec:appRetraining} gives the construction, the streaming data and the optimisation.
-
-\input{tables/hfModels.tex}
-
-In \autoref{tab:hfModels} the two parameters vary independently, which is what lets Models~A, D1 and~D2 separate the branches and estimate the overlap and patch-size covariates without confounding them. Six of the fifteen runs have $S \nmid P$, and $\theta_S$ and $\kappa_S$ rest on those.
-
-\subsection{Analysis design}
-
-Synthetic signals are sampled at $f_s=512$\,Hz and analysed over $[2,250]$\,Hz, strictly inside the Nyquist limit, whereas the telemetry is recorded once per minute, so absolute frequencies are not comparable in hertz. The transferable quantity is dimensionless: a candidate completes a whole number of cycles within one stride or one patch, so $\mathrm{cpp}=k$ corresponds, for a one-minute series with $P=16$, to a period of $16/k$ minutes. A single seed controls all stochastic generation, and one model is trained per geometry, so instance-to-instance variation is never measured and a small difference between configurations cannot be ascribed to geometry alone.
-
-\subsubsection{Exploratory frequency sweep}
-
-Pure tones cross the band in one-hertz steps at several phases, on contexts near $512$ samples shortened to a whole number of strides. The behavioural reading appends the median forecast recursively to $512$ generated samples and takes the largest non-zero Fourier component as the reconstructed frequency, recording what the model produces. The representational reading trains a linear probe on a reduced subspace of the output quantile head and asks whether the frequency stays linearly readable before that output is formed. It is scored on the seven hierarchical band-classification tasks of \autoref{tab:bandTasks}, after Pagani et al.\autocite{paganiPreliminaryInsightsChronos2026}, whose three levels of binary split place a tone in one of eight buckets, and on a local task of constant difficulty everywhere separating $f-1$\,Hz from $f+1$\,Hz. \autoref{sec:appSweep} states how each is scored and \autoref{fig:rec16-16} shows both. The scan is on the integer grid and evaluates no lock condition exactly: where a geometry has non-integer candidates it resolves their neighbourhood rather than the site. Averaging over phase and carrying no controls, its purpose is not to test a hypothesis but to establish whether the model represents frequency content at all and where that ability degrades. The inferential stage below places every candidate and control at its exact value instead.
-
-\input{tables/bandTasks.tex}
-
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=\textwidth]{figures/fig_rec_16_16.png}
-\caption{Behavioural reconstruction (left) and representational recovery (right) for pure tones under the reference geometry $P=S=16$ and seed~42. The left panel compares input and dominant generated frequencies across phases; the right reports local and hierarchical band-probe accuracy. Dashed vertical lines mark the predicted lock frequencies, and grey cells denote frequencies outside a task's coverage.}
-    \label{fig:rec16-16}
-\end{figure}
-
-A third descriptive reading uses generated signals: one realisation is forecast by the reference geometry and its horizon compared with the matching ground-truth interval, the frequencies coming from the generator record for Light TSMixup and from the transform for KernelSynth, which names none. A tone returned at the wrong frequency but still recoverable points to a loss after the representation. All three readings stay descriptive. \autoref{fig:TSM16-16} shows one example, and \autoref{sec:appSweep} the rest with the method and the resolution limit that govern them.
-
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=\textwidth]{figures/FIG_E4_tsmixup_p16-s16_spectra_seed2.png}
-\caption{Input and forecast spectra for one Light TSMixup realisation under the reference geometry $P=S=16$ and seed~2. The upper panel shows the generator-recorded input lines; the lower shows peaks recovered from the Chronos-Bolt-Tiny forecast. Dashed vertical lines mark the predicted lock frequencies, and the horizontal threshold marks the spectral cut used to retain forecast peaks.}
-    \label{fig:TSM16-16}
-\end{figure}
-
-\FloatBarrier
-\subsubsection{Bayesian analysis}
-
-% TODO: DESCRIPTION OF BAYESIAN APPROACH
-
-The truncation cancels within a triplet, which compares a candidate with its own controls under one geometry, but not between geometries; \autoref{sec:appBayes} states what it does and does not confound, and it is reported rather than adjusted for.
-
-The design is fixed before anything is measured: the configurations, the frequency grid and the coverage each geometry must reach are declared once, and a session collecting only part of it records that as a limitation rather than a new design. Each background is archived with its recipe and a content hash and admitted only if both still agree, and the collected rows are checked against the declared design, for unambiguous sites per branch and usable rows per geometry, before any model is fitted.
-
-No response filter is applied at that point. Under \autoref{eq:d2contrast} an arm in which the forecast rebuilds no measurable tone returns a miss, which is a reading and not a degenerate one, so those rows are retained rather than discarded and the design keeps the cases where the loss it looks for should be largest.
-
-\autoref{tab:bayesModels} pairs each claim with the model that decides it and \autoref{sec:appBayes} states the likelihoods, priors and sampler settings. Model~A pools the localisation triplets across geometries and carries overlap and log patch size at its configuration level, so $M1$ is a reading of the same fit rather than a separate one. Models~B, C and~D1 each have a nested counterpart, unadjusted, phase-free and single-grid, compared by leave-one-out cross-validation read with its uncertainty rather than by rank. Model~D2 assigns each detection to one branch and sets aside the sites both grids predict. Both D1 and D2 are fitted on token dispersion, which is a property of the tokenisation: a collapse of consecutive token embeddings at $f=c f_s/S$ follows from the arithmetic and would appear in an untrained network. They therefore locate candidate sites, and the evidence that a trained model loses information there is carried by Models~A and~B, which are measured on the forecast and on the representation against matched controls.
-
-Interpretation is fail-closed. Convergence, parameter recovery for every likelihood family, posterior predictive adequacy pooled and stratified by geometry and generator, prior and likelihood sensitivity, and the reliability of the leave-one-out estimates are explicit gates, fixed with the thresholds of \autoref{tab:bayesDecisions}. A gate that fails does not weaken a claim: the estimand is reported as not reportable, and a branch with fewer than ten unambiguous sites as not identified, neither of which is a null result. Every estimand is returned to its natural scale and reported by its posterior median and $95\%$ credible interval, with the probability of its threshold and, where defined, its region of practical equivalence.
+\autoref{sec:appSolar} adds two descriptive readings of a different kind. It reads the probe by depth rather than pooled, so the stage at which a candidate frequency stops being linearly separable can be located inside the stack, which Model~B cannot report because it carries the stage as a nuisance offset by design; and it puts the models in front of the measured photovoltaic series, where the forecast error is of the order of the quantity predicted on the sunrise and afternoon ramps against about two per cent at midday. Both are descriptive: the representational claim is decided by $e^{\theta_{\mathrm{lock}}}$ under the rule of \autoref{tab:bayesDecisions} and nowhere else.

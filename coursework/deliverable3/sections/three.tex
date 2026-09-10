@@ -1,20 +1,118 @@
-The ontology reproduced in \autoref{sec:appendixA} closes the loop from the signal to the agent decision. It represents the photovoltaic micro-grid, its telemetry and a single control agent, and it makes the tokenisation geometry a first-class object rather than a property of the model: a \pv{TimeSeriesSignal} has a \pv{PatchedRepresentation} carrying \pv{patchSize}, \pv{stride} and a derived \pv{overlapRatio}, and one signal may hold several, one per geometry $(P,S)$ under evaluation. Since the lock conditions are arithmetic on those same fields, the set of candidates is derivable from the knowledge base rather than hard-coded beside it, which is what lets an agent recompute it when a configuration or a sampling interval changes.
+Bayesian statistics represents uncertainty about unknown quantities through probability distributions and updates prior beliefs when data are observed\autocite{murphyProbabilisticMachineLearning2023}. It is used here because the hypotheses concern the magnitude and uncertainty of structural aliasing effects: posterior distributions quantify evidence for a localisation loss, phase independence and parameter-tracking against predeclared decision thresholds. The candidate set $\mathcal F_{\mathrm{lock}}$ of \autoref{eq:flock} is arithmetic and holds for any model. Three claims are carried into the analysis, each stated so that a particular posterior refutes it.
 
-The point of contact with the Bayesian analysis is the following. An \pv{ObservabilityAssessment} does not derive a state from the geometry alone. It records the estimand, its effect size, its credible interval and its posterior probability, and assigns \valueof{StructurallyAliased} observability state only to a frequency that is a lock candidate and also carries confirmed evidence of loss.
+\input{tables/bayesPriors.tex}
 
-Geometry alone yields a candidate, never a verdict: because the confirmation threshold exceeds one half, confirmed loss and confirmed preservation cannot both hold, and everything short of confirmed preservation is \valueof{PartiallyObservable}.
+\input{tables/bayesModels.tex}
 
-That distinction is what reaches the domain concepts, none of which is read off the raw telemetry. A \valueof{RampEvent}, or a \valueof{PartialCloud} generation context, is inferred from an observation whose short-horizon forecast the agent has already trusted, so a frequency the representation cannot hold is one whose signature cannot support that inference. The exposure is selective and the arithmetic says where: on one-minute telemetry with $P=16$ the patch comb falls at periods of $16/k$ minutes, the timescales of cloud-edge crossings and inverter duty cycling, while a broadband \valueof{InverterTrip} is untouched, since no comb hides a step. The predicted failure is therefore a missed distinction rather than a wrong number, two contexts differing only at a candidate frequency mapping towards one latent state and being misassigned silently. Hence the assessment, not the geometry, selects the mode: confirmed aliasing forces \valueof{SafeMode}, and \valueof{PartiallyObservable} forces \valueof{ConservativeMode}.
+\autoref{tab:bayesPriors} gives every prior with its role, \autoref{tab:bayesModels} pairs each claim with the model that decides it, its estimand, the value the claim predicts and the table of measurements it is fitted to, and \autoref{sec:appBayes} states each model in full. Every effect prior is centred on no effect, and its scale is varied over the sensitivity ladder $\{0.25,0.5,1.0\}$, sceptical, primary and wide, so that a conclusion resting on the choice of scale rather than on the data is detected as such.
 
-\subsection*{Control Agent}
-This report's techniques are built for an agent and the ontology of \autoref{sec:appendixA} makes that possible: it carries the tokenisation geometry as a first-class object, so every step below follows by rule from it.
+\subsubsection*{Frequency-dependent blind spots (H1)}
+At a candidate frequency $f_k\in\mathcal F_{\mathrm{lock}}$ the model retains less of the signal than at the two neighbouring control frequencies $f_k\pm\delta$, which are not themselves candidates. The claim has two readings that need not agree: a behavioural one, in which the forecast no longer rebuilds the tone at the frequency it was given, and a representational one, in which the frequency becomes harder to read out of the internal state. A loss that is absent, or not localised on the candidate set, refutes $H1$. Phase-locking is treated here as a necessary but not sufficient condition for the specific geometry-induced structural aliasing this study hypothesises: nothing in the design excludes that distinct signals acquire near-identical learned representations for reasons unrelated to $\mathcal F_{\mathrm{lock}}$, and no claim is made about frequencies outside it.
 
-Each \pv{PatchedRepresentation} records its patch size, stride and overlap. Because a signal is evaluated under several geometries, a frequency-specific loss of observability attaches to the signal-configuration pair, not to Chronos-Bolt-Tiny alone: the same checkpoint can be safe for one photovoltaic plant and not another. From $(f_s,P,S)$ alone, \autoref{eq:locking-candidate} enumerates the candidate set by arithmetic, so a reasoner can list the sites of a geometry never measured.
+\subsubsection*{Independence from temporal alignment (H2)}
+The magnitude of that loss is a property of the alignment between the signal period and the tokenisation grid, not of the point in its cycle at which the signal is observed. A loss varying systematically with the starting phase refutes $H2$.
 
-Stride-derived and patch-derived sites follow from $\mathcal{F}_{S}$ and $\mathcal{F}_{P}$ and are recomputed whenever the sampling interval or the geometry changes, a checkpoint change mattering only when it alters $(P,S)$. Placement matters more than cadence: monitoring must act on the raw telemetry before tokenisation, since a detector placed downstream inherits the blind spot it is meant to find. This is the one stage the forecaster cannot perform itself.
+\subsubsection*{Parametric dependence of blind spot sites (H3)}
+Because $\mathcal F_{\mathrm{lock}}$ is a union, the claim splits in two, one per branch, with $c,k\in\mathbb{N}^{+}$ the harmonic indices of \autoref{eq:branches}. $H3a$: at fixed $P$, the sites at $f=c\,f_s/S$ move proportionally to $1/S$. $H3b$: at fixed $S$, the sites at $f=k\,f_s/P$ move proportionally to $1/P$. A site that stays put while the parameter supposed to generate it is varied refutes its branch.
 
-A geometric candidate does not by itself establish a loss, and explanation keeps the two apart. The Bayesian layer converts them into assessments: each \pv{ObservabilityAssessment} records the estimand, the effect size, the interval and the posterior probability behind its verdict. \autoref{eq:bayesian-evidence} separates the two directions of evidence, and because $\tau>1/2$ they cannot both hold; \valueof{PartiallyObservable} then denotes an inconclusive or an absent assessment. One line per assessment reaches a person: frequency, geometry, estimand with interval, state, and the control authority that follows. Its arithmetic half is derivable for any frequency; its measured half only where a fit exists, and a missing fit is reported, not defaulted away.
+\subsection{H1: frequency-dependent blind spots}
 
-Action enters control through \autoref{eq:mode-selection}, not a policy of its own. A confirmed \valueof{StructurallyAliased} state selects \valueof{SafeMode} at the same priority as a sensor malfunction, under \autoref{eq:priority}: the battery holds and the grid balances the internal load while the array stays connected, the fault being in the model, not the plant. A merely \valueof{PartiallyObservable} state selects \valueof{ConservativeMode}, lowering the battery cap and the decision confidence without suspending dispatch. Both are bounded and reversible, degrading authority rather than substituting a correction the analysis does not support.
+The behavioural measurement is the frequency the forecast rebuilds. From the median forecast over the horizon the dominant reconstructed frequency $\hat f$ is estimated, and an arm is scored by whether that estimate lands on the frequency the arm carries, within a tolerance $\Delta$ that admits a small error rather than demanding an exact match. It is collected in matched triplets: each candidate $f_k$ with its two controls, all three sharing the same background realisation and the same phase, so that only the frequency changes. Writing $f$ for the frequency an arm carries, the response is
 
-Where no fit covers a candidate the state is \valueof{PartiallyObservable} by construction, so an unmeasured plant runs permanently at reduced authority: the cost is paid in capacity, not risk.
+\begin{equation}
+\label{eq:d2contrast}
+h = \mathbf{1}\!\left[\ \bigl|\hat f - f\bigr| \le \Delta\ \right],
+\qquad
+\Delta = 1\,\mathrm{Hz}.
+\end{equation}
+
+The tolerance lies well inside the control offset $\delta$, so a hit recorded at a candidate cannot have been produced by either of its controls. Model~A fits the three arms of a triplet jointly, the lock indicator carrying the effect,
+
+\begin{equation}
+\label{eq:d2hier}
+h_i \sim \mathrm{Bernoulli}(p_i),
+\quad
+\operatorname{logit} p_i = \beta_{c[i]} + \gamma\,\mathrm{IsLock}_i + u_{k[i]} + u_{b[i]},
+\quad
+\beta_c \sim \mathcal{N}\!\left(\bar\beta + \delta_O \widetilde O_c + \delta_P \widetilde{\log P}_c,\ \tau\right).
+\end{equation}
+
+The logit link makes the estimand multiplicative: $e^{\gamma}$ is the factor by which the odds of rebuilding the right frequency change at a candidate relative to its controls. $e^{\gamma}<1$ is the loss $H1$ predicts, whereas a posterior at or above $1$ says that candidate frequencies are rebuilt as accurately as their neighbours and the behavioural half of $H1$ fails.
+
+Model~B asks the same question of the representation through minimum description length (MDL) probing\autocite{voitaInformationTheoreticProbingMinimum2020}. At each probed frequency $f_c$ a linear probe is asked to tell a tone at $f_c-1$\,Hz from one at $f_c+1$\,Hz using a captured internal state alone, and the response $L_i$ is the prequential codelength of that sequence of labels, in bits. A codelength is positive and right-skewed with a variance growing in its mean, so the regression is
+
+\begin{equation*}
+L_i \sim \text{Gamma}\!\left(r,\ r/\mu_i\right),
+\qquad
+\log \mu_i = \alpha_0 + \theta_{\mathrm{lock}}\,\mathrm{IsLocked}_i + s_{\text{st}[i]} + g_{\text{geo}[i]},
+\end{equation*}
+
+The log link makes the estimand multiplicative: $e^{\theta_{\mathrm{lock}}}$ is the factor by which the codelength of a candidate frequency expands. $e^{\theta_{\mathrm{lock}}}>1$ is the representational cost $H1$ predicts, while $\theta_{\mathrm{lock}}$ near zero says the frequency remains as readable at a candidate as anywhere else. The representational half of $H1$ is decided on the same footing as the behavioural one: supported at $\Pr(\theta_{\mathrm{lock}} > \log 1.2 \mid D)\ge 0.95$, refuted at $\Pr(|\theta_{\mathrm{lock}}| < \log 1.1 \mid D)\ge 0.95$, both fixed in \autoref{tab:bayesDecisions} before any posterior is inspected.
+
+\subsection{H2: independence from temporal alignment}
+
+H2 uses the same triplets with one change. Model~A pools them across phases without a phase term, so the phase is marginalised and cannot be inspected; $H2$ requires it to be kept, so the phase index is retained. Model~C is Model~A on the same response, without the configuration-level covariates, which are not what $H2$ asks about, and with the phase circle cut into eight equal slices, each given its own offset $u_p$:
+
+\begin{equation}
+\label{eq:d2phase}
+h_i \sim \mathrm{Bernoulli}(p_i),
+\qquad
+\operatorname{logit} p_i = \beta_{c[i]} + \gamma\,\mathrm{IsLock}_i + u_{k[i]} + u_{b[i]} + u_{p[i]},
+\qquad
+u_p \sim \mathcal{N}(0, \sigma_\phi).
+\end{equation}
+
+The estimand $\sigma_\phi$ of \autoref{eq:d2phase} is the spread of those eight offsets, which reduces the hypothesis to a single number and presupposes no shape for a possible dependence. $\sigma_\phi$ near zero means the offsets are indistinguishable and the loss is set by the geometry alone, as $H2$ predicts, whereas a large $\sigma_\phi$ means it depends on where in its cycle the signal starts. Dropping $u_p$ gives a nested null, which is compared with the full model by leave-one-out cross-validation (LOO); the comparison separates the size of any phase effect from the evidence that one exists.
+
+One limit belongs here rather than with the results. Model~C measures the spread of the same response Model~A uses, so the two are not independent readings: where the population effect is itself indistinguishable from zero, little remains for phase to move, and $H2$ is read conditionally.
+
+\subsection{H3: parametric dependence of blind spot sites}
+
+Both branches are tested on the token collapse $z_g(f)$, the dispersion, in geometry $g$ and at frequency $f$, of the input-patch embeddings across the patches of one context; it is zero when consecutive patches are identical. All geometries are swept on one common grid, the union of a uniform one-hertz sweep with the predicted sites of every configuration in the design, so that no geometry is scored only where its own theory predicts a dip.
+
+The first question is where the dips are located, and Model~D1 answers it. Each swept frequency carries two binary labels, one per branch, recording whether it lies on the stride grid $\mathcal{F}_{S}$ or on the patch grid $\mathcal{F}_{P}$, the two families defined in \autoref{eq:branches}:
+
+\begin{equation}
+\label{eq:d2sites}
+\log z_g(f) \sim \mathcal{N}\!\left(
+\alpha_g + \theta_S \cdot \text{OnStrideGrid} + \theta_P \cdot \text{OnPatchGrid},\ \sigma
+\right),
+\end{equation}
+
+with $\alpha_g$ the per-geometry off-grid level, and the label coefficients $\theta_S$ and $\theta_P$ as estimands. $H3$ predicts both negative, and the two-label fit should win the LOO comparison against each label alone and against neither; coefficients near zero mean the dips bear no relation to either grid.
+
+The second question is whether the dips move, and Model~D2 answers it, since \autoref{eq:d2sites} remains compatible with dips that merely sit on a grid fixed once and for all. Every detected dip is assigned to the branch that predicts it and sites predicted by both are set aside, since the union of two combs has two interlaced spacings rather than one. The fundamental $\hat f^{\,F}_{1,g}$ of branch $F$ in geometry $g$, its lowest detected site, is then compared with the spacing that branch predicts, $\Delta^S_g=f_s/S_g$ or $\Delta^P_g=f_s/P_g$:
+
+\begin{equation*}
+\hat f^{\,F}_{1,g} \sim \mathcal{N}\!\left(
+\kappa_F \,\Delta^F_g,\ \sqrt{\sigma_F^2+\Delta f^2}
+\right).
+\end{equation*}
+
+The slope $\kappa_F$ is the estimand, measured spacing per unit of predicted spacing, and the residual scatter $\sigma_F$ is given the floor $\Delta f$, the sweep step, because a spacing read off a discrete grid is no more precise than one step. $\kappa_F=1$ denotes a branch that tracks its own arithmetic one for one, and a value away from one refutes that branch. Identification here is a property of the design and not of the model, since $\kappa_S$ requires a series holding $P$ fixed while $S$ varies and $\kappa_P$ the converse; \autoref{tab:hfModels} supplies both.
+
+Identification is not symmetric between the branches, and the condition belongs before the fits. A site informs $\kappa_S$ only on $\mathcal F_S \setminus \mathcal F_P$ and $\kappa_P$ only on $\mathcal F_P \setminus \mathcal F_S$; a site in the intersection is set aside. The design controls the first directly, through the six runs with $S \nmid P$, and does not control the second, so the count of attributable sites per branch is an outcome of the sweep rather than of the grid; \autoref{sec:appBayes} gives the argument in full. A branch with fewer than ten unambiguous sites is reported as not identified rather than as a null result, under the bar of \autoref{tab:bayesDecisions}.
+
+\subsection{The mitigation claim}
+
+$M1$ is not a separate model but the configuration level of Model~A promoted to an estimand. It asserts that raising the overlap $O$ raises the odds of rebuilding the right frequency, and is therefore read off the population line of \autoref{eq:d2hier},
+
+\begin{equation}
+\label{eq:d2mitigation}
+\mathbb{E}\!\left[\beta_c\right] = \bar\beta + \delta_O\,\widetilde O_c + \delta_P\,\widetilde{\log P}_c,
+\qquad
+\widetilde O_c=\frac{O_c-\bar O}{0.5},
+\qquad
+\widetilde{\log P}_c=\log P_c-\overline{\log P},
+\end{equation}
+
+where the tilde denotes centring on the design, which leaves $\bar\beta$ the baseline at the average configuration rather than an extrapolation to $O=0$ and $P=1$. The two covariates are estimable jointly because \autoref{tab:hfModels} varies overlap and patch size independently. Model~A$'$ denotes Model~A read at this level, and the estimand is $\delta_O$, the change in the log-odds of \autoref{eq:d2hier} per unit of centred overlap. An overlap that mitigates raises the odds of rebuilding the right frequency, so $\delta_O>0$ is the direction $M1$ predicts and a slope at or below zero refutes it. Every model that reads this response reads it on the same orientation, so no sign convention has to be carried between them.
+
+
+\subsection{Decisions and validation}
+
+Every threshold in \autoref{tab:bayesDecisions} is fixed before a posterior is inspected, and validation comes before interpretation. Beside each rule the table records the probability that the rule already scored under the prior, so that a posterior counts as evidence only in so far as it has moved away from that value. A claim is supported at $0.95$, refuted at $0.05$, and otherwise reported as inconclusive, which is a verdict in its own right.
+
+\input{tables/bayesDecisions.tex}
+
+Interpretation is gated by three preregistered convergence diagnostics, and competing formulations are compared by leave-one-out cross-validation under a reading rule that returns an inconclusive verdict for differences within twice their standard error. The diagnostics, the reading rule and the sampler settings shared by every fit are stated in \autoref{sec:appBayes}; a fit failing any diagnostic is not used to support a claim.
