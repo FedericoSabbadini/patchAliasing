@@ -1,7 +1,5 @@
 Bayesian statistics represents uncertainty about unknown quantities through probability distributions and updates prior beliefs when data are observed\autocite{murphyProbabilisticMachineLearning2023}. It is used here because the hypotheses concern the magnitude and uncertainty of structural aliasing effects: posterior distributions quantify evidence for a localisation loss, phase independence and parameter-tracking against predeclared decision thresholds. The candidate set $\mathcal F_{\mathrm{lock}}$ of \autoref{eq:flock} is arithmetic and holds for any model. Three claims are carried into the analysis, each stated so that a particular posterior refutes it.
 
-\input{tables/bayesModels.tex}
-
 \autoref{tab:bayesModels} pairs each claim with the model that decides it, its estimand, the value the claim predicts and the measurements it is fitted to, and \autoref{sec:appBayes} states each model in full. Every effect prior is centred on no effect, and its scale is varied over the sensitivity ladder $\{0.25,0.5,1.0\}$, sceptical, primary and wide, so that a conclusion resting on the choice of scale rather than on the data is detected as such.
 
 \subsubsection*{Frequency-dependent blind spots (H1)}
@@ -12,6 +10,8 @@ The magnitude of that loss is a property of the alignment between the signal per
 
 \subsubsection*{Parametric dependence of blind spot sites (H3)}
 Because $\mathcal F_{\mathrm{lock}}$ is a union, the claim splits in two, one per branch, with $c,k\in\mathbb{N}^{+}$ the harmonic indices of \autoref{eq:branches}. $H3a$: at fixed $P$, the sites at $f=c\,f_s/S$ move proportionally to $1/S$. $H3b$: at fixed $S$, the sites at $f=k\,f_s/P$ move proportionally to $1/P$. A site that stays put while the parameter supposed to generate it is varied refutes its branch.
+
+\input{tables/bayesModels.tex}
 
 \subsection{The models}
 
@@ -104,12 +104,12 @@ The slope $\kappa_F$ of \autoref{eq:d2spacing} is measured spacing per unit of p
 
 \input{tables/bayesPriors.tex}
 
+\input{tables/bayesDecisions.tex}
+
 \autoref{tab:bayesPriors} gives every parameter above with its prior and its role.
 
 \subsection{Decisions and validation}
 
 Every threshold in \autoref{tab:bayesDecisions} is fixed before a posterior is inspected, and validation comes before interpretation. Beside each rule the table records the probability that the rule already scored under the prior, so that a posterior counts as evidence only in so far as it has moved away from that value. A claim is supported at $0.95$, refuted at $0.05$, and otherwise reported as inconclusive, which is a verdict in its own right.
-
-\input{tables/bayesDecisions.tex}
 
 Interpretation is gated by three preregistered convergence diagnostics, and competing formulations are compared by leave-one-out cross-validation under a reading rule that returns an inconclusive verdict for differences within twice their standard error. The diagnostics, the reading rule and the sampler settings shared by every fit are stated in \autoref{sec:appBayes}; a fit failing any diagnostic is not used to support a claim.
