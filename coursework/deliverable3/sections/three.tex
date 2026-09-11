@@ -15,7 +15,7 @@ Because $\mathcal F_{\mathrm{lock}}$ is a union, the claim splits in two, one pe
 
 \subsection{The models}
 
-Five models carry the claims and \autoref{tab:bayesModels} pairs each with the one it decides. Three responses serve them: a paired behavioural contrast on the forecast, a codelength on a captured internal state, and the dispersion of the input-patch embeddings. Each is given below in the form it is fitted, with the reasoning behind every term left to \autoref{sec:appBayes}.
+Five models carry the claims and \autoref{tab:bayesModels} pairs each with the one it decides. \autoref{tab:bayesPriors} gives every parameter below with its prior and its role. Three responses serve them: a paired behavioural contrast on the forecast, a codelength on a captured internal state, and the dispersion of the input-patch embeddings. Each is stated in the form it is fitted, with the reasoning behind every term left to \autoref{sec:appBayes}.
 
 \subsubsection*{Model A, the behavioural reading (H1)}
 The measurement is the forecast amplitude recovery $R=A_{\mathrm{pred}}/A_{\mathrm{true}}$, collected in matched triplets: a candidate $f_k$ with its two controls $f_k\pm\delta$, all three sharing one background realisation and one phase, so that only the frequency changes. The contrast is
@@ -53,7 +53,7 @@ Not a separate fit but the configuration level of \autoref{eq:d2hier} promoted t
 the tilde denoting centring on the design, which leaves $\bar\beta$ the effect at the average configuration rather than an extrapolation to $O=0$ and $P=1$. The two covariates are estimable together because \autoref{tab:hfModels} varies overlap and patch size independently. A mitigation raises $d$ towards zero, so $\delta_O>0$ is the direction $M1$ predicts and a slope at or below zero refutes it.
 
 \subsubsection*{Model B, the representational reading (H1)}
-At each candidate $f_c$ a linear probe is asked to tell a tone at $f_c-1$\,Hz from one at $f_c+1$\,Hz using a captured internal state alone, over the ten probe stages named in \autoref{sec:appBayes}, and the response $L_i$ is the prequential codelength of that sequence of labels in bits\autocite{voitaInformationTheoreticProbingMinimum2020}. A codelength is positive and right-skewed with a variance growing in its mean, so the regression is
+Model~B reads the same claim off the representation by minimum description length (MDL) probing\autocite{voitaInformationTheoreticProbingMinimum2020}: at each candidate $f_c$ a linear probe is asked to tell a tone at $f_c-1$\,Hz from one at $f_c+1$\,Hz using a captured internal state alone, over the ten probe stages named in \autoref{sec:appBayes}, and the response $L_i$ is the prequential codelength of that sequence of labels in bits. A codelength is positive and right-skewed with a variance growing in its mean, so the regression is
 
 \begin{equation}
 \label{eq:d2mdl}
@@ -65,7 +65,7 @@ L_i \sim \text{Gamma}\!\left(r,\ r/\mu_i\right),
 with probe stage and geometry entering as zero-mean offsets because codelengths differ several-fold between them. The log link of \autoref{eq:d2mdl} makes the estimand multiplicative: $e^{\theta_{\mathrm{lock}}}>1$ is the representational cost $H1$ predicts, and $\theta_{\mathrm{lock}}$ near zero says a candidate frequency is as readable as anywhere else.
 
 \subsubsection*{Model C, temporal alignment (H2)}
-The same triplets with the phase kept rather than marginalised. The response is the per-phase deficit $y_i=-d_i$, positive when the candidate is worse, and the phase circle is cut into eight equal slices, each given its own offset:
+Every triplet is injected at one starting phase $\phi\in[0,2\pi)$ of the tone, and the sweep is repeated at several of them, so the same candidate is observed at several points of its own cycle. Model~A carries no phase term: its triplets are pooled across $\phi$, which leaves any phase dependence in the residual where it cannot be inspected. $H2$ is a claim about exactly that dependence, so Model~C is Model~A with the phase index retained as a grouping and the configuration-level covariates dropped, those being about the design axes rather than about alignment. The circle $[0,2\pi)$ is cut into eight equal slices, each given its own offset, and the response is the per-phase deficit $y_i=-d_i$, positive when the candidate is worse:
 
 \begin{equation}
 \label{eq:d2phase}
@@ -105,8 +105,6 @@ The slope $\kappa_F$ of \autoref{eq:d2spacing} is measured spacing per unit of p
 \input{tables/bayesPriors.tex}
 
 \input{tables/bayesDecisions.tex}
-
-\autoref{tab:bayesPriors} gives every parameter above with its prior and its role.
 
 \subsection{Decisions and validation}
 
