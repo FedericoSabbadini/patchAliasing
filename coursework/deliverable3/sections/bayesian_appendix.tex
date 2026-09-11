@@ -10,39 +10,39 @@ Where two formulations compete they are compared by leave-one-out cross-validati
 
 \subsection{Model A, the behavioural reading (H1)}
 
-Model~A is fitted to the localisation indicator of \autoref{eq:d2contrast},
+Model~A is fitted to the paired recovery contrast of \autoref{eq:d2contrast},
 
 \begin{equation}
 \label{eq:appA:contrast}
-h = \mathbf{1}\!\left[\ \bigl|\hat f - f\bigr| \le \Delta\ \right],
+d = \log(R_k + 0.01) - \tfrac{1}{2}\left[\log(R_- + 0.01) + \log(R_+ + 0.01)\right],
 \qquad
-\Delta = 1\,\mathrm{Hz},
+R = A_{\mathrm{pred}}/A_{\mathrm{true}},
 \end{equation}
 
-where $f$ is the frequency the arm carries and $\hat f$ the dominant frequency recovered from the median forecast over the prediction horizon. The tolerance $\Delta$ is what separates a reconstruction that is slightly off from one that has moved: a tone returned a hertz away is scored as rebuilt, a tone returned at an unrelated frequency is not. It is smaller than the control offset $\delta$ at every geometry of \autoref{tab:hfModels}, so the three arms of a triplet cannot claim one another's hits. Those three members share a background realisation and a phase, so a difference between them cannot be produced by the background or by the alignment of the window; only the frequency changes.
+where $R$ is the amplitude recovery of an arm, the ratio of the amplitude the forecast places at the frequency the arm carries to the amplitude injected there, and $R_k$, $R_-$ and $R_+$ are the recoveries of the candidate and of its two controls. The contrast is one number per triplet, negative when the candidate recovers less of its tone than its neighbours recover of theirs, and it can be formed only because the injected tone has a known frequency. The three members of a triplet share a background realisation and a phase, so a difference between them cannot be produced by the background or by the alignment of the window; only the frequency changes. The additive $0.01$ keeps the logarithm finite where a forecast rebuilds nothing measurable, which is a reading of the design and not a degenerate row.
 
 The fit is
 
 \begin{equation}
 \label{eq:appA:model}
-h_i \sim \mathrm{Bernoulli}(p_i),
+d_i \sim \text{Student-}t_4(\mu_i,\ \sigma),
 \quad
-\operatorname{logit} p_i = \beta_{c[i]} + \gamma\,\mathrm{IsLock}_i + u_{k[i]} + u_{b[i]},
+\mu_i = \beta_{c[i]} + u_{k[i]} + u_{b[i]},
 \quad
 \beta_c \sim \mathcal{N}\!\left(\bar\beta + \delta_O \widetilde O_c + \delta_P \widetilde{\log P}_c,\ \tau\right),
 \end{equation}
 
 and has four components, each motivated separately.
 
-The linear predictor carries the lock indicator and three offsets, one per grouping the observation belongs to: $\beta_c$ per configuration, $u_k$ per lock harmonic and $u_b$ per background draw, so that neither an unusual frequency nor a single corpus can be mistaken for the effect. The scale $\sigma_b$ of the background offset is what separates generator-specific variation from the phenomenon itself: a difference in localisation between Light TSMixup and KernelSynth backgrounds is attributed to the generator rather than inflating or deflating the estimate of $\gamma$.
+The linear predictor carries three offsets, one per grouping the observation belongs to: $\beta_c$ per configuration, $u_k$ per lock harmonic and $u_b$ per background draw, so that neither an unusual frequency nor a single corpus can be mistaken for the effect. The scale $\sigma_b$ of the background offset is what separates generator-specific variation from the phenomenon itself: a difference in recovery between Light TSMixup and KernelSynth backgrounds is attributed to the generator rather than inflating or deflating the population estimate.
 
-The response is an indicator rather than a magnitude, and the choice is not stylistic. A candidate frequency can be lost in two ways that a single amplitude does not separate: the forecast can place its energy at the right frequency and too little of it, or place it somewhere else entirely. Structural aliasing predicts the second, so scoring each arm by where its reconstruction lands, rather than by how much of the tone survives, measures the failure the hypothesis actually names. It also keeps the arms in which the forecast rebuilds nothing measurable, since such an arm returns a miss, which is a reading and not a degenerate one: no row has to be discarded and no stabilising constant has to be carried to keep a ratio finite.
+Two features of the response are deliberate. It is a paired difference rather than a level, so the effect of interest is the intercept and no separate lock indicator is needed: the differencing is done in \autoref{eq:appA:contrast} rather than in the linear predictor, which is why $\bar\beta$ carries $H1$ directly. And the likelihood is Student-$t_4$ rather than Gaussian, because where a forecast rebuilds nothing the logarithm returns very large negative contrasts; under a Gaussian a handful of those would determine the estimate, whereas the heavy tail admits them without letting them set it. Both choices keep every collected row in the fit, including the arms where the predicted loss should be largest.
 
 The configuration effects $\beta_c$ are in turn drawn around a population mean, which makes the geometries instances of one phenomenon rather than unrelated experiments. Two consequences follow. The first is that a population level exists as a parameter at all, which $H1$ requires, being a claim about patch-based tokenisation and not about a single checkpoint. The second is that each geometry contributes equal weight, so the largest design cannot dominate the estimate when the number of usable triplets varies several-fold with the in-band lock count.
 
 Two configuration-level covariates enter that population mean, and they are estimable together rather than confounded because the design varies overlap and patch size independently. Overlap enters as a ratio and patch size as $\log P$, because the patch grid has spacing $f_s/P$ and equal steps in $\log P$ are equal ratios of spacing. The tilde denotes centring on the design, $\widetilde O_c=(O_c-\bar O)/0.5$ and $\widetilde{\log P}_c=\log P_c-\overline{\log P}$, which leaves $\bar\beta$ the baseline at the average configuration rather than an extrapolation to $O=0$ and $P=1$.
 
-The estimand is $\gamma$, reported as $e^{\gamma}$: the multiplicative change in the odds of rebuilding the right frequency at a candidate relative to its controls. The intercept $\bar\beta$ is not an estimand of $H1$ but the baseline it is read against, the log-odds of a correct reconstruction at a control frequency of the average configuration. The overlap slope $\delta_O$ of that same population mean is a second estimand of the same fit, and it carries $M1$; it is stated in full at the end of this appendix.
+The estimand is $\bar\beta$, reported as $e^{\bar\beta}$: the factor by which amplitude recovery at a candidate differs from recovery at its controls, at the average configuration of the design. $e^{\bar\beta}<1$ is the loss $H1$ predicts and a posterior at or above one says that candidate frequencies are rebuilt as fully as their neighbours. The overlap slope $\delta_O$ of the same population mean is a second estimand of the same fit, and it carries $M1$; it is stated in full at the end of this appendix.
 
 \subsection{Model B, the representational reading (H1)}
 
@@ -64,12 +64,12 @@ The scope of the probe task is deliberately narrow. The seven hierarchical band 
 
 \subsection{Model C, the phase reading (H2)}
 
-Model~C is Model~A on the same response, with the phase index retained rather than marginalised. The configuration-level covariates are dropped, because $H2$ is not a question about the design axes, and the phase circle is cut into eight equal slices, each given its own offset:
+Model~C is Model~A on the per-phase deficit $y_i=-d_i$, positive when the candidate is worse, with the phase index retained rather than marginalised. The configuration-level covariates are dropped, because $H2$ is not a question about the design axes, and the phase circle is cut into eight equal slices, each given its own offset:
 
 \begin{equation*}
-h_i \sim \mathrm{Bernoulli}(p_i),
+y_i \sim \text{Student-}t_4(\mu_i,\ \sigma),
 \qquad
-\operatorname{logit} p_i = \beta_{c[i]} + \gamma\,\mathrm{IsLock}_i + u_{k[i]} + u_{b[i]} + u_{p[i]},
+\mu_i = \beta_{c[i]} + u_{k[i]} + u_{b[i]} + u_{p[i]},
 \qquad
 u_p \sim \mathcal{N}(0, \sigma_\phi).
 \end{equation*}
@@ -125,9 +125,9 @@ $M1$ claims that the loss Model~A measures is smaller where consecutive patches 
 
 with $O_c=(P_c-S_c)/P_c$ the overlap ratio of \autoref{eq:overlap} and the averages $\bar O$ and $\overline{\log P}$ taken over the fifteen configurations of \autoref{tab:hfModels}.
 
-Each term of \autoref{eq:appM1:model} has a distinct role. The response $\beta_c$ is the configuration effect of \autoref{eq:appA:model}, the baseline log-odds of a correct reconstruction under geometry $c$ on the scale of \autoref{eq:appA:contrast}, so a lower $\beta_c$ is a geometry that rebuilds frequencies less accurately overall. The intercept $\bar\beta$ is that baseline at the average configuration of the design rather than at $O=0$ and $P=1$, which is what the centring buys: an uncentred fit would report an intercept extrapolated to a geometry that is not in the grid and is not meaningful for a patch size of one sample.
+Each term of \autoref{eq:appM1:model} has a distinct role. The response $\beta_c$ is the configuration effect of \autoref{eq:appA:model}, the mean contrast under geometry $c$ on the scale of \autoref{eq:appA:contrast}, so a lower $\beta_c$ is a geometry that recovers candidate frequencies less fully overall. The intercept $\bar\beta$ is that baseline at the average configuration of the design rather than at $O=0$ and $P=1$, which is what the centring buys: an uncentred fit would report an intercept extrapolated to a geometry that is not in the grid and is not meaningful for a patch size of one sample.
 
-The slope $\delta_O$ is the estimand of $M1$: the change in the configuration effect per unit of centred overlap, one unit being half of the raw ratio, so that the design spans about a unit and a half, from $\widetilde O=-0.66$ at $O=0$ to $\widetilde O=0.84$ at $O=0.75$. Its sign is the whole claim. The response is the log-odds of \autoref{eq:appA:contrast}, which rise as reconstruction improves, so an overlap that mitigates raises them and $\delta_O>0$ is what $M1$ predicts. Every model in this appendix reads the same indicator on the same orientation, so no convention has to be carried between them and the rule of \autoref{tab:bayesDecisions} applies as written. A slope indistinguishable from zero says that overlap does not move the effect at all.
+The slope $\delta_O$ is the estimand of $M1$: the change in the configuration effect per unit of centred overlap, one unit being half of the raw ratio, so that the design spans about a unit and a half, from $\widetilde O=-0.66$ at $O=0$ to $\widetilde O=0.84$ at $O=0.75$. Its sign is the whole claim. The response is the contrast of \autoref{eq:appA:contrast}, which rises towards zero as recovery at a candidate approaches recovery at its controls, so an overlap that mitigates raises it and $\delta_O>0$ is what $M1$ predicts. Every model in this appendix reads the same indicator on the same orientation, so no convention has to be carried between them and the rule of \autoref{tab:bayesDecisions} applies as written. A slope indistinguishable from zero says that overlap does not move the effect at all.
 
 The slope $\delta_P$ carries patch size, entered as $\log P$ because the patch comb has spacing $f_s/P$ and equal steps in $\log P$ are equal ratios of spacing rather than equal numbers of hertz. It is not the object of any claim, but it must be in the model: overlap and patch size are two coordinates of the same pair $(P,S)$, and omitting one would load its variation onto the other. The scale $\tau$ is what remains of the spread between configurations once both covariates have been removed, so a $\tau$ that has not shrunk away from its prior is a report that the two design axes explain little of what separates the geometries, however large the slopes.
 

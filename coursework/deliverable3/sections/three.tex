@@ -1,10 +1,8 @@
 Bayesian statistics represents uncertainty about unknown quantities through probability distributions and updates prior beliefs when data are observed\autocite{murphyProbabilisticMachineLearning2023}. It is used here because the hypotheses concern the magnitude and uncertainty of structural aliasing effects: posterior distributions quantify evidence for a localisation loss, phase independence and parameter-tracking against predeclared decision thresholds. The candidate set $\mathcal F_{\mathrm{lock}}$ of \autoref{eq:flock} is arithmetic and holds for any model. Three claims are carried into the analysis, each stated so that a particular posterior refutes it.
 
-\input{tables/bayesPriors.tex}
-
 \input{tables/bayesModels.tex}
 
-\autoref{tab:bayesPriors} gives every prior with its role, \autoref{tab:bayesModels} pairs each claim with the model that decides it, its estimand, the value the claim predicts and the table of measurements it is fitted to, and \autoref{sec:appBayes} states each model in full. Every effect prior is centred on no effect, and its scale is varied over the sensitivity ladder $\{0.25,0.5,1.0\}$, sceptical, primary and wide, so that a conclusion resting on the choice of scale rather than on the data is detected as such.
+\autoref{tab:bayesModels} pairs each claim with the model that decides it, its estimand, the value the claim predicts and the measurements it is fitted to, and \autoref{sec:appBayes} states each model in full. Every effect prior is centred on no effect, and its scale is varied over the sensitivity ladder $\{0.25,0.5,1.0\}$, sceptical, primary and wide, so that a conclusion resting on the choice of scale rather than on the data is detected as such.
 
 \subsubsection*{Frequency-dependent blind spots (H1)}
 At a candidate frequency $f_k\in\mathcal F_{\mathrm{lock}}$ the model retains less of the signal than at the two neighbouring control frequencies $f_k\pm\delta$, which are not themselves candidates. The claim has two readings that need not agree: a behavioural one, in which the forecast no longer rebuilds the tone at the frequency it was given, and a representational one, in which the frequency becomes harder to read out of the internal state. A loss that is absent, or not localised on the candidate set, refutes $H1$. Phase-locking is treated here as a necessary but not sufficient condition for the specific geometry-induced structural aliasing this study hypothesises: nothing in the design excludes that distinct signals acquire near-identical learned representations for reasons unrelated to $\mathcal F_{\mathrm{lock}}$, and no claim is made about frequencies outside it.
@@ -15,87 +13,33 @@ The magnitude of that loss is a property of the alignment between the signal per
 \subsubsection*{Parametric dependence of blind spot sites (H3)}
 Because $\mathcal F_{\mathrm{lock}}$ is a union, the claim splits in two, one per branch, with $c,k\in\mathbb{N}^{+}$ the harmonic indices of \autoref{eq:branches}. $H3a$: at fixed $P$, the sites at $f=c\,f_s/S$ move proportionally to $1/S$. $H3b$: at fixed $S$, the sites at $f=k\,f_s/P$ move proportionally to $1/P$. A site that stays put while the parameter supposed to generate it is varied refutes its branch.
 
-\subsection{H1: frequency-dependent blind spots}
+\subsection{The models}
 
-The behavioural measurement is the frequency the forecast rebuilds. From the median forecast over the horizon the dominant reconstructed frequency $\hat f$ is estimated, and an arm is scored by whether that estimate lands on the frequency the arm carries, within a tolerance $\Delta$ that admits a small error rather than demanding an exact match. It is collected in matched triplets: each candidate $f_k$ with its two controls, all three sharing the same background realisation and the same phase, so that only the frequency changes. Writing $f$ for the frequency an arm carries, the response is
+Five models carry the claims and \autoref{tab:bayesModels} pairs each with the one it decides. Three responses serve them: a paired behavioural contrast on the forecast, a codelength on a captured internal state, and the dispersion of the input-patch embeddings. Each is given below in the form it is fitted, with the reasoning behind every term left to \autoref{sec:appBayes}.
+
+\subsubsection*{Model A, the behavioural reading (H1)}
+The measurement is the forecast amplitude recovery $R=A_{\mathrm{pred}}/A_{\mathrm{true}}$, collected in matched triplets: a candidate $f_k$ with its two controls $f_k\pm\delta$, all three sharing one background realisation and one phase, so that only the frequency changes. The contrast is
 
 \begin{equation}
 \label{eq:d2contrast}
-h = \mathbf{1}\!\left[\ \bigl|\hat f - f\bigr| \le \Delta\ \right],
-\qquad
-\Delta = 1\,\mathrm{Hz}.
+d = \log(R_k + 0.01) - \tfrac{1}{2}\left[\log(R_- + 0.01) + \log(R_+ + 0.01)\right],
 \end{equation}
 
-The tolerance lies well inside the control offset $\delta$, so a hit recorded at a candidate cannot have been produced by either of its controls. Model~A fits the three arms of a triplet jointly, the lock indicator carrying the effect,
+one number per triplet, negative when the candidate recovers less than its neighbours, and formable only because the injected tone has a known frequency. Model~A fits it as
 
 \begin{equation}
 \label{eq:d2hier}
-h_i \sim \mathrm{Bernoulli}(p_i),
+d_i \sim \text{Student-}t_4(\mu_i,\ \sigma),
 \quad
-\operatorname{logit} p_i = \beta_{c[i]} + \gamma\,\mathrm{IsLock}_i + u_{k[i]} + u_{b[i]},
+\mu_i = \beta_{c[i]} + u_{k[i]} + u_{b[i]},
 \quad
 \beta_c \sim \mathcal{N}\!\left(\bar\beta + \delta_O \widetilde O_c + \delta_P \widetilde{\log P}_c,\ \tau\right).
 \end{equation}
 
-The logit link makes the estimand multiplicative: $e^{\gamma}$ is the factor by which the odds of rebuilding the right frequency change at a candidate relative to its controls. $e^{\gamma}<1$ is the loss $H1$ predicts, whereas a posterior at or above $1$ says that candidate frequencies are rebuilt as accurately as their neighbours and the behavioural half of $H1$ fails.
+The response is already a paired difference, so the effect is the intercept rather than a term beside it: $e^{\bar\beta}$ is recovery at a candidate relative to its controls and $H1$ predicts $e^{\bar\beta}<1$. The heavy tail absorbs the arms that rebuild nothing, where the logarithm returns very large contrasts and a Gaussian would let a handful of them set the estimate; the three offsets keep an unusual harmonic or a single generator from being read as the effect.
 
-Model~B asks the same question of the representation through minimum description length (MDL) probing\autocite{voitaInformationTheoreticProbingMinimum2020}. At each probed frequency $f_c$ a linear probe is asked to tell a tone at $f_c-1$\,Hz from one at $f_c+1$\,Hz using a captured internal state alone, and the response $L_i$ is the prequential codelength of that sequence of labels, in bits. A codelength is positive and right-skewed with a variance growing in its mean, so the regression is
-
-\begin{equation*}
-L_i \sim \text{Gamma}\!\left(r,\ r/\mu_i\right),
-\qquad
-\log \mu_i = \alpha_0 + \theta_{\mathrm{lock}}\,\mathrm{IsLocked}_i + s_{\text{st}[i]} + g_{\text{geo}[i]},
-\end{equation*}
-
-The log link makes the estimand multiplicative: $e^{\theta_{\mathrm{lock}}}$ is the factor by which the codelength of a candidate frequency expands. $e^{\theta_{\mathrm{lock}}}>1$ is the representational cost $H1$ predicts, while $\theta_{\mathrm{lock}}$ near zero says the frequency remains as readable at a candidate as anywhere else. The representational half of $H1$ is decided on the same footing as the behavioural one: supported at $\Pr(\theta_{\mathrm{lock}} > \log 1.2 \mid D)\ge 0.95$, refuted at $\Pr(|\theta_{\mathrm{lock}}| < \log 1.1 \mid D)\ge 0.95$, both fixed in \autoref{tab:bayesDecisions} before any posterior is inspected.
-
-\subsection{H2: independence from temporal alignment}
-
-H2 uses the same triplets with one change. Model~A pools them across phases without a phase term, so the phase is marginalised and cannot be inspected; $H2$ requires it to be kept, so the phase index is retained. Model~C is Model~A on the same response, without the configuration-level covariates, which are not what $H2$ asks about, and with the phase circle cut into eight equal slices, each given its own offset $u_p$:
-
-\begin{equation}
-\label{eq:d2phase}
-h_i \sim \mathrm{Bernoulli}(p_i),
-\qquad
-\operatorname{logit} p_i = \beta_{c[i]} + \gamma\,\mathrm{IsLock}_i + u_{k[i]} + u_{b[i]} + u_{p[i]},
-\qquad
-u_p \sim \mathcal{N}(0, \sigma_\phi).
-\end{equation}
-
-The estimand $\sigma_\phi$ of \autoref{eq:d2phase} is the spread of those eight offsets, which reduces the hypothesis to a single number and presupposes no shape for a possible dependence. $\sigma_\phi$ near zero means the offsets are indistinguishable and the loss is set by the geometry alone, as $H2$ predicts, whereas a large $\sigma_\phi$ means it depends on where in its cycle the signal starts. Dropping $u_p$ gives a nested null, which is compared with the full model by leave-one-out cross-validation (LOO); the comparison separates the size of any phase effect from the evidence that one exists.
-
-One limit belongs here rather than with the results. Model~C measures the spread of the same response Model~A uses, so the two are not independent readings: where the population effect is itself indistinguishable from zero, little remains for phase to move, and $H2$ is read conditionally.
-
-\subsection{H3: parametric dependence of blind spot sites}
-
-Both branches are tested on the token collapse $z_g(f)$, the dispersion, in geometry $g$ and at frequency $f$, of the input-patch embeddings across the patches of one context; it is zero when consecutive patches are identical. All geometries are swept on one common grid, the union of a uniform one-hertz sweep with the predicted sites of every configuration in the design, so that no geometry is scored only where its own theory predicts a dip.
-
-The first question is where the dips are located, and Model~D1 answers it. Each swept frequency carries two binary labels, one per branch, recording whether it lies on the stride grid $\mathcal{F}_{S}$ or on the patch grid $\mathcal{F}_{P}$, the two families defined in \autoref{eq:branches}:
-
-\begin{equation}
-\label{eq:d2sites}
-\log z_g(f) \sim \mathcal{N}\!\left(
-\alpha_g + \theta_S \cdot \text{OnStrideGrid} + \theta_P \cdot \text{OnPatchGrid},\ \sigma
-\right),
-\end{equation}
-
-with $\alpha_g$ the per-geometry off-grid level, and the label coefficients $\theta_S$ and $\theta_P$ as estimands. $H3$ predicts both negative, and the two-label fit should win the LOO comparison against each label alone and against neither; coefficients near zero mean the dips bear no relation to either grid.
-
-The second question is whether the dips move, and Model~D2 answers it, since \autoref{eq:d2sites} remains compatible with dips that merely sit on a grid fixed once and for all. Every detected dip is assigned to the branch that predicts it and sites predicted by both are set aside, since the union of two combs has two interlaced spacings rather than one. The fundamental $\hat f^{\,F}_{1,g}$ of branch $F$ in geometry $g$, its lowest detected site, is then compared with the spacing that branch predicts, $\Delta^S_g=f_s/S_g$ or $\Delta^P_g=f_s/P_g$:
-
-\begin{equation*}
-\hat f^{\,F}_{1,g} \sim \mathcal{N}\!\left(
-\kappa_F \,\Delta^F_g,\ \sqrt{\sigma_F^2+\Delta f^2}
-\right).
-\end{equation*}
-
-The slope $\kappa_F$ is the estimand, measured spacing per unit of predicted spacing, and the residual scatter $\sigma_F$ is given the floor $\Delta f$, the sweep step, because a spacing read off a discrete grid is no more precise than one step. $\kappa_F=1$ denotes a branch that tracks its own arithmetic one for one, and a value away from one refutes that branch. Identification here is a property of the design and not of the model, since $\kappa_S$ requires a series holding $P$ fixed while $S$ varies and $\kappa_P$ the converse; \autoref{tab:hfModels} supplies both.
-
-Identification is not symmetric between the branches, and the condition belongs before the fits. A site informs $\kappa_S$ only on $\mathcal F_S \setminus \mathcal F_P$ and $\kappa_P$ only on $\mathcal F_P \setminus \mathcal F_S$; a site in the intersection is set aside. The design controls the first directly, through the six runs with $S \nmid P$, and does not control the second, so the count of attributable sites per branch is an outcome of the sweep rather than of the grid; \autoref{sec:appBayes} gives the argument in full. A branch with fewer than ten unambiguous sites is reported as not identified rather than as a null result, under the bar of \autoref{tab:bayesDecisions}.
-
-\subsection{The mitigation claim}
-
-$M1$ is not a separate model but the configuration level of Model~A promoted to an estimand. It asserts that raising the overlap $O$ raises the odds of rebuilding the right frequency, and is therefore read off the population line of \autoref{eq:d2hier},
+\subsubsection*{Model A$'$, the mitigation claim (M1)}
+Not a separate fit but the configuration level of \autoref{eq:d2hier} promoted to an estimand,
 
 \begin{equation}
 \label{eq:d2mitigation}
@@ -106,8 +50,61 @@ $M1$ is not a separate model but the configuration level of Model~A promoted to 
 \widetilde{\log P}_c=\log P_c-\overline{\log P},
 \end{equation}
 
-where the tilde denotes centring on the design, which leaves $\bar\beta$ the baseline at the average configuration rather than an extrapolation to $O=0$ and $P=1$. The two covariates are estimable jointly because \autoref{tab:hfModels} varies overlap and patch size independently. Model~A$'$ denotes Model~A read at this level, and the estimand is $\delta_O$, the change in the log-odds of \autoref{eq:d2hier} per unit of centred overlap. An overlap that mitigates raises the odds of rebuilding the right frequency, so $\delta_O>0$ is the direction $M1$ predicts and a slope at or below zero refutes it. Every model that reads this response reads it on the same orientation, so no sign convention has to be carried between them.
+the tilde denoting centring on the design, which leaves $\bar\beta$ the effect at the average configuration rather than an extrapolation to $O=0$ and $P=1$. The two covariates are estimable together because \autoref{tab:hfModels} varies overlap and patch size independently. A mitigation raises $d$ towards zero, so $\delta_O>0$ is the direction $M1$ predicts and a slope at or below zero refutes it.
 
+\subsubsection*{Model B, the representational reading (H1)}
+At each candidate $f_c$ a linear probe is asked to tell a tone at $f_c-1$\,Hz from one at $f_c+1$\,Hz using a captured internal state alone, over the ten probe stages named in \autoref{sec:appBayes}, and the response $L_i$ is the prequential codelength of that sequence of labels in bits\autocite{voitaInformationTheoreticProbingMinimum2020}. A codelength is positive and right-skewed with a variance growing in its mean, so the regression is
+
+\begin{equation}
+\label{eq:d2mdl}
+L_i \sim \text{Gamma}\!\left(r,\ r/\mu_i\right),
+\qquad
+\log \mu_i = \alpha_0 + \theta_{\mathrm{lock}}\,\mathrm{IsLocked}_i + s_{\text{st}[i]} + g_{\text{geo}[i]},
+\end{equation}
+
+with probe stage and geometry entering as zero-mean offsets because codelengths differ several-fold between them. The log link of \autoref{eq:d2mdl} makes the estimand multiplicative: $e^{\theta_{\mathrm{lock}}}>1$ is the representational cost $H1$ predicts, and $\theta_{\mathrm{lock}}$ near zero says a candidate frequency is as readable as anywhere else.
+
+\subsubsection*{Model C, temporal alignment (H2)}
+The same triplets with the phase kept rather than marginalised. The response is the per-phase deficit $y_i=-d_i$, positive when the candidate is worse, and the phase circle is cut into eight equal slices, each given its own offset:
+
+\begin{equation}
+\label{eq:d2phase}
+y_i \sim \text{Student-}t_4(\mu_i,\ \sigma),
+\qquad
+\mu_i = \beta_{c[i]} + u_{k[i]} + u_{b[i]} + u_{p[i]},
+\qquad
+u_p \sim \mathcal{N}(0, \sigma_\phi).
+\end{equation}
+
+The estimand $\sigma_\phi$ of \autoref{eq:d2phase} is the spread of those eight offsets, near zero when the geometry alone sets the deficit, as $H2$ predicts, and large when it depends on where in its cycle the signal starts. Slices presuppose no shape for a dependence, and dropping $u_p$ gives the nested null the leave-one-out comparison is made against. One limit belongs here rather than with the results: Model~C reads the spread of the same response Model~A reads, so where the population effect is itself indistinguishable from zero little remains for phase to move, and $H2$ is read conditionally.
+
+\subsubsection*{Model D1, where the sites are (H3)}
+Both branches are read on the token collapse $z_g(f)$, the dispersion in geometry $g$ and at frequency $f$ of the input-patch embeddings across the patches of one context, which is zero when consecutive patches are identical. Every swept frequency carries two binary labels recording whether it lies on the stride grid $\mathcal{F}_{S}$ or the patch grid $\mathcal{F}_{P}$:
+
+\begin{equation}
+\label{eq:d2sites}
+\log z_g(f) \sim \mathcal{N}\!\left(
+\alpha_g + \theta_S \cdot \text{OnStrideGrid} + \theta_P \cdot \text{OnPatchGrid},\ \sigma
+\right),
+\end{equation}
+
+with $\alpha_g$ the per-geometry off-grid level and the label coefficients as estimands. $H3$ predicts both negative and the two-label fit winning the leave-one-out comparison against each one-label alternative.
+
+\subsubsection*{Model D2, whether the sites move (H3a, H3b)}
+\autoref{eq:d2sites} remains compatible with dips sitting on a grid fixed once and for all, so the measured spacing is regressed on the spacing each branch predicts:
+
+\begin{equation}
+\label{eq:d2spacing}
+\hat f^{\,F}_{1,g} \sim \mathcal{N}\!\left(
+\kappa_F \,\Delta^F_g,\ \sqrt{\sigma_F^2+\Delta f^2}
+\right).
+\end{equation}
+
+The slope $\kappa_F$ of \autoref{eq:d2spacing} is measured spacing per unit of predicted spacing, so $\kappa_F=1$ is the claim, and the residual scatter carries the floor $\Delta f$, the sweep step, because a spacing read off a grid cannot be sharper than the grid. Identification is not symmetric between the branches and the condition belongs before the fits: a site informs $\kappa_S$ only on $\mathcal F_S \setminus \mathcal F_P$ and $\kappa_P$ only on $\mathcal F_P \setminus \mathcal F_S$, and a branch reaching fewer than ten unambiguous sites is reported as not identified rather than as a null.
+
+\input{tables/bayesPriors.tex}
+
+\autoref{tab:bayesPriors} gives every parameter above with its prior and its role.
 
 \subsection{Decisions and validation}
 
