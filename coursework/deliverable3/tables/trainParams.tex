@@ -30,7 +30,7 @@
         \midrule
         Corpora (streamed)          & TSMixup $10$M, KernelSynth $1$M    & same                & public Chronos collection \\
         Mixing ratio                & $9{:}1$                            & $9{:}1$             & TSMixup to KernelSynth \\
-        Shuffle buffer              & $10{,}000$                         & $100{,}000$         & \textbf{departure}: streaming throughput \\
+        Shuffle buffer              & $10{,}000$                         & $100{,}000$         & departure: streaming throughput \\
         Minimum observed past       & $60$ samples                       & $60$                & required before the horizon \\
         Maximum missing per series  & $0.9$                              & $0.9$               & series above this are discarded \\
         Injected missing rate       & $\mathcal U(0,0.2)$                & $\mathcal U(0,0.2)$ & masked, excluded from the loss \\
@@ -41,7 +41,7 @@
         \multicolumn{4}{@{}l}{\textit{Optimisation}}\\
         \textbf{Parameter} & \textbf{Adopted} & \textbf{Published} & \textbf{Constraint / note} \\
         \midrule
-        Gradient updates            & $100{,}000$                        & $200{,}000$         & \textbf{departure}: compute budget \\
+        Gradient updates            & $100{,}000$                        & $200{,}000$         & departure: compute budget \\
         Batch size                  & $32$ windows                       & $32$                & --- \\
         Optimiser                   & AdamW                              & AdamW               & --- \\
         Learning rate               & $10^{-3}$                          & $10^{-3}$           & --- \\

@@ -77,6 +77,10 @@ twoside, % Two side traditional mode where headers and footers change between od
 \setcounter{totalnumber}{5}
 \setcounter{dbltopnumber}{3}
 
+% Float-heavy pages were being justified to full height by stretching the glue between
+% a top float and the text under it, which opened gaps mid-page. Let short pages end short.
+\raggedbottom
+
 \runninghead{Frequency Information Degeneracies in Chronos-Bolt-Tiny Learned Representation} % A shortened article title to appear in the running head, leave this command empty for no running head
 
 % \footertext{\textit{Journal of ...}} % Text to appear in the footer, leave this command empty for no footer text

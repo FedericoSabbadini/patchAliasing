@@ -8,7 +8,7 @@ Whatever the architecture downstream, predictive fidelity is bounded by the digi
 f_s > 2f_{\max}.
 \end{equation}
 
-The threshold $f_N = f_s/2$ is the Nyquist frequency. When the criterion is violated by an insufficient sampling rate or a missing anti-aliasing filter, components above $f_N$ fold back into the lower spectrum and become indistinguishable from genuine low-frequency content, an irreversible acquisition-time loss known as \textit{aliasing}, whereas satisfying \autoref{eq:nyquist_criterion} is conventionally treated as sufficient for a discrete sequence to represent its source faithfully.
+The threshold $f_N = f_s/2$ is the Nyquist frequency. When the criterion is violated by an insufficient sampling rate or a missing anti-aliasing filter, components above $f_N$ fold back into the lower spectrum and become indistinguishable from genuine low-frequency content, an irreversible acquisition-time loss known as aliasing, whereas satisfying \autoref{eq:nyquist_criterion} is conventionally treated as sufficient for a discrete sequence to represent its source faithfully.
 
 \subsection*{Evolution of Forecasting Methodologies}
 Statistical models such as ARIMA and Exponential Smoothing are interpretable but assume linearity and stationarity; deep models relax both, and Transformers buy long-range dependence at a cost quadratic in sequence length\autocite{wangDeepTimeSeries2026}. Patch-based architectures answer that cost by grouping neighbouring observations into tokens. Chronos quantises values into discrete tokens\autocite{ansariChronosLearningLanguage2024}; Chronos-Bolt replaces quantisation with patching and a direct multi-quantile head\autocite{ansariChronosLearningLanguage2024a,FastAccurateZeroshot2024a,AmazonChronosbolttinyHugging2025}.
