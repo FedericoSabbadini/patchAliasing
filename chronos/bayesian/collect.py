@@ -887,11 +887,15 @@ def main(argv: list[str]) -> int:
     if args.population and args.population != getattr(pl, "_POP_NAME", "deliverable3"):
         import os as _os
         env = dict(_os.environ, PATCHALIASING_POPULATION=args.population)
-        rest = [a for a in argv if not a.startswith("--population")]
-        if "--population" in argv:
-            i = argv.index("--population"); rest = argv[:i] + argv[i+2:]
-        print(f"popolazione richiesta: {args.population} -> riavvio del processo")
-        return subprocess.call([sys.executable, __file__] + rest, env=env)
+        rest = list(argv)
+        if "--population" in rest:
+            i = rest.index("--population"); rest = rest[:i] + rest[i+2:]
+        # sys.argv[0], NON __file__: se questo modulo e' stato importato da uno script di
+        # ingresso diverso (per esempio un driver che sostituisce una funzione per limitare
+        # la memoria), __file__ punterebbe a collect.py e il riavvio perderebbe il driver.
+        entry = sys.argv[0] if sys.argv and sys.argv[0].endswith(".py") else __file__
+        print(f"popolazione richiesta: {args.population} -> riavvio di {entry}")
+        return subprocess.call([sys.executable, entry] + rest, env=env)
 
     cfg = Config.smoke_cfg() if args.smoke else Config()
     if args.no_band_tasks:
