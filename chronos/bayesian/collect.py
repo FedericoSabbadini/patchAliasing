@@ -327,7 +327,13 @@ def collect_collapse(probe: "pl.Probe", cfg: Config) -> pd.DataFrame:
     dip instead, because the background breaks patch identity; fitting the comb model to all three
     is what shows the conclusion is not an artefact of noise-free inputs.
     """
-    grid = pl.union_grid(pl.MODELS, cfg.collapse_step)  # union over ALL geometries, not just the fitted ones
+    # GRID_MODELS, non MODELS: la griglia di sweep resta quella delle quindici congelate
+    # anche quando la popolazione raccolta e' piu' ampia. Passando pl.MODELS, allargare la
+    # popolazione avrebbe aggiunto alla griglia i siti delle nuove geometrie, cambiando le
+    # curve di collasso di TUTTE -- comprese quelle gia' raccolte, che sarebbero diventate
+    # non confrontabili. Il senso dell'unione (valutare ogni geometria anche dove predicono
+    # le concorrenti) resta, su una base di confronto fissa.
+    grid = pl.union_grid(getattr(pl, "GRID_MODELS", pl.MODELS), cfg.collapse_step)
     rows = []
     for mode in cfg.collapse_modes:
         for rep in range(cfg.collapse_reps):
