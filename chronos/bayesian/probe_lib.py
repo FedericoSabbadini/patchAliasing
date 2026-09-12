@@ -103,8 +103,8 @@ MODELS_ALL: list[tuple[int, int]] = [
     (32, 32),   # O=0.000   S|P
 ]
 
-# Exclude certain stride values from Deliverable 3. S4 and S5 are excluded by its design; S15 and
-# S28 do not divide the 480-sample context. What remains is the fifteen-geometry design of
+# Exclude certain stride values from Deliverable 3. S4 and S5 are excluded by its design; S28
+# does not divide the 480-sample context. What remains is the fifteen-geometry design of
 # tab:hfModels, and that is the set every result in bayesian_analysis.ipynb is fitted on.
 EXCLUDE_S: set[int] = {4, 5, 15, 28}
 
@@ -112,10 +112,51 @@ EXCLUDE_S: set[int] = {4, 5, 15, 28}
 # context-closing geometries). Keep this public name for that notebook's frozen compatibility.
 BAYES_MODELS: list[tuple[int, int]] = [(P, S) for P, S in MODELS_ALL if CTX % S == 0]
 
+# --------------------------------------------------------------------------------- #
+#  Selectable collection population
+# --------------------------------------------------------------------------------- #
+# M1 is a BETWEEN-geometry contrast: its precision is set by how many configurations exist,
+# not by how many draws are taken, so it is the one estimand that a wider population can
+# decide and a longer run cannot. The registry below therefore became selectable, while the
+# default stays exactly the frozen fifteen so that every existing manifest, union grid and
+# result is bit-for-bit unaffected unless a population is asked for explicitly.
+#
+#   deliverable3 (default) : the 15 of tab:hfModels. S in {4,5,15,28} excluded, CTX % S == 0.
+#   extended21             : every geometry that closes the 480-sample context (S != 28).
+#   all22                  : every geometry in MODELS_ALL.
+#
+# CAVEAT on all22: p32-s28 does NOT close the context (480 % 28 = 20), so 20 samples fall
+# outside the patch grid. That is why it sits outside both other populations. Including it is
+# defensible only if the carried-over remainder is declared alongside the result.
+import os as _os_pop
+
+_POPULATIONS: dict[str, set[int]] = {
+    "deliverable3": {4, 5, 15, 28},
+    "extended21": set(),
+    "all22": set(),
+}
+_POP_NAME = (_os_pop.environ.get("PATCHALIASING_POPULATION", "").strip()
+             or "deliverable3")
+if _POP_NAME not in _POPULATIONS:
+    raise ValueError(
+        f"PATCHALIASING_POPULATION={_POP_NAME!r} unknown; "
+        f"choose one of {sorted(_POPULATIONS)}")
+_POP_EXCLUDE = set(_POPULATIONS[_POP_NAME])
+_POP_CLOSES_CONTEXT = _POP_NAME != "all22"
+
 # The authoritative population for coursework/deliverable3 and this full Bayesian workflow.
 DELIVERABLE3_MODELS: tuple[tuple[int, int], ...] = tuple(
-    (P, S) for P, S in MODELS_ALL if S not in EXCLUDE_S and CTX % S == 0)
+    (P, S) for P, S in MODELS_ALL
+    if S not in _POP_EXCLUDE and (CTX % S == 0 or not _POP_CLOSES_CONTEXT))
 MODELS: list[tuple[int, int]] = list(DELIVERABLE3_MODELS)
+
+# The union sweep grid of collect_collapse is built from MODELS, so widening the population
+# would change the collapse curves of geometries already collected and invalidate them. The
+# grid is therefore pinned to the frozen fifteen whatever population is selected: D1 and D2
+# keep one fixed basis of comparison, and only the contrast tables gain the extra geometries.
+FROZEN15_MODELS: tuple[tuple[int, int], ...] = tuple(
+    (P, S) for P, S in MODELS_ALL if S not in {4, 5, 15, 28} and CTX % S == 0)
+GRID_MODELS: list[tuple[int, int]] = list(FROZEN15_MODELS)
 
 # Optional session override.  It never mutates the frozen Deliverable 3 registry used by manifests
 # and union grids; it only chooses which subset this runtime collects next.
@@ -126,7 +167,9 @@ if _only:
     SESSION_MODELS = [(P, S) for P, S in DELIVERABLE3_MODELS if f"p{P}-s{S}" in _tags]
     unknown = _tags - {f"p{P}-s{S}" for P, S in DELIVERABLE3_MODELS}
     if unknown:
-        raise ValueError(f"PATCHALIASING_MODELS contains non-Deliverable-3 tags: {sorted(unknown)}")
+        raise ValueError(
+            f"PATCHALIASING_MODELS contains tags outside the selected population "
+            f"({_POP_NAME}): {sorted(unknown)}")
 else:
     SESSION_MODELS = list(DELIVERABLE3_MODELS)
 
@@ -652,7 +695,10 @@ def union_grid(models: list[tuple[int, int]] = None, step: float = 1.0,
     and it puts the non-integer sites (42.66... Hz for S=12, 21.33... Hz for S=24) on the grid,
     which a plain 1 Hz sweep misses entirely.
     """
-    models = MODELS if models is None else models
+    # GRID_MODELS, non MODELS: la griglia resta quella delle quindici congelate anche quando
+    # la popolazione raccolta e' piu' ampia, altrimenti allargare la popolazione cambierebbe
+    # le curve di collasso delle geometrie gia' raccolte.
+    models = GRID_MODELS if models is None else models
     lo, hi = band
     grid = set(np.round(np.arange(lo, hi + 1e-9, step), 6))
     for (P, S) in models:

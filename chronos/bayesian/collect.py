@@ -27,6 +27,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import subprocess
 import sys
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
@@ -821,12 +822,18 @@ def collect_all(
     planned_models = list(pl.DELIVERABLE3_MODELS if planned_models is None else planned_models)
     models = list(planned_models if models is None else models)
     if not set(models).issubset(set(planned_models)):
-        raise ValueError("session models must be a subset of the frozen planned model registry")
+        fuori = sorted(pl.model_tag(P, S) for P, S in set(models) - set(planned_models))
+        raise ValueError(
+            f"session models must be a subset of the frozen planned model registry; "
+            f"outside it: {fuori}. La popolazione attiva e' "
+            f"'{getattr(pl, '_POP_NAME', 'deliverable3')}' ({len(planned_models)} geometrie): "
+            f"per raccoglierne altre usare --population extended21 / all22.")
     if set(models) != set(planned_models) and not allow_partial:
         raise ValueError("a model subset requires allow_partial=True and cannot be reportable yet")
     manifest = _load_or_create_manifest(out, cfg, planned_models)
     print(f"collecting into {out}  |  {'SMOKE (NON-REPORTABLE)' if cfg.smoke else 'FULL'} "
-          f"design  |  session {len(models)}/{len(planned_models)} geometries")
+          f"design  |  population '{getattr(pl, '_POP_NAME', 'deliverable3')}'  |  "
+          f"session {len(models)}/{len(planned_models)} geometries")
 
     index_path = out / "signals" / "signals_index.parquet"
     signal_entry = manifest.get("signals")
@@ -861,7 +868,24 @@ def main(argv: list[str]) -> int:
     ap.add_argument("--device", default=None, help="cuda / cpu (default: cuda if available)")
     ap.add_argument("--batch-size", type=int, default=None)
     ap.add_argument("--merge-only", action="store_true", help="only re-merge existing shards")
+    ap.add_argument("--population", default=None,
+                    choices=["deliverable3", "extended21", "all22"],
+                    help="registro delle geometrie da raccogliere (default: deliverable3, le 15 "
+                         "di tab:hfModels). Va impostato PRIMA di importare probe_lib, quindi "
+                         "questo flag riesegue il processo con la variabile d'ambiente settata.")
     args = ap.parse_args(argv)
+
+    # La popolazione e' letta da probe_lib al momento dell'import, quindi cambiarla ora non
+    # avrebbe effetto: se il flag chiede una popolazione diversa da quella gia' caricata, il
+    # processo si riesegue una volta sola con la variabile d'ambiente giusta.
+    if args.population and args.population != getattr(pl, "_POP_NAME", "deliverable3"):
+        import os as _os
+        env = dict(_os.environ, PATCHALIASING_POPULATION=args.population)
+        rest = [a for a in argv if not a.startswith("--population")]
+        if "--population" in argv:
+            i = argv.index("--population"); rest = argv[:i] + argv[i+2:]
+        print(f"popolazione richiesta: {args.population} -> riavvio del processo")
+        return subprocess.call([sys.executable, __file__] + rest, env=env)
 
     cfg = Config.smoke_cfg() if args.smoke else Config()
     if args.no_band_tasks:
