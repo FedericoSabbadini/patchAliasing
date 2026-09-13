@@ -150,13 +150,16 @@ DELIVERABLE3_MODELS: tuple[tuple[int, int], ...] = tuple(
     if S not in _POP_EXCLUDE and (CTX % S == 0 or not _POP_CLOSES_CONTEXT))
 MODELS: list[tuple[int, int]] = list(DELIVERABLE3_MODELS)
 
-# The union sweep grid of collect_collapse is built from MODELS, so widening the population
-# would change the collapse curves of geometries already collected and invalidate them. The
-# grid is therefore pinned to the frozen fifteen whatever population is selected: D1 and D2
-# keep one fixed basis of comparison, and only the contrast tables gain the extra geometries.
+# La griglia di sweep di collect_collapse segue la POPOLAZIONE selezionata. Serviva
+# congelarla finche' si voleva riusare una raccolta precedente: allargare la popolazione
+# cambia la griglia, e quindi le curve di collasso di tutte le geometrie, rendendo le
+# vecchie non confrontabili. Raccogliendo l'intera popolazione da zero quel vincolo non
+# esiste piu', e congelarla avrebbe un costo preciso: i siti predetti dalle geometrie
+# aggiunte non verrebbero campionati, quindi D1 e D2 su quelle geometrie non avrebbero
+# nulla da misurare. Con la griglia estesa le nuove geometrie contribuiscono davvero.
 FROZEN15_MODELS: tuple[tuple[int, int], ...] = tuple(
     (P, S) for P, S in MODELS_ALL if S not in {4, 5, 15, 28} and CTX % S == 0)
-GRID_MODELS: list[tuple[int, int]] = list(FROZEN15_MODELS)
+GRID_MODELS: list[tuple[int, int]] = list(DELIVERABLE3_MODELS)
 
 # Optional session override.  It never mutates the frozen Deliverable 3 registry used by manifests
 # and union grids; it only chooses which subset this runtime collects next.
