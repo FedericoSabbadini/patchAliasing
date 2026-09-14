@@ -27,6 +27,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import subprocess
 import sys
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
@@ -326,7 +327,13 @@ def collect_collapse(probe: "pl.Probe", cfg: Config) -> pd.DataFrame:
     dip instead, because the background breaks patch identity; fitting the comb model to all three
     is what shows the conclusion is not an artefact of noise-free inputs.
     """
-    grid = pl.union_grid(pl.MODELS, cfg.collapse_step)  # union over ALL geometries, not just the fitted ones
+    # GRID_MODELS, non MODELS: la griglia di sweep resta quella delle quindici congelate
+    # anche quando la popolazione raccolta e' piu' ampia. Passando pl.MODELS, allargare la
+    # popolazione avrebbe aggiunto alla griglia i siti delle nuove geometrie, cambiando le
+    # curve di collasso di TUTTE -- comprese quelle gia' raccolte, che sarebbero diventate
+    # non confrontabili. Il senso dell'unione (valutare ogni geometria anche dove predicono
+    # le concorrenti) resta, su una base di confronto fissa.
+    grid = pl.union_grid(getattr(pl, "GRID_MODELS", pl.MODELS), cfg.collapse_step)
     rows = []
     for mode in cfg.collapse_modes:
         for rep in range(cfg.collapse_reps):
@@ -821,12 +828,18 @@ def collect_all(
     planned_models = list(pl.DELIVERABLE3_MODELS if planned_models is None else planned_models)
     models = list(planned_models if models is None else models)
     if not set(models).issubset(set(planned_models)):
-        raise ValueError("session models must be a subset of the frozen planned model registry")
+        fuori = sorted(pl.model_tag(P, S) for P, S in set(models) - set(planned_models))
+        raise ValueError(
+            f"session models must be a subset of the frozen planned model registry; "
+            f"outside it: {fuori}. La popolazione attiva e' "
+            f"'{getattr(pl, '_POP_NAME', 'deliverable3')}' ({len(planned_models)} geometrie): "
+            f"per raccoglierne altre usare --population extended21 / all22.")
     if set(models) != set(planned_models) and not allow_partial:
         raise ValueError("a model subset requires allow_partial=True and cannot be reportable yet")
     manifest = _load_or_create_manifest(out, cfg, planned_models)
     print(f"collecting into {out}  |  {'SMOKE (NON-REPORTABLE)' if cfg.smoke else 'FULL'} "
-          f"design  |  session {len(models)}/{len(planned_models)} geometries")
+          f"design  |  population '{getattr(pl, '_POP_NAME', 'deliverable3')}'  |  "
+          f"session {len(models)}/{len(planned_models)} geometries")
 
     index_path = out / "signals" / "signals_index.parquet"
     signal_entry = manifest.get("signals")
@@ -861,7 +874,28 @@ def main(argv: list[str]) -> int:
     ap.add_argument("--device", default=None, help="cuda / cpu (default: cuda if available)")
     ap.add_argument("--batch-size", type=int, default=None)
     ap.add_argument("--merge-only", action="store_true", help="only re-merge existing shards")
+    ap.add_argument("--population", default=None,
+                    choices=["deliverable3", "extended21", "all22"],
+                    help="registro delle geometrie da raccogliere (default: deliverable3, le 15 "
+                         "di tab:hfModels). Va impostato PRIMA di importare probe_lib, quindi "
+                         "questo flag riesegue il processo con la variabile d'ambiente settata.")
     args = ap.parse_args(argv)
+
+    # La popolazione e' letta da probe_lib al momento dell'import, quindi cambiarla ora non
+    # avrebbe effetto: se il flag chiede una popolazione diversa da quella gia' caricata, il
+    # processo si riesegue una volta sola con la variabile d'ambiente giusta.
+    if args.population and args.population != getattr(pl, "_POP_NAME", "deliverable3"):
+        import os as _os
+        env = dict(_os.environ, PATCHALIASING_POPULATION=args.population)
+        rest = list(argv)
+        if "--population" in rest:
+            i = rest.index("--population"); rest = rest[:i] + rest[i+2:]
+        # sys.argv[0], NON __file__: se questo modulo e' stato importato da uno script di
+        # ingresso diverso (per esempio un driver che sostituisce una funzione per limitare
+        # la memoria), __file__ punterebbe a collect.py e il riavvio perderebbe il driver.
+        entry = sys.argv[0] if sys.argv and sys.argv[0].endswith(".py") else __file__
+        print(f"popolazione richiesta: {args.population} -> riavvio di {entry}")
+        return subprocess.call([sys.executable, entry] + rest, env=env)
 
     cfg = Config.smoke_cfg() if args.smoke else Config()
     if args.no_band_tasks:
