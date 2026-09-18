@@ -15,12 +15,14 @@ patchAliasing/
 │   │   ├── train_sweep.py      # from-scratch retraining driver
 │   │   ├── upload_models.py    # push checkpoints to HuggingFace
 │   │   └── weights/            # local checkpoints (gitignored)
-│   ├── bayesian/               # Bayesian analysis (Deliverable 2 workflow)
-│   │   ├── probe_lib.py        # batched probing core (22 geometries)
-│   │   ├── collect.py          # data collection for the Bayesian models
-│   │   ├── model_loader.py     # checkpoint resolution (local or HuggingFace)
-│   │   ├── bayesian_analysis.ipynb
-│   │   └── reconstruction_figures.ipynb
+│   ├── bayesian/               # Bayesian analyses, appendices and comparisons
+│   │   ├── notebooks/
+│   │   │   ├── models/         # Bayesian models and diagnostics
+│   │   │   ├── appendixes/     # reconstruction, decomposition and probing figures
+│   │   │   └── experiments/    # solar benchmarks and complex-signal sweeps
+│   │   ├── support_scripts/   # collection, shared libraries and CLI runners
+│   │   ├── tests/             # tests, validation and diagnostic builders
+│   │   └── README.md          # notebook and script catalogue
 │   ├── data/
 │   │   ├── synthetic/          # TSMixup and KernelSynth signal generators
 │   │   └── dataset/            # real-world PV telemetry (SolarTechLab)
@@ -68,11 +70,11 @@ uv sync
 **Bayesian data collection**:
 ```bash
 cd chronos/bayesian
-python -m collect --out ./results --smoke   # pipeline check
-python -m collect --out ./results           # full design
+python support_scripts/collect.py --out ./results --smoke   # pipeline check
+python support_scripts/collect.py --out ./results           # full design
 ```
 
-Then open `bayesian_analysis.ipynb` for the PyMC inference.
+Then open `notebooks/models/bayesian_analysis.ipynb` for the PyMC inference. See the [Bayesian catalogue](chronos/bayesian/README.md) for all notebooks and support scripts.
 
 ## Key findings (provisional)
 

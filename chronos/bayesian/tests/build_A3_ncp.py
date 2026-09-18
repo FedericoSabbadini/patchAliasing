@@ -8,7 +8,7 @@ BAYES = Path(__file__).resolve().parents[1]
 
 
 def main():
-    nb = json.loads((BAYES/'model_A3_reduced_localisation_standalone_colab.ipynb').read_text(encoding='utf8'))
+    nb = json.loads((BAYES/'notebooks/models/model_A3_reduced_localisation_standalone_colab.ipynb').read_text(encoding='utf8'))
     cells = nb['cells']
     source = [''.join(c['source']) for c in cells]
     source[12] = ncp_source(source[12])
@@ -75,7 +75,7 @@ existing non-centered coordinates. No prior was widened to make the stress test 
             c['outputs'] = []
             c['execution_count'] = None
     nb['metadata'].pop('widgets',None)
-    target = BAYES/'model_A3_reduced_ncp_localisation_standalone_colab.ipynb'
+    target = BAYES/'notebooks/models/model_A3_reduced_ncp_localisation_standalone_colab.ipynb'
     target.write_text(json.dumps(nb,indent=1,ensure_ascii=False)+'\n',encoding='utf8')
     print(target)
 

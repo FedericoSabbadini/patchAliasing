@@ -19,7 +19,7 @@ from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[3]
 os.environ.setdefault('PYTENSOR_FLAGS', 'base_compiledir='+str(ROOT/'tmp/pytensor_a3_validation').replace('\\', '/'))
-sys.path.insert(0, str(ROOT/'chronos/bayesian'))
+sys.path.insert(0, str(ROOT/'chronos/bayesian/support_scripts'))
 import arviz as az
 import matplotlib
 matplotlib.use('Agg')
@@ -32,7 +32,7 @@ import xarray as xr
 from scipy.special import expit, ndtr, logit, gammaln
 import checkpointing as cp
 
-NOTEBOOK = ROOT/'chronos/bayesian/model_A3_localisation_standalone_colab.ipynb'
+NOTEBOOK = ROOT/'chronos/bayesian/notebooks/models/model_A3_localisation_standalone_colab.ipynb'
 
 
 def namespace():

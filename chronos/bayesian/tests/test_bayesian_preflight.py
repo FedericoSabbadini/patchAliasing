@@ -20,7 +20,7 @@ except ModuleNotFoundError:
 
 BAYES_DIR = Path(__file__).resolve().parents[1]
 GENERATOR_DIR = BAYES_DIR.parent / "data" / "synthetic" / "generators"
-for path in (BAYES_DIR, GENERATOR_DIR):
+for path in (BAYES_DIR / "support_scripts", GENERATOR_DIR):
     if str(path) not in sys.path:
         sys.path.insert(0, str(path))
 
@@ -223,7 +223,7 @@ class BayesianGateTests(unittest.TestCase):
 class NotebookContractTests(unittest.TestCase):
     @unittest.skipUnless(nbformat is not None, "nbformat not active")
     def test_notebook_is_structurally_valid_and_fail_closed(self):
-        notebook_path = BAYES_DIR / "bayesian_analysis.ipynb"
+        notebook_path = BAYES_DIR / "notebooks/models/bayesian_analysis.ipynb"
         notebook = nbformat.read(notebook_path, as_version=4)
         nbformat.validate(notebook)
         self.assertEqual(len(notebook.cells), len({cell.id for cell in notebook.cells}))
@@ -259,7 +259,7 @@ class NotebookContractTests(unittest.TestCase):
 
     @unittest.skipUnless(pm is not None, "locked PyMC environment not active")
     def test_all_notebook_model_factories_build_in_locked_pymc(self):
-        notebook = json.loads((BAYES_DIR / "bayesian_analysis.ipynb").read_text(encoding="utf-8"))
+        notebook = json.loads((BAYES_DIR / "notebooks/models/bayesian_analysis.ipynb").read_text(encoding="utf-8"))
         model_cell_source = "".join(notebook["cells"][40]["source"])
         namespace = {
             "np": np, "pd": pd, "pm": pm, "pl": pl,

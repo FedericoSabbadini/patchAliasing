@@ -8,7 +8,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]
 BAYES = ROOT / 'chronos/bayesian'
-TARGET = BAYES / 'model_A3_reduced_localisation_standalone_colab.ipynb'
+TARGET = BAYES / 'notebooks/models/model_A3_reduced_localisation_standalone_colab.ipynb'
 
 
 def function_source(text, name):
@@ -33,7 +33,7 @@ class Standalone(ast.NodeTransformer):
 
 
 def main():
-    nb = json.loads((BAYES / 'model_A3_localisation_standalone_colab.ipynb').read_text(encoding='utf-8'))
+    nb = json.loads((BAYES / 'notebooks/models/model_A3_localisation_standalone_colab.ipynb').read_text(encoding='utf-8'))
     src = [''.join(c['source']) for c in nb['cells']]
     screened = (BAYES / 'coordination/codex_a3_no_r_screen.py').read_text(encoding='utf-8')
     model = function_source(screened, 'candidate_model')

@@ -34,7 +34,7 @@ def main():
     import pymc as pm
     import pandas as pd
     import scipy.linalg
-    nb = json.loads((BAYES/'model_A3_reduced_localisation_standalone_colab.ipynb').read_text(encoding='utf8'))
+    nb = json.loads((BAYES/'notebooks/models/model_A3_reduced_localisation_standalone_colab.ipynb').read_text(encoding='utf8'))
     src = ''.join(nb['cells'][12]['source'])
     ncp = dict(g)
     exec(compile(ncp_source(src), 'ncp_model', 'exec'), ncp)

@@ -14,9 +14,9 @@ import time
 
 ROOT = Path(__file__).resolve().parents[3]
 BAYES = ROOT / 'chronos/bayesian'
-NOTEBOOK = BAYES / 'model_A3_reduced_localisation_standalone_colab.ipynb'
+NOTEBOOK = BAYES / 'notebooks/models/model_A3_reduced_localisation_standalone_colab.ipynb'
 os.environ.setdefault('PYTENSOR_FLAGS', 'base_compiledir=' + str(ROOT/'tmp/pytensor_a3_reduced').replace('\\', '/'))
-sys.path.insert(0, str(BAYES))
+sys.path.insert(0, str(BAYES / "support_scripts"))
 
 
 def namespace(output, draws=2000, tune=1500, chains=4, compile_mode='NUMBA'):
