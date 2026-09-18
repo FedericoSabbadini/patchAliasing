@@ -112,29 +112,60 @@ twoside, % Two side traditional mode where headers and footers change between od
 \section*{Introduction}\label{sec:introduction}
 \input{sections/introduction}
 
+\section{Application Domain and Agent Objectives}\label{sec:domain}
+\input{sections/domain}
+
 \section{Patch-Based Tokenisation and Phase Locking}\label{sec:one}
 \input{sections/one}
 
-\section{Application Domain}\label{sec:two}
+\section{Proposed Approach: Observability, Agent Behaviour and Mitigation}\label{sec:proposal}
+The ontology and control rules below describe the proposed deployment scenario. Increased patch overlap is introduced as a candidate mitigation whose effectiveness remains to be tested.
+
+\subsection{Ontology and Agent Behaviour}\label{sec:two}
+\begingroup
+\let\subsection\subsubsection
 \input{sections/two}
+\endgroup
 
-\section{Expected Behaviour at Blind-Spot Frequencies}\label{sec:three}
+\subsection{Proposed Mitigation}\label{sec:seven}
+\input{sections/mitigation_proposal}
+
+\section{Research Questions and Experimental Methodology}\label{sec:methodology}
+\subsection{Expected Behaviour at Blind-Spot Frequencies}\label{sec:three}
+\begingroup
+\let\subsubsection\paragraph
+\let\subsection\subsubsection
 \input{sections/three}
+\endgroup
 
-\section{Signals and Data}\label{sec:four}
+\subsection{Signals and Data}\label{sec:four}
+\begingroup
+\let\subsection\subsubsection
 \input{sections/four}
+\endgroup
 
-\section{Experimental Framework}\label{sec:five}
+\subsection{Experimental Framework}\label{sec:five}
+\begingroup
+\let\subsubsection\paragraph
+\let\subsection\subsubsection
 \input{sections/five}
+\endgroup
 
 \section{Results}\label{sec:six}
 \input{sections/six}
 
-\section{Mitigation}\label{sec:seven}
+\section{Discussion and Security Risk Assessment}\label{sec:discussion}
+\subsection{Mitigation: Evaluation and Further Strategies}\label{sec:mitigationDiscussion}
+\begingroup
+\let\subsection\subsubsection
 \input{sections/seven}
+\endgroup
 
-\section{Security Risk Assessment}\label{sec:eight}
+\subsection{Security Risk Assessment}\label{sec:eight}
+\begingroup
+\let\subsection\subsubsection
 \input{sections/eight}
+\endgroup
 
 \section{Conclusions}\label{sec:conclusions}
 \input{sections/conclusion}
