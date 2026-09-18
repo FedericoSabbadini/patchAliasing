@@ -112,11 +112,8 @@ twoside, % Two side traditional mode where headers and footers change between od
 \section*{Introduction}\label{sec:introduction}
 \input{sections/introduction}
 
-\section{Application Domain and Agent Objectives}\label{sec:domain}
-\input{sections/domain}
-
-\section{Patch-Based Tokenisation and Phase Locking}\label{sec:one}
-\input{sections/tokenisation_phase_locking}
+\section{Patch-Based Tokenisation}\label{sec:one}
+\input{sections/1_tokenisation_phase_locking.tex}
 
 \section{Proposed Approach: Observability, Agent Behaviour and Mitigation}\label{sec:proposal}
 The ontology and control rules below describe the proposed deployment scenario. Increased patch overlap is introduced as a candidate mitigation whose effectiveness remains to be tested.
@@ -124,51 +121,51 @@ The ontology and control rules below describe the proposed deployment scenario. 
 \subsection{Ontology and Agent Behaviour}\label{sec:two}
 \begingroup
 \let\subsection\subsubsection
-\input{sections/ontology_agent_behaviour}
+\input{sections/2.1_ontology_agent_behaviour.tex}
 \endgroup
 
 \subsection{Proposed Mitigation}\label{sec:seven}
-\input{sections/mitigation_proposal}
+\input{sections/2.2_mitigation_proposal.tex}
 
 \section{Research Questions and Experimental Methodology}\label{sec:methodology}
 \subsection{Expected Behaviour at Blind-Spot Frequencies}\label{sec:three}
 \begingroup
 \let\subsubsection\paragraph
 \let\subsection\subsubsection
-\input{sections/hypotheses_bayesian_models}
+\input{sections/3.1_hypotheses_bayesian_models.tex}
 \endgroup
 
 \subsection{Signals and Data}\label{sec:four}
 \begingroup
 \let\subsection\subsubsection
-\input{sections/signals_data}
+\input{sections/3.2_signals_data.tex}
 \endgroup
 
 \subsection{Experimental Framework}\label{sec:five}
 \begingroup
 \let\subsubsection\paragraph
 \let\subsection\subsubsection
-\input{sections/experimental_framework}
+\input{sections/3.3_experimental_framework.tex}
 \endgroup
 
 \section{Results}\label{sec:six}
-\input{sections/results}
+\input{sections/4_results.tex}
 
 \section{Discussion and Security Risk Assessment}\label{sec:discussion}
 \subsection{Mitigation: Evaluation and Further Strategies}\label{sec:mitigationDiscussion}
 \begingroup
 \let\subsection\subsubsection
-\input{sections/mitigation_discussion}
+\input{sections/5.1_mitigation_discussion.tex}
 \endgroup
 
 \subsection{Security Risk Assessment}\label{sec:eight}
 \begingroup
 \let\subsection\subsubsection
-\input{sections/security_risk_assessment}
+\input{sections/5.2_security_risk_assessment.tex}
 \endgroup
 
 \section{Conclusions}\label{sec:conclusions}
-\input{sections/conclusion}
+\input{sections/6_conclusion.tex}
 
 \newpage
 \printbibliography[]
@@ -178,31 +175,31 @@ The ontology and control rules below describe the proposed deployment scenario. 
 \newpage
 \appendixsection{Ontology of the Photovoltaic Application Domain}{sec:appendixA}
 \begingroup \let\section\subsection \let\subsection\subsubsection
-\input{sections/ontology_appendix.tex}
+\input{sections/A_ontology_appendix.tex}
 \endgroup
 
 \newpage
 \appendixsection{Bayesian Model Specifications}{sec:appBayes}
-\input{sections/bayesian_appendix}
+\input{sections/B_bayesian_appendix.tex}
 
 \newpage
 \appendixsection{Light TSMixup}{sec:appB}
-\input{sections/lighttsmixup_appendix}
+\input{sections/C_lighttsmixup_appendix.tex}
 
 \newpage
 \appendixsection{KernelSynth}{sec:appC}
-\input{sections/kernelsynth_appendix}
+\input{sections/D_kernelsynth_appendix.tex}
 
 \newpage
 \appendixsection{Chronos-Bolt-Tiny Retraining Procedure}{sec:appRetraining}
-\input{sections/retraining_appendix}
+\input{sections/E_retraining_appendix.tex}
 
 \newpage
 \appendixsection{The Exploratory Frequency Sweep}{sec:appSweep}
-\input{sections/sweep_appendix}
+\input{sections/F_sweep_appendix.tex}
 
 \newpage
 \appendixsection{The Photovoltaic Series and the Probe by Depth}{sec:appSolar}
-\input{sections/solar_appendix}
+\input{sections/G_solar_appendix.tex}
 
 \end{document}
