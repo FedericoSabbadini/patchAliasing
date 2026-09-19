@@ -110,59 +110,22 @@ twoside, % Two side traditional mode where headers and footers change between od
 
 \newpage
 \section*{Introduction}\label{sec:introduction}
-\input{sections/introduction}
+\input{sections/0_introduction}
 
 \section{Patch-Based Tokenisation}\label{sec:one}
 \input{sections/1_tokenisation_phase_locking.tex}
 
 \section{Proposed Approach: Observability, Agent Behaviour and Mitigation}\label{sec:proposal}
-The ontology and control rules below describe the proposed deployment scenario. Increased patch overlap is introduced as a candidate mitigation whose effectiveness remains to be tested.
-
-\subsection{Ontology and Agent Behaviour}\label{sec:two}
-\begingroup
-\let\subsection\subsubsection
-\input{sections/2.1_ontology_agent_behaviour.tex}
-\endgroup
-
-\subsection{Proposed Mitigation}\label{sec:seven}
-\input{sections/2.2_mitigation_proposal.tex}
+\input{sections/2_agent_behaviour_mitigation.tex}
 
 \section{Research Questions and Experimental Methodology}\label{sec:methodology}
-\subsection{Expected Behaviour at Blind-Spot Frequencies}\label{sec:three}
-\begingroup
-\let\subsubsection\paragraph
-\let\subsection\subsubsection
-\input{sections/3.1_hypotheses_bayesian_models.tex}
-\endgroup
-
-\subsection{Signals and Data}\label{sec:four}
-\begingroup
-\let\subsection\subsubsection
-\input{sections/3.2_signals_data.tex}
-\endgroup
-
-\subsection{Experimental Framework}\label{sec:five}
-\begingroup
-\let\subsubsection\paragraph
-\let\subsection\subsubsection
-\input{sections/3.3_experimental_framework.tex}
-\endgroup
+\input{sections/3_research_questions_methodology.tex}
 
 \section{Results}\label{sec:six}
 \input{sections/4_results.tex}
 
 \section{Discussion and Security Risk Assessment}\label{sec:discussion}
-\subsection{Mitigation: Evaluation and Further Strategies}\label{sec:mitigationDiscussion}
-\begingroup
-\let\subsection\subsubsection
-\input{sections/5.1_mitigation_discussion.tex}
-\endgroup
-
-\subsection{Security Risk Assessment}\label{sec:eight}
-\begingroup
-\let\subsection\subsubsection
-\input{sections/5.2_security_risk_assessment.tex}
-\endgroup
+\input{sections/5_discussion_risk_assessment.tex}
 
 \section{Conclusions}\label{sec:conclusions}
 \input{sections/6_conclusion.tex}
