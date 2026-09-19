@@ -39,6 +39,9 @@ x[n]
 
 where $f$ denotes the signal frequency satisfying the Nyquist criterion $f < \frac{f_s}{2}$, and $\phi\in[0,2\pi)$ is an arbitrary phase offset.
 
+\pagebreak
+
+
 Phase-locking occurs when the structural phase profile of the signal repeats exactly under a translational shift equal to the stride $S$. Evaluating a stride translation yields
 
 \begin{equation*}
@@ -168,7 +171,11 @@ x[n],
 \forall n,
 \end{equation*}
 
-but only the first bears on consecutive patches. Tokens begin at multiples of the stride, so the step from token $k$ to token $k+j$ is a shift of $jS$ samples. Substituting \autoref{eq:element_def} and reducing by the stride condition at $j=1$ gives
+but only the first bears on consecutive patches. Tokens begin at multiples of the stride, so the step from token $k$ to token $k+j$ is a shift of $jS$ samples. 
+
+\pagebreak
+
+Substituting \autoref{eq:element_def} and reducing by the stride condition at $j=1$ gives
 
 \begin{equation}
 \label{eq:collapse_S}

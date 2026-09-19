@@ -1,0 +1,33 @@
+\begin{table}[!t]
+    \centering
+    \small
+    \begin{tabular}{@{}cccc@{}}
+        \toprule
+        \textbf{$P$} & \textbf{$S$} &
+        $|\mathcal{F}_{S}\setminus\mathcal{F}_{P}|$ & $|\mathcal{F}_{P}\setminus\mathcal{F}_{S}|$ \\
+        \midrule
+        $8$ & $8$ & $0$ & $0$ \\
+        \midrule
+        $16$ & $8$ & $0$ & $4$ \\
+        $16$ & $12$ & $4$ & $6$ \\
+        $16$ & $16$ & $0$ & $0$ \\
+        \midrule
+        $24$ & $8$ & $0$ & $8$ \\
+        $24$ & $12$ & $0$ & $6$ \\
+        $24$ & $16$ & $4$ & $8$ \\
+        $24$ & $20$ & $8$ & $10$ \\
+        $24$ & $24$ & $0$ & $0$ \\
+        \midrule
+        $32$ & $8$ & $0$ & $12$ \\
+        $32$ & $12$ & $4$ & $14$ \\
+        $32$ & $16$ & $0$ & $8$ \\
+        $32$ & $20$ & $8$ & $14$ \\
+        $32$ & $24$ & $8$ & $12$ \\
+        $32$ & $32$ & $0$ & $0$ \\
+        \midrule
+        \multicolumn{2}{c}{\textbf{Total}} & $36$ & $102$ \\
+        \bottomrule
+    \end{tabular}
+\caption{What each geometry can attribute to one branch alone: the frequencies in $[2,250]$\,Hz that one grid predicts and the other does not. A zero in the first column is the case $S \mid P$, where every stride site $c f_s/S$ is also a patch site $k f_s/P$; a zero in both is $P=S$, where the two branches are the same set of frequencies. The last row totals them over the design. The counts are taken from the grids themselves rather than from any measurement, and are unchanged whether coincidence is required exactly or only to within the $1$\,Hz resolution of the sweep.}
+    \label{tab:branchSites}
+\end{table}

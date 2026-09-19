@@ -1,0 +1,41 @@
+The ontology and control rules below describe the proposed deployment scenario. Increased patch overlap is introduced as a candidate mitigation whose effectiveness remains to be tested.
+
+\subsection{Ontology and Agent Behaviour}\label{sec:two}
+\begingroup
+\let\subsection\subsubsection
+The ontology of \autoref{sec:appendixA} closes the loop from the signal to the agent decision by making the tokenisation geometry a first-class object rather than a property of the model: a \pv{TimeSeriesSignal} carries one \pv{PatchedRepresentation} per geometry $(P,S)$ under evaluation, each recording its patch size, stride and overlap. A frequency-specific loss of observability therefore attaches to the signal-configuration pair rather than to Chronos-Bolt-Tiny alone, so the same checkpoint can be safe for one plant and not for another. Because the lock conditions of \autoref{eq:locking-candidate} are arithmetic on those same fields, the candidate set is derivable from the knowledge base rather than hard-coded beside it: a reasoner can list the sites of a geometry never measured, and recompute them whenever the geometry or the sampling interval changes, a checkpoint change mattering only when it alters $(P,S)$.
+
+What that arithmetic reaches is the domain vocabulary, none of whose terms is read off the raw telemetry. A \valueof{RampEvent}, or a \valueof{PartialCloud} generation context, is inferred from an observation whose short-horizon forecast the agent has already trusted. So a frequency the representation cannot hold is one whose signature cannot support that inference. The exposure is selective and the arithmetic says where: on one-minute telemetry with $P=16$ the patch comb falls at periods of $16/k$ minutes, the timescales of cloud-edge crossings and inverter duty cycling, while a broadband \valueof{InverterTrip} is untouched, since no comb hides a step. The predicted failure is therefore a missed distinction rather than a wrong number: two contexts differing only at a candidate frequency collapse to one latent state.
+
+\subsection*{Agentic Deployment}
+For monitoring, placement matters more than cadence. The stride-derived and patch-derived candidates follow separately from $\mathcal{F}_{S}$ and $\mathcal{F}_{P}$, but neither can be watched downstream: a detector placed after tokenisation inherits the blind spot it is meant to find, so the monitor acts on the raw telemetry, the one stage the forecaster cannot perform itself.
+
+The explanation the agent produces keeps a geometric candidate apart from an established loss. Each \pv{ObservabilityAssessment} records the estimand, the effect size, the interval and the posterior probability behind its verdict, and assigns \valueof{StructurallyAliased} only to a frequency that is a lock candidate and also carries confirmed evidence of loss; \autoref{eq:bayesian-evidence} separates the two directions of evidence, and because $\tau>1/2$ they cannot both hold, so everything short of confirmed preservation is \valueof{PartiallyObservable}. An operator therefore reads why authority was reduced and not merely that it was: the frequency and geometry that triggered the warning, and whether a fit measured the loss there or the arithmetic only predicted one.
+
+Action enters control through \autoref{eq:mode-selection} and not through a policy of its own, so the assessment rather than the geometry selects the mode. A confirmed \valueof{StructurallyAliased} state selects \valueof{SafeMode} at the same priority as a sensor malfunction, under \autoref{eq:priority}, the array staying connected because the fault is in the model and not in the plant; a merely \valueof{PartiallyObservable} state selects \valueof{ConservativeMode}, which lowers authority without suspending dispatch. Both are reversible, degrading authority rather than substituting a correction the analysis does not support, and the default runs in the safe direction: where no fit covers a candidate the state is \valueof{PartiallyObservable} by construction, so an unmeasured plant runs permanently at reduced authority and pays the cost in capacity rather than in risk.
+\endgroup
+
+\subsection{Proposed Mitigation}\label{sec:seven}
+One mitigation is carried through the design and pre-registered as $M1$: increase patch overlap $O$ by reducing the stride $S$ at fixed patch size $P$. Its geometric basis lies in the stride branch, whose candidates are in $\mathcal{F}_{S}$. $M1$ asks whether this reduction also decreases the observed recovery deficit. Model~A$'$ of \autoref{sec:three} tests the claim through the overlap slope $\delta_O$, read on the contrast $d$ that Model~A is fitted to, where a mitigation is a positive slope. The pre-registered rule has two legs: $\Pr(\delta_O>0\mid D)\geq0.95$, and the configuration level carrying the overlap term must win the leave-one-out comparison against the same level without it. Both must hold.
+
+Part of the answer does not wait on the fit. In the analysed band the stride candidates satisfy $f=cf_s/S$ with $c<S/2$, so a geometry has $\lceil S/2\rceil-1$ of them; a smaller $S$ raises the fundamental $f_s/S$, widens the spacing and lowers that count, and halving $S$ retains only the even-indexed sites. The patch fundamental $f_s/P$ is untouched by any of this, so $\mathcal{F}_{P}$ is invariant under the mitigation by construction. Overlap is therefore a partial geometric adjustment at best: it displaces stride-derived candidates and cannot remove patch-derived ones.
+
+\subsection{Patch Geometries and Retraining}\label{sec:geometries}
+\begingroup
+\let\subsection\subsubsection
+$M1$ is a change of geometry, so it cannot be tested on the geometry the model is distributed with. Overlap is fixed by the pair $(P,S)$ through \autoref{eq:overlap}, and the published Chronos-Bolt-Tiny sits at $P=S=16$, where $O=0$: the mitigation has no value to vary there. Testing whether raising $O$ reduces the recovery deficit requires a population of geometries that spans the range of $O$, and none of them exists as a released checkpoint. The design that follows, and the cost of retraining it, are consequences of that.
+
+\subsection{Patch geometries}
+
+Studying the published point alone would show how the published configuration behaves, but not whether a blind spot follows the tokenisation parameters that generate it. The design therefore varies both: at fixed $P$, changing $S$ moves the overlap and the stride spacing; at fixed $S$, changing $P$ moves the patch width and the patch spacing, with the $P=S$ runs as contiguous baselines at different temporal resolutions. Varying $S$ alone would confound the mitigation with the stride spacing it also moves, which is why $P$ is varied as well and the two enter the analysis as separate covariates. Configurations with $S>P$ are excluded, since their gaps discard input samples and would confound geometry with data loss.
+
+\subsection{Retraining}
+
+Every geometry, the baseline included, is trained from scratch: changing $P$ changes the input width of the first patch projection and changing $S$ the token sequence on which inter-patch dynamics are learned, so reusing the published weights would leave the variants on unequal training histories. Only the architectural configuration is taken from the published model; $(P,S)$ is overridden before random initialisation, and data, optimiser, budget and seed are held fixed. \autoref{sec:appRetraining} gives the construction, the streaming data and the optimisation.
+
+\input{tables/hfModels.tex}
+
+\autoref{tab:hfModels} lists the fifteen runs this produces. The overlap ratio spans $0$ to $0.75$, and because $P$ and $S$ vary independently rather than along a single line, the overlap term the mitigation is about can be estimated separately from the patch size that moves with it.
+
+The patch grid spans only a whole number of strides, $L_{\mathrm{tok}}$, of the analysis context. The samples beyond it, at most sixteen of the $480$ supplied, enter no token and are lost.
+\endgroup
