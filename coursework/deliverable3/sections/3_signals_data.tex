@@ -1,0 +1,17 @@
+Four kinds of signal appear in this study. Three are synthetic and are what the models are probed with, each serving a different purpose rather than being a variant of the others; the fourth is the real telemetry of the application domain. This section states what each source is and why it is in the study; the appendices carry the pseudocode, the parameters and the pool composition.
+
+\subsection*{Single-harmonic sinusoid}
+
+It is the primitive the design rests on: frequency and phase are exact, so a locked frequency produces exactly the degeneracy of \autoref{eq:token_collapse} and no background content can be blamed for a loss observed at a predicted site. It takes the form $x(t)=A\sin(2\pi f t+\phi)$, sampled at $f_s$.
+
+\subsection*{Light TSMixup}
+
+A controlled probing variant of the mixup augmentation used to train Chronos\autocite{ansariChronosLearningLanguage2024}, in which the real source datasets of the original are replaced by a pool of sinusoids. It tests whether the effect survives when the tone is embedded in a multi-component signal whose composition is still fully known. Its pseudocode and parameters are given in \autoref{sec:appB}.
+
+\subsection*{KernelSynth}
+
+The Gaussian-process generator of the same training recipe\autocite{ansariChronosLearningLanguage2024}. Its output carries trends and broadband content as well as periodicity, so it tests whether the effect survives in signals resembling the corpus the model was trained on rather than the probe used to measure it. Its pseudocode, kernel bank and parameters are given in \autoref{sec:appC}.
+
+\subsection*{Photovoltaic telemetry}
+
+The measured series of the SolarTech Lab at Politecnico di Milano, released open access on IEEE DataPort\autocite{levaPhotovoltaicPowerWeather2020}. Six channels are recorded at one-minute resolution and timestamped in Central European Time: module power at a $30^\circ$ tilt, ambient temperature, global horizontal irradiance, global irradiance in the plane of array, wind speed and wind direction. Missing samples are frequent and structural. They supply the quantities the ontology of \autoref{sec:appendixA} names and the cadence against which the dimensionless readings of \autoref{sec:tokenisation} are interpreted. The set is the application domain of this study, no hypothesis is tested on it, \autoref{sec:appSolar} reports how it is treated and what is read off it.

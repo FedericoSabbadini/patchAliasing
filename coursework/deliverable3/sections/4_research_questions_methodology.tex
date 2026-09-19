@@ -1,19 +1,10 @@
-\subsection{Expected Behaviour at Blind-Spot Frequencies}\label{sec:three}
+\subsection{Bayesian Analysis}\label{sec:three}
 \begingroup
 \let\subsubsection\paragraph
 \let\subsection\subsubsection
-Bayesian statistics represents uncertainty about unknown quantities through probability distributions and updates prior beliefs when data are observed\autocite{murphyProbabilisticMachineLearning2023}. It is used here because the hypotheses concern the magnitude and uncertainty of structural aliasing effects: posterior distributions quantify evidence for a localisation loss, phase independence and parameter-tracking against predeclared decision thresholds. The candidate set $\mathcal F_{\mathrm{lock}}$ of \autoref{eq:flock} is arithmetic and holds for any model. Three claims are carried into the analysis, each stated so that a particular posterior refutes it.
+Bayesian statistics represents uncertainty about unknown quantities through probability distributions and updates prior beliefs when data are observed\autocite{murphyProbabilisticMachineLearning2023}. It is used here because the hypotheses concern the magnitude and uncertainty of structural aliasing effects: posterior distributions quantify evidence for a localisation loss, phase independence and parameter-tracking against predeclared decision thresholds. Each of the three claims of \autoref{sec:seven}, and the mitigation proposed with them, is decided by a posterior stated here.
 
 \autoref{tab:bayesModels} pairs each claim with the model that decides it, its estimand, the value the claim predicts and the measurements it is fitted to, and \autoref{sec:appBayes} states each model in full. Every effect prior is centred on no effect, and its scale is varied over the sensitivity ladder $\{0.25,0.5,1.0\}$, sceptical, primary and wide, so that a conclusion resting on the choice of scale rather than on the data is detected as such.
-
-\subsubsection*{Frequency-dependent blind spots (H1)}
-At a candidate frequency $f_k\in\mathcal F_{\mathrm{lock}}$ the model retains less of the signal than at the two neighbouring control frequencies $f_k\pm\delta$, which are not themselves candidates. The claim has two readings that need not agree: a behavioural one, in which the forecast no longer rebuilds the tone at the frequency it was given, and a representational one, in which the frequency becomes harder to read out of the internal state. A loss that is absent, or not localised on the candidate set, refutes $H1$. Phase-locking is treated here as a necessary but not sufficient condition for the specific geometry-induced structural aliasing this study hypothesises: nothing in the design excludes that distinct signals acquire near-identical learned representations for reasons unrelated to $\mathcal F_{\mathrm{lock}}$, and no claim is made about frequencies outside it.
-
-\subsubsection*{Independence from temporal alignment (H2)}
-The magnitude of that loss is a property of the alignment between the signal period and the tokenisation grid, not of the point in its cycle at which the signal is observed. A loss varying systematically with the starting phase refutes $H2$.
-
-\subsubsection*{Parametric dependence of blind spot sites (H3)}
-Because $\mathcal F_{\mathrm{lock}}$ is a union, the claim splits in two, one per branch, with $c,k\in\mathbb{N}^{+}$ the harmonic indices of \autoref{eq:branches}. $H3a$: at fixed $P$, the sites at $f=c\,f_s/S$ move proportionally to $1/S$. $H3b$: at fixed $S$, the sites at $f=k\,f_s/P$ move proportionally to $1/P$. A site that stays put while the parameter supposed to generate it is varied refutes its branch.
 
 \input{tables/bayesModels.tex}
 
@@ -119,33 +110,11 @@ Every threshold in \autoref{tab:bayesDecisions} is fixed before a posterior is i
 Interpretation is gated by three preregistered convergence diagnostics, and competing formulations are compared by leave-one-out cross-validation under a reading rule that returns an inconclusive verdict for differences within twice their standard error. The diagnostics, the reading rule and the sampler settings shared by every fit are stated in \autoref{sec:appBayes}; a fit failing any diagnostic is not used to support a claim.
 \endgroup
 
-\subsection{Signals and Data}\label{sec:four}
-\begingroup
-\let\subsection\subsubsection
-Four kinds of signal appear in this study. Three are synthetic and are what the models are probed with, each serving a different purpose rather than being a variant of the others; the fourth is the real telemetry of the application domain. This section states what each source is and why it is in the study; the appendices carry the pseudocode, the parameters and the pool composition.
-
-\subsection*{Single-harmonic sinusoid}
-
-It is the primitive the design rests on: frequency and phase are exact, so a locked frequency produces exactly the degeneracy of \autoref{eq:token_collapse} and no background content can be blamed for a loss observed at a predicted site. It takes the form $x(t)=A\sin(2\pi f t+\phi)$, sampled at $f_s$.
-
-\subsection*{Light TSMixup}
-
-A controlled probing variant of the mixup augmentation used to train Chronos\autocite{ansariChronosLearningLanguage2024}, in which the real source datasets of the original are replaced by a pool of sinusoids. It tests whether the effect survives when the tone is embedded in a multi-component signal whose composition is still fully known. Its pseudocode and parameters are given in \autoref{sec:appB}.
-
-\subsection*{KernelSynth}
-
-The Gaussian-process generator of the same training recipe\autocite{ansariChronosLearningLanguage2024}. Its output carries trends and broadband content as well as periodicity, so it tests whether the effect survives in signals resembling the corpus the model was trained on rather than the probe used to measure it. Its pseudocode, kernel bank and parameters are given in \autoref{sec:appC}.
-
-\subsection*{Photovoltaic telemetry}
-
-The measured series of the SolarTech Lab at Politecnico di Milano, released open access on IEEE DataPort\autocite{levaPhotovoltaicPowerWeather2020}. Six channels are recorded at one-minute resolution and timestamped in Central European Time: module power at a $30^\circ$ tilt, ambient temperature, global horizontal irradiance, global irradiance in the plane of array, wind speed and wind direction. Missing samples are frequent and structural. They supply the quantities the ontology of \autoref{sec:appendixA} names and the cadence against which the dimensionless readings of \autoref{sec:tokenisation} are interpreted. The set is the application domain of this study, no hypothesis is tested on it, \autoref{sec:appSolar} reports how it is treated and what is read off it.
-\endgroup
-
 \subsection{Experimental Framework}\label{sec:five}
 \begingroup
 \let\subsubsection\paragraph
 \let\subsection\subsubsection
-Testing the hypotheses of \autoref{sec:three} requires a design in which the two branches of $\mathcal F_{\mathrm{lock}}$ can be told apart, signals whose frequency content is known by construction, and an order of execution in which nothing that decides a hypothesis is chosen after the data have been seen.
+Testing the hypotheses of \autoref{sec:seven} requires a design in which the two branches of $\mathcal F_{\mathrm{lock}}$ can be told apart, signals whose frequency content is known by construction, and an order of execution in which nothing that decides a hypothesis is chosen after the data have been seen.
 
 Three things are deliberately outside this design. Variation between independently trained instances is not measured, since one model is trained per geometry. The photovoltaic series supplies the application domain and the semantic layer, not an experimental corpus: no hypothesis is tested on measured telemetry. And no untrained network is probed, so the claim that token collapse precedes learning rests on the arithmetic rather than on a baseline.
 

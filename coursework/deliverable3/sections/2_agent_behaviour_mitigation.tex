@@ -1,6 +1,6 @@
 The deployment this report is written for is a photovoltaic plant whose power output is read as a time series, forecast by the model of \autoref{sec:tokenisation}, and acted on by a control agent. This section describes that scenario at the level needed to see why the tokenisation geometry matters to it; \autoref{sec:appendixA} gives the formal statement.
 
-\subsection{Ontology and Agent Behaviour}\label{sec:two}
+\subsection{OWL2 Ontology}\label{sec:two}
 \begingroup
 \let\subsection\subsubsection
 An ontology names the things a deployment involves and the relations between them, so that a reasoner can derive statements about a plant rather than have them written down case by case. The one used here names two kinds of thing. The first is what the domain contains: a \ont{TimeSeriesSignal} produced by a \ont{PVSystem}, the conditions that shape it, from \valueof{ClearSky} through \valueof{PartialCloud} to a \valueof{RampEvent} or an \valueof{InverterTrip}, and the \ont{Forecast} and \ont{PowerRoutingDecision} that follow.
@@ -13,12 +13,24 @@ The agent reads the plant, forecasts it, and chooses how much authority to act o
 The agent therefore keeps an \ont{ObservabilityAssessment} per signal and geometry, recording whether a candidate frequency is \valueof{Observable}, only \valueof{PartiallyObservable}, or \valueof{StructurallyAliased}, and on what evidence. That verdict, not the geometry alone, selects the \ont{ControlMode}: \valueof{NormalMode}, or \valueof{ConservativeMode} and \valueof{SafeMode} where observability is in doubt. Authority is reduced rather than overridden, and an unmeasured plant runs conservatively by default. One placement constraint follows from the arithmetic alone: a monitor sitting after tokenisation would inherit the blind spot it is meant to find, so it has to read the raw telemetry.
 \endgroup
 
-\subsection{Proposed Mitigation}\label{sec:seven}
-If the loss follows from the geometry, the geometry is where to act. The mitigation carried through this design, pre-registered as $M1$, is to overlap the patches: hold the patch size $P$ and shorten the stride $S$, so consecutive patches share samples and each instant is seen in more than one token. The intent is to leave a frequency fewer places to fall where the representation cannot hold it.
+\subsection{Expected Behaviour and Proposed Mitigation}\label{sec:seven}
+That such blind spots exist at all is not this report's observation. Pagani et al.\autocite{paganiPreliminaryInsightsChronos2026} report that frequency content is recovered unevenly from Chronos representations, and their own title calls the insights preliminary: the readings are descriptive, they are not paired against control frequencies, and nothing ties the places where recovery degrades to a set that can be written down in advance. \autoref{sec:tokenisation} supplies exactly such a set.
+
+That is what makes the question answerable. The arithmetic gives a list of frequencies at which a loss is possible; whether anything is actually lost there, and whether the loss follows the rule the arithmetic predicts, is an empirical question, and the rest of this report is about settling it. Because $\mathcal{F}_{\mathrm{lock}}$ of \autoref{eq:flock} holds for any model, three claims can be carried into the analysis, each stated so that a particular measurement refutes it, and a mitigation proposed alongside them. \autoref{sec:methodology} states how each one is decided.
+
+\subsubsection*{Frequency-dependent blind spots (H1)}
+At a candidate frequency $f_k\in\mathcal F_{\mathrm{lock}}$ the model retains less of the signal than at the two neighbouring control frequencies $f_k\pm\delta$, which are not themselves candidates. The claim has two readings that need not agree: a behavioural one, in which the forecast no longer rebuilds the tone at the frequency it was given, and a representational one, in which the frequency becomes harder to read out of the internal state. A loss that is absent, or not localised on the candidate set, refutes $H1$. Phase-locking is treated here as a necessary but not sufficient condition for the specific geometry-induced structural aliasing this study hypothesises: nothing in the design excludes that distinct signals acquire near-identical learned representations for reasons unrelated to $\mathcal F_{\mathrm{lock}}$, and no claim is made about frequencies outside it.
+
+\subsubsection*{Independence from temporal alignment (H2)}
+The magnitude of that loss is a property of the alignment between the signal period and the tokenisation grid, not of the point in its cycle at which the signal is observed. A loss varying systematically with the starting phase refutes $H2$.
+
+\subsubsection*{Parametric dependence of blind spot sites (H3)}
+Because $\mathcal F_{\mathrm{lock}}$ is a union, the claim splits in two, one per branch, with $c,k\in\mathbb{N}^{+}$ the harmonic indices of \autoref{eq:branches}. $H3a$: at fixed $P$, the sites at $f=c\,f_s/S$ move proportionally to $1/S$. $H3b$: at fixed $S$, the sites at $f=k\,f_s/P$ move proportionally to $1/P$. A site that stays put while the parameter supposed to generate it is varied refutes its branch.
+
+\subsubsection*{A candidate mitigation (M1)}
+If the loss does follow from the geometry, the geometry is where to act. The mitigation carried through this design, pre-registered as $M1$, is to overlap the patches: hold the patch size $P$ and shorten the stride $S$, so consecutive patches share samples and each instant is seen in more than one token. The intent is to leave a frequency fewer places to fall where the representation cannot hold it.
 
 Part of the answer needs no measurement. Raising the overlap moves the stride-derived candidates $\mathcal{F}_{S}$ and thins them, but the patch fundamental $f_s/P$ is untouched, so $\mathcal{F}_{P}$ is invariant under the mitigation by construction. Overlap is a partial adjustment at best: it displaces one branch and cannot reach the other.
-
-\input{tables/hfModels.tex}
 
 \subsection{Patch Geometries and Retraining}\label{sec:geometries}
 \begingroup
@@ -26,6 +38,8 @@ Part of the answer needs no measurement. Raising the overlap moves the stride-de
 $M1$ is a change of geometry, so it cannot be tested where the model is distributed: Chronos-Bolt-Tiny is published at $P=S=16$, where the overlap of \autoref{eq:overlap} is zero and there is nothing to vary. A population spanning that range is needed, and none of it exists as a released checkpoint.
 
 Both parameters therefore vary. At fixed $P$, changing $S$ moves the overlap; at fixed $S$, changing $P$ moves the patch width, with the $P=S$ runs as contiguous baselines. Varying $S$ alone would confound the mitigation with the stride spacing it also moves, and $S>P$ is excluded because such gaps discard input samples. Every geometry is trained from scratch, the baseline included, since reusing the published weights would leave the variants on unequal training histories; \autoref{sec:appRetraining} gives the construction, the data and the optimisation.
+
+\input{tables/hfModels.tex}
 
 \autoref{tab:hfModels} lists the fifteen runs this produces. The overlap spans $0$ to $0.75$, and because $P$ and $S$ vary independently rather than along a single line, the overlap can be estimated separately from the patch size that moves with it. One cost is worth recording: of the $480$ samples supplied, the patch grid spans only $L_{\mathrm{tok}}$, a whole number of strides, and the samples beyond it, at most sixteen, enter no token and are lost.
 \endgroup

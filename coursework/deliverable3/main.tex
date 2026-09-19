@@ -98,7 +98,7 @@ twoside, % Two side traditional mode where headers and footers change between od
 
 % Authors are listed in a comma-separated list with superscript numbers indicating affiliations
 % \thanks{} is used for any text that should be placed in a footnote on the first page, such as the corresponding author's email, journal acceptance dates, a copyright/license notice, keywords, etc
-\author{ Matteo Boniotti, Gianluca Brignoli and Federico Sabbadini\thanks{\raggedright This work is licensed under the Creative Commons Attribution 4.0 International License. Concurrently, all associated source code, probing scripts, and software artifacts generated throughout the project lifecycle are released under the open-source MIT license. \newline Copyright for any third-party material included in this work remains with its respective owners and must be respected accordingly. \newline \newline During the preparation of this work, the authors used AI-based tools, namely GPT-6 Astra and Opus 5 in distinct roles. The tools supported language refinement and clarity throughout the report, and assisted with the implementation and refactoring of the code released with this work, including the Bayesian model descriptions in Appendix~B. The tools were not used to generate experimental results, which come from the recorded runs in the accompanying repository. All generated or suggested content was reviewed, revised where necessary and validated by the authors, who assume full responsibility for the final content of this work.} }
+\author{ Matteo Boniotti, Gianluca Brignoli and Federico Sabbadini\thanks{\raggedright This work is licensed under the Creative Commons Attribution 4.0 International License. Concurrently, all associated source code, probing scripts, and software artifacts generated throughout the project lifecycle are released under the open-source MIT license. \newline Copyright for any third-party material included in this work remains with its respective owners and must be respected accordingly. \newline \newline During the preparation of this work, the authors used AI-based tools, namely GPT-6 Astra, GPT-5.6 Sol, Opus 5, and Sonnet 5 in distinct roles. The tools supported language refinement and clarity throughout the report, and assisted with the implementation and refactoring of the probing, data-collection and analysis code released with this work, including the Bayesian model descriptions in Appendix~B and the figure-generating scripts. The tools were not used to generate experimental results, which come from the recorded runs in the accompanying repository. All generated or suggested content was reviewed, revised where necessary and validated by the authors, who assume full responsibility for the final content of this work.} }
 
 \renewcommand{\maketitlehookd}{
 	\begin{abstract}
@@ -118,20 +118,23 @@ twoside, % Two side traditional mode where headers and footers change between od
 \section{Patch-Based Tokenisation}\label{sec:tokenisation}
 \input{sections/1_tokenisation_phase_locking.tex}
 
-\section{Agent Behaviour and Mitigation}\label{sec:agent}
+\section{System Behaviour at Phase Locking Frequencies}\label{sec:agent}
 \input{sections/2_agent_behaviour_mitigation.tex}
 
+\section{Signals and Data}\label{sec:signals}
+\input{sections/3_signals_data.tex}
+
 \section{Experimental Methodology}\label{sec:methodology}
-\input{sections/3_research_questions_methodology.tex}
+\input{sections/4_research_questions_methodology.tex}
 
 \section{Results}\label{sec:results}
-\input{sections/4_results.tex}
+\input{sections/5_results.tex}
 
 \section{Security Risk Assessment}\label{sec:security}
-\input{sections/5_discussion_risk_assessment.tex}
+\input{sections/6_discussion_risk_assessment.tex}
 
 \section{Conclusions}\label{sec:conclusions}
-\input{sections/6_conclusion.tex}
+\input{sections/7_conclusion.tex}
 
 \newpage
 \printbibliography[]
