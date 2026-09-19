@@ -138,7 +138,7 @@ The Gaussian-process generator of the same training recipe\autocite{ansariChrono
 
 \subsection*{Photovoltaic telemetry}
 
-The measured series of the SolarTech Lab at Politecnico di Milano, released open access on IEEE DataPort\autocite{levaPhotovoltaicPowerWeather2020}. Six channels are recorded at one-minute resolution and timestamped in Central European Time: module power at a $30^\circ$ tilt, ambient temperature, global horizontal irradiance, global irradiance in the plane of array, wind speed and wind direction. Missing samples are frequent and structural. They supply the quantities the ontology of \autoref{sec:appendixA} names and the cadence against which the dimensionless readings of \autoref{sec:one} are interpreted. The set is the application domain of this study, no hypothesis is tested on it, \autoref{sec:appSolar} reports how it is treated and what is read off it.
+The measured series of the SolarTech Lab at Politecnico di Milano, released open access on IEEE DataPort\autocite{levaPhotovoltaicPowerWeather2020}. Six channels are recorded at one-minute resolution and timestamped in Central European Time: module power at a $30^\circ$ tilt, ambient temperature, global horizontal irradiance, global irradiance in the plane of array, wind speed and wind direction. Missing samples are frequent and structural. They supply the quantities the ontology of \autoref{sec:appendixA} names and the cadence against which the dimensionless readings of \autoref{sec:tokenisation} are interpreted. The set is the application domain of this study, no hypothesis is tested on it, \autoref{sec:appSolar} reports how it is treated and what is read off it.
 \endgroup
 
 \subsection{Experimental Framework}\label{sec:five}
@@ -161,7 +161,7 @@ Pure tones cross the band in one-hertz steps at several phases, on contexts near
 
 \input{tables/bandTasks.tex}
 
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     \includegraphics[width=\textwidth]{figures/fig_rec_16_16.png}
 \caption{Behavioural reconstruction (left) and representational recovery (right) for pure tones under the reference geometry $P=S=16$ and seed~42. The left panel compares input and dominant generated frequencies across phases; the right reports local and hierarchical band-probe accuracy. Dashed vertical lines mark the predicted lock frequencies, and grey cells denote frequencies outside a task's coverage.}
@@ -170,7 +170,7 @@ Pure tones cross the band in one-hertz steps at several phases, on contexts near
 
 A third descriptive reading uses generated signals: one realisation is forecast by the reference geometry and its horizon compared with the matching ground-truth interval, the frequencies coming from the generator record for Light TSMixup and from the transform for KernelSynth, which names none. A tone returned at the wrong frequency but still recoverable points to a loss after the representation. All three readings stay descriptive. \autoref{fig:TSM16-16} shows one example, and \autoref{sec:appSweep} the rest with the method and the resolution limit that govern them.
 
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     \includegraphics[width=\textwidth]{figures/FIG_E4_tsmixup_p16-s16_spectra_seed2.png}
 \caption{Input and forecast spectra for one Light TSMixup realisation under the reference geometry $P=S=16$ and seed~2. The upper panel shows the generator-recorded input lines; the lower shows peaks recovered from the Chronos-Bolt-Tiny forecast. Dashed vertical lines mark the predicted lock frequencies, and the horizontal threshold marks the spectral cut used to retain forecast peaks.}

@@ -1,4 +1,4 @@
-This appendix holds the descriptive pass that precedes the Bayesian analysis. It covers the fifteen geometries of \autoref{tab:hfModels}, five per page, and each row is one geometry read twice: on the left what the model outputs, on the right what its internal state retains. It is reported here rather than in the body because none of it is a hypothesis test. Both readings average over phase, both use a single signal family, and neither carries a statement of uncertainty; their role is to show that the phenomenon the models of \autoref{sec:three} are built to measure is present in the raw sweep, and on the signals constructed with the generators of \autoref{sec:four}. A summary of the observed information is given in \autoref{sec:six}.
+This appendix holds the descriptive pass that precedes the Bayesian analysis. It covers the fifteen geometries of \autoref{tab:hfModels}, five per page, and each row is one geometry read twice: on the left what the model outputs, on the right what its internal state retains. It is reported here rather than in the body because none of it is a hypothesis test. Both readings average over phase, both use a single signal family, and neither carries a statement of uncertainty; their role is to show that the phenomenon the models of \autoref{sec:three} are built to measure is present in the raw sweep, and on the signals constructed with the generators of \autoref{sec:four}. A summary of the observed information is given in \autoref{sec:results}.
 
 Two of these readings are carried into the body at the reference geometry, and what follows here is the rest of the same measurement. \autoref{fig:rec16-16} is the $P=S=16$ row of the sweep drawn on its own: the left panel places the dominant frequency of the generated window against the frequency supplied as context, so a point on the diagonal is a tone returned where it was given and a departure from it is a tone the model has moved, while the right panel reports the same geometry through the probe, on the local task and on the seven hierarchical band tasks of \autoref{tab:bandTasks}. Drawing the two side by side is what makes the asymmetry visible, because a frequency can be readable in the internal state and still be placed wrongly in the output. \autoref{fig:TSM16-16} then moves the same geometry from pure tones to a multi-component draw: the upper panel shows the lines the Light TSMixup generator recorded for one realisation, the lower the lines recovered from the forecast, with the dashed verticals marking $\mathcal F_{\mathrm{lock}}$ for that geometry and the horizontal cut marking the amplitude below which a forecast line is not retained. It is the single-draw version of what the decomposition pages below repeat across generators and seeds.
 
@@ -58,11 +58,11 @@ The decomposition pages show the same asymmetry on richer signals. A draw whose 
 
 The four pages are arranged as two pairs, one per generator, so that a feature of a single draw is not read as a property of the family. \autoref{fig:decompTS17} and \autoref{fig:decompTS85} are two Light TSMixup realisations under the same settings: because that generator records the frequencies it drew, the left column of each states the input content rather than estimating it, and the comparison between the two columns is therefore between a known set of lines and a recovered one. \autoref{fig:decompKS2} and \autoref{fig:decompKS33} repeat the reading on KernelSynth, where the draw is a Gaussian-process realisation that names no frequencies, so both columns are estimated and the left panel reports what the transform recovers from the context rather than what the generator put there. Read as a set, the pairs separate two things the single-tone sweep cannot: whether a line survives at all, and whether a line that survives is placed correctly. The second is the quantity the paired design of \autoref{sec:five} measures against matched controls; these pages only show that both outcomes occur.
 
-None of this is evidence for or against the hypotheses of \autoref{sec:three}. What these Figures establish is that there is something to measure and that the two readings disagree in a specific direction; the paired design described in \autoref{sec:five} and the fits reported in \autoref{sec:six} are what decide whether the disagreement is located at $\mathcal F_{\mathrm{lock}}$.
+None of this is evidence for or against the hypotheses of \autoref{sec:three}. What these Figures establish is that there is something to measure and that the two readings disagree in a specific direction; the paired design described in \autoref{sec:five} and the fits reported in \autoref{sec:results} are what decide whether the disagreement is located at $\mathcal F_{\mathrm{lock}}$.
 
 \begin{figure*}[!p]
     \centering
-    \includegraphics[width=0.96\textwidth]{figures/FIG_E1_page1.png}
+    \includegraphics[width=0.85\textwidth]{figures/FIG_E1_page1.png}
     \caption{Reconstruction and probe sweep, page 1 of 3: geometries p8-s8, p16-s8, p16-s12,
     p16-s16 and p24-s8. Each row is one geometry. Left, the dominant frequency of the generated
     window against the frequency supplied as context, averaged over four starting phases, drawn as
@@ -80,7 +80,7 @@ None of this is evidence for or against the hypotheses of \autoref{sec:three}. W
 
 \begin{figure*}[!p]
     \centering
-    \includegraphics[width=0.96\textwidth]{figures/FIG_E1_page2.png}
+    \includegraphics[width=0.85\textwidth]{figures/FIG_E1_page2.png}
     \caption{Page 2 of 3: geometries p24-s12, p24-s16, p24-s20, p24-s24 and p32-s8, read as \autoref{fig:sweepPage1}, the
     pale red band again being $\pm1$ standard deviation of the dominant frequency over the four
     starting phases. The first four hold the patch size at $P=24$ and shorten the stride
@@ -93,7 +93,7 @@ None of this is evidence for or against the hypotheses of \autoref{sec:three}. W
 
 \begin{figure*}[!p]
     \centering
-    \includegraphics[width=0.96\textwidth]{figures/FIG_E1_page3.png}
+    \includegraphics[width=0.85\textwidth]{figures/FIG_E1_page3.png}
     \caption{Page 3 of 3: geometries p32-s12, p32-s16, p32-s20, p32-s24 and p32-s32, read as \autoref{fig:sweepPage1}, the
     pale red band again being $\pm1$ standard deviation of the dominant frequency over the four
     starting phases. The patch size is held at $P=32$, the widest of the design, so the
