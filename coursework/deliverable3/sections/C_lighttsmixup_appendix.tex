@@ -6,7 +6,7 @@ Light TSMixup is a variant of the TSMixup augmentation described in the Chronos 
 
 \subsection{The source pool}
 
-The pool holds $574$ unit-amplitude sinusoids, one per frequency, and is built from the design rather than fixed by hand: adding a geometry to \autoref{tab:hfModels} adds its own frequencies automatically. It spans the analysed band, $2$ to $250$\,Hz, so no part of that band is silent in the background. It has four parts.
+The pool holds $574$ unit-amplitude sinusoids, one per frequency, and is built from the design rather than fixed by hand: adding a geometry to \autoref{tab:hfModels} adds its own frequencies automatically. It spans the analysed band, $2$ to $250$\,Hz, so no part of that band is silent in the background, and it has four parts.
 
 The first is every integer frequency from $2$ to $250$\,Hz, which is $249$ sources. Covering the integer grid uniformly is what keeps the pool neutral with respect to the hypotheses: a candidate frequency is represented in the background exactly as the frequencies flanking it are, so the background cannot by itself make a candidate easier or harder to recover than its controls.
 
@@ -20,7 +20,7 @@ The fourth is $150$ further non-integer frequencies spread evenly across the ban
 
 One realisation is produced by drawing a number of components $k$ uniformly between one and the maximum $K$, drawing that many sources from the pool with replacement, scaling each by the reciprocal of its mean absolute value, and returning their convex combination under weights drawn from a symmetric Dirichlet distribution of concentration $\alpha$. The values adopted are $K=10$ and $\alpha=1.5$, and every source is generated at the full draw length, the probing context plus the forecast horizon, so no source is tiled or truncated. Drawing with replacement means a frequency may enter one mixture more than once, and a mixture therefore carries at most ten of the $574$ frequencies: a single background is sparse in that range even though the pool is dense in it.
 
-Two consequences follow. The concentration $\alpha$ sets how evenly the mixing weights are spread, so values near zero return something close to a single sinusoid while larger values return balanced mixtures; at $\alpha=1.5$ the components are comparable in size without being equal. And because the sources are defined in hertz rather than in cycles per sample, the pool is tied to the sampling rate, hence to the lock arithmetic of \autoref{eq:flock}: the same construction at a different $f_s$ yields a different pool, which is the intended behaviour.
+Two consequences follow: the concentration $\alpha$ sets how evenly the mixing weights are spread, so values near zero return something close to a single sinusoid while larger values return balanced mixtures; at $\alpha=1.5$ the components are comparable in size without being equal. And because the sources are defined in hertz rather than in cycles per sample, the pool is tied to the sampling rate, hence to the lock arithmetic of \autoref{eq:flock}: the same construction at a different $f_s$ yields a different pool, which is the intended behaviour.
 
 The probe tone is not part of this generator. A realisation is normalised to unit variance and the tone is added afterwards, at the frequency and phase the design requires and at a fixed signal-to-noise ratio, so the background and the quantity under test are produced independently of one another.
 

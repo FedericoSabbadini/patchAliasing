@@ -13,7 +13,7 @@ The agent reads the plant, forecasts it, and chooses how much authority to act o
 The agent therefore keeps an \ont{ObservabilityAssessment} per signal and geometry, recording whether a candidate frequency is \valueof{Observable}, only \valueof{PartiallyObservable}, or \valueof{StructurallyAliased}, and on what evidence. That verdict, not the geometry alone, selects the \ont{ControlMode}: \valueof{NormalMode}, or \valueof{ConservativeMode} and \valueof{SafeMode} where observability is in doubt. Authority is reduced rather than overridden, and an unmeasured plant runs conservatively by default. One placement constraint follows from the arithmetic alone: a monitor sitting after tokenisation would inherit the blind spot it is meant to find, so it has to read the raw telemetry.
 \endgroup
 
-\subsection{Expected Behaviour and Proposed Mitigation}
+\subsection{Expected Behaviour and Proposed Mitigation}\label{sec:seven}
 Pagani et al.\autocite{paganiPreliminaryInsightsChronos2026} report that frequency content is recovered unevenly from Chronos representations, \autoref{sec:tokenisation} supplies a set of frequencies at which that effect is expected.
 
 The arithmetic gives a list of frequencies at which a loss is possible; whether anything is actually lost there, and whether the loss follows the rule the arithmetic predicts, is an empirical question, and the rest of this report is about settling it. Because $\mathcal{F}_{\mathrm{lock}}$ of \autoref{eq:flock} holds for any model, three claims can be carried into the analysis, each stated so that a particular measurement refutes it, and a mitigation proposed alongside them.

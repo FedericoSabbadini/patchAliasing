@@ -55,11 +55,23 @@ twoside, % Two side traditional mode where headers and footers change between od
 [block] {\raggedright\normalsize\bfseries} {\thesubsubsection} {0.5em} {} []
 \titlespacing*{\subsubsection}{0pt}{1.0\baselineskip}{3pt}
 
+% Stesso problema un livello piu' sotto: \paragraph e' run-in, quindi il titolo di ogni
+% modello e il corpo finiscono sulla stessa riga e il titolo si legge come testo in grassetto.
+\titleformat{\paragraph}
+[block] {\raggedright\normalsize\bfseries} {} {0pt} {} []
+\titlespacing*{\paragraph}{0pt}{0.9\baselineskip}{2pt}
+
 % pv: a class, an object property or a data property of the ontology
 % valueof: a named individual of one of the closed vocabularies
 \newcommand{\pv}[1]{\texttt{pv:#1}}
 % ont: lo stesso nome citato nel corpo del testo, senza il prefisso
 \newcommand{\ont}[1]{\texttt{#1}}
+
+% Segnaposto per una figura non ancora disponibile: compila, occupa lo spazio che occupera'
+% la figura vera, e si vede a colpo d'occhio che manca. L'argomento opzionale e' l'altezza.
+\newcommand{\placeholderfig}[2][0.30\textheight]{%
+  \fbox{\parbox[c][#1][c]{\dimexpr\linewidth-2\fboxsep-2\fboxrule\relax}{%
+    \centering\textcolor{red}{\textbf{Placeholder figure.} #2}}}}
 \newcommand{\valueof}[1]{\textsf{#1}}
 
 % ---- float placement -------------------------------------------------------------------
@@ -103,7 +115,7 @@ twoside, % Two side traditional mode where headers and footers change between od
 \renewcommand{\maketitlehookd}{
 	\begin{abstract}
 		\sloppy
-		\input{sections/summary}
+		\input{sections/summary} 
 	\end{abstract}
 }
 
@@ -118,13 +130,13 @@ twoside, % Two side traditional mode where headers and footers change between od
 \section{Patch-Based Tokenisation}\label{sec:tokenisation}
 \input{sections/1_tokenisation_phase_locking.tex}
 
-\section{System Behaviour at Phase Locking Frequencies}\label{sec:agent}
+\section{System Behaviour at Blind Spot Frequencies}\label{sec:agent}
 \input{sections/2_agent_behaviour_mitigation.tex}
 
 \section{Signals and Data}\label{sec:signals}
 \input{sections/3_signals_data.tex}
 
-\section{Models and Methodology}\label{sec:methodology}
+\section{Experimental Methodology}\label{sec:methodology}
 \input{sections/4_research_questions_methodology.tex}
 
 \section{Results}\label{sec:results}

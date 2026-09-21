@@ -4,7 +4,7 @@ This document defines a compact ontology for a photovoltaic system governed by o
 
 The modeled system contains four energy assets: a photovoltaic array, battery storage, an aggregate internal load, and an external grid. The internal load is a passive sink representing a factory or a fleet of machines. Its demand is observed, but it has no agent, machine-level taxonomy, curtailment command, or scheduling model. The external grid is an available bidirectional boundary bus which supplies residual demand and accepts residual production.
 
-Exactly one \pv{ControlAgent} coordinates the four passive assets. It observes one synchronized control cycle, assigns environmental, anomaly, and observability states, selects a control mode, and emits one or more directional decisions. There is no peer-to-peer negotiation among assets.
+Exactly one \pv{ControlAgent} coordinates the four passive assets. It observes one synchronized control cycle, assigns environmental, anomaly, and observability states, selects a control mode, and emits one or more directional decisions, with no peer-to-peer negotiation among assets.
 
 The seven admissible transfer directions are
 \begin{equation}
@@ -112,7 +112,7 @@ If $V_t$ is false, no physical anomaly or forecast-driven route is inferred from
 \label{eq:signed-ramp}
 r_t=\frac{P_t-P_{t-1}}{\Delta t}.
 \end{equation}
-The anomaly rules are expressed with configurable thresholds: $g_{\mathrm{trip}}$ for sufficient irradiance, $p_0$ for positive near-zero power, and $r_{\max}$ for maximum admissible ramp magnitude. The controller evaluates sensor validity first. A sensor malfunction therefore cannot be reinterpreted as a physical ramp or inverter trip. If a valid inverter trip also satisfies the ramp predicate, the safe response to the trip takes precedence over ramp smoothing.
+The anomaly rules are expressed with configurable thresholds: $g_{\mathrm{trip}}$ for sufficient irradiance, $p_0$ for positive near-zero power, and $r_{\max}$ for maximum admissible ramp magnitude. The controller evaluates sensor validity first, so a sensor malfunction cannot be reinterpreted as a physical ramp or inverter trip. If a valid inverter trip also satisfies the ramp predicate, the safe response to the trip takes precedence over ramp smoothing.
 
 \subsubsection{Sensor malfunction}
 

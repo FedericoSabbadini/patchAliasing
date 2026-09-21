@@ -4,6 +4,57 @@ This section separates what the descriptive pass suggests from what the inferent
 
 One limit is arithmetic rather than empirical, and it is worth stating before any estimate. The two branches of $\mathcal F_{\mathrm{lock}}$ are not equally well served by the design, because a geometry can only speak about the stride branch where the stride grid is not already contained in the patch grid. \autoref{tab:branchSites} counts, for each of the fifteen runs, the frequencies in the analysed band that one grid predicts and the other does not. Where $S \mid P$ every stride site is also a patch site, so nine of the fifteen runs yield no stride-only frequency at all, and four of those nine are the $P=S$ baselines where the two grids coincide entirely. The stride branch is therefore carried by the six runs with $S \nmid P$, and $\theta_S$ and $\kappa_S$ rest on those. Across the whole design they supply thirty-six stride-only frequencies against one hundred and two patch-only ones, and the most any single geometry supplies is eight, below the ten unambiguous sites that \autoref{sec:five} requires of a branch: the stride branch is identified only by pooling the six, never by any one of them. Those same six are the geometries whose analysis context is truncated, the ones with $L_{\mathrm{tok}}<480$ in \autoref{tab:hfModels}, so the subset that carries the stride branch is also the subset least like the rest of the design. All of this is fixed by the choice of $(P,S)$ before anything is measured, and it bounds what the stride-branch estimates below can be asked to settle.
 
-Before the Bayesian estimates are reported, the pages of \autoref{sec:appSweep} provide a descriptive reading of what those models must explain. Across the retrained geometries, dominant-frequency reconstruction appears more reliable over the lower half of the analysed band, while faster inputs often return near $0$\,Hz. Within that lower half, possible holes occur near $\mathcal F_{\mathrm{lock}}$, and hierarchical band probes sometimes weaken there, although the local $f\pm1$\,Hz task remains stronger. The generated-signal examples add a second question: slow components may survive, yet their forecast amplitudes can approach the noise floor, making recovery ambiguous. These plots therefore motivate paired Bayesian analysis on generated backgrounds and frame the contrasts reported next. They are exploratory observations only, not confirmation of structural aliasing or of the preregistered hypotheses in \autoref{sec:seven}.
+\subsection{The frequency sweep}
 
-\autoref{sec:appSolar} adds two descriptive readings of a different kind. It reads the probe by depth rather than pooled, so the stage at which a candidate frequency stops being linearly separable can be located inside the stack, which Model~B cannot report because it carries the stage as a nuisance offset by design; and it puts the models in front of the measured photovoltaic series, where the forecast error is of the order of the quantity predicted on the sunrise and afternoon ramps against about two per cent at midday. Both are descriptive: the representational claim is decided by $e^{\theta_{\mathrm{lock}}}$ under the rule of \autoref{tab:bayesDecisions} and nowhere else.
+Before the Bayesian estimates are reported, the pages of \autoref{sec:appSweep} provide a descriptive reading of what those models must explain. Across the retrained geometries, dominant-frequency reconstruction appears more reliable over the lower half of the analysed band, while faster inputs often return near $0$\,Hz. Within that lower half, possible holes occur near $\mathcal F_{\mathrm{lock}}$, and hierarchical band probes sometimes weaken there, although the local $f\pm1$\,Hz task remains stronger. \autoref{fig:rec16-16} shows both readings at the reference geometry, as exploratory observations only and not as confirmation of structural aliasing or of the preregistered claims of \autoref{sec:agent}.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=\textwidth]{figures/fig_rec_16_16.png}
+\caption{Behavioural reconstruction (left) and representational recovery (right) for pure tones under the retrained reference geometry $P=S=16$ and seed~42. The left panel compares input and dominant generated frequencies across phases; the right reports local and hierarchical band-probe accuracy. Dashed vertical lines mark the predicted lock frequencies, and grey cells denote frequencies outside a task's coverage.}
+    \label{fig:rec16-16}
+\end{figure}
+
+\subsection{Recovering a component from a complex background}
+
+\textcolor{red}{\textbf{Placeholder, to be replaced once the decomposition notebook is complete.} Two or three paragraphs: how many of the components the generators put into a realisation are recovered from the forecast, how that count changes for components sitting on $\mathcal F_{\mathrm{lock}}$ against components off it, whether a missed component is absent altogether or returned at a displaced frequency, and whether the two generators agree. State also the amplitude floor, since a component whose recovered line falls under the cut is indistinguishable from one that was never rebuilt.}
+
+\input{tables/decomposition.tex}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=\textwidth]{figures/FIG_E4_tsmixup_p16-s16_spectra_seed2.png}
+\caption{Input and forecast spectra for one Light TSMixup realisation under the reference geometry $P=S=16$ and seed~2. The upper panel shows the generator-recorded input lines; the lower shows peaks recovered from the Chronos-Bolt-Tiny forecast. Dashed vertical lines mark the predicted lock frequencies, and the horizontal threshold marks the spectral cut used to retain forecast peaks.}
+    \label{fig:TSM16-16}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering
+    \placeholderfig{One KernelSynth realisation decomposed, drawn as \autoref{fig:TSM16-16}: input components against the components recovered from the forecast, with those falling on $\mathcal F_{\mathrm{lock}}$ marked.}
+\caption{\textcolor{red}{\textbf{Placeholder figure, to be replaced.} The KernelSynth counterpart of \autoref{fig:TSM16-16}, at the same geometry: which components of one realisation survive the forecast and which do not. KernelSynth records no line list, so both sides are estimated by the same transform.}}
+    \label{fig:KS16-16}
+\end{figure}
+
+\FloatBarrier
+\subsection{Prediction on the measured series}
+
+\textcolor{red}{\textbf{Placeholder, to be replaced once the photovoltaic benchmark is complete.} Two or three paragraphs: how the forecast error behaves across the daily cycle, how much of it is concentrated on the sunrise and afternoon ramps against the flat midday hours, what the night contributes, and whether the ordering between geometries on this series resembles the ordering the synthetic readings produce. State plainly that no claim is decided here: the series is the application domain, not an experimental corpus.}
+
+\input{tables/solarPrediction.tex}
+
+\begin{figure}[ht]
+    \centering
+    \placeholderfig{One recorded day of module power with the forecast issued in the morning drawn over it, context and horizon marked.}
+\caption{\textcolor{red}{\textbf{Placeholder figure, to be replaced.} A full recorded daily cycle of the SolarTech Lab series, with a forecast issued on the sunrise ramp drawn against the measured horizon.}}
+    \label{fig:solarMorning}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering
+    \placeholderfig{The same day with the forecast issued at midday, where the series is flat and the relative error is smallest.}
+\caption{\textcolor{red}{\textbf{Placeholder figure, to be replaced.} The same recorded day with a forecast issued at midday, for comparison with \autoref{fig:solarMorning}.}}
+    \label{fig:solarMidday}
+\end{figure}
+
+\FloatBarrier
+\autoref{sec:appSolar} adds a reading of a different kind: it takes the probe by depth rather than pooled, so the stage at which a candidate frequency stops being linearly separable can be located inside the stack, which Model~B cannot report because it carries the stage as a nuisance offset by design. That too is descriptive: the representational claim is decided by $e^{\theta_{\mathrm{lock}}}$ under the rule of \autoref{tab:bayesDecisions} and nowhere else.
