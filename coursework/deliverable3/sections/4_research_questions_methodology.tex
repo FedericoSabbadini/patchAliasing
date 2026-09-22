@@ -70,7 +70,7 @@ y_i \sim \text{Student-}t_4(\mu_i,\ \sigma),
 u_p \sim \mathcal{N}(0, \sigma_\phi),
 \end{equation}
 
-where $\sigma_\phi$ is the spread of the eight offsets, near zero when geometry alone sets the deficit, as $H2$ predicts. Slices presuppose no shape for a dependence, and dropping $u_p$ gives the nested null. Where the population effect is itself indistinguishable from zero little remains for phase to move, so $H2$ is read conditionally.
+where $\sigma_\phi$ is the spread of the eight offsets, near zero when geometry alone sets the deficit, as $H2$ predicts. Slices presuppose no shape for a dependence, and dropping $u_p$ gives the nested null. Where the population effect is itself indistinguishable from zero, little remains for phase to move, so $H2$ is read conditionally.
 
 \subsubsection*{Model D1, where the sites are (H3)}
 To test whether the loss sits on the two predicted grids, both branches are read on the token collapse $z_g(f)$, the dispersion of the input-patch embeddings across the patches of one context, which is zero when consecutive patches are identical. Every swept frequency carries two binary labels, for lying on $\mathcal{F}_{S}$ and on $\mathcal{F}_{P}$, against which the dispersion is regressed as
@@ -112,7 +112,7 @@ Interpretation is gated by three preregistered convergence diagnostics, and comp
 \begingroup
 \let\subsubsection\paragraph
 \let\subsection\subsubsection
-Testing the claims of \autoref{sec:agent} requires a design in which the two branches of $\mathcal F_{\mathrm{lock}}$ can be told apart, signals whose frequency content is known by construction, and an order of execution in which nothing that decides a claim is chosen after the data have been seen. This section is the roadmap; each step names the appendix that states it in full.
+Testing the claims of \autoref{sec:agent} requires a design in which the two branches of $\mathcal F_{\mathrm{lock}}$ can be told apart, signals whose frequency content is known by construction, and an order of execution in which nothing that decides a claim is chosen after the data have been seen.
 
 Three things are deliberately outside it: variation between independently trained instances, since one model is trained per geometry; the photovoltaic series, which supplies the application domain and the semantic layer rather than an experimental corpus, so no claim is decided on measured telemetry; and the untrained network, never probed, so that the claim that token collapse precedes learning rests on the arithmetic rather than on a baseline.
 
@@ -120,7 +120,7 @@ The fifteen geometries the whole study runs on, and the reason they had to be re
 
 \subsection{Step one: the frequency sweep}
 
-Pure tones cross the band in one-hertz steps at several starting phases, once per geometry. Two readings are taken of each: a behavioural one, which rolls the forecast forward and asks at what frequency the model rebuilds the tone, and a representational one, which trains a linear probe on a captured internal state and asks whether the frequency is still readable before the forecast is formed. The probe is scored on the hierarchical band tasks of \autoref{tab:bandTasks}, after Pagani et al.\autocite{paganiPreliminaryInsightsChronos2026}, and on a local task separating $f-1$\,Hz from $f+1$\,Hz. The scan averages over phase and carries no controls, so its purpose is not to decide a claim but to establish whether frequency content is represented at all and where that ability degrades. \autoref{sec:appSweep} states the contexts, the scoring and the resolution limit.
+Pure tones cross the band in one-hertz steps at several starting phases, once per geometry. Two readings are taken of each: a behavioural one, which rolls the forecast forward and asks at what frequency the model rebuilds the tone, and a representational one, which trains a linear probe on a captured internal state and asks whether the frequency is still readable before the forecast is formed. The probe is scored on the hierarchical band tasks of \autoref{tab:bandTasks}, after Pagani et al.\autocite{paganiPreliminaryInsightsChronos2026}, seven binary questions that locate a tone by halving the analysed range three times over, and on a local task separating $f-1$\,Hz from $f+1$\,Hz. The scan averages over phase and carries no controls, so its purpose is not to decide a claim but to establish whether frequency content is represented at all and where that ability degrades. \autoref{sec:appSweep} states the contexts, the scoring and the resolution limit.
 
 \input{tables/bandTasks.tex}
 

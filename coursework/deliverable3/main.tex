@@ -38,6 +38,7 @@ twoside, % Two side traditional mode where headers and footers change between od
 \usepackage{float} % enables the [H] float specifier to pin figures/tables in place
 \usepackage{stfloats} % a table* may only be [t] or [p] by default; this adds [b]
 \usepackage{placeins} % keeps the Bayesian model table inside its section
+\usepackage{colortbl} % rules in colour: used for the light row separators of Tables 2 and 3
 
 %----------------------------------------------------------------------------------------
 % ONTOLOGY APPENDIX SUPPORT
@@ -73,6 +74,19 @@ twoside, % Two side traditional mode where headers and footers change between od
   \fbox{\parbox[c][#1][c]{\dimexpr\linewidth-2\fboxsep-2\fboxrule\relax}{%
     \centering\textcolor{red}{\textbf{Placeholder figure.} #2}}}}
 \newcommand{\valueof}[1]{\textsf{#1}}
+
+% Tabelle in cui una riga occupa piu' di una linea: le righe vanno distinte fra loro senza
+% trasformare la tabella in una griglia. \rowtint tinge le righe alternate ed e' quello in uso
+% nelle Tabelle 2 e 3; \rowsep e' l'alternativa a filetti, tenuta qui se si vuole tornare indietro.
+\newcommand{\rowtint}{\rowcolor{black!6}}
+\newcommand{\rowsep}{\arrayrulecolor{black!25}\specialrule{0.4pt}{1.5pt}{1.5pt}\arrayrulecolor{black}}
+
+% La classe definisce L, R e C su p{}, che allinea in alto: in una riga alta due o tre
+% linee le celle brevi restano appese al bordo superiore. M, N e O sono le stesse colonne
+% su m{}, che centra verticalmente; l'allineamento orizzontale resta quello di L, R e C.
+\newcolumntype{M}[1]{>{\raggedright\arraybackslash}m{#1}}
+\newcolumntype{N}[1]{>{\raggedleft\arraybackslash}m{#1}}
+\newcolumntype{O}[1]{>{\centering\arraybackslash}m{#1}}
 
 % ---- float placement -------------------------------------------------------------------
 % Defaults let a page carry at most 70% floats and demand 20% text, which is what strands a
@@ -115,7 +129,7 @@ twoside, % Two side traditional mode where headers and footers change between od
 \renewcommand{\maketitlehookd}{
 	\begin{abstract}
 		\sloppy
-		\input{sections/summary} 
+		\input{sections/summary}
 	\end{abstract}
 }
 

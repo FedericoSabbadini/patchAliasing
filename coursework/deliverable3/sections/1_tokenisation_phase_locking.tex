@@ -157,7 +157,7 @@ It is convenient to express both conditions in units that do not depend on the s
 
 \autoref{eq:phase_boundary} and \autoref{eq:phase_boundary_2} read simply $\mathrm{cps}\in\mathbb{N}^{+}$ and $\mathrm{cpp}\in\mathbb{N}^{+}$: $\mathcal{F}_{\mathrm{lock}}$ is the set of frequencies completing a whole number of cycles within one stride or within one patch. This normalisation makes the two branches directly comparable across geometries and across sampling rates.
 
-Neither branch is restricted to sinusoidal signals. Both conditions generalise to an arbitrary discrete-time signal invariant under a translation equal to the stride or to the patch,
+Neither branch is restricted to sinusoidal signals: both conditions generalise to an arbitrary discrete-time signal invariant under a translation equal to the stride or to the patch,
 
 \begin{equation*}
 x[n+S]
@@ -278,7 +278,7 @@ O
 
 which is $0$ for contiguous patches and approaches $1$ as the stride shortens.
 
-In this regime the two branches separate. Since $f_s/S>f_s/P$, the stride comb is the sparser of the two. The derivation of \autoref{eq:collapse_S} makes no use of the relation between $P$ and $S$, so at $f\in\mathcal{F}_{S}$ consecutive tokens are still exactly equal.
+In this regime the two branches separate, and since $f_s/S>f_s/P$ the stride comb is the sparser of the two. The derivation of \autoref{eq:collapse_S} makes no use of the relation between $P$ and $S$, so at $f\in\mathcal{F}_{S}$ consecutive tokens are still exactly equal.
 
 \subsubsection*{Disjoint Windows ($S>P$)}
 \label{sec:disjoint}
