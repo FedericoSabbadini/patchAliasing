@@ -530,14 +530,23 @@ def save_signal_pool(out_dir, generators=GENERATORS, n_bg: int = 6,
     return meta
 
 
-def build_context(bg: np.ndarray | None, f: float, phase: float, n: int = CTX) -> np.ndarray:
+def build_context(bg: np.ndarray | None, f: float, phase: float, n: int = CTX,
+                  amp: float | None = None) -> np.ndarray:
     """One model input: unit-variance background + tone at (f, phase), or the pure tone if bg is None.
 
     `bg is None` reproduces the clean-sinusoid mode of hypotheses.py, where the token collapse at a
     stride lock is EXACTLY zero. With a background the collapse becomes a deep dip instead, both
     modes are collected, because H3's comb model is fitted on each.
+
+    `amp` is the tone amplitude over the unit-variance background. It defaults to the module
+    constant `TONE_SNR`, which is what every existing caller gets, and exists so that a collection
+    can carry its amplitude in its own configuration instead of relying on a module global: the
+    amplitude then enters the collection's design fingerprint, and two collections that differ only
+    in it cannot be mistaken for each other. It is ignored without a background, where the tone is
+    the whole signal and its amplitude is the unit the recovery ratio is measured in.
     """
-    tone = make_tone(f, phase, n, TONE_SNR if bg is not None else 1.0)
+    tone = make_tone(f, phase, n, (TONE_SNR if amp is None else float(amp)) if bg is not None
+                     else 1.0)
     return tone if bg is None else (bg[:n] + tone).astype(np.float32)
 
 

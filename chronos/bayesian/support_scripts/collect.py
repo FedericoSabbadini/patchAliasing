@@ -22,6 +22,7 @@ and immutable checkpoint identity all match.
     python -m collect --out ./bayes_data --smoke         # tiny grid, minutes not tens of minutes
     python -m collect --out ./bayes_data --models p16-s16 p8-s8
     python -m collect --out ./bayes_data --force         # ignore existing shards
+    python -m collect --out ./bayes_data --tone-snr 1.5 --response contrast
 """
 from __future__ import annotations
 
@@ -37,10 +38,23 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+try:                                    # POSIX only; without it the progress line drops the RSS
+    import resource
+except ImportError:                     # pragma: no cover
+    resource = None
+
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import probe_lib as pl
 import checkpointing as cp
 import model_loader as ml
+
+def _peak_resident_gib() -> float:
+    """Peak resident set size. ru_maxrss is kilobytes on Linux and bytes on macOS."""
+    if resource is None:
+        return float("nan")
+    peak = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+    return peak / 1024 ** 3 if sys.platform == "darwin" else peak / 1024 ** 2
+
 
 TABLES = ("contrasts", "mdl_cells", "mdl_bandtasks", "collapse", "sites")
 RAW_TABLES = ("contrasts", "mdl_cells", "mdl_bandtasks", "collapse")
@@ -62,6 +76,13 @@ class Config:
     smoke: bool = False
     batch_size: int = 64
     device: str | None = None
+
+    #, the tone, over a unit-variance background,
+    # The amplitude is an inferential choice and it is deliberately held here rather than read
+    # from probe_lib's module constant, so that it enters the design fingerprint through
+    # `_design_payload` and two collections differing only in it can never be merged.
+    tone_snr: float = pl.TONE_SNR
+    sites_per_block: int = 4        # candidate frequencies forwarded at once; throughput only
 
     #, contrasts (H1 behavioural / H2),
     n_phase_contrast: int = 10      # phase offsets per lock; the S_f cap of Pagani et al. Eq. 6
@@ -115,27 +136,31 @@ class Config:
 #  1. contrasts, the matched (f_k, f_k - delta, f_k + delta) triplets
 # --------------------------------------------------------------------------------- #
 def collect_contrasts(probe: "pl.Probe", cfg: Config) -> pd.DataFrame:
-    """The localisation indicator h of deliverable Eq. (8), ONE ROW PER ARM.
+    """The matched triplets of deliverable Eq. (8), ONE ROW PER ARM.
 
-    The response is whether the forecast rebuilt the frequency the arm carries:
-    h = 1[|f_hat - f| <= 1 Hz], with f_hat the dominant frequency of the median forecast over the
-    horizon (`pl.dominant_freq`). Models A and C are Bernoulli fits on h with a lock indicator, so
-    the three arms of a triplet are three OBSERVATIONS rather than one contrast; this table is
-    therefore long where it used to be wide, and carries `role`, `f` and `is_lock` per row.
+    Each candidate frequency f_k in F_lock is paired with two controls at the largest offset not
+    exceeding 0.25 fs/S that keeps both clear of both grids. The three arms of a triplet share the
+    SAME background realisation and the SAME phase: that is what makes the contrast paired, and it
+    is the one place this collection deliberately departs from `hypotheses.py`, which averages over
+    phases drawn separately per frequency. Keeping the phase index is what makes H2 testable at
+    all, since Model C bins the phase circle and gives each bin its own offset.
 
-    Nothing is discarded. An arm whose forecast rebuilds nothing measurable returns h = 0, which is
-    a reading and not a degenerate one, so the old `live` filter and the epsilon stabiliser that
-    kept a log-ratio finite are both gone. R is retained per arm because `pl.Probe.measure` gets it
-    from the same forward pass at no extra cost, but no model is fitted to it.
+    One forward pass yields two readings, and both are recorded because both are wanted by a model:
 
-    Design (deliverable Local Contrast Analysis): each lock frequency f_k in F_lock is paired with
-    two controls at f_k +/- 0.25 fs/S. The three signals of a triplet share the SAME background
-    realisation and the SAME phase, that is what makes the contrast paired, and it is the one
-    place where this collection deliberately departs from `hypotheses.py`, which averages over
-    phases drawn separately per frequency.
+      * `R`, the amplitude recovery A_pred / A_true, from which the notebook forms the paired
+        contrast d of Eq. (8) that Models A and C are fitted to;
+      * `h`, the localisation indicator 1[|f_hat - f| <= tol], for the models fitted to a hit.
 
-    Keeping the phase index is what makes H2 testable at all: Model C bins the phase circle and
-    gives each bin its own offset, which is impossible once phases have been averaged away.
+    Nothing is discarded. An arm whose forecast rebuilds nothing measurable returns a small R and
+    h = 0, which is a reading and not a degenerate row, so no response filter is applied here or
+    anywhere downstream.
+
+    Candidate frequencies are forwarded in blocks of `cfg.sites_per_block`. At 100 backgrounds per
+    generator a single geometry reaches 130,000 contexts of 544 samples, and the true continuations
+    double that, which is enough to exhaust a hosted runtime before the first shard is written.
+    Blocking changes the working set and nothing else: the blocks partition the candidate list in
+    order and each row's readings depend on that row alone, so the table is identical to the one an
+    unblocked pass produces, row for row and in the same order.
     """
     P, S = probe.P, probe.S
 
@@ -146,44 +171,56 @@ def collect_contrasts(probe: "pl.Probe", cfg: Config) -> pd.DataFrame:
     # every stride-only site on a patch null, discarding all four.
     offsets = {f: pl.control_offset(P, S, f) for f in pl.f_lock(P, S)}
     sites = [f for f, d in offsets.items() if np.isfinite(d)]
+    block_size = max(1, int(cfg.sites_per_block))
 
-    contexts, futures, freqs, meta = [], [], [], []
+    frames: list[pd.DataFrame] = []
     for gen in cfg.generators:
         pool = pl.background_pool(gen, cfg.n_bg, pl.CTX + pl.PRED)
-        for fk in sites:
-            phases = pl.phases_Sf(fk, cfg.n_phase_contrast)
-            for bg_id, bg in enumerate(pool):
-                for ph_idx, ph in enumerate(phases):
-                    d_fk = offsets[fk]
-                    for role, f in (("lock", fk), ("lo", fk - d_fk), ("hi", fk + d_fk)):
-                        # context and its TRUE continuation are slices of one long realisation,
-                        # so the forecast target is the real future rather than a fresh draw
-                        full = pl.build_context(bg, f, ph, pl.CTX + pl.PRED)
-                        contexts.append(full[:pl.CTX])
-                        futures.append(full[pl.CTX:])
-                        freqs.append(f)
-                        meta.append(dict(generator=gen, bg_id=bg_id, f_lock=fk, delta=d_fk,
-                                         phase_idx=ph_idx, phase=float(ph), role=role,
-                                         f=float(f)))
+        for start in range(0, len(sites), block_size):
+            block = sites[start:start + block_size]
+            contexts, futures, freqs, meta = [], [], [], []
+            for fk in block:
+                phases = pl.phases_Sf(fk, cfg.n_phase_contrast)
+                d_fk = offsets[fk]
+                for bg_id, bg in enumerate(pool):
+                    for ph_idx, ph in enumerate(phases):
+                        for role, f in (("lock", fk), ("lo", fk - d_fk), ("hi", fk + d_fk)):
+                            # context and its TRUE continuation are slices of one long realisation,
+                            # so the forecast target is the real future rather than a fresh draw
+                            full = pl.build_context(bg, f, ph, pl.CTX + pl.PRED,
+                                                    amp=cfg.tone_snr)
+                            contexts.append(np.asarray(full[:pl.CTX]))
+                            futures.append(np.asarray(full[pl.CTX:]))
+                            freqs.append(f)
+                            meta.append(dict(generator=gen, bg_id=bg_id, f_lock=fk, delta=d_fk,
+                                             phase_idx=ph_idx, phase=float(ph), role=role,
+                                             f=float(f)))
+            if not contexts:
+                continue
 
-    if not contexts:
+            R, dphase, f_hat, f_hat_truth = probe.measure(
+                np.stack(contexts), np.stack(futures), np.array(freqs), k=cfg.fhat_topk)
+            frame = pd.DataFrame(meta)
+            frame["R"] = R
+            frame["dphase"] = dphase
+            frame["f_hat"] = f_hat[:, 0]             # strongest peak, for description
+            frame["h"] = pl.localisation_hit(f_hat, frame["f"].to_numpy(float),
+                                             tol=cfg.fhat_tol_hz)
+            # the same estimator on the TRUE continuation: where this misses, the instrument
+            # failed on that row and it carries no evidence about the model
+            frame["h_truth"] = pl.localisation_hit(f_hat_truth, frame["f"].to_numpy(float),
+                                                   tol=cfg.fhat_tol_hz)
+            frames.append(frame)
+            del contexts, futures, freqs, meta, R, dphase, f_hat, f_hat_truth
+            print(f"      {gen}: candidates {start + 1}-{start + len(block)} of {len(sites)}, "
+                  f"{sum(len(x) for x in frames):,} rows so far, peak RSS "
+                  f"{_peak_resident_gib():.1f} GiB", flush=True)
+
+    if not frames:
         return pd.DataFrame()
 
-    # one forward pass, three readings; the indicator is the response, R is descriptive
-    R, dphase, f_hat, f_hat_truth = probe.measure(
-        np.stack(contexts), np.stack(futures), np.array(freqs), k=cfg.fhat_topk)
-
-    out = pd.DataFrame(meta)
-    out["R"] = R
-    out["dphase"] = dphase
-    out["f_hat"] = f_hat[:, 0]                   # strongest peak, for description
-    out["h"] = pl.localisation_hit(f_hat, out["f"].to_numpy(float), tol=cfg.fhat_tol_hz)
-    # the same estimator on the TRUE continuation: where this misses, the instrument failed on
-    # that row and it carries no evidence about the model. Part 5 fits with and without the
-    # conditioning and reports the LOO comparison rather than assuming which scope is right.
-    out["h_truth"] = pl.localisation_hit(f_hat_truth, out["f"].to_numpy(float), tol=cfg.fhat_tol_hz)
+    out = pd.concat(frames, ignore_index=True)
     out["is_lock"] = (out["role"] == "lock").astype(np.int8)
-
     out["model"] = probe.tag
     out["P"], out["S"] = P, S
     out["overlap"] = (P - S) / P                 # O_c of Eq. (9)
@@ -234,7 +271,8 @@ def collect_mdl_cells(probe: "pl.Probe", cfg: Config) -> pd.DataFrame:
             if len(combos) > cfg.mdl_n_per_class:
                 idx = np.linspace(0, len(combos) - 1, cfg.mdl_n_per_class).round().astype(int)
                 combos = [combos[i] for i in idx]
-            ctx = np.stack([pl.build_context(bg, f, ph, pl.CTX) for bg, ph in combos])
+            ctx = np.stack([pl.build_context(bg, f, ph, pl.CTX, amp=cfg.tone_snr)
+                            for bg, ph in combos])
             X_all.append(probe.capture_reg(ctx))
             y_all.append(np.full(len(ctx), label))
 
@@ -272,7 +310,8 @@ def collect_band_tasks(probe: "pl.Probe", cfg: Config) -> pd.DataFrame:
         ctx, lab = [], []
         for i, f in enumerate(fl):
             for j, ph in enumerate(pl.phases_Sf(f, nph)):
-                ctx.append(pl.build_context(pool[(i + j) % len(pool)], f, ph, pl.CTX))
+                ctx.append(pl.build_context(pool[(i + j) % len(pool)], f, ph, pl.CTX,
+                                            amp=cfg.tone_snr))
                 lab.append(f)
         return probe.capture_reg(np.stack(ctx), pipe=pipe), np.asarray(lab)
 
@@ -342,7 +381,7 @@ def collect_collapse(probe: "pl.Probe", cfg: Config) -> pd.DataFrame:
                 bg = pl.background_pool(mode, cfg.collapse_reps, pl.CTX)[rep]
             ctx = np.stack([
                 pl.build_context(bg, f, pl.phases_Sf(f, cfg.collapse_reps)[
-                    rep % len(pl.phases_Sf(f, cfg.collapse_reps))], pl.CTX)
+                    rep % len(pl.phases_Sf(f, cfg.collapse_reps))], pl.CTX, amp=cfg.tone_snr)
                 for f in grid])
             z = probe.collapse(ctx)
             rows.append(pd.DataFrame(dict(model=probe.tag, P=probe.P, S=probe.S, mode=mode,
@@ -402,14 +441,28 @@ def derive_sites(collapse: pd.DataFrame, cfg: Config | None = None) -> pd.DataFr
                     n_unassigned += 1
 
             for branch, members in by_branch.items():
+                summary = pl.site_summary(members)
+                spacing = pl.FS / (S if branch == "stride" else P)
+                # Which harmonic of its own comb the lowest detected site is. Eq. (13) regresses
+                # the FUNDAMENTAL on the predicted spacing, so a geometry whose first dip was not
+                # detected contributes a higher harmonic and pulls kappa above one. Recording the
+                # order here keeps that visible to every consumer; it is never divided out, which
+                # would impose the slope the model is estimating.
+                first_harmonic = (int(round(summary["f1"] / spacing))
+                                  if np.isfinite(summary["f1"]) and spacing > 0 else 0)
                 rows.append(dict(model=model, P=P, S=S, mode=mode, rep=int(rep),
                                  branch=branch,
-                                 predicted_spacing=pl.FS / (S if branch == "stride" else P),
+                                 predicted_spacing=spacing,
                                  sites=" ".join(f"{s:.3f}" for s in members),
                                  n_ambiguous=n_both, n_unassigned=n_unassigned,
                                  max_assignment_error=(max(assignment_residuals[branch])
                                                        if assignment_residuals[branch] else np.nan),
-                                 **pl.site_summary(members)))
+                                 first_harmonic=first_harmonic,
+                                 harmonic_status=(
+                                     "no site detected" if first_harmonic == 0
+                                     else "lowest site is the fundamental" if first_harmonic == 1
+                                     else f"lowest site is harmonic {first_harmonic}"),
+                                 **summary))
     return pd.DataFrame(rows)
 
 
@@ -436,10 +489,13 @@ def _package_versions() -> dict[str, str | None]:
 
 def _design_payload(cfg: Config, planned_models: list[tuple[int, int]]) -> dict:
     design = asdict(cfg)
-    # Batching and device affect throughput, not the observations.  Every inferential knob remains
-    # in the fingerprint; changing one requires a fresh run namespace.
+    # Batching, device and the block size affect throughput, not the observations.  Every
+    # inferential knob remains in the fingerprint, `tone_snr` among them, so a collection at a
+    # different tone amplitude is refused rather than merged; changing one requires a fresh run
+    # namespace.
     design.pop("batch_size", None)
     design.pop("device", None)
+    design.pop("sites_per_block", None)
     sources = [
         Path(__file__).resolve(),
         Path(pl.__file__).resolve(),
@@ -522,8 +578,11 @@ def _validate_frame(frame: pd.DataFrame, table: str, tag: str | None = None) -> 
         raise ValueError(f"{table} is empty")
     if tag is not None and set(frame["model"].astype(str)) != {tag}:
         raise ValueError(f"{table} shard for {tag} contains models {sorted(frame['model'].unique())}")
+    # `f_hat` is deliberately absent: `dominant_freqs` pads with NaN when fewer than k peaks clear
+    # the band, and `localisation_hit` already reads a NaN peak as a miss. Requiring it finite
+    # would throw away a whole geometry's forward passes over a row that is a legitimate reading.
     finite_columns = {
-        "contrasts": ("f", "f_hat", "h", "h_truth"),
+        "contrasts": ("f", "R", "h", "h_truth"),
         "mdl_cells": ("L_bits",),
         "mdl_bandtasks": ("L_bits",),
         "collapse": ("f", "z", "z_norm"),
@@ -622,13 +681,34 @@ def collect_model(
         probe.close()
 
 
+RESPONSES = ("localisation", "contrast")
+
+
 def check_design(
     tables: dict[str, pd.DataFrame],
     expected_models: list[tuple[int, int]] | None = None,
     cfg: Config | None = None,
+    response: str = "localisation",
 ) -> dict:
-    """Fail closed on incomplete/non-identifiable inputs before any posterior is sampled."""
+    """Fail closed on incomplete/non-identifiable inputs before any posterior is sampled.
+
+    Coverage, schema and the checks every model needs are applied whatever is fitted. The rest
+    depend on which response the tables are about, because a criterion for one is undefined for
+    the other, and failing a finished collection on a criterion that does not apply to it would
+    discard hours of forward passes for nothing:
+
+      ``localisation``  the response is the hit indicator h. The indicator must not be constant,
+                        and each geometry must retain enough candidate sites under the instrument
+                        ceiling h_truth for its own level of the hierarchy to mean anything.
+      ``contrast``      the response is the paired contrast d of Eq. (8), formed from R. Every
+                        geometry must yield complete triplets, and h plays no part: an arm that
+                        misses is a small R, which is a reading.
+
+    The default is ``localisation`` so that every existing caller keeps the behaviour it had.
+    """
     cfg = cfg or Config()
+    if response not in RESPONSES:
+        raise ValueError(f"response must be one of {RESPONSES}, not {response!r}")
     expected_models = expected_models or list(pl.DELIVERABLE3_MODELS)
     expected_tags = {pl.model_tag(P, S) for P, S in expected_models}
     failures: list[str] = []
@@ -660,23 +740,41 @@ def check_design(
                   f"ctrl={n_ctrl:>5d} hit={hit_rate:>5.3f} "
                   f"locks={group['f_lock'].nunique():>3d} phases={group['phase_idx'].nunique():>3d} "
                   f"generators={group['generator'].nunique()}")
+            # Both levels of the arm indicator are needed whatever the response: one level empty
+            # means there is no candidate to compare with its controls, or no controls.
             if n_lock == 0 or n_ctrl == 0:
-                failures.append(f"{model}: gamma NOT IDENTIFIED (one IsLock level empty)")
-            if group["h"].nunique() < 2:
-                failures.append(f"{model}: localisation indicator is constant at {hit_rate:.0f}")
-            # Survival is a per-geometry property, not a global one. P=S=8 has only three lock
-            # sites in band, so a low ceiling can reduce it to about one while the pooled table
-            # still looks healthy. A geometry contributing one site contributes a beta_c that is
-            # one number, and M1 is a regression over those numbers.
-            surviving = int(group.loc[group["is_lock"] == 1, "h_truth"].astype(bool).sum() and
-                            group.loc[group["h_truth"].astype(bool) & (group["is_lock"] == 1),
-                                      "f_lock"].nunique())
-            if surviving < cfg.min_sites_per_geometry:
-                failures.append(f"{model}: only {surviving} candidate site(s) survive the "
-                                f"instrument ceiling, below the bar of "
-                                f"{cfg.min_sites_per_geometry}")
+                failures.append(f"{model}: NOT IDENTIFIED (one arm level empty)")
             if set(group["generator"]) != set(cfg.generators):
                 failures.append(f"{model}: generator coverage mismatch in contrasts")
+
+            if response == "localisation":
+                if group["h"].nunique() < 2:
+                    failures.append(
+                        f"{model}: localisation indicator is constant at {hit_rate:.0f}")
+                # Survival is a per-geometry property, not a global one. P=S=8 has only three lock
+                # sites in band, so a low ceiling can reduce it to about one while the pooled table
+                # still looks healthy. A geometry contributing one site contributes a beta_c that
+                # is one number, and M1 is a regression over those numbers.
+                surviving = int(group.loc[group["is_lock"] == 1, "h_truth"].astype(bool).sum() and
+                                group.loc[group["h_truth"].astype(bool) & (group["is_lock"] == 1),
+                                          "f_lock"].nunique())
+                if surviving < cfg.min_sites_per_geometry:
+                    failures.append(f"{model}: only {surviving} candidate site(s) survive the "
+                                    f"instrument ceiling, below the bar of "
+                                    f"{cfg.min_sites_per_geometry}")
+            else:
+                # The contrast needs all three arms of a triplet present, finite and non-negative.
+                keys = ["generator", "bg_id", "f_lock", "phase_idx"]
+                arms_per_triplet = group.groupby(keys, observed=True)["role"].nunique()
+                complete = int((arms_per_triplet == 3).sum())
+                if complete == 0:
+                    failures.append(f"{model}: no complete triplet, so Eq. (8) cannot be formed")
+                elif complete < len(arms_per_triplet):
+                    print(f"      {len(arms_per_triplet) - complete} incomplete triplet(s) "
+                          f"of {len(arms_per_triplet)}")
+                recovery = pd.to_numeric(group["R"], errors="coerce")
+                if not np.isfinite(recovery).all() or (recovery < 0).any():
+                    failures.append(f"{model}: amplitude recovery is not finite and non-negative")
 
     if "mdl_cells" in tables:
         for model, group in tables["mdl_cells"].groupby("model"):
@@ -708,9 +806,11 @@ def check_design(
         }
         summary["d2_identification"] = identification
 
+    summary["response"] = response
     summary["failures"] = failures
     summary["ok"] = not failures
-    print("  design check:", "PASS" if not failures else "FAIL, do not sample on this data")
+    print(f"  design check ({response}):",
+          "PASS" if not failures else "FAIL, do not sample on this data")
     if failures:
         raise ValueError("design validation failed: " + "; ".join(failures))
     return summary
@@ -722,6 +822,7 @@ def merge(
     planned_models: list[tuple[int, int]] | None = None,
     allow_partial: bool = False,
     manifest: dict | None = None,
+    response: str = "localisation",
 ) -> dict[str, pd.DataFrame]:
     """Merge only exact manifest-listed shards; stale glob matches are never included."""
     out = Path(out)
@@ -771,7 +872,7 @@ def merge(
         "rows": len(sites),
     }
 
-    design_summary = check_design(merged, complete_models, cfg)
+    design_summary = check_design(merged, complete_models, cfg, response=response)
     manifest["design_check"] = design_summary
     manifest["status"] = "complete" if not missing_models else "partial"
     manifest.pop("last_error", None)
@@ -785,6 +886,7 @@ def load_collection(
     cfg: Config | None = None,
     planned_models: list[tuple[int, int]] | None = None,
     require_complete: bool = True,
+    response: str = "localisation",
 ) -> dict[str, pd.DataFrame]:
     """Load merged tables only after manifest, hashes, coverage and design gates pass."""
     out = Path(out)
@@ -808,7 +910,7 @@ def load_collection(
         (int(group.P.iloc[0]), int(group.S.iloc[0]))
         for _, group in tables["contrasts"].groupby("model")
     ]
-    check_design(tables, expected, cfg)
+    check_design(tables, expected, cfg, response=response)
     return tables
 
 
@@ -820,6 +922,7 @@ def collect_all(
     planned_models: list[tuple[int, int]] | None = None,
     allow_partial: bool = False,
     probe_factory=None,
+    response: str = "localisation",
 ) -> dict[str, pd.DataFrame]:
     """Collect a session subset against one frozen fifteen-model design."""
     out = Path(out)
@@ -858,7 +961,8 @@ def collect_all(
     print(f"  archived/validated {len(meta)} signals -> {out / 'signals'}")
     for P, S in models:
         collect_model(P, S, out, cfg, manifest, force=force, probe_factory=probe_factory)
-    return merge(out, cfg, planned_models, allow_partial=allow_partial, manifest=manifest)
+    return merge(out, cfg, planned_models, allow_partial=allow_partial, manifest=manifest,
+                 response=response)
 
 
 # --------------------------------------------------------------------------------- #
@@ -874,6 +978,15 @@ def main(argv: list[str]) -> int:
     ap.add_argument("--device", default=None, help="cuda / cpu (default: cuda if available)")
     ap.add_argument("--batch-size", type=int, default=None)
     ap.add_argument("--merge-only", action="store_true", help="only re-merge existing shards")
+    ap.add_argument("--tone-snr", type=float, default=None,
+                    help="tone amplitude over the unit-variance background (default: "
+                         f"{pl.TONE_SNR}). It is an inferential choice and enters the design "
+                         "fingerprint, so a directory collected at one amplitude refuses another.")
+    ap.add_argument("--sites-per-block", type=int, default=None,
+                    help="candidate frequencies forwarded at once (throughput only)")
+    ap.add_argument("--response", default="localisation", choices=list(RESPONSES),
+                    help="which response the design gate is applied for: 'localisation' for the "
+                         "hit indicator h, 'contrast' for the paired recovery contrast of Eq. (8)")
     ap.add_argument("--population", default=None,
                     choices=["deliverable3", "extended21", "all22"],
                     help="registro delle geometrie da raccogliere (default: deliverable3, le 15 "
@@ -904,6 +1017,10 @@ def main(argv: list[str]) -> int:
         cfg.device = args.device
     if args.batch_size:
         cfg.batch_size = args.batch_size
+    if args.tone_snr is not None:
+        cfg.tone_snr = args.tone_snr
+    if args.sites_per_block is not None:
+        cfg.sites_per_block = args.sites_per_block
 
     wanted = set(args.models) if args.models else None
     models = [(P, S) for (P, S) in pl.DELIVERABLE3_MODELS
@@ -915,11 +1032,12 @@ def main(argv: list[str]) -> int:
 
     out = Path(args.out)
     if args.merge_only:
-        merge(out, cfg, list(pl.DELIVERABLE3_MODELS), allow_partial=args.models is not None)
+        merge(out, cfg, list(pl.DELIVERABLE3_MODELS), allow_partial=args.models is not None,
+              response=args.response)
     else:
         collect_all(out, models, cfg, force=args.force,
                     planned_models=list(pl.DELIVERABLE3_MODELS),
-                    allow_partial=args.models is not None)
+                    allow_partial=args.models is not None, response=args.response)
     return 0
 
 
