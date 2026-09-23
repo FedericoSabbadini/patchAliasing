@@ -147,8 +147,12 @@ def collect_contrasts(probe: "pl.Probe", cfg: Config) -> pd.DataFrame:
 
     One forward pass yields two readings, and both are recorded because both are wanted by a model:
 
-      * `R`, the amplitude recovery A_pred / A_true, from which the notebook forms the paired
-        contrast d of Eq. (8) that Models A and C are fitted to;
+      * `a_pred` and `a_true`, the least-squares amplitudes at the arm's own frequency in the
+        forecast and in the true continuation, together with `amp_injected`, the amplitude the
+        tone was injected at. `R` is recorded as a_pred / a_true, which is what this estimator
+        has always returned, but the paired contrast of Eq. (8) can be formed downstream from
+        either denominator because both are kept; the appendix defines the recovery against the
+        injected amplitude, and the two are not the same quantity;
       * `h`, the localisation indicator 1[|f_hat - f| <= tol], for the models fitted to a hit.
 
     Nothing is discarded. An arm whose forecast rebuilds nothing measurable returns a small R and
@@ -198,9 +202,16 @@ def collect_contrasts(probe: "pl.Probe", cfg: Config) -> pd.DataFrame:
             if not contexts:
                 continue
 
-            R, dphase, f_hat, f_hat_truth = probe.measure(
-                np.stack(contexts), np.stack(futures), np.array(freqs), k=cfg.fhat_topk)
+            R, dphase, f_hat, f_hat_truth, a_pred, a_true = probe.measure(
+                np.stack(contexts), np.stack(futures), np.array(freqs), k=cfg.fhat_topk,
+                return_amplitudes=True)
             frame = pd.DataFrame(meta)
+            # Both amplitudes are recorded, not only their ratio. The denominator of the recovery
+            # is a choice, the appendix and this estimator do not make the same one, and after the
+            # forward pass the two cannot be separated again; see Probe.measure.
+            frame["a_pred"] = a_pred
+            frame["a_true"] = a_true
+            frame["amp_injected"] = float(cfg.tone_snr)
             frame["R"] = R
             frame["dphase"] = dphase
             frame["f_hat"] = f_hat[:, 0]             # strongest peak, for description
@@ -211,7 +222,7 @@ def collect_contrasts(probe: "pl.Probe", cfg: Config) -> pd.DataFrame:
             frame["h_truth"] = pl.localisation_hit(f_hat_truth, frame["f"].to_numpy(float),
                                                    tol=cfg.fhat_tol_hz)
             frames.append(frame)
-            del contexts, futures, freqs, meta, R, dphase, f_hat, f_hat_truth
+            del contexts, futures, freqs, meta, R, dphase, f_hat, f_hat_truth, a_pred, a_true
             print(f"      {gen}: candidates {start + 1}-{start + len(block)} of {len(sites)}, "
                   f"{sum(len(x) for x in frames):,} rows so far, peak RSS "
                   f"{_peak_resident_gib():.1f} GiB", flush=True)
@@ -227,8 +238,8 @@ def collect_contrasts(probe: "pl.Probe", cfg: Config) -> pd.DataFrame:
     out["cpp"] = out["f_lock"] * P / pl.FS       # cycles per patch
     out["family"] = [pl.lock_family(f, P, S) for f in out["f_lock"]]
     return out[["model", "P", "S", "overlap", "generator", "bg_id", "f_lock", "family", "cpp",
-                "delta", "phase_idx", "phase", "role", "f", "is_lock", "R", "dphase",
-                "f_hat", "h", "h_truth"]]
+                "delta", "phase_idx", "phase", "role", "f", "is_lock",
+                "a_pred", "a_true", "amp_injected", "R", "dphase", "f_hat", "h", "h_truth"]]
 
 
 # --------------------------------------------------------------------------------- #
@@ -560,7 +571,7 @@ def _load_or_create_manifest(
 
 _REQUIRED_COLUMNS = {
     "contrasts": {"model", "P", "S", "generator", "f_lock", "role", "f", "is_lock",
-                  "f_hat", "h", "h_truth"},
+                  "a_pred", "a_true", "amp_injected", "f_hat", "h", "h_truth"},
     "mdl_cells": {"model", "P", "S", "stage", "is_locked", "L_bits"},
     "mdl_bandtasks": {"model", "P", "S", "stage", "task", "L_bits"},
     "collapse": {"model", "P", "S", "mode", "rep", "f", "z", "z_norm"},
@@ -582,7 +593,7 @@ def _validate_frame(frame: pd.DataFrame, table: str, tag: str | None = None) -> 
     # the band, and `localisation_hit` already reads a NaN peak as a miss. Requiring it finite
     # would throw away a whole geometry's forward passes over a row that is a legitimate reading.
     finite_columns = {
-        "contrasts": ("f", "R", "h", "h_truth"),
+        "contrasts": ("f", "a_pred", "a_true", "amp_injected", "R", "h", "h_truth"),
         "mdl_cells": ("L_bits",),
         "mdl_bandtasks": ("L_bits",),
         "collapse": ("f", "z", "z_norm"),

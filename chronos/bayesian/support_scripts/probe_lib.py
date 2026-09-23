@@ -901,9 +901,18 @@ class Probe:
 
     # ---------------------------------------------------------------------- #
     def measure(self, contexts: np.ndarray, futures: np.ndarray, freqs: np.ndarray,
-                k: int = FHAT_TOPK
-                ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+                k: int = FHAT_TOPK, return_amplitudes: bool = False
+                ) -> tuple[np.ndarray, ...]:
         """One forward pass, three readings: (R, dphase, f_hat, f_hat_truth).
+
+        With `return_amplitudes=True` the two amplitudes R is built from are appended,
+        (R, dphase, f_hat, f_hat_truth, a_pred, a_true), and nothing else changes. They are worth
+        recording because R's denominator is a choice and the two candidates cannot be told apart
+        after the fact: `a_true` is the least-squares amplitude of the TRUE continuation at the
+        arm's frequency, which is the injected tone plus whatever the background contributes
+        there, while the deliverable's appendix defines the recovery against the amplitude
+        INJECTED. Keeping both amplitudes lets either ratio be formed downstream from one
+        collection, instead of fixing the choice at the only point where a forward pass happens.
 
         Chronos is the whole cost of collection, so they share a single call to `forecast` rather
         than paying for it three times. R is retained because it costs nothing and keeps the
@@ -922,12 +931,18 @@ class Probe:
         t_fut = np.arange(CTX, CTX + preds.shape[1]) / FS
         R = np.empty(len(preds))
         dphase = np.empty(len(preds))
+        amp_pred = np.empty(len(preds))
+        amp_true = np.empty(len(preds))
         for i, f in enumerate(np.asarray(freqs, float)):
             a_hat, ph_hat = fit_amp_phase(preds[i], t_fut, f)
             a_true, ph_true = fit_amp_phase(np.asarray(futures[i], float), t_fut, f)
+            amp_pred[i] = a_hat
+            amp_true[i] = a_true
             R[i] = a_hat / max(a_true, 1e-9)
             dphase[i] = np.degrees(abs(np.angle(np.exp(1j * (ph_hat - ph_true)))))
-        return R, dphase, dominant_freqs(preds, k=k), dominant_freqs(np.asarray(futures, float), k=k)
+        readings = (R, dphase, dominant_freqs(preds, k=k),
+                    dominant_freqs(np.asarray(futures, float), k=k))
+        return readings + (amp_pred, amp_true) if return_amplitudes else readings
 
     # ---------------------------------------------------------------------- #
     def collapse(self, contexts: np.ndarray) -> np.ndarray:
