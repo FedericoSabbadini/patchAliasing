@@ -1,18 +1,36 @@
-\begin{table}[!t]
+\begin{table}[!htbp]
     \centering
     \small
-    \begin{tabular}{@{}lrrrr@{}}
+    \setlength{\tabcolsep}{4.5pt}
+    \renewcommand{\arraystretch}{1.1}
+    \begin{tabular}{@{}cccccccccc@{}}
         \toprule
-        \textbf{Regime} & \textbf{Windows} & \textbf{MAE} & \textbf{Bias} & \textbf{Relative error} \\
+        & & \multicolumn{3}{c}{\textbf{All minutes}} & \multicolumn{3}{c}{\textbf{MAE by regime}} & \multicolumn{2}{c}{\textbf{$\Delta$MAE vs retrained $16$--$16$}} \\
+        \cmidrule(lr){3-5} \cmidrule(lr){6-8} \cmidrule(l){9-10}
+        \textbf{$P$} & \textbf{$S$} & \textbf{MAE} & \textbf{Bias} & \textbf{RMSE} & \textbf{Night} & \textbf{Trans.} & \textbf{Day} & \textbf{Estimate} & \textbf{Interval} \\
         \midrule
-        Sunrise ramp    & --- & --- & --- & --- \\
-        Midday          & --- & --- & --- & --- \\
-        Afternoon ramp  & --- & --- & --- & --- \\
-        Night           & --- & --- & --- & --- \\
+        $16$ & $16^{\dagger}$ & $7.95$ & $-0.73$ & $19.12$ & $0.36$ & $11.25$ & $17.30$ & $-2.52$ & $[-3.63,\,-1.40]$ \\
         \midrule
-        \multicolumn{1}{@{}l}{\textbf{All windows}} & --- & --- & --- & --- \\
+        $8$ & $8$ & $11.11$ & $-4.05$ & $22.59$ & $1.53$ & $16.23$ & $22.69$ & $+0.64$ & $[-0.36,\,1.67]$ \\
+        \midrule
+        $16$ & $8$ & $9.86$ & $-1.57$ & $21.74$ & $1.41$ & $16.42$ & $19.61$ & $-0.61$ & $[-1.61,\,0.43]$ \\
+        $16$ & $12$ & $14.60$ & $-1.67$ & $28.26$ & $2.17$ & $24.69$ & $28.83$ & $+4.13$ & $[2.69,\,5.56]$ \\
+        $16$ & $16$ & $10.47$ & $-0.75$ & $20.77$ & $2.42$ & $18.20$ & $19.41$ & --- & --- \\
+        \midrule
+        $24$ & $8$ & $13.03$ & $0.75$ & $24.55$ & $1.88$ & $22.64$ & $25.67$ & $+2.56$ & $[1.41,\,3.76]$ \\
+        $24$ & $12$ & $11.11$ & $-0.78$ & $22.08$ & $2.16$ & $19.43$ & $21.11$ & $+0.64$ & $[-0.45,\,1.80]$ \\
+        $24$ & $16$ & $14.39$ & $-8.21$ & $29.06$ & $1.01$ & $17.21$ & $31.56$ & $+3.92$ & $[2.05,\,5.85]$ \\
+        $24$ & $20$ & $15.54$ & $-5.01$ & $28.91$ & $3.48$ & $21.10$ & $30.32$ & $+5.07$ & $[3.47,\,6.74]$ \\
+        $24$ & $24$ & $11.24$ & $0.14$ & $22.87$ & $1.32$ & $17.11$ & $23.11$ & $+0.77$ & $[-0.48,\,2.14]$ \\
+        \midrule
+        $32$ & $8$ & $14.32$ & $-2.21$ & $25.49$ & $4.65$ & $21.48$ & $25.55$ & $+3.85$ & $[2.83,\,4.83]$ \\
+        $32$ & $12$ & $12.67$ & $-7.24$ & $26.23$ & $1.39$ & $15.74$ & $26.98$ & $+2.20$ & $[0.69,\,3.61]$ \\
+        $32$ & $16$ & $13.34$ & $-2.24$ & $24.72$ & $2.18$ & $20.68$ & $26.51$ & $+2.87$ & $[1.89,\,3.93]$ \\
+        $32$ & $20$ & $32.54$ & $3.43$ & $51.22$ & $13.59$ & $40.50$ & $55.95$ & $+22.07$ & $[16.91,\,27.36]$ \\
+        $32$ & $24$ & $13.24$ & $-1.50$ & $26.62$ & $2.02$ & $23.28$ & $25.86$ & $+2.77$ & $[1.67,\,3.90]$ \\
+        $32$ & $32$ & $10.56$ & $-0.30$ & $21.95$ & $1.47$ & $18.08$ & $20.94$ & $+0.09$ & $[-0.62,\,0.85]$ \\
         \bottomrule
     \end{tabular}
-\caption{\textcolor{red}{\textbf{Placeholder table, to be filled from the photovoltaic benchmark.} Forecast error on the measured series by regime of the daily cycle, on disjoint windows drawn across the record. The columns are indicative and will follow whatever the benchmark reports.}}
+\caption{Forecast error of the median forecast on the measured photovoltaic series, in watts, over $150$ disjoint windows and $9{,}187$ scored minutes per model ($4{,}777$ at night, $822$ in the transitions around sunrise and sunset, $3{,}588$ in daylight). The first row, marked $\dagger$, is the published Chronos-Bolt-Tiny checkpoint; the others are the retrained geometries of \autoref{tab:hfModels}. The last two columns give the paired difference in MAE from the retrained $P=S=16$, positive when the model is worse, with a bootstrap interval that resamples whole weeks; an interval containing zero means the two cannot be told apart on this series.}
     \label{tab:solarPrediction}
 \end{table}

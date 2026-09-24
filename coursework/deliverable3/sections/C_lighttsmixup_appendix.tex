@@ -22,6 +22,6 @@ One realisation is produced by drawing a number of components $k$ uniformly betw
 
 Two consequences follow: the concentration $\alpha$ sets how evenly the mixing weights are spread, so values near zero return something close to a single sinusoid while larger values return balanced mixtures; at $\alpha=1.5$ the components are comparable in size without being equal. And because the sources are defined in hertz rather than in cycles per sample, the pool is tied to the sampling rate, hence to the lock arithmetic of \autoref{eq:flock}: the same construction at a different $f_s$ yields a different pool, which is the intended behaviour.
 
-The probe tone is not part of this generator. A realisation is normalised to unit variance and the tone is added afterwards, at the frequency and phase the design requires and at a fixed signal-to-noise ratio, so the background and the quantity under test are produced independently of one another.
+The probe tone is not part of this generator: a realisation is normalised to unit variance and the tone is added afterwards, at the frequency and phase the design requires and at a fixed signal-to-noise ratio, so the background and the quantity under test are produced independently of one another.
 
 \autoref{alg:light_tsmixup} states the procedure step by step, with the values adopted here; the pool it takes as input is the one described in this appendix.

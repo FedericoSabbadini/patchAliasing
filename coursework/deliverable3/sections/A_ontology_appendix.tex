@@ -4,7 +4,7 @@ This document defines a compact ontology for a photovoltaic system governed by o
 
 The modeled system contains four energy assets: a photovoltaic array, battery storage, an aggregate internal load, and an external grid. The internal load is a passive sink representing a factory or a fleet of machines. Its demand is observed, but it has no agent, machine-level taxonomy, curtailment command, or scheduling model. The external grid is an available bidirectional boundary bus which supplies residual demand and accepts residual production.
 
-Exactly one \pv{ControlAgent} coordinates the four passive assets. It observes one synchronized control cycle, assigns environmental, anomaly, and observability states, selects a control mode, and emits one or more directional decisions, with no peer-to-peer negotiation among assets.
+Exactly one \pv{ControlAgent} coordinates the four passive assets: it observes one synchronized control cycle, assigns environmental, anomaly, and observability states, selects a control mode, and emits one or more directional decisions, with no peer-to-peer negotiation among assets.
 
 The seven admissible transfer directions are
 \begin{equation}
@@ -31,13 +31,13 @@ All terms denote non-negative magnitudes; import and export are therefore kept s
 
 The ontology provides the smallest semantic layer needed to represent the physical boundary, validated observations, environmental context, three selected anomalies, and the effect of the tokenisation over model observability. It does not model individual machines, market prices, dispatch optimisation, grid faults, or a deployed real-time controller. Load demand, battery state of charge (SoC), asset limits, and the optional grid-exchange reference are asserted because they are not present in the photovoltaic telemetry dataset.
 
-The environmental states are operational generation proxies, not meteorological diagnoses. Likewise, the routing rules describe a deterministic conceptual policy rather than the central experimental contribution. Structural aliasing remains an empirically tested property of a signal-representation pair.
+The environmental states are operational generation proxies, not meteorological diagnoses, and likewise the routing rules describe a deterministic conceptual policy rather than the central experimental contribution. Structural aliasing remains an empirically tested property of a signal-representation pair.
 
 \section{Ontology Representation}
 
 \subsection{Core classes and closed vocabularies}
 
-\autoref{tab:classes} defines the compact class interface. The four asset subclasses form a disjoint union; the \pv{PVSystem} contains exactly one asset of each type and it is managed by a control agent. Closed operational vocabularies are represented as named individuals rather than deeper class hierarchies. Reading down its rows shows the design decision the rest of the appendix rests on: the physical plant, the observation, the model configuration and the assessment are separate classes rather than attributes of one another, so a tokenisation geometry is an object the reasoner can quantify over instead of a parameter buried in a checkpoint. The closed vocabularies matter for the same reason. Because each is a fixed set of named individuals, a rule may enumerate its cases exhaustively and a state outside the vocabulary is a modelling error rather than a silently admitted value.
+\autoref{tab:classes} defines the compact class interface: the four asset subclasses form a disjoint union; the \pv{PVSystem} contains exactly one asset of each type and it is managed by a control agent. Closed operational vocabularies are represented as named individuals rather than deeper class hierarchies. Reading down its rows shows the design decision the rest of the appendix rests on: the physical plant, the observation, the model configuration and the assessment are separate classes rather than attributes of one another, so a tokenisation geometry is an object the reasoner can quantify over instead of a parameter buried in a checkpoint. The closed vocabularies matter for the same reason: because each is a fixed set of named individuals, a rule may enumerate its cases exhaustively and a state outside the vocabulary is a modelling error rather than a silently admitted value.
 
 \input{tables/ontClasses.tex}
 
@@ -61,7 +61,7 @@ The environmental states are operational generation proxies, not meteorological 
 
 \noindent\valueof{PVToInternalLoad}, \valueof{PVToBattery}, and \valueof{PVToExternalGrid};\newline \valueof{BatteryToInternalLoad} and \valueof{BatteryToExternalGrid};\newline \valueof{ExternalGridToInternalLoad} and \valueof{ExternalGridToBattery}.
 
-Formally, each vocabulary class is an OWL-style enumeration of the listed named individuals (\texttt{oneOf}). The five vocabulary classes are pairwise disjoint, and all listed values are declared globally different (\texttt{AllDifferent}). This prevents a value such as \valueof{SafeMode} from being silently identified with \valueof{ClearSky} or \valueof{NormalMode} under open-world semantics. Each valid time-stamped observation has exactly one generation context. Each completed observability assessment has exactly one observability state, and each routing decision records exactly one control mode. Co-issued decisions based on the same synchronized observation must record the same mode. Anomalies are not declared mutually exclusive because, for example, an abrupt inverter trip also creates a large power change. Deterministic control is obtained through the priority rules in the closed-loop section.
+Formally, each vocabulary class is an OWL-style enumeration of the listed named individuals (\texttt{oneOf}). The five vocabulary classes are pairwise disjoint, and all listed values are declared globally different (\texttt{AllDifferent}). This prevents a value such as \valueof{SafeMode} from being silently identified with \valueof{ClearSky} or \valueof{NormalMode} under open-world semantics. Each valid time-stamped observation has exactly one generation context, each completed observability assessment has exactly one observability state, and each routing decision records exactly one control mode. Co-issued decisions based on the same synchronized observation must record the same mode. Anomalies are not declared mutually exclusive because, for example, an abrupt inverter trip also creates a large power change. Deterministic control is obtained through the priority rules in the closed-loop section.
 
 \subsection{Object properties}
 
@@ -69,7 +69,7 @@ The semantic relations in \autoref{tab:objects} connect the physical boundary to
 
 \input{tables/ontObjects.tex}
 
-\pv{hasRepresentation} is intentionally non-functional because one signal can be evaluated under several $(P,S)$ configurations. Each assessment identifies exactly which representation it evaluates. Each decision is based on exactly one current observation and its completed assessment; its own \pv{selectsMode} value therefore scopes the mode without accumulating incompatible modes on the persistent agent. The range of \pv{basedOn} is the union of observation and inferred-assessment entities, rather than the intersection that multiple RDFS range declarations would imply.
+\pv{hasRepresentation} is intentionally non-functional because one signal can be evaluated under several $(P,S)$ configurations. Each assessment identifies exactly which representation it evaluates, and each decision is based on exactly one current observation and its completed assessment; its own \pv{selectsMode} value therefore scopes the mode without accumulating incompatible modes on the persistent agent. The range of \pv{basedOn} is the union of observation and inferred-assessment entities, rather than the intersection that multiple RDFS range declarations would imply.
 
 OWL's open-world semantics do not by themselves validate that endpoint types match a named route. The operational validator therefore admits only the seven ordered pairs in \autoref{eq:routes}, rejects identical endpoints, and checks consistency among \pv{hasRoute}, source, and destination. A hold decision has no route or endpoints and has a zero or absent setpoint. The \pv{basedOn} relation is retained only as the minimum evidence link required to justify a selected mode; no separate trace model is introduced.
 
@@ -79,7 +79,7 @@ OWL's open-world semantics do not by themselves validate that endpoint types mat
 
 The synchronized observation combines the measured photovoltaic and environmental variables with asserted or simulated battery, load, and grid-reference values. The control-critical quantities are PV power $P_{\mathrm{pv}}$, tilted irradiance $G_{\mathrm{tilt}}$, normalized battery state of charge $s\in[0,1]$, and aggregate load demand $P_{\mathrm{load}}\geq0$. Each has a separate validity flag derived from presence, finiteness, freshness, and a configured physical range. Horizontal irradiance, air temperature, wind speed, and wind direction remain environmental evidence but do not independently block the controller. The signed \pv{gridExchangeReferenceW} is optional, with positive values denoting export; it is usable only when present, finite, and fresh.
 
-Missing or stale data cannot be inferred safely from OWL's open-world assumption alone. An operational validation layer therefore compares the observation time stamp with a configurable staleness limit, validates numeric ranges, and asserts the four critical Boolean flags consumed by the ontology. This keeps data-quality validation distinct from semantic classification.
+Missing or stale data cannot be inferred safely from OWL's open-world assumption alone. An operational validation layer therefore compares the observation time stamp with a configurable staleness limit, validates numeric ranges, and asserts the four critical Boolean flags consumed by the ontology, which keeps data-quality validation distinct from semantic classification.
 
 \input{tables/ontData.tex}
 
@@ -99,7 +99,7 @@ Z_G(G_t)=
 \valueof{ClearSky}, & G_t\geq g_2.
 \end{cases}
 \end{equation*}
-Values $g_0=0$, $g_1=150$, and $g_2=800\ \mathrm{W\,m^{-2}}$ are retained only as an illustrative configuration compatible with the current coursework. They are not universal meteorological boundaries. In particular, low irradiance can also be caused by solar position; the four values must therefore be read as generation-context proxies rather than certain weather diagnoses.
+Values $g_0=0$, $g_1=150$, and $g_2=800\ \mathrm{W\,m^{-2}}$ are retained only as an illustrative configuration compatible with the current coursework rather than as universal meteorological boundaries. In particular, low irradiance can also be caused by solar position; the four values must therefore be read as generation-context proxies rather than certain weather diagnoses.
 
 \subsection{Anomaly detection and precedence}
 
@@ -158,7 +158,7 @@ Z&=(L_S\vee L_P)\wedge\left(0<f<\frac{f_s}{2}\right),
 \end{aligned}
 \label{eq:locking-candidate}
 \end{equation}
-where $\varepsilon_S$ and $\varepsilon_P$ are tied to frequency resolution and are never hardcoded frequency bands. Only $L_S$ expresses equality of consecutive patch phases; $L_P$ records whole-cycle repetition inside a patch and is retained as an H3 experimental factor (see \autoref{sec:appBayes}). Their union $Z$ is a candidate geometry class, not proof that two domain concepts are indistinguishable.
+where $\varepsilon_S$ and $\varepsilon_P$ are tied to frequency resolution and are never hardcoded frequency bands. Only $L_S$ expresses equality of consecutive patch phases; $L_P$ records whole-cycle repetition inside a patch and is retained as an H3 experimental factor (\autoref{sec:appBayes}). Their union $Z$ is a candidate geometry class, not proof that two domain concepts are indistinguishable.
 
 This is a division of labour, and it bounds what the ontology can conclude on its own. Phase-locking is derivable: $L_S$, $L_P$ and $Z$ follow by rule from \pv{signalFrequencyHz}, \pv{samplingFrequencyHz}, \pv{patchSize} and \pv{stride}, all of which the knowledge base already holds, so a reasoner can enumerate the candidate set for any configuration without observing a model. Structural aliasing is not derivable and is only recorded: it enters through $Y$ below, which is posterior evidence from an experiment external to the ontology, and no rule here can produce it. An agent using this ontology therefore detects phase-locking and reports structural aliasing.
 
@@ -169,7 +169,7 @@ Y=\left[\Pr\!\left(\Delta_{\mathrm{loss}}(q)>\delta\mid D\right)\geq\tau\right],
 R=\left[\Pr\!\left(\Delta_{\mathrm{loss}}(q)\leq\delta\mid D\right)\geq\tau\right].
 \label{eq:bayesian-evidence}
 \end{equation}
-Because $\tau>1/2$, $Y$ and $R$ cannot both hold for the same assessment. The assessment interface receives the offline evidence produced by the Bayesian analysis of this report (see \autoref{sec:appBayes}): a local amplitude-recovery contrast with a heavy-tailed Student-$t_4$ likelihood and a Gamma regression with log link for non-negative prequential-MDL codelength. These are evidence fields, not universal ontology thresholds. Unless that inference satisfies the predeclared criterion, no instance may be asserted as \valueof{StructurallyAliased}.
+Because $\tau>1/2$, $Y$ and $R$ cannot both hold for the same assessment. The assessment interface receives the offline evidence produced by the Bayesian analysis of this report (\autoref{sec:appBayes}): a local amplitude-recovery contrast with a heavy-tailed Student-$t_4$ likelihood and a Gamma regression with log link for non-negative prequential-MDL codelength. These are evidence fields rather than universal ontology thresholds, and unless that inference satisfies the predeclared criterion, no instance may be asserted as \valueof{StructurallyAliased}.
 
 The three observability values are assigned as follows:
 \begin{equation*}
@@ -243,7 +243,7 @@ P_{\mathrm{sur}}=(P_{\mathrm{pv}}-P_{\mathrm{load}})^{+},
 \qquad
 P_{\mathrm{def}}=(P_{\mathrm{load}}-P_{\mathrm{pv}})^{+}.
 \end{equation}
-Here daylight abbreviates \{\valueof{ClearSky}, \valueof{PartialCloud}, \valueof{Overcast}\}. A cycle issues a route only for a strictly positive transfer and may issue several co-mode decisions. All setpoints are clipped to SoC, capacity, and charge/discharge limits. \autoref{fig:routing-policy} shows the priority scan as a single pass: the modes are tested in a fixed order, the first that matches issues its routes, and no later branch can override an earlier one, which is what makes the policy deterministic rather than a set of competing preferences. The conservative branch rejoins the ordinary load-first router under its reduced cap, so degrading authority narrows the same policy instead of substituting a different one, and the ramp branch is available only in \valueof{NormalMode}. \autoref{tab:routing} states the boundary cases the figure cannot show, each row pairing a triggering condition with the routes it admits and the guard that blocks it: a daylight deficit, a negative ramp with no usable reference, and the cases where a missing, stale or non-finite value forces the conservative path.
+Here daylight abbreviates \{\valueof{ClearSky}, \valueof{PartialCloud}, \valueof{Overcast}\}. A cycle issues a route only for a strictly positive transfer and may issue several co-mode decisions, with all setpoints clipped to SoC, capacity, and charge/discharge limits. \autoref{fig:routing-policy} shows the priority scan as a single pass: the modes are tested in a fixed order, the first that matches issues its routes, and no later branch can override an earlier one, which is what makes the policy deterministic rather than a set of competing preferences. The conservative branch rejoins the ordinary load-first router under its reduced cap, so degrading authority narrows the same policy instead of substituting a different one, and the ramp branch is available only in \valueof{NormalMode}. \autoref{tab:routing} states the boundary cases the figure cannot show, each row pairing a triggering condition with the routes it admits and the guard that blocks it: a daylight deficit, a negative ramp with no usable reference, and the cases where a missing, stale or non-finite value forces the conservative path.
 
 \begin{figure}[H]
 \centering
@@ -254,4 +254,4 @@ Here daylight abbreviates \{\valueof{ClearSky}, \valueof{PartialCloud}, \valueof
 
 \input{tables/ontRouting.tex}
 
-For a negative ramp, Battery$\to$Grid is admissible only after the internal load has been fully served, the export reference is present, fresh, finite, and positive, measured export is below that reference, the battery remains above reserve, and discharge capacity remains after load support. If any condition fails, the ordinary load-first route applies. At night, Grid$\to$Battery begins only after Grid$\to$Load has been satisfied and stops when reserve is restored. These rules preserve \autoref{eq:power-balance} without turning the routing policy into a separate optimisation problem.
+For a negative ramp, Battery$\to$Grid is admissible only after the internal load has been fully served, the export reference is present, fresh, finite, and positive, measured export is below that reference, the battery remains above reserve, and discharge capacity remains after load support; if any condition fails, the ordinary load-first route applies. At night, Grid$\to$Battery begins only after Grid$\to$Load has been satisfied and stops when reserve is restored. These rules preserve \autoref{eq:power-balance} without turning the routing policy into a separate optimisation problem.

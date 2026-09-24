@@ -6,15 +6,23 @@
         \toprule
         \textbf{Claim} & \textbf{Rule} & \textbf{Prior} & \textbf{Reads as} \\
         \midrule
-        \rowtint $H1$ behav.\ supported & $\Pr(\bar\beta < \log 0.8 \mid D) \ge 0.95$   & $0.34$ & recovery at a candidate falls to at most four fifths of its controls \\
+        $H1$ behav.\ supported & $\Pr(\bar\beta < \log 0.8 \mid D) \ge 0.95$   & $0.34$ & recovery at a candidate falls to at most four fifths of its controls \\
+        \rowsep
         $H1$ behav.\ refuted   & $\Pr(|\bar\beta| < \log 1.1 \mid D) \ge 0.95$ & $0.14$ & any effect on that recovery is under $10\%$ \\
-        \rowtint $H1$ repr.\ supported  & $\Pr(\theta_{\mathrm{lock}} > \log 1.2 \mid D) \ge 0.95$   & $0.36$ & at least $20\%$ more code \\
+        \rowsep
+        $H1$ repr.\ supported  & $\Pr(\theta_{\mathrm{lock}} > \log 1.2 \mid D) \ge 0.95$   & $0.36$ & at least $20\%$ more code \\
+        \rowsep
         $H1$ repr.\ refuted    & $\Pr(|\theta_{\mathrm{lock}}| < \log 1.1 \mid D) \ge 0.95$ & $0.15$ & any expansion is under $10\%$ \\
-        \rowtint $H2$ supported & $\Pr(\sigma_\phi < \log 1.1 \mid D) \ge 0.95$ & $0.30$ & phase moves the deficit by under $10\%$ \\
+        \rowsep
+        $H2$ supported & $\Pr(\sigma_\phi < \log 1.1 \mid D) \ge 0.95$ & $0.30$ & phase moves the deficit by under $10\%$ \\
+        \rowsep
         $H3$ location  & two-label fit wins LOO, $\theta_S,\theta_P<0$ & \text{n/a} & deterministic dips sit on both predicted grids \\
-        \rowtint D2 identified  & at least $10$ unambiguous sites for branch $F$ & \text{n/a} & otherwise report not identified \\
+        \rowsep
+        D2 identified  & at least $10$ unambiguous sites for branch $F$ & \text{n/a} & otherwise report not identified \\
+        \rowsep
         $H3a$, $H3b$   & $\Pr(|\kappa_F - 1| < 0.1 \mid D) \ge 0.95$   & $0.05$ & identified branch tracks its own parameter \\
-        \rowtint $M1$ supported & $\Pr(\delta_O > 0 \mid D) \ge 0.95$, overlap wins LOO & $0.50$ & overlap is associated with a smaller loss \\
+        \rowsep
+        $M1$ supported & $\Pr(\delta_O > 0 \mid D) \ge 0.95$, overlap wins LOO & $0.50$ & overlap is associated with a smaller loss \\
         \bottomrule
     \end{tabular}
 \caption{Preregistered decision rules. The \textbf{Prior} column gives the probability each probabilistic rule already scores under the priors of \autoref{tab:bayesPriors}: a calibration reference, not an empirical verdict. A claim is supported when its rule reaches $0.95$, refuted when its support probability falls to $0.05$ or its equivalence rule reaches $0.95$, and is otherwise inconclusive. The D2 identification gate applies before either branch rule, so fewer than ten unambiguous sites yields not identified rather than a null result. Every signed rule follows the orientation of its own fitted response, and the three on $\bar\beta$, $\sigma_\phi$ and $\delta_O$ share one: the paired recovery contrast, which rises as recovery at a candidate approaches recovery at its controls.}

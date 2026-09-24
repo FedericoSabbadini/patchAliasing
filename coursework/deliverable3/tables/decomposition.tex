@@ -1,17 +1,37 @@
-\begin{table}[!t]
+\begin{table}[!htbp]
     \centering
     \small
-    \begin{tabular}{@{}lrrrr@{}}
+    \renewcommand{\arraystretch}{1.15}
+    \begin{tabular}{@{}cccccc@{}}
         \toprule
-        \textbf{Generator} & \textbf{Components} & \textbf{Recovered} & \textbf{Missed} & \textbf{Displaced} \\
+        & & \multicolumn{2}{c}{\textbf{Light TSMixup}} & \multicolumn{2}{c}{\textbf{KernelSynth}} \\
+        \cmidrule(lr){3-4} \cmidrule(l){5-6}
+        \textbf{$P$} & \textbf{$S$} & \textbf{Lock (\%)} & \textbf{Control (\%)} & \textbf{Lock (\%)} & \textbf{Control (\%)} \\
         \midrule
-        Light TSMixup & --- & --- & --- & --- \\
-        KernelSynth   & --- & --- & --- & --- \\
+        $16$ & $16^{\dagger}$ & $42$ & $16$ & $43$ & $16$ \\
         \midrule
-        \multicolumn{1}{@{}l}{\textbf{On $\mathcal F_{\mathrm{lock}}$}} & --- & --- & --- & --- \\
-        \multicolumn{1}{@{}l}{\textbf{Off $\mathcal F_{\mathrm{lock}}$}} & --- & --- & --- & --- \\
+        $8$ & $8$ & $53$ & $0$ & $58$ & $0$ \\
+        \midrule
+        $16$ & $8$ & $26$ & $2$ & $25$ & $3$ \\
+        $16$ & $12$ & $35$ & $1$ & $30$ & $0$ \\
+        $16$ & $16$ & $23$ & $1$ & $22$ & $0$ \\
+        \midrule
+        $24$ & $8$ & $36$ & $1$ & $34$ & $0$ \\
+        $24$ & $12$ & $39$ & $4$ & $35$ & $4$ \\
+        $24$ & $16$ & $25$ & $0$ & $24$ & $0$ \\
+        $24$ & $20$ & $16$ & $0$ & $16$ & $1$ \\
+        $24$ & $24$ & $40$ & $2$ & $35$ & $1$ \\
+        \midrule
+        $32$ & $8$ & $16$ & $3$ & $15$ & $3$ \\
+        $32$ & $12$ & $18$ & $1$ & $19$ & $1$ \\
+        $32$ & $16$ & $17$ & $2$ & $13$ & $4$ \\
+        $32$ & $20$ & $6$ & $4$ & $5$ & $2$ \\
+        $32$ & $24$ & $25$ & $5$ & $25$ & $4$ \\
+        $32$ & $32$ & $13$ & $6$ & $17$ & $7$ \\
+        \midrule
+        \multicolumn{2}{c}{\textbf{Retrained mean}} & $25.9$ & $2.1$ & $24.9$ & $2.0$ \\
         \bottomrule
     \end{tabular}
-\caption{\textcolor{red}{\textbf{Placeholder table, to be filled from the decomposition notebook.} One row per generator and one per position relative to the candidate set, with the number of input components, how many are recovered from the forecast, how many are absent and how many return at a different frequency. The columns are indicative and will follow whatever the notebook reports.}}
+\caption{Recovery rates, in per cent: the percentage of trials in which an added tone is recovered from the $64$-sample median forecast, on one of the geometry's candidate sites (Lock) or at a nearby control (Control), for each generator. Every cell is out of $100$ trials, with lock and control paired on the same background and phase; a tone counts as recovered when a retained forecast line lies within $\pm1$\,Hz of it. The first row, marked $\dagger$, is the published Chronos-Bolt-Tiny checkpoint and receives exactly the signals of the retrained $P=S=16$; the mean is taken over the fifteen retrained geometries. The rate records whether a line is present in the forecast and does not subtract content the background already carried at that frequency.}
     \label{tab:decomposition}
 \end{table}

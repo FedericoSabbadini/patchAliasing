@@ -1,9 +1,9 @@
-The deployment this report is written for is a photovoltaic plant whose power output is read as a time series, forecast by the model of \autoref{sec:tokenisation}, and acted on by a control agent. This section describes that scenario at the level needed to see why the tokenisation geometry matters to it; \autoref{sec:appendixA} gives the formal statement.
+The deployment this report is written for is a photovoltaic plant whose power output is read as a time series, forecast by the model of \autoref{sec:tokenisation}, and acted on by a control agent. This section describes that scenario at the level needed to see why the tokenisation geometry matters to it; \autoref{sec:appOntology} gives the formal statement.
 
-\subsection{OWL2 Ontology}\label{sec:two}
+\subsection{OWL2 Ontology}\label{sec:ontology}
 \begingroup
 \let\subsection\subsubsection
-An ontology names the things a deployment involves and the relations between them, so that a reasoner can derive statements about a plant rather than have them written down case by case. The one used here names two kinds of thing. The first is what the domain contains: a \ont{TimeSeriesSignal} produced by a \ont{PVSystem}, the conditions that shape it, from \valueof{ClearSky} through \valueof{PartialCloud} to a \valueof{RampEvent} or an \valueof{InverterTrip}, and the \ont{Forecast} and \ont{PowerRoutingDecision} that follow.
+An ontology names the things a deployment involves and the relations between them, so that a reasoner can derive statements about a plant rather than have them written down case by case, and the one used here names two kinds of thing. The first is what the domain contains: a \ont{TimeSeriesSignal} produced by a \ont{PVSystem}, the conditions that shape it, from \valueof{ClearSky} through \valueof{PartialCloud} to a \valueof{RampEvent} or an \valueof{InverterTrip}, and the \ont{Forecast} and \ont{PowerRoutingDecision} that follow.
 
 The second is what this study adds: how that signal is cut up before the model sees it. A signal carries one \ont{PatchedRepresentation} per geometry under evaluation, recording its \ont{patchSize}, its \ont{stride} and the overlap between them. The tokenisation is therefore a described object rather than a hidden property of a checkpoint, and the candidate frequencies of \autoref{eq:flock} follow from those fields by arithmetic, for a plant whose sampling interval or geometry has changed and which nobody has measured again.
 
@@ -13,7 +13,7 @@ The agent reads the plant, forecasts it, and chooses how much authority to act o
 The agent therefore keeps an \ont{ObservabilityAssessment} per signal and geometry, recording whether a candidate frequency is \valueof{Observable}, only \valueof{PartiallyObservable}, or \valueof{StructurallyAliased}, and on what evidence. That verdict, not the geometry alone, selects the \ont{ControlMode}, which is \valueof{NormalMode} unless observability is in doubt, and \valueof{ConservativeMode} or \valueof{SafeMode} when it is. Authority is reduced rather than overridden, and an unmeasured plant runs conservatively by default. One placement constraint follows from the arithmetic alone: a monitor sitting after tokenisation would inherit the blind spot it is meant to find, so it has to read the raw telemetry.
 \endgroup
 
-\subsection{Expected Behaviour and Proposed Mitigation}\label{sec:seven}
+\subsection{Expected Behaviour and Proposed Mitigation}\label{sec:hypotheses}
 Pagani et al.\autocite{paganiPreliminaryInsightsChronos2026} report that frequency content is recovered unevenly from Chronos representations, \autoref{sec:tokenisation} supplies a set of frequencies at which that effect is expected.
 
 The arithmetic gives a list of frequencies at which a loss is possible; whether anything is actually lost there, and whether the loss follows the rule the arithmetic predicts, is an empirical question, and the rest of this report is about settling it. Because $\mathcal{F}_{\mathrm{lock}}$ of \autoref{eq:flock} holds for any model, three claims can be carried into the analysis, each stated so that a particular measurement refutes it, and a mitigation proposed alongside them.

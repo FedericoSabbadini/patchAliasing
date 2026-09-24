@@ -1,8 +1,4 @@
-This section separates what the descriptive pass suggests from what the inferential stage decides. The first is reported here only to establish that there is something to measure; the second is reported under the rules fixed in \autoref{tab:bayesDecisions}.
-
-\input{tables/branchSites.tex}
-
-One limit is arithmetic rather than empirical: the two branches of $\mathcal F_{\mathrm{lock}}$ are not equally well served by the design, because a geometry can only speak about the stride branch where the stride grid is not already contained in the patch grid. \autoref{tab:branchSites} counts, for each of the fifteen runs, the frequencies in the analysed band that one grid predicts and the other does not. Where $S \mid P$ every stride site is also a patch site, so nine of the fifteen runs yield no stride-only frequency at all, and four of those nine are the $P=S$ baselines where the two grids coincide entirely. The stride branch is therefore carried by the six runs with $S \nmid P$, and $\theta_S$ and $\kappa_S$ rest on those. Across the whole design they supply thirty-six stride-only frequencies against one hundred and two patch-only ones, and the most any single geometry supplies is eight, below the ten unambiguous sites that \autoref{sec:five} requires of a branch: the stride branch is identified only by pooling the six, never by any one of them. Those same six are the geometries whose analysis context is truncated, the ones with $L_{\mathrm{tok}}<480$ in \autoref{tab:hfModels}, so the subset that carries the stride branch is also the subset least like the rest of the design. All of this is fixed by the choice of $(P,S)$ before anything is measured, and it bounds what the stride-branch estimates below can be asked to settle.
+This section separates what the signals show from what the inferential stage decides. The readings of the first three subsections are exploratory: they describe what can be seen when the models are given controlled and measured signals, and they give the study its direction by pointing to the frequencies the models appear unable to represent. What they suggest is not taken as a result: it is the direction that the Bayesian hypotheses then test, and their verdicts are reported in \autoref{sec:bayesResults} under the rules fixed in \autoref{tab:bayesDecisions}.
 
 \subsection{The frequency sweep}
 
@@ -19,44 +15,37 @@ Before the Bayesian estimates are reported, the appendix figures provide a descr
 
 \subsection{Recovering a component from a complex background}
 
-\textcolor{red}{\textbf{Placeholder, to be replaced once the decomposition notebook is complete.} Two or three paragraphs: how many of the components the generators put into a realisation are recovered from the forecast, how that count changes for components sitting on $\mathcal F_{\mathrm{lock}}$ against components off it, whether a missed component is absent altogether or returned at a displaced frequency, and whether the two generators agree. State also the amplitude floor, since a component whose recovered line falls under the cut is indistinguishable from one that was never rebuilt.}
+The sweep isolates one tone at a time, whereas this reading asks whether a single component added to a richer background survives into the forecast. Each geometry receives paired trials in which the same background carries an added tone either on one of its candidate sites or at a nearby control, and a tone counts as recovered when the forecast still shows a clear spectral line at its frequency. \autoref{tab:decomposition} summarises the outcome for the fifteen retrained geometries and for the published checkpoint, and \autoref{sec:appDecomp} states the procedure and shows single draws.
 
 \input{tables/decomposition.tex}
 
-\begin{figure}[ht]
-    \centering
-    \includegraphics[width=\textwidth]{figures/FIG_E4_tsmixup_p16-s16_spectra_seed2.png}
-\caption{Input and forecast spectra for one Light TSMixup realisation under the reference geometry $P=S=16$ and seed~2. The upper panel shows the generator-recorded input lines; the lower shows peaks recovered from the Chronos-Bolt-Tiny forecast. Dashed vertical lines mark the predicted lock frequencies, and the horizontal threshold marks the spectral cut used to retain forecast peaks.}
-    \label{fig:TSM16-16}
-\end{figure}
+The overall picture is one of loss rather than recovery: the retrained models seldom return an added component, and when they do it is mostly on the candidate sites, while the same component placed beside a site is almost always absorbed into a forecast dominated by its slowest content. The smallest patch retains the most and the widest patches the least, and the pattern is the same whichever generator supplied the background, which suggests that it belongs to the geometry rather than to the signal family.
 
-\begin{figure}[ht]
-    \centering
-    \placeholderfig{One KernelSynth realisation decomposed, drawn as \autoref{fig:TSM16-16}: input components against the components recovered from the forecast, with those falling on $\mathcal F_{\mathrm{lock}}$ marked.}
-\caption{\textcolor{red}{\textbf{Placeholder figure, to be replaced.} The KernelSynth counterpart of \autoref{fig:TSM16-16}, at the same geometry: which components of one realisation survive the forecast and which do not. KernelSynth records no line list, so both sides are estimated by the same transform.}}
-    \label{fig:KS16-16}
-\end{figure}
+The published checkpoint behaves differently at the same geometry, returning added components more often both on and off the candidate sites. Since the geometry is shared, the difference is more plausibly related to training than to tokenisation, because the retrained models follow the original Chronos T5 training mixture and procedure under a reduced budget (\autoref{sec:appRetraining}) while the published checkpoint was trained with its own data and schedule.
 
-\FloatBarrier
+These rates describe what each geometry tends to return rather than what is retained inside the model. A line in the forecast does not exclude energy already carried by the background, and a tone on a candidate site produces a repeating token sequence (\autoref{sec:tokenisation}) that a forecaster can prolong without representing the frequency as distinct from its neighbours. Their value lies in the direction they give, pointing to where the representation of frequency content appears weakest, and whether that weakness concentrates at the candidate sites once background and phase are matched is the question the Bayesian analysis of \autoref{sec:bayesResults} is designed to test.
+
 \subsection{Prediction on the measured series}
 
-\textcolor{red}{\textbf{Placeholder, to be replaced once the photovoltaic benchmark is complete.} Two or three paragraphs: how the forecast error behaves across the daily cycle, how much of it is concentrated on the sunrise and afternoon ramps against the flat midday hours, what the night contributes, and whether the ordering between geometries on this series resembles the ordering the synthetic readings produce. State plainly that no claim is decided here: the series is the application domain, not an experimental corpus.}
+On the photovoltaic series of \autoref{sec:signals}, every checkpoint forecasts the same windows spread across the year and is scored on the same minutes. \autoref{tab:solarPrediction} reports the error of the median forecast, overall and by regime of the daily cycle, and \autoref{sec:appSolar} states the procedure.
 
 \input{tables/solarPrediction.tex}
 
-\begin{figure}[ht]
+\begin{figure}[!htbp]
     \centering
-    \placeholderfig{One recorded day of module power with the forecast issued in the morning drawn over it, context and horizon marked.}
-\caption{\textcolor{red}{\textbf{Placeholder figure, to be replaced.} A full recorded daily cycle of the SolarTech Lab series, with a forecast issued on the sunrise ramp drawn against the measured horizon.}}
-    \label{fig:solarMorning}
+    \includegraphics[width=\textwidth]{figures/SOLAR_day019_1300_p16-s16_both.png}
+\caption{Forecast issued at 13:00 on 19 January 2017 by the retrained $P=S=16$ geometry and by the published checkpoint. Left, the $2048$-minute context, which spans the previous day and night: $818$ minutes are measured, $1203$ missing night-time minutes are set to zero and $27$ minutes of short daylight gaps are interpolated. Right, the last $90$ minutes of context and the $64$ forecast minutes, with each model's median and $80\%$ interval against the measured values.}
+    \label{fig:solarForecast19}
 \end{figure}
 
-\begin{figure}[ht]
-    \centering
-    \placeholderfig{The same day with the forecast issued at midday, where the series is flat and the relative error is smallest.}
-\caption{\textcolor{red}{\textbf{Placeholder figure, to be replaced.} The same recorded day with a forecast issued at midday, for comparison with \autoref{fig:solarMorning}.}}
-    \label{fig:solarMidday}
-\end{figure}
+The error is concentrated in daylight, where the forecast has to follow a changing level, and it grows through the transitions around sunrise and sunset into the day itself, whereas at night almost every model correctly continues a series held at zero. The published checkpoint is the most accurate, and since it shares its geometry with the retrained $P=S=16$, the gap is again more plausibly related to training than to tokenisation. Among the retrained models none improves on that baseline, several cannot be told apart from it and the rest are moderately worse, with no ordering by overlap or by patch size. One geometry, p32-s20, stands apart with a much larger error and non-zero output at night, which points to an issue with that checkpoint that still has to be verified.
+
+The forecast of \autoref{fig:solarForecast19}, issued on a winter afternoon at the reference geometry, illustrates the typical behaviour: both checkpoints prolong the level of the last hour while the measured power begins its afternoon decline, so the error grows along the horizon, and only the wider interval of the retrained model keeps the measurement within its bounds until the end.
+
+The series offers high-level insight into the application domain rather than a test of the design, because the dominant content of every window is the daily cycle, far below the first candidate site at one cycle per patch, and no window therefore carries energy on $\mathcal F_{\mathrm{lock}}$. For the application the direction is nonetheless clear: content at the candidate sites reaches this plant only through short weather transients lasting a few minutes, and those are the events a forecaster of this series would be least able to represent.
 
 \FloatBarrier
-\autoref{sec:appSolar} adds a reading of a different kind: it takes the probe by depth rather than pooled, so the stage at which a candidate frequency stops being linearly separable can be located inside the stack, which Model~B cannot report because it carries the stage as a nuisance offset by design. That too is descriptive: the representational claim is decided by $e^{\theta_{\mathrm{lock}}}$ under the rule of \autoref{tab:bayesDecisions} and nowhere else.
+
+\subsection{Bayesian analysis}\label{sec:bayesResults}
+
+\textcolor{red}{\textbf{Placeholder, to be replaced once the Bayesian fits are complete.} Report the posterior estimates of the models of \autoref{tab:bayesModels} with their credible intervals, the verdict of each rule of \autoref{tab:bayesDecisions} (supported, refuted or inconclusive), and the convergence diagnostics and posterior predictive checks that gate them. State, for each direction suggested by the readings above, whether the corresponding hypothesis is supported, refuted or left inconclusive. This is the only subsection in which a statement about the hypotheses is made; the readings above give the study its direction and are not used to decide any of them.}
