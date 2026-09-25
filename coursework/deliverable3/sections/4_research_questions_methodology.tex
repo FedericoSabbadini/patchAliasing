@@ -1,104 +1,74 @@
-This section sets out the experimental framework first, the four steps and the design that fixes what each can settle, and then the Bayesian models and the decision rules applied to the last of them.
+This section sets out the experimental framework, the four steps and what each can settle, and then the Bayesian models and the decision rules applied to the last of them.
 
 \subsection{Experimental Framework}\label{sec:framework}
 \begingroup
 \let\subsubsection\paragraph
 \let\subsection\subsubsection
-Testing the claims of \autoref{sec:agent} requires a design in which the two branches of $\mathcal F_{\mathrm{lock}}$ can be told apart, signals whose frequency content is known by construction, and an order of execution in which nothing that decides a claim is chosen after the data have been seen.
-
-Three things are deliberately outside it: variation between independently trained instances, since one model is trained per geometry; the photovoltaic series, which supplies the application domain and the semantic layer rather than an experimental corpus, so no claim is decided on measured telemetry; and the untrained network, never probed, so that the claim that token collapse precedes learning rests on the arithmetic rather than on a baseline.
+Testing the claims of \autoref{sec:agent} requires a design in which the two branches of $\mathcal F_{\mathrm{lock}}$ can be told apart, signals whose frequency content is known by construction, and an order of execution in which nothing that decides a claim is chosen after the data have been seen. Three things are deliberately left outside it: variation between independently trained instances, since one model is trained per geometry; the photovoltaic series, which supplies the application domain rather than an experimental corpus, so no claim is decided on measured telemetry; and the untrained network, so that the claim that token collapse precedes learning rests on the arithmetic rather than on a baseline.
 
 \input{tables/branchSites.tex}
 
-The fifteen geometries the whole study runs on, and the reason they had to be retrained, are given in \autoref{sec:geometries}. That $P$ and $S$ vary independently there is what lets Models~D1 and~D2 separate the branches, and Model~A estimate the overlap and patch-size covariates without confounding them. Synthetic signals are sampled at $f_s=512$\,Hz and analysed over $[2,250]$\,Hz, strictly inside the Nyquist limit, whereas the telemetry is recorded once per minute: absolute frequencies are therefore not comparable in hertz, and the transferable quantity is the dimensionless count of cycles per patch or per stride.
+The fifteen geometries of \autoref{sec:geometries} vary $P$ and $S$ independently, which is what lets Models~D1 and~D2 separate the branches and Model~A estimate the overlap and patch-size covariates without confounding them. Synthetic signals are sampled at $f_s=512$\,Hz and analysed over $[2,250]$\,Hz, strictly inside the Nyquist limit, whereas the telemetry is recorded once per minute, so the quantity transferred between the two is the dimensionless count of cycles per patch or per stride rather than a frequency in hertz.
 
-One limit of the design is arithmetic rather than empirical: the two branches of $\mathcal F_{\mathrm{lock}}$ are not equally well served by the design, because a geometry can only speak about the stride branch where the stride grid is not already contained in the patch grid. \autoref{tab:branchSites} counts, for each of the fifteen runs, the frequencies in the analysed band that one grid predicts and the other does not. Where $S \mid P$ every stride site is also a patch site, so nine of the fifteen runs yield no stride-only frequency at all, and four of those nine are the $P=S$ baselines where the two grids coincide entirely. The stride branch is therefore carried by the six runs with $S \nmid P$, and $\theta_S$ and $\kappa_S$ rest on those. Across the whole design they supply thirty-six stride-only frequencies against one hundred and two patch-only ones, and no single geometry supplies more than eight, so the stride branch can be read only by pooling the six. Those same six are also the geometries whose context is truncated (\autoref{sec:geometries}), which makes the subset that carries the stride branch the one least like the rest of the design. All of this is fixed by the choice of $(P,S)$ before anything is measured, and it bounds what the stride-branch estimates below can be asked to settle.
+One limit of the design is arithmetic rather than empirical. Where $S \mid P$ every stride site is also a patch site, so nine of the fifteen runs, the four $P=S$ baselines among them, yield no stride-only frequency (\autoref{tab:branchSites}). The stride branch therefore rests on the six runs with $S \nmid P$, which together supply thirty-six stride-only frequencies against one hundred and two patch-only ones, never more than eight per geometry, and which are also the runs whose context is truncated (\autoref{sec:geometries}). Both facts are fixed by the choice of $(P,S)$ before anything is measured, and they bound what the stride-branch estimates can settle.
 
 \subsection{Step one: the frequency sweep}
 
-Pure tones cross the band in one-hertz steps at several starting phases, once per geometry. Two readings are taken of each: a behavioural one, which rolls the forecast forward and asks at what frequency the model rebuilds the tone, and a representational one, which trains a linear probe on a captured internal state and asks whether the frequency is still readable before the forecast is formed. The probe is scored on the hierarchical band tasks of \autoref{tab:bandTasks}, after Pagani et al.\autocite{paganiPreliminaryInsightsChronos2026}, seven binary questions that locate a tone by halving the analysed range three times over, and on a local task separating $f-1$\,Hz from $f+1$\,Hz. The scan averages over phase and carries no controls, so its purpose is not to decide a claim but to establish whether frequency content is represented at all and where that ability degrades, while \autoref{sec:appSweep} states the contexts, the scoring and the resolution limit.
-
-\input{tables/bandTasks.tex}
+Pure tones cross the band in one-hertz steps at several starting phases, once per geometry, and are read twice: behaviourally, by rolling the forecast forward and asking at what frequency the model rebuilds the tone, and representationally, by asking whether a linear probe on a captured internal state can still place it, on the seven hierarchical band tasks of Pagani et al.\autocite{paganiPreliminaryInsightsChronos2026} and on a local task separating $f-1$\,Hz from $f+1$\,Hz. The scan averages over phase and carries no controls, so it decides no claim: it establishes whether frequency content is represented at all and where that ability degrades. \autoref{sec:appSweep} states the contexts, the tasks and the resolution limit.
 
 \subsection{Step two: decomposition of generated signals}
 
-The sweep asks what happens to one tone in isolation, which is not what a deployment ever sees, so the second step moves to multi-component draws from the two generators of \autoref{sec:signals}. One realisation is forecast by the reference geometry, and input and forecast are decomposed into their frequency components, so that a component present in the one can be looked for in the other. Light TSMixup records the lines it drew, so that side is known rather than estimated, while KernelSynth names none and both sides are estimated alike. The observable is a component returned at the wrong frequency, or not returned at all. \autoref{sec:appDecomp} states the decomposition and the amplitude cut below which a recovered line is not retained.
+A deployment never receives an isolated tone, so the second step moves to multi-component draws from the two generators of \autoref{sec:signals}. Input and forecast are decomposed into their frequency components, so that a component present in the one can be looked for in the other, and the observable is a component returned at the wrong frequency or not returned at all. \autoref{sec:appDecomp} states the decomposition and the amplitude cut below which a recovered line is not retained.
 
 \subsection{Step three: forecasting the measured series}
 
-The third step moves to the photovoltaic telemetry of \autoref{sec:signals}, forecast by every geometry and by the published checkpoint, which is neither synthetic nor controlled: its content is whatever the plant and the weather put there, its cadence is one sample per minute, and its gaps are structural. It asks what the geometry costs on a series a deployment would actually be handed, read alongside the forecast error over the daily cycle. Nothing here decides a claim: \autoref{sec:appSolar} states how the record is treated, which windows are admissible and what is read off them.
+The third step gives the photovoltaic telemetry to every geometry and to the published checkpoint, to see what the geometry costs on a series a deployment would actually be handed, whose content, cadence and gaps are those of the plant rather than of a design. Nothing here decides a claim, and \autoref{sec:appSolar} states how the record is treated and which windows are admissible.
 
 \subsection{Step four: the Bayesian analysis}
 
-The three steps above average over phase, carry no controls, and cannot separate a loss at a candidate frequency from one the model would show anywhere. The inferential step places every candidate beside two controls at its exact value, under one geometry, one background and one phase, so that only the frequency changes, and fits the models of \autoref{sec:models} to the contrasts. The truncation of \autoref{sec:geometries} cancels within such a triplet but not between geometries; \autoref{sec:appBayes} states what it does and does not confound, and it is reported rather than adjusted for.
-
-The order is fixed before anything is measured: the configurations, the frequency grid and the coverage each geometry must reach are declared once, and a session collecting only part of it records that as a limitation rather than a new design. No response filter is applied afterwards, so the arms where the forecast rebuilds nothing, which is where the loss should be largest, are kept rather than dropped.
-
-Interpretation is fail-closed: convergence, parameter recovery, posterior predictive adequacy, sensitivity to the prior scale and the reliability of the leave-one-out comparisons are explicit gates, with the thresholds fixed in \autoref{sec:decisions}. A gate that fails does not weaken a claim: the estimand is reported as not reportable, and a branch reaching fewer than ten unambiguous sites as not identified, neither of which is a null result. Every estimand is reported on its natural scale by its posterior median and $95\%$ credible interval. \autoref{sec:appBayes} states the provenance checks, the gates and the sampler settings in full.
+The three steps above cannot separate a loss at a candidate frequency from one the model would show anywhere. The inferential step therefore places every candidate beside two controls under one geometry, one background and one phase, so that only the frequency changes, and fits the models of \autoref{sec:models} to the resulting contrasts. The configurations, the frequency grid and the coverage each geometry must reach are declared before anything is measured, and no response filter is applied afterwards, so the arms where the forecast rebuilds nothing, where the loss should be largest, are kept. Interpretation is fail-closed: convergence, parameter recovery, posterior predictive adequacy, prior sensitivity and the reliability of the leave-one-out comparisons are gates, and an estimand that fails one is reported as not reportable, and a branch with fewer than ten unambiguous sites as not identified, neither of which is a null result. \autoref{sec:appBayes} states the gates, the sampler settings and how the context truncation enters each comparison.
 \endgroup
 
 \input{tables/bayesModels.tex}
 
 \subsection{Models and estimands}\label{sec:models}
-Bayesian statistics represents uncertainty about unknown quantities through probability distributions and updates prior beliefs when data are observed\autocite{murphyProbabilisticMachineLearning2023}. It is used here because the hypotheses concern the magnitude and uncertainty of structural aliasing effects: posterior distributions quantify evidence for a localisation loss, phase independence and parameter-tracking against predeclared decision thresholds. Each of the three claims of \autoref{sec:agent}, and the mitigation proposed with them, is decided by a posterior stated here.
-
-Every effect prior is centred on no effect, and its scale is varied over the sensitivity ladder $\{0.25,0.5,1.0\}$, sceptical, primary and wide, so that a conclusion resting on the choice of scale rather than on the data is detected as such.
+Bayesian inference represents uncertainty about unknown quantities through probability distributions and updates prior beliefs when data are observed\autocite{murphyProbabilisticMachineLearning2023}. It suits this study because the hypotheses concern the size of an effect and the uncertainty about it, which a posterior quantifies directly against thresholds declared in advance. Every effect prior is centred on no effect and its scale is varied over the sensitivity ladder $\{0.25,0.5,1.0\}$, so that a conclusion resting on the prior rather than on the data is detected as such. Five models carry the claims, one estimand each, as paired in \autoref{tab:bayesModels}; the priors and the role of every term are given in \autoref{sec:appBayes}.
 
 \begingroup
 \let\subsubsection\paragraph
 
-Five models carry those claims, one estimand each; \autoref{tab:bayesModels} pairs each with the claim it decides, its estimand, the value the claim predicts and the measurements it is fitted to. Three responses serve them: a paired behavioural contrast on the forecast, a codelength on a captured internal state, and the dispersion of the input-patch embeddings. Each is stated below in the form it is fitted, with its prior in \autoref{tab:bayesPriors} and its derivation in \autoref{sec:appBayes}.
-
 \subsection*{Model A, the behavioural reading (H1)}
-To test whether the forecast rebuilds a candidate frequency less well than its neighbours, amplitude recovery $R=A_{\mathrm{pred}}/A_{\mathrm{true}}$ is collected in matched triplets, a candidate $f_k$ with its controls $f_k\pm\delta$ sharing one background and one phase, and reduced to one contrast per triplet,
-
+Amplitude recovery $R=A_{\mathrm{pred}}/A_{\mathrm{true}}$ is collected in matched triplets, a candidate $f_k$ with its controls $f_k\pm\delta$ sharing one background and one phase, and reduced to one contrast per triplet,
 \begin{equation}
 \label{eq:d2contrast}
 d = \log(R_k + 0.01) - \tfrac{1}{2}\left[\log(R_- + 0.01) + \log(R_+ + 0.01)\right],
 \end{equation}
-
 negative when the candidate recovers less than its neighbours, and fitted as
-
 \begin{equation}
 \label{eq:d2hier}
 d_i \sim \text{Student-}t_4(\mu_i,\ \sigma),
 \quad
 \mu_i = \beta_{c[i]} + u_{k[i]} + u_{b[i]},
 \quad
-\beta_c \sim \mathcal{N}\!\left(\bar\beta + \delta_O \widetilde O_c + \delta_P \widetilde{\log P}_c,\ \tau\right),
+\beta_c \sim \mathcal{N}\!\left(\bar\beta + \delta_O \widetilde O_c + \delta_P \widetilde{\log P}_c,\ \tau\right).
 \end{equation}
-
-a hierarchy on an already-paired response, so the effect is the intercept: $e^{\bar\beta}$ is recovery at a candidate relative to its controls, and $H1$ predicts $e^{\bar\beta}<1$. The heavy tail absorbs the arms that rebuild nothing; the three offsets keep one harmonic, background or generator from being read as the effect.
+The response is already paired, so the effect is the intercept: $e^{\bar\beta}$ is recovery at a candidate relative to its controls at the average configuration, and $H1$ predicts $e^{\bar\beta}<1$.
 
 \subsection*{Model A$'$, the mitigation claim (M1)}
-To test whether overlap reduces that deficit, no second fit is needed: the configuration level of \autoref{eq:d2hier} is promoted to an estimand,
-
-\begin{equation}
-\label{eq:d2mitigation}
-\mathbb{E}\!\left[\beta_c\right] = \bar\beta + \delta_O\,\widetilde O_c + \delta_P\,\widetilde{\log P}_c,
-\qquad
-\widetilde O_c=\frac{O_c-\bar O}{0.5},
-\qquad
-\widetilde{\log P}_c=\log P_c-\overline{\log P},
-\end{equation}
-
-a slope in overlap and one in patch size, centred on the design and estimable together because \autoref{tab:hfModels} varies the two independently. Since a mitigation raises $d$, the direction $M1$ predicts is $\delta_O>0$.
+No second fit is needed: the configuration level of \autoref{eq:d2hier} is read as an estimand, in which $\delta_O$ is the slope in centred overlap, estimable beside the patch-size slope $\delta_P$ because \autoref{tab:hfModels} varies the two independently. A mitigation raises $d$ towards zero, so $M1$ predicts $\delta_O>0$.
 
 \subsection*{Model B, the representational reading (H1)}
-To test the same claim on the representation rather than the forecast, a linear probe is asked at each candidate to tell a tone at $f_c-1$\,Hz from one at $f_c+1$\,Hz using a captured internal state alone, and scored by minimum description length\autocite{voitaInformationTheoreticProbingMinimum2020}: the response $L_i$ is the prequential codelength in bits, fitted as
-
+A linear probe is asked, from a captured internal state alone, to tell a tone at $f-1$\,Hz from one at $f+1$\,Hz, and is scored by its prequential minimum description length\autocite{voitaInformationTheoreticProbingMinimum2020}, the codelength $L_i$ in bits,
 \begin{equation}
 \label{eq:d2mdl}
 L_i \sim \text{Gamma}\!\left(r,\ r/\mu_i\right),
 \qquad
 \log \mu_i = \alpha_0 + \theta_{\mathrm{lock}}\,\mathrm{IsLocked}_i + s_{\text{st}[i]} + g_{\text{geo}[i]},
 \end{equation}
-
-a Gamma regression whose log link makes the estimand multiplicative, with probe stage and geometry as zero-mean offsets, so that $H1$ predicts $e^{\theta_{\mathrm{lock}}}>1$: more bits to read a locked frequency.
+with probe stage and geometry as zero-mean offsets, so that $H1$ predicts $e^{\theta_{\mathrm{lock}}}>1$, more bits to read a locked frequency.
 
 \subsection*{Model C, temporal alignment (H2)}
-To test whether that deficit depends on where in its cycle the signal starts, the sweep is repeated at several starting phases and the circle is cut into eight equal slices, each given its own offset. Model~A pools across phase and leaves any such dependence in the residual, so it is refitted with the phase index retained and the configuration covariates dropped, on the deficit $y_i=-d_i$:
-
+Model~A pools across phase, so it is refitted on the per-phase deficit $y_i=-d_i$ with the configuration covariates dropped and the phase circle cut into eight slices, each with its own offset,
 \begin{equation}
 \label{eq:d2phase}
 y_i \sim \text{Student-}t_4(\mu_i,\ \sigma),
@@ -107,39 +77,32 @@ y_i \sim \text{Student-}t_4(\mu_i,\ \sigma),
 \qquad
 u_p \sim \mathcal{N}(0, \sigma_\phi),
 \end{equation}
-
-where $\sigma_\phi$ is the spread of the eight offsets, near zero when geometry alone sets the deficit, as $H2$ predicts. Slices presuppose no shape for a dependence, and dropping $u_p$ gives the nested null. Where the population effect is itself indistinguishable from zero, little remains for phase to move, so $H2$ is read conditionally.
+where the spread $\sigma_\phi$ is near zero when geometry alone sets the deficit, as $H2$ predicts. Where the population effect is itself indistinguishable from zero little remains for phase to move, so $H2$ is read conditionally on $H1$.
 
 \subsection*{Model D1, where the sites are (H3)}
-To test whether the loss sits on the two predicted grids, both branches are read on the token collapse $z_g(f)$, the dispersion of the input-patch embeddings across the patches of one context, which is zero when consecutive patches are identical. Every swept frequency carries two binary labels, for lying on $\mathcal{F}_{S}$ and on $\mathcal{F}_{P}$, against which the dispersion is regressed as
-
+Both branches are read on the token collapse $z_g(f)$, the dispersion of the input-patch embeddings across the patches of one context, which is zero when consecutive patches are identical. Model~D1 regresses it on two labels marking whether a swept frequency lies on $\mathcal F_S$ or on $\mathcal F_P$,
 \begin{equation}
 \label{eq:d2sites}
 \log z_g(f) \sim \mathcal{N}\!\left(
 \alpha_g + \theta_S \cdot \text{OnStrideGrid} + \theta_P \cdot \text{OnPatchGrid},\ \sigma
 \right),
 \end{equation}
-
-a regression on an off-grid level $\alpha_g$ per geometry. $H3$ predicts both label coefficients negative and the two-label fit winning the leave-one-out comparison against each one-label alternative.
+and $H3$ predicts both coefficients negative, with the two-label fit winning the leave-one-out comparison against each one-label alternative.
 
 \subsection*{Model D2, whether the sites move (H3a, H3b)}
-\autoref{eq:d2sites} remains compatible with dips on a grid fixed once and for all, so to test whether the sites move with the parameter that generates them, the measured spacing is regressed on the spacing each branch predicts,
-
+Dips on a grid fixed once and for all would satisfy \autoref{eq:d2sites} as well, so Model~D2 regresses the measured fundamental of each branch on the spacing $\Delta^F_g$ that branch predicts,
 \begin{equation}
 \label{eq:d2spacing}
 \hat f^{\,F}_{1,g} \sim \mathcal{N}\!\left(
 \kappa_F \,\Delta^F_g,\ \sqrt{\sigma_F^2+\Delta f^2}
 \right),
 \end{equation}
-
-whose slope $\kappa_F$ is measured spacing per unit of predicted spacing, so $\kappa_F=1$ is the claim and the residual carries the floor $\Delta f$, the sweep step. Identification is not symmetric: a site informs $\kappa_S$ only on $\mathcal F_S \setminus \mathcal F_P$ and $\kappa_P$ only on $\mathcal F_P \setminus \mathcal F_S$, and a branch reaching fewer than ten unambiguous sites is reported as not identified rather than as a null.
+where $\kappa_F=1$ is the claim ($H3a$ for the stride branch, $H3b$ for the patch branch) and $\Delta f$ is the sweep step. A site informs $\kappa_S$ only on $\mathcal F_S \setminus \mathcal F_P$ and $\kappa_P$ only on $\mathcal F_P \setminus \mathcal F_S$.
 
 \endgroup
 
 \subsection{Decisions and validation}\label{sec:decisions}
 
-Every threshold in \autoref{tab:bayesDecisions} is fixed before a posterior is inspected, and validation comes before interpretation. Beside each rule the table records the probability that the rule already scored under the prior, so that a posterior counts as evidence only in so far as it has moved away from that value. A claim is supported at $0.95$, refuted at $0.05$, and otherwise reported as inconclusive, which is a verdict in its own right. The identification gate of Model~D2 asks for at least ten unambiguous sites per branch, and \autoref{tab:branchSites} shows that no single geometry reaches it on the stride branch, which is therefore identified only across the six geometries with $S\nmid P$ taken together.
+Every threshold in \autoref{tab:bayesDecisions} is fixed before a posterior is inspected, and beside each rule the table records the probability that the rule already scores under the prior, so that a posterior counts as evidence only in so far as it has moved away from that value. A claim is supported at $0.95$, refuted at $0.05$, and otherwise reported as inconclusive, which is a verdict in its own right. Interpretation is gated by three preregistered convergence diagnostics, and competing formulations are compared by leave-one-out cross-validation, with a difference within twice its standard error read as inconclusive. The stride branch reaches the identification gate of Model~D2 only across the six geometries with $S\nmid P$ taken together (\autoref{tab:branchSites}).
 
 \input{tables/bayesDecisions.tex}
-
-Interpretation is gated by three preregistered convergence diagnostics, and competing formulations are compared by leave-one-out cross-validation under a reading rule that returns an inconclusive verdict for differences within twice their standard error. The diagnostics, the reading rule and the sampler settings shared by every fit are stated in \autoref{sec:appBayes}; a fit failing any diagnostic is not used to support a claim.

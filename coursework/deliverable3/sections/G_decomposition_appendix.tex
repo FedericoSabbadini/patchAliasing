@@ -22,25 +22,13 @@ The spectra page draws the three magnitude spectra in the same order, each with 
 
 \subsection{Single draws}
 
-\autoref{fig:decompKS} and \autoref{fig:decompTS} show one draw per generator, read as described above. They illustrate the procedure and the typical outcome and are not samples in any statistical sense.
+\autoref{fig:decompKS} to \autoref{fig:decompTSlowspec} show three draws at the reference geometry $P=S=16$, one KernelSynth background and two Light TSMixup ones, each forecast by the retrained model and by the published checkpoint, with the components of a draw on one page and the spectra they were read from on the next. They are orientative: they show how the two checkpoints behave on individual signals, test no hypothesis and are not samples in any statistical sense, while the aggregate over many draws is \autoref{tab:decomposition} in \autoref{sec:results}.
 
-\begin{figure*}[p]
-    \centering
-    \includegraphics[width=0.97\textwidth,height=0.44\textheight,keepaspectratio]{figures/FIG_E3_kernelsynth_p16-s12_main_components_seed59.png}
-    \par\vspace{6pt}
-    \includegraphics[width=0.97\textwidth,height=0.30\textheight,keepaspectratio]{figures/FIG_E4_kernelsynth_p16-s12_spectra_seed59.png}
-\caption{KernelSynth, one draw. Above, the components of the real continuation, of the retrained geometry and of the published checkpoint, each forecast made from the same context; below, the spectra those components were read from. Both sides are estimated, since the generator names no frequencies. \textcolor{red}{\textbf{Placeholder, to be replaced with the $P=S=16$ reference geometry (seed~59 shown here on the retrained p16-s12).} The real continuation carries five lines, from $14$ to $205$\,Hz ($0.44$ to $6.41$ cycles per patch). The retrained model keeps only the slowest content, a single line at $8$\,Hz with about a third of the real amplitude and fitted over one cycle, and returns none of the lines above $50$\,Hz. The published model keeps three weak lines between $25$ and $57$\,Hz beside a strong near-zero component, so it retains more structure than the retrained one, but neither returns the lines at $103$, $154$ and $205$\,Hz.}}
-    \label{fig:decompKS}
-\end{figure*}
+The KernelSynth draw carries six lines spread over the whole band, at $44$, $85$, $114$, $141$, $171$ and $242$\,Hz ($1.38$ to $7.56$ cycles per patch). The published checkpoint recovers more of them: it returns lines at $85$ and $171$\,Hz, one at $108$\,Hz that lies within the native spacing of the $114$\,Hz line, and slow content at $11$ and $21$\,Hz, beside a line at $128$\,Hz. The retrained model keeps only two lines, a slow one at $19$\,Hz and one at $128$\,Hz in the middle of the band; that line sits on a candidate site of the geometry, four cycles per patch, between the real lines at $114$ and $141$\,Hz rather than on either of them, and neither checkpoint returns the highest line at $242$\,Hz.
 
-\begin{figure*}[p]
-    \centering
-    \includegraphics[width=0.97\textwidth,height=0.44\textheight,keepaspectratio]{figures/FIG_E3_tsmixup_p16-s12_main_components_seed74.png}
-    \par\vspace{6pt}
-    \includegraphics[width=0.97\textwidth,height=0.30\textheight,keepaspectratio]{figures/FIG_E4_tsmixup_p16-s12_spectra_seed74.png}
-\caption{Light TSMixup, one draw, read as \autoref{fig:decompKS}. The real side lists the frequencies the generator drew rather than estimating them. \textcolor{red}{\textbf{Placeholder, to be replaced with the $P=S=16$ reference geometry (seed~74 shown here on the retrained p16-s12).} The draw holds a single component at $226$\,Hz ($7.06$ cycles per patch, $2$\,Hz from the patch site at $224$\,Hz) with amplitude $1.41$. Neither checkpoint returns it: both forecasts are nearly flat, with residual lines two orders of magnitude weaker than the input. Several of those residual lines fall within one hertz of the checkpoint's own candidate sites, at $43$\,Hz for the retrained model and at $65$ and $129$\,Hz for the published one, so the forecasts carry content on their combs that the input did not.}}
-    \label{fig:decompTS}
-\end{figure*}
+The first Light TSMixup draw carries a single injected tone at a high frequency, $197$\,Hz ($6.16$ cycles per patch) with amplitude $1.42$, and neither checkpoint returns it: both forecasts are nearly flat, their strongest lines are two orders of magnitude weaker than the input, and two of the retrained model's residual lines, at $64$ and $127$\,Hz, fall within one hertz of its own candidate sites. The second draw injects a low-frequency tone at $41.67$\,Hz ($1.30$ cycles per patch) into a background that already holds a component at $214$\,Hz ($6.69$ cycles per patch). Both checkpoints keep the injected tone, returning it at $43$\,Hz, within the native spacing, with amplitude close to the input for the retrained model ($1.06$ against $1.08$) and somewhat lower for the published one ($0.84$), whereas both lose the high component that was already in the signal, and the weak $28$\,Hz line falls below the cut in either forecast.
+
+Read together, the three draws illustrate the behaviour that the recovery count quantifies: slow content tends to survive into the forecast and fast content tends to be lost, the published checkpoint returns more components than the retrained one, and the lines the retrained model returns away from the input often sit on its own candidate sites. This describes how the models behave on these signals and does not confirm any hypothesis, which is decided only by the paired analysis of \autoref{sec:bayesResults}.
 
 \subsection{The recovery count}
 
@@ -48,4 +36,49 @@ The single draws show what happens to one realisation; the count behind \autoref
 
 Each forecast is decomposed as above, with up to eight candidate lines and the $35\%$ cut. A trial counts as recovered when any retained line lies within $\pm1$\,Hz of the added tone, bounds included. All one hundred trials remain in each denominator, and a forecast that cannot be produced stops the count rather than being dropped from it, so a geometry cannot improve its rate by failing on the difficult cases.
 
+\autoref{tab:decomposition} in \autoref{sec:results} reports the outcome. The retrained models seldom return an added component, on average in about a quarter of the lock trials and in two per cent of the control trials, so when a tone does reappear it is mostly on a candidate site, while the same tone placed beside a site is almost always absorbed into a forecast dominated by its slowest content. The smallest patch retains the most, above half of the lock trials at $P=S=8$, and the widest patches the least, down to five or six per cent at p32-s20, with the same ordering for both generators. The published checkpoint returns added components more often both on and off the sites, $42$ and $16$ per cent on Light TSMixup backgrounds against $23$ and $1$ for the retrained $P=S=16$; since the two share their geometry and receive the same signals, the difference is more plausibly related to training than to tokenisation, the retrained models following the original Chronos T5 mixture and procedure under a reduced budget (\autoref{sec:appRetraining}).
+
 Three limits bound what the count can say, the first being that it measures presence in the output and not attribution, since the background may already carry energy near the added frequency and nothing is subtracted for it. The one-hertz tolerance is finer than the native spacing, so a recovered line is one located near the tone, not one resolved from its neighbours. And the count carries no interval, so it describes the geometries at a high level and is not a statistical test.
+
+\begin{figure*}[p]
+    \centering
+    \includegraphics[width=\textwidth,height=0.86\textheight,keepaspectratio]{figures/FIG_G_kernelsynth_p16-s16_seed85_components.png}
+\caption{KernelSynth draw at the reference geometry $P=S=16$, components. Columns, left to right: the real continuation, the forecast of the retrained model and that of the published checkpoint, each headed by its $64$-sample window; each row below is one retained component, titled with its frequency in hertz, in cycles per patch and per stride, and its fitted amplitude, and marked when it lies within one hertz of a candidate site. Both sides are estimated, since the generator names no frequencies. Orientative only: the aggregate is \autoref{tab:decomposition}.}
+    \label{fig:decompKS}
+\end{figure*}
+
+\begin{figure*}[p]
+    \centering
+    \includegraphics[width=\textwidth,height=0.80\textheight,keepaspectratio]{figures/FIG_G_kernelsynth_p16-s16_seed85_spectra.png}
+\caption{Spectra of the draw of \autoref{fig:decompKS}: real continuation (top), retrained model (middle) and published checkpoint (bottom), in cycles per patch on the lower axis and per stride on the upper one. Dashed verticals are the candidate sites, the dotted horizontal is the $35\%$ cut and triangles mark the lines carried into the components page; grey margins lie outside the analysed band.}
+    \label{fig:decompKSspec}
+\end{figure*}
+
+\begin{figure*}[p]
+    \centering
+    \includegraphics[width=\textwidth,height=0.70\textheight,keepaspectratio]{figures/FIG_G_tsmixup_p16-s16_seed42_components.png}
+\caption{Light TSMixup draw with a single high-frequency injected tone at $197$\,Hz, reference geometry $P=S=16$, components, read as \autoref{fig:decompKS}. The real side lists the frequencies the generator drew rather than estimating them. Every component panel shares the vertical scale of the strongest real component, so the residual forecast lines, about a hundredth of the input, read as nearly flat. Orientative only: the aggregate is \autoref{tab:decomposition}.}
+    \label{fig:decompTS}
+\end{figure*}
+
+\begin{figure*}[p]
+    \centering
+    \includegraphics[width=\textwidth,height=0.80\textheight,keepaspectratio]{figures/FIG_G_tsmixup_p16-s16_seed42_spectra.png}
+\caption{Spectra of the draw of \autoref{fig:decompTS}, read as \autoref{fig:decompKSspec}; the green vertical marks the frequency the generator drew. The two forecast panels have their own vertical scale, two orders of magnitude below that of the input.}
+    \label{fig:decompTSspec}
+\end{figure*}
+
+\begin{figure*}[p]
+    \centering
+    \includegraphics[width=\textwidth,height=0.70\textheight,keepaspectratio]{figures/FIG_G_tsmixup_p16-s16_seed17_components.png}
+\caption{Light TSMixup draw with a low-frequency injected tone at $41.67$\,Hz in a background that also holds components at $28$ and $214$\,Hz, reference geometry $P=S=16$, components, read as \autoref{fig:decompKS}. Both checkpoints return the injected tone, at $43$\,Hz, and neither returns the $214$\,Hz component. Orientative only: the aggregate is \autoref{tab:decomposition}.}
+    \label{fig:decompTSlow}
+\end{figure*}
+
+\begin{figure*}[p]
+    \centering
+    \includegraphics[width=\textwidth,height=0.80\textheight,keepaspectratio]{figures/FIG_G_tsmixup_p16-s16_seed17_spectra.png}
+\caption{Spectra of the draw of \autoref{fig:decompTSlow}, read as \autoref{fig:decompKSspec}; green verticals mark the three frequencies the generator drew.}
+    \label{fig:decompTSlowspec}
+\end{figure*}
+

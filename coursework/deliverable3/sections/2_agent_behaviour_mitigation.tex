@@ -14,9 +14,7 @@ The agent therefore keeps an \ont{ObservabilityAssessment} per signal and geomet
 \endgroup
 
 \subsection{Expected Behaviour and Proposed Mitigation}\label{sec:hypotheses}
-Pagani et al.\autocite{paganiPreliminaryInsightsChronos2026} report that frequency content is recovered unevenly from Chronos representations, \autoref{sec:tokenisation} supplies a set of frequencies at which that effect is expected.
-
-The arithmetic gives a list of frequencies at which a loss is possible; whether anything is actually lost there, and whether the loss follows the rule the arithmetic predicts, is an empirical question, and the rest of this report is about settling it. Because $\mathcal{F}_{\mathrm{lock}}$ of \autoref{eq:flock} holds for any model, three claims can be carried into the analysis, each stated so that a particular measurement refutes it, and a mitigation proposed alongside them.
+Pagani et al.\autocite{paganiPreliminaryInsightsChronos2026} report that frequency content is recovered unevenly from Chronos representations, and \autoref{sec:tokenisation} supplies the frequencies at which a loss is possible. Whether anything is actually lost there, and whether the loss follows the rule the arithmetic predicts, is an empirical question; because $\mathcal{F}_{\mathrm{lock}}$ of \autoref{eq:flock} holds for any model, three claims can be carried into the analysis, each stated so that a particular measurement refutes it, together with a proposed mitigation.
 
 \subsubsection*{Frequency-dependent blind spots (H1)}
 At a candidate frequency $f_k\in\mathcal F_{\mathrm{lock}}$ the model retains less of the signal than at the two neighbouring control frequencies $f_k\pm\delta$, which are not themselves candidates. The claim has two readings that need not agree: a behavioural one, in which the forecast no longer rebuilds the tone at the frequency it was given, and a representational one, in which the frequency becomes harder to read out of the internal state. A loss that is absent, or not localised on the candidate set, refutes $H1$. Phase-locking is treated here as a necessary but not sufficient condition for the specific geometry-induced structural aliasing this study hypothesises: nothing in the design excludes that distinct signals acquire near-identical learned representations for reasons unrelated to $\mathcal F_{\mathrm{lock}}$, and no claim is made about frequencies outside it.
@@ -35,9 +33,7 @@ Raising the overlap moves the stride-derived candidates $\mathcal{F}_{S}$ and th
 \subsection{Patch Geometries and Retraining}\label{sec:geometries}
 \begingroup
 \let\subsection\subsubsection
-$M1$ is a change of geometry, so it cannot be tested where the model is distributed: Chronos-Bolt-Tiny is published at $P=S=16$, where the overlap of \autoref{eq:overlap} is zero and there is nothing to vary. A population spanning that range is needed, and none of it exists as a released checkpoint.
-
-Both parameters therefore vary: at fixed $P$, changing $S$ moves the overlap; at fixed $S$, changing $P$ moves the patch width, with the $P=S$ runs as contiguous baselines. Varying $S$ alone would confound the mitigation with the stride spacing it also moves, and $S>P$ is excluded because such gaps discard input samples. Every geometry is trained from scratch, the baseline included, since reusing the published weights would leave the variants on unequal training histories; \autoref{sec:appRetraining} gives the construction, the data and the optimisation.
+$M1$ is a change of geometry, so it cannot be tested on the distributed model: Chronos-Bolt-Tiny is published only at $P=S=16$, where the overlap of \autoref{eq:overlap} is zero, and no released checkpoint spans a range of geometries. Both parameters therefore vary: at fixed $P$, changing $S$ moves the overlap; at fixed $S$, changing $P$ moves the patch width, with the $P=S$ runs as contiguous baselines. Varying $S$ alone would confound the mitigation with the stride spacing it also moves, and $S>P$ is excluded because such gaps discard input samples. Every geometry is trained from scratch, the baseline included, since reusing the published weights would leave the variants on unequal training histories; \autoref{sec:appRetraining} gives the construction, the data and the optimisation.
 
 \input{tables/hfModels.tex}
 

@@ -8,6 +8,8 @@ The left column is behavioural: the tone is given as context, the median forecas
 
 The right column is representational: at each swept frequency the internal state at the output quantile head is standardised, reduced to its leading twenty principal components, and a logistic regression is trained on that projection and scored by cross-validation, with the standardisation and the projection fitted inside each training fold. Eight tasks are scored per geometry: the seven hierarchical band tasks of \autoref{tab:bandTasks}, after Pagani et al.\autocite{paganiPreliminaryInsightsChronos2026}, which locate a tone by halving the analysed range three times over, and one local task separating a tone at $f-1$\,Hz from one at $f+1$\,Hz. A geometry that answers the first level and fails the third has kept the coarse position of a tone and lost its fine one. The band tasks are cross-validated with folds grouped by frequency, so a probe cannot score by memorising frequencies, while the local task holds out phases, using ten per frequency. Because the reduction is unsupervised and the probe is linear, what is scored is a lower bound on what the state holds: a red cell shows that a frequency is not easily readable, not that it is absent.
 
+\input{tables/bandTasks.tex}
+
 \begin{figure*}[!p]
     \centering
     \includegraphics[width=0.85\textwidth]{figures/FIG_E1_page1.png}
@@ -43,7 +45,7 @@ The right column is representational: at each swept frequency the internal state
     \caption{Third of three: geometries p32-s12, p32-s16, p32-s20, p32-s24 and p32-s32, read as \autoref{fig:sweepA}. The patch size is held at $P=32$, the widest of the design, so the
     patch comb is the densest and the overlap ratio runs from $0.62$ down to $0$ within this one figure.
     Read against \autoref{fig:sweepB} at equal stride, the difference between the two is a difference of
-    patch size alone, which is the comparison the covariate $\log P$ of \autoref{eq:d2mitigation}
+    patch size alone, which is the comparison the covariate $\log P$ of \autoref{eq:appM1:model}
     is fitted to.}
     \label{fig:sweepC}
 \end{figure*}

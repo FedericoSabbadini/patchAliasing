@@ -6,6 +6,8 @@ Every model is fitted by the No-U-Turn sampler with the same settings, so that n
 
 Three preregistered diagnostics gate interpretation: $\hat R<1.01$ measures agreement between the four chains, and values near one indicate that each has converged to the same distribution. Bulk and tail effective sample size above $1000$ counts the genuinely independent draws remaining after correcting for autocorrelation, the tail figure guarding the interval endpoints that the credible intervals are read from. Zero divergences requires that the sampler encountered no geometric pathology it could not traverse. A fit failing any of the three is not used to support a claim, although it may still be reported.
 
+The collection itself is fixed in advance: the configurations, the frequency grid and the coverage each geometry must reach are declared once, a session collecting only part of it records that as a limitation rather than a new design, and no response filter is applied afterwards. Every estimand is reported on its natural scale by its posterior median and $95\%$ credible interval.
+
 Where two formulations compete they are compared by leave-one-out cross-validation. The quantity read is the difference in expected log pointwise predictive density, $\mathrm{elpd\_diff}$, with its standard error $\mathrm{dse}$; a difference smaller than twice its standard error is reported as inconclusive rather than rounded into a decision, so that a nominal ranking is not mistaken for evidence.
 
 \subsection{Model A, the behavioural reading (H1)}

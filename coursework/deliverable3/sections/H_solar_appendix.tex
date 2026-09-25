@@ -2,9 +2,16 @@ This appendix describes how the photovoltaic series is prepared, forecast and sc
 
 \subsection{The record}
 
-The series is the module power of the SolarTech Lab plant\autocite{levaPhotovoltaicPowerWeather2020}, recorded once per minute over the whole of 2017, $525{,}601$ timestamps in total. Only $198{,}730$ of them, $37.8\%$, carry a valid reading. Power is absent outside daylight by construction, because the plant produces nothing and the logger records nothing; during the day readings are also lost whenever the logger misses a minute. Twenty readings above $1$\,kW, with a maximum near $60$\,kW, are physically impossible for this module and are treated as missing rather than as data.
+The series is the module power of the SolarTech Lab plant\autocite{levaPhotovoltaicPowerWeather2020}, recorded once per minute over the whole of 2017 and timestamped in Central European Time, $525{,}601$ timestamps in total. Only $198{,}730$ of them, $37.8\%$, carry a valid reading. Power is absent outside daylight by construction, because the plant produces nothing and the logger records nothing; during the day readings are also lost whenever the logger misses a minute. Twenty readings above $1$\,kW, with a maximum near $60$\,kW, are physically impossible for this module and are treated as missing rather than as data.
 
-Each day is inspected by locating its longest run of consecutive valid readings, which is the longest stretch that could be handed to a model without any filling. The longest run in the whole year is $880$ minutes, on 5 July, and only $64$ of the $365$ days reach the $544$ consecutive readings used by the synthetic windows. \autoref{fig:solarOverlay} superimposes four days of different character: clear summer days follow a smooth arc, a winter day produces less power over a shorter interval, and a cloudy day departs from the arc in rapid drops and peaks that last a few minutes each. Those departures come from the weather and not from the plant, so they are part of what a forecaster is asked to predict and cannot learn from the context.
+Each day is inspected by locating its longest run of consecutive valid readings, which is the longest stretch that could be handed to a model without any filling. The longest run in the whole year is $880$ minutes, on 5 July, and only $64$ of the $365$ days reach the $544$ consecutive readings used by the synthetic windows. \autoref{fig:solarDays} shows two of the longest runs: on the clear day the power traces a smooth arc that peaks near $200$\,W, whereas on the cloudy one the midday readings scatter well away from that arc. \autoref{fig:solarOverlay} superimposes four days of different character: clear summer days follow a smooth arc, a winter day produces less power over a shorter interval, and a cloudy day departs from the arc in rapid drops and peaks that last a few minutes each. Those departures come from the weather and not from the plant, so they are part of what a forecaster is asked to predict and cannot learn from the context.
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=\textwidth]{figures/SOLAR_days_186_212.png}
+\caption{Module power over two recorded days, 5 July (left) and 31 July 2017 (right), one point per valid minute coloured by its value. The grey band marks the longest run of consecutive valid readings in each day. The first day is clear and follows the expected arc; on the second, the scattered readings between noon and mid-afternoon are drops and peaks caused by passing clouds and changing weather.}
+    \label{fig:solarDays}
+\end{figure}
 
 \begin{figure}[!htbp]
     \centering
@@ -25,7 +32,7 @@ The tokeniser sees a sequence of samples and has no notion of seconds, so the se
 
 \subsection{One forecast in detail}
 
-A single forecast is first examined in detail, issued at 13:00 on 5 July 2017, the day with the longest valid run, and repeated for the published checkpoint and for every retrained geometry on the same context. It complements the winter forecast of \autoref{sec:results} with a summer day of a different kind: the context starts at 02:52 on the previous day, $1377$ of its $2048$ minutes are measured, $634$ night-time minutes are set to zero, $37$ minutes of short daylight gaps are bridged, and all $64$ horizon minutes are measured.
+A single forecast is first examined in detail, issued at 13:00 on 5 July 2017, the day with the longest valid run, and repeated for the published checkpoint and for every retrained geometry on the same context. It is complemented by the winter forecast of \autoref{fig:solarForecast19} in the benchmark below, and is a summer day of a different kind: the context starts at 02:52 on the previous day, $1377$ of its $2048$ minutes are measured, $634$ night-time minutes are set to zero, $37$ minutes of short daylight gaps are bridged, and all $64$ horizon minutes are measured.
 
 \begin{figure}[!htbp]
     \centering
@@ -58,9 +65,20 @@ The benchmark draws $150$ windows of $2048+64$ minutes each, chosen at random ov
 
 The point forecast is the median of the nine quantiles each model returns. For each model the mean absolute error, the mean error or bias, the variance of the error and the root mean square error are computed over all scored minutes, and the weighted quantile loss is computed over all nine quantiles to judge the forecast distribution rather than its median alone. Each model is also compared with two references, the published checkpoint and the retrained $P=S=16$, through the paired difference in mean absolute error. Its interval comes from a bootstrap that resamples whole weeks, $51$ of them, $2000$ times, so that windows falling in the same week are not treated as independent. An interval that contains zero means the two models cannot be told apart on this series; it does not mean that they are equal.
 
-\autoref{tab:solarPrediction} in \autoref{sec:results} reports the errors and the comparison with the retrained baseline, and \autoref{tab:solarVsOfficial} reports the quantile loss and the comparison with the published checkpoint. Every retrained geometry is worse than the published model, by between $1.9$ and $7.6$\,W apart from the outlying p32-s20, and the quantile loss orders the models almost exactly as the mean absolute error does, while \autoref{fig:solarSummary} draws the three error measures side by side.
+\input{tables/solarPrediction.tex}
+
+\autoref{tab:solarPrediction} reports the error of the median forecast, overall and by regime of the daily cycle, with the comparison with the retrained baseline, and \autoref{tab:solarVsOfficial} reports the quantile loss and the comparison with the published checkpoint. The error is concentrated in daylight, where the forecast has to follow a changing level, and it grows through the transitions around sunrise and sunset into the day itself, whereas at night almost every model correctly continues a series held at zero. Among the retrained models none improves on the $P=S=16$ baseline: p8-s8, p16-s8, p24-s12, p24-s24 and p32-s32 cannot be told apart from it, the others except p32-s20 are worse by roughly two to five watts, and neither overlap nor patch size orders them. Every retrained geometry is worse than the published model, by between $1.9$ and $7.6$\,W apart from the outlying p32-s20, and the quantile loss orders the models almost exactly as the mean absolute error does, while \autoref{fig:solarSummary} draws the three error measures side by side.
 
 \input{tables/solarVsOfficial.tex}
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=\textwidth]{figures/SOLAR_day019_1300_p16-s16_both.png}
+\caption{Forecast issued at 13:00 on 19 January 2017 by the retrained $P=S=16$ geometry and by the published checkpoint. Left, the $2048$-minute context, which spans the previous day and night: $818$ minutes are measured, $1203$ missing night-time minutes are set to zero and $27$ minutes of short daylight gaps are interpolated. Right, the last $90$ minutes of context and the $64$ forecast minutes, with each model's median and $80\%$ interval against the measured values.}
+    \label{fig:solarForecast19}
+\end{figure}
+
+The forecast of \autoref{fig:solarForecast19}, issued on a winter afternoon at the reference geometry, illustrates the typical behaviour over the benchmark: both checkpoints prolong the level of the last hour while the measured power begins its afternoon decline, so the error grows along the horizon, and only the wider interval of the retrained model keeps the measurement within its bounds until the end.
 
 \begin{figure}[!htbp]
     \centering
