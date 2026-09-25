@@ -253,3 +253,10 @@ UsersboniodevpatchAliasingoutputa2_improvedpytensor_smoke_cache2
 UsersboniodevpatchAliasingoutputa2_improvedpytensor_smoke_cache
 UsersboniodevpatchAliasingoutputd2_validationpytensor_cache
 chronos/bayesian/coordination
+# Current notebooks layout (legacy exclusions above retain old local artifacts)
+notebooks/chronos_architecture/weights/
+notebooks/data/corpus/
+notebooks/_run/
+notebooks/_gen_tmp/
+notebooks/bayes_data/
+notebooks/results/

@@ -15,13 +15,25 @@ def main():
     import matplotlib
     matplotlib.use('Agg')
     import matplotlib.pyplot as plt
-    import chronos.support_scripts.comparison_lib as c
-    import chronos.support_scripts.solar_benchmark_lib as sb
-    import chronos.support_scripts.complex_sweep_lib as sw
-    import chronos.support_scripts.solar_chronos2_lib as s2
+    if __package__:
+        from . import comparison_lib as c
+    else:
+        import comparison_lib as c
+    if __package__:
+        from . import solar_benchmark_lib as sb
+    else:
+        import solar_benchmark_lib as sb
+    if __package__:
+        from . import complex_sweep_lib as sw
+    else:
+        import complex_sweep_lib as sw
+    if __package__:
+        from . import solar_chronos2_lib as s2
+    else:
+        import solar_chronos2_lib as s2
     bayes = Path(__file__).resolve().parents[1]
     root = bayes/'_run/comparison'
-    csv = bayes.parent/'data/dataset/Dataset-SolarTechLab.csv'
+    csv = bayes/'data/Dataset-SolarTechLab.csv'
     if args.task in ('solar','benchmark'):
         cfg, models = sb.SolarBenchmarkConfig(), c.MODELS
         if args.smoke:

@@ -33,16 +33,19 @@ from pathlib import Path
 import numpy as np
 
 # --------------------------------------------------------------------------------- #
-#  Repo wiring: this file lives in chronos/bayesian/support_scripts/
+#  Repo wiring: this file lives in notebooks/support_scripts/
 # --------------------------------------------------------------------------------- #
 _HERE = Path(__file__).resolve().parent
-_CHRONOS = _HERE.parent.parent
-_SYNTHETIC = _CHRONOS / "data" / "synthetic"
+_NOTEBOOKS = _HERE.parent
+_SYNTHETIC = _NOTEBOOKS / "data" / "synthetic"
 for _p in (_HERE, _SYNTHETIC):
     if str(_p) not in sys.path:
         sys.path.insert(0, str(_p))
 
-import chronos.support_scripts.checkpointing as cp
+if __package__:
+    from . import checkpointing as cp
+else:
+    import checkpointing as cp
 
 # --------------------------------------------------------------------------------- #
 #  Fixed experimental setup (deliverable convention, do not change without changing the .tex)
@@ -337,7 +340,7 @@ def background(generator: str, n: int, seed: int, max_attempts: int = 8) -> np.n
     """
     key = (generator, int(seed))
     if key not in _bg_cache:
-        import signalGenerator as sg                  # chronos/data/synthetic/signalGenerator.py
+        import signalGenerator as sg                  # notebooks/data/synthetic/signalGenerator.py
 
         m = max(int(n), CANON_LEN)
         tmp = _HERE.parent / "_gen_tmp"                      # generators want an output dir; nothing is saved
@@ -774,7 +777,10 @@ def load_checkpoint(P: int, S: int, device: str = "cpu", pipeline_cls=None):
     The published ``amazon/chronos-bolt-tiny`` is never used: even (16, 16) loads the retrained
     variant so the baseline is budget-matched like the rest of the design.
     """
-    import chronos.support_scripts.model_loader as ml
+    if __package__:
+        from . import model_loader as ml
+    else:
+        import model_loader as ml
 
     if pipeline_cls is None:
         from chronos import BaseChronosPipeline as pipeline_cls
@@ -812,7 +818,10 @@ class Probe:
         self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
         self.batch_size = batch_size
         self.pipe, self.label = load_checkpoint(P, S, device=self.device)
-        import chronos.support_scripts.model_loader as ml
+        if __package__:
+            from . import model_loader as ml
+        else:
+            import model_loader as ml
         self.checkpoint_identity = ml.checkpoint_identity(P, S)
 
         cfg = self.pipe.model.config.chronos_config

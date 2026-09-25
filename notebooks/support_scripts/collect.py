@@ -44,9 +44,18 @@ except ImportError:                     # pragma: no cover
     resource = None
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-import chronos.support_scripts.probe_lib as pl
-import chronos.support_scripts.checkpointing as cp
-import chronos.support_scripts.model_loader as ml
+if __package__:
+    from . import probe_lib as pl
+else:
+    import probe_lib as pl
+if __package__:
+    from . import checkpointing as cp
+else:
+    import checkpointing as cp
+if __package__:
+    from . import model_loader as ml
+else:
+    import model_loader as ml
 
 def _peak_resident_gib() -> float:
     """Peak resident set size. ru_maxrss is kilobytes on Linux and bytes on macOS."""
@@ -511,7 +520,7 @@ def _design_payload(cfg: Config, planned_models: list[tuple[int, int]]) -> dict:
         Path(__file__).resolve(),
         Path(pl.__file__).resolve(),
         Path(ml.__file__).resolve(),
-        Path(pl.__file__).resolve().parents[2] / "data" / "synthetic" / "generators"
+        Path(pl.__file__).resolve().parents[1] / "data" / "synthetic" / "generators"
         / "kernelsynth_generator.py",
     ]
     return {
@@ -523,7 +532,7 @@ def _design_payload(cfg: Config, planned_models: list[tuple[int, int]]) -> dict:
         "checkpoints": {
             pl.model_tag(P, S): ml.checkpoint_identity(P, S) for P, S in planned_models
         },
-        "source_sha256": {str(path.relative_to(Path(__file__).resolve().parents[3])): cp.sha256_file(path)
+        "source_sha256": {str(path.relative_to(Path(__file__).resolve().parents[2])): cp.sha256_file(path)
                           for path in sources},
         "package_versions": _package_versions(),
     }

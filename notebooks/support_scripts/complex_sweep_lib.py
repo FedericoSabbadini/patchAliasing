@@ -5,9 +5,18 @@ from pathlib import Path
 import time
 import numpy as np
 import pandas as pd
-import chronos.support_scripts.comparison_lib as c
-import chronos.support_scripts.checkpointing as cp
-import chronos.support_scripts.probe_lib as pl
+if __package__:
+    from . import comparison_lib as c
+else:
+    import comparison_lib as c
+if __package__:
+    from . import checkpointing as cp
+else:
+    import checkpointing as cp
+if __package__:
+    from . import probe_lib as pl
+else:
+    import probe_lib as pl
 from threadpoolctl import threadpool_limits
 
 MODELS16 = (c.MODELS[0], c.MODELS[4])

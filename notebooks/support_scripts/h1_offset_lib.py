@@ -25,7 +25,10 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-import chronos.support_scripts.probe_lib as pl
+if __package__:
+    from . import probe_lib as pl
+else:
+    import probe_lib as pl
 
 # Frozen for the H1 sensitivity analysis.  This is intentionally not an alias of
 # pl.BAYES_MODELS: a later registry change must not silently alter the population.

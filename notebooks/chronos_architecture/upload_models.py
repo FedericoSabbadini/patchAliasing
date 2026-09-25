@@ -2,7 +2,7 @@
 upload_models.py — push every FINISHED checkpoint to the HuggingFace sweep repository.
 
 Each geometry's training run writes a ``DONE`` marker file when it completes successfully.
-This script scans ``chronos/models/weights/`` for those markers and uploads the associated
+This script scans ``notebooks/chronos_architecture/weights/`` for those markers and uploads the associated
 artefacts (weights, config, loss curves) to the shared HF repository so that downstream
 code (model_loader.py, probe_lib.py) can fetch them without local copies.
 
@@ -12,7 +12,7 @@ sub-folders on the hub, so the latest local version always wins.
 
 Usage::
 
-    python chronos/models/upload_models.py
+    python notebooks/chronos_architecture/upload_models.py
 """
 from pathlib import Path
 

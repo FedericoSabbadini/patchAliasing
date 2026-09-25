@@ -4,9 +4,18 @@ from pathlib import Path
 import time
 import numpy as np
 import pandas as pd
-import chronos.support_scripts.checkpointing as cp
-import chronos.support_scripts.comparison_lib as c
-import chronos.support_scripts.solar_benchmark_lib as sb
+if __package__:
+    from . import checkpointing as cp
+else:
+    import checkpointing as cp
+if __package__:
+    from . import comparison_lib as c
+else:
+    import comparison_lib as c
+if __package__:
+    from . import solar_benchmark_lib as sb
+else:
+    import solar_benchmark_lib as sb
 
 CHRONOS2_ID = "amazon/chronos-2"
 CHRONOS2_REVISION = "29ec3766d36d6f73f0696f85560a422f50e8498c"

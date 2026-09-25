@@ -1,8 +1,8 @@
 """Headless runner for the two companion notebooks; results use the same caches.
 
 From the repository root:
-  .venv/Scripts/python.exe chronos/bayesian/support_scripts/run_comparison.py --task all
-  .venv/Scripts/python.exe chronos/bayesian/support_scripts/run_comparison.py --task all --smoke
+  .venv/Scripts/python.exe notebooks/support_scripts/run_comparison.py --task all
+  .venv/Scripts/python.exe notebooks/support_scripts/run_comparison.py --task all --smoke
 """
 import argparse
 from dataclasses import replace
@@ -10,7 +10,10 @@ from pathlib import Path
 
 import torch
 
-import chronos.support_scripts.comparison_lib as cl
+if __package__:
+    from . import comparison_lib as cl
+else:
+    import comparison_lib as cl
 
 
 def main():
@@ -23,7 +26,7 @@ def main():
     parser.add_argument('--output', type=Path, default=Path(__file__).parents[1]/'_run/comparison')
     args = parser.parse_args()
     torch.set_num_threads(args.threads)
-    csv = Path(__file__).parents[2]/'data/dataset/Dataset-SolarTechLab.csv'
+    csv = Path(__file__).parents[1]/'data/Dataset-SolarTechLab.csv'
     recovery, solar = cl.RecoveryConfig(), cl.SolarConfig()
     models = cl.MODELS
     if args.smoke:

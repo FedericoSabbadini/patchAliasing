@@ -16,8 +16,14 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-import chronos.support_scripts.comparison_lib as c
-import chronos.support_scripts.checkpointing as cp
+if __package__:
+    from . import comparison_lib as c
+else:
+    import comparison_lib as c
+if __package__:
+    from . import checkpointing as cp
+else:
+    import checkpointing as cp
 
 
 @dataclass(frozen=True)

@@ -2,12 +2,12 @@
 model_loader.py — locate and load retrained Chronos-Bolt checkpoints.
 
 Every (P, S) geometry in the sweep has a checkpoint directory named ``p{P}-s{S}-seed42``
-under ``chronos/models/weights/``.  This module resolves that directory, preferring the
+under ``notebooks/chronos_architecture/weights/``.  This module resolves that directory, preferring the
 local copy when one exists and falling back to the Hugging Face sweep repository.
 
 This is the only place checkpoint resolution lives for the Bayesian analysis.  The older
 ``chronos/testing/testing_lib.py`` provides the same service for the Deliverable 1 testing
-notebooks; this copy exists so that ``chronos/bayesian/`` is self-contained.
+notebooks; this copy exists so that ``notebooks/`` is self-contained.
 """
 from __future__ import annotations
 
@@ -23,8 +23,8 @@ SWEEP_REPO: str = "federicosabbadini/chronos-bolt-patch-sweep"
 SWEEP_REVISION: str = "230ea28278a3c60621964b920e9778c0ba73337e"
 
 # ---- local directory that mirrors (or replaces) the HF repo --------------------------
-# ``chronos/models/weights/`` sits two levels above this file.
-_WEIGHTS_DIR: Path = Path(__file__).resolve().parents[2] / "models" / "weights"
+# ``notebooks/chronos_architecture/weights/`` is shared with the training and upload scripts.
+_WEIGHTS_DIR: Path = Path(__file__).resolve().parents[1] / "chronos_architecture" / "weights"
 
 REQUIRED_CHECKPOINT_FILES = ("model.safetensors", "config.json", "run_config.json")
 EXPECTED_TRAINING_STEPS = 100_000

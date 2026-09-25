@@ -10,26 +10,16 @@ Patch-based tokenisation splits a time series into overlapping windows of size P
 
 ```
 patchAliasing/
-├── chronos/                    # code, experiments and data
-│   ├── models/                 # training sweep (22 geometries, 100k steps each)
-│   │   ├── train_sweep.py      # from-scratch retraining driver
-│   │   ├── upload_models.py    # push checkpoints to HuggingFace
+├── notebooks/                  # code, notebooks and data
+│   ├── chronos_architecture/   # architecture notebook, training and model upload
 │   │   └── weights/            # local checkpoints (gitignored)
-│   ├── bayesian/               # Bayesian analyses, appendices and comparisons
-│   │   ├── notebooks/
-│   │   │   ├── models/         # Bayesian models and diagnostics
-│   │   │   ├── appendixes/     # reconstruction, decomposition and probing figures
-│   │   │   └── experiments/    # solar benchmarks and complex-signal sweeps
-│   │   ├── support_scripts/   # collection, shared libraries and CLI runners
-│   │   ├── tests/             # tests, validation and diagnostic builders
-│   │   └── README.md          # notebook and script catalogue
+│   ├── bayesian/               # Deliverable 2 Bayesian notebook and companion report
+│   ├── signal_analysis/        # reconstruction, decomposition and solar notebooks
+│   ├── support_scripts/        # shared collection, comparison and model-loading modules
 │   ├── data/
 │   │   ├── synthetic/          # TSMixup and KernelSynth signal generators
-│   │   └── dataset/            # real-world PV telemetry (SolarTechLab)
-│   └── ontology/               # OWL2 DL semantic layer for the PV domain
-│       ├── ontology.ttl        # OWL ontology (Turtle)
-│       ├── pv_data.py          # Python adapter (concept risk, state classification)
-│       └── pv_full_analysis.ipynb
+│   │   └── Dataset-SolarTechLab.csv
+│   └── _run/                  # local analysis outputs and caches (gitignored)
 ├── coursework/                 # LaTeX deliverables and report
 │   ├── _coursework_/           # current working report
 │   │   ├── main.tex
@@ -69,12 +59,12 @@ uv sync
 
 **Bayesian data collection**:
 ```bash
-cd chronos/bayesian
+cd notebooks
 python support_scripts/collect.py --out ./results --smoke   # pipeline check
 python support_scripts/collect.py --out ./results           # full design
 ```
 
-Then open `notebooks/models/bayesian_analysis.ipynb` for the PyMC inference. See the [Bayesian catalogue](chronos/bayesian/README.md) for all notebooks and support scripts.
+Then open `notebooks/bayesian/deliverable2_bayesian_models.ipynb` for the PyMC inference. See the [Bayesian guide](notebooks/bayesian/README.md) for its setup and execution modes.
 
 ## Key findings (provisional)
 

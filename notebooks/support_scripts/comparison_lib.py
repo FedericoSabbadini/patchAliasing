@@ -13,8 +13,14 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-import chronos.support_scripts.checkpointing as cp
-import chronos.support_scripts.model_loader as ml
+if __package__:
+    from . import checkpointing as cp
+else:
+    import checkpointing as cp
+if __package__:
+    from . import model_loader as ml
+else:
+    import model_loader as ml
 
 FS, CTX, HORIZON = 512, 480, 64
 BAND = (2., 250.)
@@ -205,13 +211,19 @@ def control_delta(p, s, frequency, guard=2.000001):
 
 def recovery_pool():
     # Explicit population prevents unrelated environment settings changing the pool.
-    import chronos.support_scripts.probe_lib as pl
+    if __package__:
+        from . import probe_lib as pl
+    else:
+        import probe_lib as pl
     return np.asarray(pl.tsmixup_pool(models=list(FROZEN15)), dtype=float)
 
 
 def generate_backgrounds(family, cfg):
     """Original decomposition recipes: K<=4 Light TSMixup or J=5 KernelSynth."""
-    import chronos.support_scripts.probe_lib as pl  # wires the generator imports, no model is loaded
+    if __package__:
+        from . import probe_lib as pl  # wires the generator imports, no model is loaded
+    else:
+        import probe_lib as pl
     seeds = np.arange(cfg.seed, cfg.seed+cfg.n_backgrounds, dtype=np.int64)
     pool = recovery_pool()
     signals, metadata = [], []
@@ -268,7 +280,10 @@ def injection_trials(backgrounds, seeds, p, s, cfg):
         amplitude = cfg.amplitude * float(np.std(bg, dtype=np.float64))
         for arm, frequency in (("lock", fk), ("control", fc)):
             # Use the same sinusoid convention as the original notebook.
-            import chronos.support_scripts.probe_lib as pl
+            if __package__:
+                from . import probe_lib as pl
+            else:
+                import probe_lib as pl
             signal = bg + pl.make_tone(float(frequency), float(phase), len(t), amplitude)
             inputs.append(signal.astype(np.float32))
             rows.append(dict(background=i, background_seed=int(seeds[i]), P=p, S=s,
@@ -319,7 +334,7 @@ def run_recovery(root, cfg=RecoveryConfig(), models=MODELS, device=None):
         # Dataset cache is independent of checkpoints and figure controls.
         recipe = {"family": family, "config": asdict(cfg),
                   "code": cp.sha256_file(Path(__file__)), "pool": array_hash(recovery_pool()),
-                  "generator": cp.sha256_file(Path(__file__).parents[2]/"data/synthetic/signalGenerator.py")}
+                  "generator": cp.sha256_file(Path(__file__).parents[1]/"data/synthetic/signalGenerator.py")}
         pool_dir = Path(root)/"backgrounds"/cfg.mode/cp.fingerprint(recipe)[:16]
         pool_dir.mkdir(parents=True, exist_ok=True)
         if (pool_dir/"signals.npz").exists() and (pool_dir/"draws.json").exists():

@@ -5,7 +5,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.lines import Line2D
 
-from chronos.support_scripts.comparison_lib import FS, BAND, lock_frequencies
+if __package__:
+    from .comparison_lib import FS, BAND, lock_frequencies
+else:
+    from comparison_lib import FS, BAND, lock_frequencies
 
 COLORS = {"real": "#1f4e79", "retrained": "#c81e3c", "official": "#7851a9"}
 
