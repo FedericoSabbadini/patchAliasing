@@ -1,0 +1,33 @@
+\begin{table}[!htbp]
+    \centering
+    \small
+    \renewcommand{\arraystretch}{1.1}
+    \begin{tabular}{@{}cccccccc@{}}
+        \toprule
+        & & \multicolumn{4}{c}{\textbf{Sweep context}} & \multicolumn{2}{c}{\textbf{$480$-sample context}} \\
+        \cmidrule(lr){3-6} \cmidrule(l){7-8}
+        \textbf{$P$} & \textbf{$S$} & \textbf{$L$} & \textbf{Padding} & \textbf{Tokens} & \textbf{Left out} & \textbf{Tokens} & \textbf{Left out} \\
+        \midrule
+        $8$ & $8$ & $512$ & $0$ & $64$ & $0$ & $60$ & $0$ \\
+        \midrule
+        $16$ & $8$ & $512$ & $0$ & $63$ & $0$ & $59$ & $0$ \\
+        $16$ & $12$ & $504$ & $8$ & $42$ & $4$ & $39$ & $8$ \\
+        $16$ & $16$ & $512$ & $0$ & $32$ & $0$ & $30$ & $0$ \\
+        \midrule
+        $24$ & $8$ & $512$ & $16$ & $64$ & $0$ & $58$ & $0$ \\
+        $24$ & $12$ & $504$ & $0$ & $41$ & $0$ & $39$ & $0$ \\
+        $24$ & $16$ & $512$ & $16$ & $32$ & $8$ & $29$ & $8$ \\
+        $24$ & $20$ & $500$ & $4$ & $25$ & $0$ & $23$ & $16$ \\
+        $24$ & $24$ & $504$ & $0$ & $21$ & $0$ & $20$ & $0$ \\
+        \midrule
+        $32$ & $8$ & $512$ & $0$ & $61$ & $0$ & $57$ & $0$ \\
+        $32$ & $12$ & $504$ & $8$ & $41$ & $0$ & $38$ & $4$ \\
+        $32$ & $16$ & $512$ & $0$ & $31$ & $0$ & $29$ & $0$ \\
+        $32$ & $20$ & $500$ & $12$ & $25$ & $0$ & $23$ & $8$ \\
+        $32$ & $24$ & $504$ & $8$ & $21$ & $0$ & $19$ & $16$ \\
+        $32$ & $32$ & $512$ & $0$ & $16$ & $0$ & $15$ & $0$ \\
+        \bottomrule
+    \end{tabular}
+\caption{How Chronos-Bolt tokenises the two contexts of this study. The model left-pads a context of $L$ samples with masked values up to a multiple of $P$ (Padding) and cuts a patch every $S$ samples, so the $(L'-P)\bmod S$ most recent samples of the padded length $L'$ enter no token (Left out). The sweep of this appendix uses about $512$ samples shortened to a multiple of the stride; the inferential stage and the decomposition use $480$ samples, a multiple of every $P$, so no padding is added there and samples are left out only when $S\nmid P$.}
+    \label{tab:sweepContext}
+\end{table}

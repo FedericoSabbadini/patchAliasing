@@ -143,22 +143,22 @@ No numerical value is inherited for $r_{\max}$ because it must be calibrated aft
 
 \subsection{Signal observability and structural aliasing}
 
-For a signal frequency $f$, sampling frequency $f_s$, patch size $P$, and stride $S$, define a stride-lock ratio and a patch-periodicity ratio
+For a signal frequency $f$, sampling frequency $f_s$, patch size $P$, and stride $S$, the ontology uses the cycles per stride and per patch of \autoref{sec:tokenisation},
 \begin{equation*}
-\rho_S=\frac{fS}{f_s},
+\mathrm{cps}=\frac{fS}{f_s},
 \qquad
-\rho_P=\frac{fP}{f_s}.
+\mathrm{cpp}=\frac{fP}{f_s},
 \end{equation*}
-A stride phase-lock candidate $L_S$ and a within-patch repetition candidate $L_P$ are
+stored as the data properties \pv{strideLockingRatio} and \pv{patchLockingRatio}. A stride-lock candidate $L_S$ and a patch-aligned periodicity candidate $L_P$ are
 \begin{equation}
 \begin{aligned}
-L_S&=\big[\exists m\in\mathbb{Z}^{+}:|\rho_S-m|\leq\varepsilon_S\big],\\
-L_P&=\big[\exists k\in\mathbb{Z}^{+}:|\rho_P-k|\leq\varepsilon_P\big],\\
+L_S&=\big[\exists c\in\mathbb{N}^{+}:|\mathrm{cps}-c|\leq\varepsilon_S\big],\\
+L_P&=\big[\exists k\in\mathbb{N}^{+}:|\mathrm{cpp}-k|\leq\varepsilon_P\big],\\
 Z&=(L_S\vee L_P)\wedge\left(0<f<\frac{f_s}{2}\right),
 \end{aligned}
 \label{eq:locking-candidate}
 \end{equation}
-where $\varepsilon_S$ and $\varepsilon_P$ are tied to frequency resolution and are never hardcoded frequency bands. Only $L_S$ expresses equality of consecutive patch phases; $L_P$ records whole-cycle repetition inside a patch and is retained as an H3 experimental factor (\autoref{sec:appBayes}). Their union $Z$ is a candidate geometry class, not proof that two domain concepts are indistinguishable.
+where $\varepsilon_S$ and $\varepsilon_P$ are tied to frequency resolution and are never hardcoded frequency bands. $L_S$ makes consecutive tokens equal, whereas $L_P$ makes tokens equal every $P/\gcd(P,S)$ positions, and the two coincide when $P=S$; both enter $H3$ as experimental factors (\autoref{sec:appBayes}). Their union $Z$ is a candidate geometry class, not proof that two domain concepts are indistinguishable.
 
 This is a division of labour, and it bounds what the ontology can conclude on its own. Phase-locking is derivable: $L_S$, $L_P$ and $Z$ follow by rule from \pv{signalFrequencyHz}, \pv{samplingFrequencyHz}, \pv{patchSize} and \pv{stride}, all of which the knowledge base already holds, so a reasoner can enumerate the candidate set for any configuration without observing a model. Structural aliasing is not derivable and is only recorded: it enters through $Y$ below, which is posterior evidence from an experiment external to the ontology, and no rule here can produce it. An agent using this ontology therefore detects phase-locking and reports structural aliasing.
 
