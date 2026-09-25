@@ -80,6 +80,8 @@ To place each window in the units of \autoref{sec:tokenisation}, the strongest n
     \label{fig:solarFreq}
 \end{figure}
 
+\FloatBarrier
+
 \subsection{Limits}
 
 The benchmark covers one plant and one year, and the published checkpoint was trained with a different data mixture and procedure, possibly including series of this kind, whereas the retrained models follow the original Chronos T5 recipe, so its advantage cannot be attributed to geometry; only the comparison among the retrained models isolates the geometry, and on this series it shows no geometry better than the $P=S=16$ baseline. The zero-filling of night-time minutes is exact, but the zero-filling of long daytime gaps in the context is an assumption. Finally, the p32-s20 checkpoint produces power at night and errs more than twice as much as any other model; that behaviour belongs to the checkpoint and should be verified before it is read as an effect of the geometry.
