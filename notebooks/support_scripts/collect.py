@@ -28,6 +28,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import shutil
 import subprocess
 import sys
 from dataclasses import asdict, dataclass
@@ -148,7 +149,8 @@ class Config:
 # --------------------------------------------------------------------------------- #
 #  1. contrasts, the matched (f_k, f_k - delta, f_k + delta) triplets
 # --------------------------------------------------------------------------------- #
-def collect_contrasts(probe: "pl.Probe", cfg: Config) -> pd.DataFrame:
+def collect_contrasts(probe: "pl.Probe", cfg: Config, partial_dir: Path | None = None
+                      ) -> pd.DataFrame:
     """The matched triplets of deliverable Eq. (8), ONE ROW PER ARM.
 
     Each candidate frequency f_k in F_lock is paired with two controls at the largest offset not
@@ -185,8 +187,18 @@ def collect_contrasts(probe: "pl.Probe", cfg: Config) -> pd.DataFrame:
     Blocking changes the working set and nothing else: the blocks partition the candidate list in
     order and each row's readings depend on that row alone, so the table is identical to the one an
     unblocked pass produces, row for row and in the same order.
+
+    With `partial_dir`, every finished block is also written there on its own, together with the
+    background-only forecasts of each generator, and a block already on disk is read back instead
+    of being forwarded again. A session that drops in the middle of a geometry therefore loses at
+    most the block it was forwarding, not the whole table. Every block is a deterministic function
+    of the design and the checkpoint, and the caller (`collect_model`) only passes a directory that
+    belongs to the same manifest, so a block read back is the block that would be recomputed.
     """
     P, S = probe.P, probe.S
+    if partial_dir is not None:
+        partial_dir = Path(partial_dir)
+        partial_dir.mkdir(parents=True, exist_ok=True)
 
     # Per-site control offset (Deliverable 3, "What enters the inference"): the largest offset
     # not exceeding 0.25*fs/S that keeps BOTH controls clear of BOTH grids. A site is dropped only
@@ -203,11 +215,34 @@ def collect_contrasts(probe: "pl.Probe", cfg: Config) -> pd.DataFrame:
         null_forecasts = None
         if cfg.null_arm:
             # one forward pass per background: the forecast of the background alone
-            null_forecasts = probe.forecast(np.stack([np.asarray(bg[:pl.CTX], np.float32)
-                                                      for bg in pool]))
+            null_path = None if partial_dir is None else partial_dir / f"null_{gen}.npy"
+            if null_path is not None and null_path.is_file():
+                null_forecasts = np.load(null_path, allow_pickle=False)
+                if null_forecasts.shape[0] != len(pool):
+                    raise ValueError(f"{null_path} holds {null_forecasts.shape[0]} forecasts, "
+                                     f"the pool has {len(pool)}")
+            else:
+                null_forecasts = probe.forecast(np.stack([np.asarray(bg[:pl.CTX], np.float32)
+                                                          for bg in pool]))
+                if null_path is not None:
+                    cp.atomic_npy(null_path, null_forecasts)
             t_fut = np.arange(pl.CTX, pl.CTX + null_forecasts.shape[1]) / pl.FS
         for start in range(0, len(sites), block_size):
             block = sites[start:start + block_size]
+            block_path = (None if partial_dir is None
+                          else partial_dir / f"block_{gen}_{start:04d}.parquet")
+            expected_rows = sum(len(pl.phases_Sf(fk, cfg.n_phase_contrast))
+                                for fk in block) * len(pool) * 3
+            if block_path is not None and block_path.is_file():
+                saved = pd.read_parquet(block_path)
+                saved_locks = np.sort(saved["f_lock"].unique().astype(float))
+                if (len(saved) == expected_rows and len(saved_locks) == len(block)
+                        and np.allclose(saved_locks, np.sort(np.asarray(block, float)))):
+                    frames.append(saved)
+                    print(f"      {gen}: candidates {start + 1}-{start + len(block)} of "
+                          f"{len(sites)} read back from {block_path.name}", flush=True)
+                    continue
+                block_path.unlink()          # a truncated or foreign block is recomputed
             contexts, futures, freqs, meta = [], [], [], []
             for fk in block:
                 phases = pl.phases_Sf(fk, cfg.n_phase_contrast)
@@ -252,6 +287,8 @@ def collect_contrasts(probe: "pl.Probe", cfg: Config) -> pd.DataFrame:
             # failed on that row and it carries no evidence about the model
             frame["h_truth"] = pl.localisation_hit(f_hat_truth, frame["f"].to_numpy(float),
                                                    tol=cfg.fhat_tol_hz)
+            if block_path is not None:
+                cp.atomic_parquet(block_path, frame)
             frames.append(frame)
             del contexts, futures, freqs, meta, R, dphase, f_hat, f_hat_truth, a_pred, a_true, c_pred
             print(f"      {gen}: candidates {start + 1}-{start + len(block)} of {len(sites)}, "
@@ -518,6 +555,11 @@ def _shard(out: Path, table: str, tag: str) -> Path:
     return out / "raw" / f"{table}__{tag}.parquet"
 
 
+def _partial_dir(out: Path, table: str, tag: str) -> Path:
+    """Where the blocks of one unfinished shard are kept until the shard itself is written."""
+    return out / "raw" / "_partial" / f"{table}__{tag}"
+
+
 def _expected_raw_tables(cfg: Config) -> tuple[str, ...]:
     return RAW_TABLES if cfg.band_tasks else tuple(t for t in RAW_TABLES if t != "mdl_bandtasks")
 
@@ -567,11 +609,33 @@ def _manifest_path(out: Path) -> Path:
     return Path(out) / MANIFEST_NAME
 
 
+def _fingerprint_payload(payload: dict) -> dict:
+    """What the design fingerprint covers: everything except the package versions.
+
+    The versions are recorded, per session, but they do not gate a resume. A hosted runtime can be
+    replaced between two sessions of one collection by an image with another numpy or torch, and
+    refusing the resume would throw away hours of forward passes for a difference that is recorded
+    and inspectable in `sessions` instead. The design, the source code and the checkpoint
+    identities still gate it.
+    """
+    return {key: value for key, value in payload.items() if key != "package_versions"}
+
+
+def _record_session(manifest: dict, payload: dict) -> None:
+    sessions = manifest.setdefault("sessions", [])
+    versions = payload.get("package_versions", {})
+    if sessions and sessions[-1].get("package_versions") != versions:
+        print("  NOTE: the package versions differ from the previous session of this collection; "
+              "both are recorded in the manifest under 'sessions'")
+    sessions.append({"started_utc": datetime.now(timezone.utc).isoformat(),
+                     "package_versions": versions})
+
+
 def _load_or_create_manifest(
     out: Path, cfg: Config, planned_models: list[tuple[int, int]]
 ) -> dict:
     payload = _design_payload(cfg, planned_models)
-    design_fingerprint = cp.fingerprint(payload)
+    design_fingerprint = cp.fingerprint(_fingerprint_payload(payload))
     path = _manifest_path(out)
     if path.is_file():
         manifest = json.loads(path.read_text(encoding="utf-8"))
@@ -694,9 +758,12 @@ def collect_model(
     if actual_identity.get("identity_sha256") != expected_identity:
         probe.close()
         raise ValueError(f"checkpoint identity changed while loading {tag}")
+    partial = _partial_dir(out, "contrasts", tag)
+    if force and partial.exists():
+        shutil.rmtree(partial)
     try:
         builders = {
-            "contrasts": lambda: collect_contrasts(probe, cfg),
+            "contrasts": lambda: collect_contrasts(probe, cfg, partial_dir=partial),
             "mdl_cells": lambda: collect_mdl_cells(probe, cfg),
             "mdl_bandtasks": lambda: collect_band_tasks(probe, cfg),
             "collapse": lambda: collect_collapse(probe, cfg),
@@ -719,6 +786,8 @@ def collect_model(
             manifest["updated_utc"] = datetime.now(timezone.utc).isoformat()
             cp.atomic_json(_manifest_path(out), manifest)
             print(f"    {table}: {len(frame):>6d} rows -> {path.name}")
+            if table == "contrasts" and partial.exists():
+                shutil.rmtree(partial)       # the shard is recorded; its blocks are redundant
     except Exception as exc:
         manifest["status"] = "failed"
         manifest["last_error"] = f"{type(exc).__name__}: {exc}"
@@ -971,8 +1040,17 @@ def collect_all(
     allow_partial: bool = False,
     probe_factory=None,
     response: str = "localisation",
+    regenerate_signals: bool = True,
 ) -> dict[str, pd.DataFrame]:
-    """Collect a session subset against one frozen fifteen-model design."""
+    """Collect a session subset against one frozen fifteen-model design.
+
+    `regenerate_signals` (default) draws every background again from its seed in every session,
+    rather than trusting an in-memory cache or an earlier archive. In a new output directory that
+    is simply how the archive is made. When resuming, each regenerated draw is compared with the
+    archived one and the difference is recorded; the archived draw, the one every shard already
+    written was computed from, is the one used, so a collection never mixes two versions of a
+    signal.
+    """
     out = Path(out)
     out.mkdir(parents=True, exist_ok=True)
     cfg = cfg or Config()
@@ -988,6 +1066,7 @@ def collect_all(
     if set(models) != set(planned_models) and not allow_partial:
         raise ValueError("a model subset requires allow_partial=True and cannot be reportable yet")
     manifest = _load_or_create_manifest(out, cfg, planned_models)
+    _record_session(manifest, _design_payload(cfg, planned_models))
     print(f"collecting into {out}  |  {'SMOKE (NON-REPORTABLE)' if cfg.smoke else 'FULL'} "
           f"design  |  population '{getattr(pl, '_POP_NAME', 'deliverable3')}'  |  "
           f"session {len(models)}/{len(planned_models)} geometries")
@@ -999,11 +1078,14 @@ def collect_all(
     if signal_entry is not None and cp.sha256_file(index_path) != signal_entry.get("sha256"):
         raise ValueError("signal index hash mismatch; refuse to resume altered inputs")
     meta = pl.save_signal_pool(out, generators=cfg.generators,
-                               n_bg=max(cfg.n_bg, cfg.mdl_n_bg, cfg.collapse_reps))
+                               n_bg=max(cfg.n_bg, cfg.mdl_n_bg, cfg.collapse_reps),
+                               regenerate=regenerate_signals)
     manifest["signals"] = {
         "file": str(index_path.relative_to(out)),
         "sha256": cp.sha256_file(index_path),
         "rows": len(meta),
+        "regenerated_this_session": bool(regenerate_signals),
+        "max_regeneration_difference": meta.attrs.get("max_regeneration_difference"),
     }
     cp.atomic_json(_manifest_path(out), manifest)
     print(f"  archived/validated {len(meta)} signals -> {out / 'signals'}")

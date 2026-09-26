@@ -19,7 +19,9 @@
 \fancyfoot[L]{\small PATCHALIAS $|$ the Deliverable 2 Bayesian models: implementation report}
 \fancyfoot[R]{\small\thepage}
 \renewcommand{\headrulewidth}{0pt}
-\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\code}[1]{\texttt{\UseBreakableUnderscores #1}}
+% let long identifiers break after an underscore, a dot or an opening parenthesis in narrow columns
+\newcommand{\UseBreakableUnderscores}{\def\_{\textunderscore\allowbreak}}
 \begin{document}
 
 {\LARGE\bfseries Structural aliasing in Chronos-Bolt}\par\vspace{4pt}
@@ -204,6 +206,7 @@ addition & operational thresholds & the report names the checks but not their th
 4 & The fits: Model~A in four configuration levels and its net reading, Model~B adjusted and literal, Model~C with and without phase, Model~D1 in four labellings per generator plus the tolerance robustness, Model~D2 per branch and per response plus the per-replicate harmonic-order audit. & One checkpoint per fit and per pair of chains, the coefficient tables, the site audit.\\
 5 & Convergence; stratified posterior predictive checks; the sensitivity ladder; LOO over the whole design; the verdicts; the gate table of the report. & The convergence, predictive, sensitivity, LOO and verdict tables, \code{bayesGates.tex}, the run summary.\\
 6 & Reading the results from the saved artifacts alone. & Figures and the figure and table indices.\\
+7 & One table of every fit (convergence and the gates it feeds) and one of every claim (worst convergence, each gate, the verdict); the export a later analysis starts from; and, as the last output, prior against posterior for every claim. & \code{bayesFitSummary.tex}, \code{export/}, the prior-posterior figures as vector PDF, \code{07\_prior\_posterior.csv}.\\
 \bottomrule
 \end{tabularx}
 \end{center}
@@ -266,7 +269,11 @@ NOT IDENTIFIED & The design cannot answer the question, for a reason stated in t
 \section{Memory, and resuming}
 The constraint that shaped the implementation is a $10$\,GB runtime against a Model~A design of $371{,}000$ observations. The log likelihood of one Model~A fit ($23.7$\,GiB) is never built: sampling runs with it switched off and it is rebuilt from the posterior in slices of at most $192$\,MiB. Posterior predictive replicates are drawn in batches of $25$ with only the per-stratum statistics accumulated. The collection processes candidate frequencies in blocks with resident memory reported as it goes; the background-only arm adds one forecast per realisation, $200$ per geometry.
 
-Resumption works at three granularities: the collection shards per table per geometry, each fit is drawn in blocks of two chains and each block is checkpointed, and each fit's per-observation leave-one-out contributions are checkpointed on their own. Every artifact is written atomically and recorded with its SHA-256 and byte count; a checkpoint is resumed only when its hash matches. The run fingerprint covers the seed, the sampler settings, the tone amplitude, every analysis constant, the hashes of the shared scripts and those of the functions that build models and datasets.
+Resumption works at every stage that costs more than a few minutes: the contrast collection is checkpointed per block of candidate frequencies while a geometry is being collected, and per table per geometry once it is done; each fit is drawn in blocks of two chains and each block is checkpointed; the posterior predictive checks are checkpointed per fit; and each fit's per-observation leave-one-out contributions are checkpointed on their own. Every artifact is written atomically and recorded with its SHA-256 and byte count; a checkpoint is resumed only when its hash matches. The run fingerprint covers the seed, the sampler settings, the tone amplitude, every analysis constant, the hashes of the shared scripts and the source of the functions that build models and datasets, read as tokens so that neither comments, nor the Python version of a new runtime, nor the per-process string hash can move it.
+
+\paragraph{The run folder.} Every run has a folder of its own under \code{MyDrive/patchAliasing\_D3\_final/}, named \code{<mode>\_snr<amplitude>\_<UTC time>\_<suffix>} on its first launch and found again through the pointer \code{ACTIVE\_RUN\_<mode>\_snr<amplitude>.json} on every later one. A fresh run from zero (\code{NEW\_RUN}) opens another new folder and moves the pointer; no run writes into an older folder and nothing is deleted. \code{run\_info.json} records the creation, the commit the run started from and one entry per session, and a resumed session checks the clone out at that commit before any shared script is imported, so a push during a day-long run cannot change the code it resumes with.
+
+\paragraph{The signals.} With \code{REGENERATE\_SIGNALS} on, the default, every background is generated again from its seed in every collecting session. In a new folder that is how the signal archive is written; on a resume each regenerated draw is compared with the archived one, the largest difference is recorded in the collection manifest, and the archived draw, the one every shard already written used, is kept.
 
 \section{What the earlier notebooks did differently}
 \begin{center}\small
@@ -295,6 +302,8 @@ The tone amplitude lived in a module constant, outside the collection's design f
 \code{collect\_contrasts} built every context of a geometry before a single forward pass. & Candidate frequencies forwarded in blocks of \code{Config.sites\_per\_block}. & The blocks partition the candidate list in order, so the table is unchanged.\\
 \code{check\_design} gated every collection on criteria written for the hit indicator. & \code{check\_design}, \code{merge}, \code{load\_collection} and \code{collect\_all} take a response. & The library would otherwise stay wrong for the next analysis.\\
 A line the model draws at a site on its own was counted as recovery. & \code{Config.null\_arm}: one background-only forecast per realisation; \code{a\_null} and \code{a\_net} per arm, from \code{probe\_lib.fit\_complex} and \code{Probe.measure(return\_complex=True)}. & The subtraction needs the complex coefficients, which exist only at the forward pass.\\
+A disconnect in the middle of a geometry lost the whole contrasts table of that geometry. & The contrasts are written block by block under \code{data/raw/\_partial/} and read back on a resume; the package versions are recorded per session rather than gating a resume. & The block is the unit of work of the collector.\\
+Backgrounds were read from the archive once it existed. & \code{collect\_all(regenerate\_signals=True)} and \code{save\_signal\_pool(regenerate=True)}: every draw regenerated from its seed and compared with the archive. & The archive and the generator are both in the library.\\
 \bottomrule
 \end{tabularx}
 \end{center}
@@ -304,6 +313,8 @@ The null arm was verified with a stub forecaster that draws a line of its own at
 
 \section{Verifying the implementation itself}
 Two pieces of this notebook are second implementations of something a library already provides, and both are proved inside the notebook before anything depends on them. The reconstructed log likelihood is checked against \code{pm.compute\_log\_likelihood} on the same posterior and rows, for every family and both of Model~A's likelihoods, to better than $10^{-8}$. The ported Pareto smoothing is checked against \code{az.loo} on those same fits to better than $10^{-6}$. The gate logic is exercised offline: a gate over several fits fails when any of them fails, an empty list of fits is a failure, the comparison decides only the two claims whose rule has a comparison leg, the readings that must agree are required to, and the verdict resolves mode, identification, gates, rule, comparison leg and agreement in that order. What none of that establishes is that the sampler will converge on these data; that is what the convergence gate is for.
+
+\paragraph{An end-to-end rehearsal.} The whole notebook was also executed, cell by cell and in order, off Colab, in \code{smoke} mode, with the pinned PyMC~5.28.5 and ArviZ~0.22.0 and with a stand-in for the Chronos checkpoint: a forecaster that attenuates the stride comb and a patch embedding that reproduces the exact collapse of consecutive patches at a lock. It is not evidence about Chronos; it exercises every line from the collection to the last figure, a resume in a second process, and a figures-only session. It found three defects, all corrected: PyMC~5.28 refuses an observed variable named like its own dimension, so every fit stopped at its first draw; the convergence records carried the checkpoint name (\code{04\_A\_both}) while every gate looked them up by the fit's name (\code{A\_both}), so every claim would have failed its convergence gate; and a set literal in one builder made the code fingerprint depend on the per-process string hash, so every resumed session would have refused the fits of the previous one.
 
 \section{Limitations no fit can remove}
 \begin{itemize}
@@ -326,15 +337,18 @@ Two pieces of this notebook are second implementations of something a library al
 \code{analysis\_manifest.json} & The run specification and one entry per artifact, with its SHA-256 and byte count.\\
 \code{data/} & The five collected tables, their shards and the collection manifest.\\
 \code{tables/*.csv} & Every result table, including the verdicts, the gate report and \code{bayesGates.tex}.\\
-\code{figures/*.png} & Roughly thirty figures, indexed at the end of the run.\\
+\code{figures/*.png} & Roughly forty figures, indexed at the end of Part~6.\\
+\code{figures/report/} & The prior-posterior figures of Part~7.3, as vector PDF and 300\,dpi PNG, one per claim and one with all of them.\\
 \code{*.nc} & One checkpoint per fit and per pair of chains.\\
+\code{export/} & \code{az.summary} of every fit, every estimand draw and the prior draws in long form, Model~A's configuration effects, the environment and a README: what a later analysis needs without refitting.\\
+\code{run\_info.json} & Creation, the commit the run started from, one entry per session, and the status.\\
 \code{05\_run\_summary.json} & Mode, fingerprint, commit, amplitude, collection hashes, every gate result, every verdict, the timings and the limitations.\\
 \bottomrule
 \end{tabularx}
 \end{center}
 
 \section{Running it}
-Open the notebook in Colab and choose Run all. The first cell installs the pinned environment and restarts the runtime once; choose Run all again and it steps past the install. From an empty folder it collects $1{,}116{,}000$ forecasts, $3{,}000$ of them the background-only arm, and then fits about sixty-six posteriors, twelve of them on the full $371{,}000$ observations.
+Push the current \code{notebooks/support\_scripts/} first: on Colab the notebook clones the repository and imports them from the clone, and Part~0.7 stops, by name, if the clone is older than the notebook. Then open the notebook in Colab and choose Run all. The first cell installs the pinned environment and restarts the runtime once; choose Run all again and it steps past the install. From an empty folder it collects $1{,}116{,}000$ forecasts, $3{,}000$ of them the background-only arm, and then fits about sixty-six posteriors, twelve of them on the full $371{,}000$ observations.
 
 \begin{center}\small
 \begin{tabularx}{\textwidth}{@{}L{6cm}Y@{}}
@@ -344,9 +358,11 @@ Open the notebook in Colab and choose Run all. The first cell installs the pinne
 The reportable run & \code{MODE = "full"}; the gate table is then written into the report.\\
 Rehearse the whole chain in minutes & \code{MODE = "smoke"}; three phases per candidate so that all eight phase slices are populated; every verdict is non-reportable by construction.\\
 Check the design, the priors and every gate's plumbing, with the short fits the parity checks and parameter recovery need & \code{MODE = "preflight"}; it stops at the start of Part~4 with a message saying so.\\
-Regenerate the figures alone & \code{STANDALONE\_FIGURES = True}.\\
+Regenerate the figures alone & \code{STANDALONE\_FIGURES = True} and \code{RUN\_NAME} set to the finished run.\\
 Split the fits across sessions & Turn off the \code{FIT\_MODEL\_*} flags this session should not fit.\\
-Use a different tone amplitude & Change \code{TONE\_SNR} and \code{RUN\_FOLDER}.\\
+Resume after a disconnect & Run all again; the pointer on Drive finds the folder.\\
+Start again from zero, keeping everything already on Drive & \code{NEW\_RUN = True} for one launch, then back to \code{False}.\\
+Use a different tone amplitude & Change \code{TONE\_SNR}; it has its own pointer and folder.\\
 \bottomrule
 \end{tabularx}
 \end{center}
