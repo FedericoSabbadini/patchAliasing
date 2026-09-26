@@ -51,9 +51,14 @@ else:
 #  Fixed experimental setup (deliverable convention, do not change without changing the .tex)
 # --------------------------------------------------------------------------------- #
 FS = 512                    # sampling frequency [Hz]; Nyquist = 256 Hz
-CTX = 480                   # context length. Divisible by every stride used by the Bayesian design
-                            # (8/12/15/16/20/24/32) so the patch grid is exact and no internal
-                            # padding fakes a collapse. S=28 is excluded: see DELIVERABLE3_MODELS.
+CTX = 480                   # context length. A multiple of every stride (8/12/16/20/24/32) and
+                            # patch size (8/16/24/32), so Chronos-Bolt adds no masked left
+                            # padding. It does NOT make the patch grid exact for every stride:
+                            # patches start every S samples from the
+                            # oldest one, so the (480 - P) mod S most recent samples enter no token
+                            # when S does not divide 480 - P (six geometries, up to 16 samples;
+                            # Appendix F, table sweepContext). The loss is identical for a
+                            # candidate and its controls. S=28 is excluded: see DELIVERABLE3_MODELS.
 PRED = 64                   # forecast horizon (Chronos-Bolt's native prediction_length)
 BAND = (2.0, 250.0)         # analysis band, strictly inside Nyquist
 FHAT_NFFT = 8192            # zero-padded FFT length for `dominant_freqs`; see its docstring
@@ -577,6 +582,19 @@ def fit_amp_phase(y: np.ndarray, t: np.ndarray, f: float) -> tuple[float, float]
     return float(np.hypot(a, b)), float(np.arctan2(b, a))
 
 
+def fit_complex(y: np.ndarray, t: np.ndarray, f: float) -> complex:
+    """The least-squares tone at `f` as one complex number, a - i b for y ~ a cos + b sin + c.
+
+    Its modulus is the amplitude `fit_amp_phase` returns. Keeping the complex form lets two
+    forecasts be subtracted tone for tone: the background-only arm of Item 68 removes from a
+    forecast the component the model puts at `f` with no tone injected, which an amplitude
+    difference could not do, since two components of different phase do not add in modulus.
+    """
+    X = np.stack([np.cos(2 * np.pi * f * t), np.sin(2 * np.pi * f * t), np.ones_like(t)], 1)
+    a, b, _ = np.linalg.lstsq(X, np.asarray(y, float), rcond=None)[0]
+    return complex(a, -b)
+
+
 def dominant_freqs(y: np.ndarray, k: int = FHAT_TOPK, nfft: int = FHAT_NFFT,
                    band: tuple[float, float] = BAND) -> np.ndarray:
     """The `k` strongest spectral peaks of each row of `y`, strongest first. [N, T] -> [N, k].
@@ -910,8 +928,8 @@ class Probe:
 
     # ---------------------------------------------------------------------- #
     def measure(self, contexts: np.ndarray, futures: np.ndarray, freqs: np.ndarray,
-                k: int = FHAT_TOPK, return_amplitudes: bool = False
-                ) -> tuple[np.ndarray, ...]:
+                k: int = FHAT_TOPK, return_amplitudes: bool = False,
+                return_complex: bool = False) -> tuple[np.ndarray, ...]:
         """One forward pass, three readings: (R, dphase, f_hat, f_hat_truth).
 
         With `return_amplitudes=True` the two amplitudes R is built from are appended,
@@ -951,7 +969,13 @@ class Probe:
             dphase[i] = np.degrees(abs(np.angle(np.exp(1j * (ph_hat - ph_true)))))
         readings = (R, dphase, dominant_freqs(preds, k=k),
                     dominant_freqs(np.asarray(futures, float), k=k))
-        return readings + (amp_pred, amp_true) if return_amplitudes else readings
+        if return_amplitudes:
+            readings = readings + (amp_pred, amp_true)
+        if return_complex:
+            # the forecast's own tone at each arm's frequency, for the background-only subtraction
+            readings = readings + (np.array([fit_complex(preds[i], t_fut, f) for i, f in
+                                             enumerate(np.asarray(freqs, float))]),)
+        return readings
 
     # ---------------------------------------------------------------------- #
     def collapse(self, contexts: np.ndarray) -> np.ndarray:

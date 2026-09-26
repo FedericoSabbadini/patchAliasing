@@ -26,7 +26,7 @@ x[kS+m],
 m\in\{0,\ldots,P-1\}.
 \end{equation}
 
-\subsection{Phase Locking and Token Degeneracies}
+\subsection{Phase-Locking and Token Degeneracies}
 Consider a continuous-time periodic signal sampled uniformly at sampling frequency $f_s$, yielding the discrete-time sequence $x[n]$. Isolating a fundamental harmonic component and modelling it as a single sinusoid gives
 
 \begin{equation*}
@@ -197,7 +197,7 @@ and since this holds for every component,
 \mathbf{t}_k.
 \end{equation}
 
-Here and below, for positive integers $A$ and $B$, the notation $A\mid B$ means that $A$ divides $B$, namely $B=qA$ for some $q\in\mathbb{N}^{+}$, viceversa $A\nmid B$.
+Here and below, for positive integers $A$ and $B$, the notation $A\mid B$ means that $A$ divides $B$, namely $B=qA$ for some $q\in\mathbb{N}^{+}$, and $A\nmid B$ otherwise.
 
 The patch condition reduces the same shift only when $P$ divides $jS$. At $j=1$ that requires $P \mid S$, which under $S\le P$ occurs only at $S=P$, so consecutive tokens are left distinct. It does hold at the smallest $j$ for which $P \mid jS$, namely $j = P/\gcd(P,S)$; since $S/\gcd(P,S)\in\mathbb{N}^{+}$, repeated application of patch-aligned periodicity one period at a time gives
 

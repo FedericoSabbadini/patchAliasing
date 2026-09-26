@@ -2,12 +2,12 @@
 \caption{KernelSynth: Synthetic Data Generation using Gaussian Processes}
 \label{alg:kernelsynth}
 \begin{algorithmic}[1]
-\Require Kernel bank $\mathcal{K}$ listed in \autoref{tab:kernelsynth_bank}; maximum kernels per time series $J=5$; generated length $l_{\mathrm{syn}}=1024$; optional numerical jitter $\epsilon=0$.
+\Require Kernel bank $\mathcal{K}$ listed in \autoref{tab:kernelsynth_bank}; maximum kernels per time series $J=5$; generated length $l_{\mathrm{syn}}=544$; numerical jitter $\epsilon=10^{-4}$.
 \Ensure A synthetic time series $x_{1:l_{\mathrm{syn}}}$.
 \State $j \sim U\{1,J\}$ \Comment{sample the number of kernels}
 \State $\{\kappa_1(t,t'),\ldots,\kappa_j(t,t')\} \overset{\mathrm{i.i.d.}}{\sim} \mathcal{K}$ \Comment{sample kernels with replacement}
 \State $t \gets \operatorname{linspace}(0,1,l_{\mathrm{syn}})$
-\State $\kappa^\star(t,t') \gets \kappa_1(t,t')$ \Comment{initialize the composite covariance}
+\State $\kappa^\star(t,t') \gets \kappa_1(t,t')$ \Comment{initialise the composite covariance}
 \For{$i \gets 2$ to $j$}
     \State $\star \sim U\{+,\times\}$ \Comment{sample a binary composition operator}
     \State $\kappa^\star(t,t') \gets \kappa^\star(t,t') \star \kappa_i(t,t')$ \Comment{compose kernels}

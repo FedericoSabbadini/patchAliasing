@@ -18,13 +18,17 @@
         \rowsep
         $H3$ location  & two-label fit wins LOO, $\theta_S,\theta_P<0$ & \text{n/a} & deterministic dips sit on both predicted grids \\
         \rowsep
+        $H3$ loc.\ equiv.$^{*}$ & $\Pr(|\theta_S|<\log 1.1 \lor |\theta_P|<\log 1.1 \mid D) \ge 0.95$ & $0.15$ & on each generator, one grid carries a dip under $10\%$ \\
+        \rowsep
         D2 identified  & at least $10$ unambiguous sites for branch $F$ & \text{n/a} & otherwise report not identified \\
         \rowsep
         $H3a$, $H3b$   & $\Pr(|\kappa_F - 1| < 0.1 \mid D) \ge 0.95$   & $0.05$ & identified branch tracks its own parameter \\
         \rowsep
         $M1$ supported & $\Pr(\delta_O > 0 \mid D) \ge 0.95$, overlap wins LOO & $0.50$ & overlap is associated with a smaller loss \\
+        \rowsep
+        $M1$ equiv.$^{*}$ & $\Pr(|\delta_O| < \log 1.1 \mid D) \ge 0.95$ & $0.14$ & half a unit of overlap moves the loss by under $10\%$ \\
         \bottomrule
     \end{tabular}
-\caption{Preregistered decision rules. The \textbf{Prior} column gives the probability each probabilistic rule already scores under the priors of \autoref{tab:bayesPriors}: a calibration reference, not an empirical verdict. A claim is supported when its rule reaches $0.95$, refuted when its support probability falls to $0.05$ or its equivalence rule reaches $0.95$, and is otherwise inconclusive. The D2 identification gate applies before either branch rule, so fewer than ten unambiguous sites yields not identified rather than a null result. Every signed rule follows the orientation of its own fitted response, and the three on $\bar\beta$, $\sigma_\phi$ and $\delta_O$ share one: the paired recovery contrast, which rises as recovery at a candidate approaches recovery at its controls.}
+\caption{Preregistered decision rules. The \textbf{Prior} column gives the probability each probabilistic rule already scores under the priors of \autoref{tab:bayesPriors}: a calibration reference, not an empirical verdict. A claim is supported when its rule reaches $0.95$, refuted when its support probability falls to $0.05$ or its equivalence rule reaches $0.95$, and is otherwise inconclusive. The equivalence rules marked $^{*}$ are added to Deliverable~2 in the form of the $H1$ rules, for the two claims whose support rule is directional; no support rule is changed. The D2 identification gate applies before either branch rule, so fewer than ten unambiguous sites yields not identified rather than a null result. Every signed rule follows the orientation of its own fitted response, and the three on $\bar\beta$, $\sigma_\phi$ and $\delta_O$ share one: the paired recovery contrast, which rises as recovery at a candidate approaches recovery at its controls.}
     \label{tab:bayesDecisions}
 \end{table}

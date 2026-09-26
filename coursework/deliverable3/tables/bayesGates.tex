@@ -1,0 +1,20 @@
+\begin{table*}[!htbp]
+    \centering
+    \footnotesize
+    \setlength{\tabcolsep}{3pt}
+    \begin{tabular}{@{}llrrrccccccclp{2.3cm}@{}}
+        \toprule
+        \textbf{Claim} & \textbf{Model} & $\max\hat R$ & \textbf{min ESS} & \textbf{Div.} & \textbf{Conv.} & \textbf{Recov.} & \textbf{PPC} & \textbf{Sens.} & \textbf{LOO} & \textbf{D2} & \textbf{Net} & \textbf{Verdict} & \textbf{Decided by} \\
+        \midrule
+        $H1$ behav. & A & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & -- & -- & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} \\
+        $M1$ & A$'$ & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & -- & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} \\
+        $H1$ repr. & B & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & -- & -- & -- & \textcolor{red}{?} & \textcolor{red}{?} \\
+        $H2$ & C & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & -- & -- & -- & \textcolor{red}{?} & \textcolor{red}{?} \\
+        $H3$ location & D1 & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & -- & -- & \textcolor{red}{?} & \textcolor{red}{?} \\
+        $H3a$ & D2 & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & -- & \textcolor{red}{?} & -- & \textcolor{red}{?} & \textcolor{red}{?} \\
+        $H3b$ & D2 & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & -- & \textcolor{red}{?} & -- & \textcolor{red}{?} & \textcolor{red}{?} \\
+        \bottomrule
+    \end{tabular}
+\caption{Convergence and gates of every claim. Convergence columns give the worst value over every fit the claim is read from ($\hat R<1.01$, bulk and tail ESS $>1000$, no divergences); each gate is shown on its own, and the last column names the condition that set the verdict. A claim that fails any gate is not reportable, which is not a null result; -- marks a gate that does not apply; Net is Model~A refitted net of the background-only forecast. \textcolor{red}{Placeholder: the notebook writes this table, with its values, at the end of the full run.}}
+    \label{tab:bayesGates}
+\end{table*}

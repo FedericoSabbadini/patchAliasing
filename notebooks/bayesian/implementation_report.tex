@@ -1,0 +1,356 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[a4paper,margin=2cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs,tabularx,longtable,array}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage[hidelinks]{hyperref}
+\sloppy
+\setlist{itemsep=2pt,topsep=3pt,leftmargin=1.4em}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\renewcommand{\arraystretch}{1.18}
+\pagestyle{fancy}\fancyhf{}
+\fancyfoot[L]{\small PATCHALIAS $|$ the Deliverable 2 Bayesian models: implementation report}
+\fancyfoot[R]{\small\thepage}
+\renewcommand{\headrulewidth}{0pt}
+\newcommand{\code}[1]{\texttt{#1}}
+\begin{document}
+
+{\LARGE\bfseries Structural aliasing in Chronos-Bolt}\par\vspace{4pt}
+{\large The five Bayesian models of Deliverable 2: implementation, fitting procedure, gates and verdicts}\par\vspace{4pt}
+{\small PATCHALIAS $\cdot$ final implementation $\cdot$ revised 26 September 2026\\ companion report to \code{notebooks/bayesian/deliverable2\_bayesian\_models.ipynb}}
+
+\medskip
+This report documents the notebook that fits the five model families of Deliverable 2 to the fifteen retrained patch/stride geometries. It states what the notebook implements, which choices the submitted documents already fix and which were left open, what was chosen for each open one and why, how the fitting proceeds, what every gate is and where its threshold comes from, and what the notebook cannot establish. It is written to be read before the notebook is run and beside its output afterwards. The Bayesian specification it follows is Appendix~E of Deliverable~3.
+
+\section{What the notebook implements, and what decides what}
+Deliverable 2 specifies five models, one estimand each, and a decision rule per claim. Deliverable 3's Appendix~E states the same five models in full, with the parameterisation, the sampler settings and the reading rule for model comparisons. Where the two documents differ the appendix is followed, for two reasons: it is the same specification written out rather than a new one, and it carries the correction to the one sign error the earlier table contains.
+
+\begin{center}\small
+\begin{tabularx}{\textwidth}{@{}L{2.3cm}L{0.8cm}L{1.6cm}YL{3.5cm}@{}}
+\toprule
+\textbf{Claim} & \textbf{Model} & \textbf{Estimand} & \textbf{Rule} & \textbf{Response fitted}\\
+\midrule
+$H1$ behavioural & A & $e^{\bar\beta}$ & $\Pr(\bar\beta<\log0.8)\ge0.95$; refuted when that falls to $0.05$ or $\Pr(|\bar\beta|<\log1.1)\ge0.95$; the reading net of the background-only forecast must agree & paired recovery contrast $d$, Eq.~(8)\\
+$M1$ mitigation & A$'$ & $\delta_O$ & $\Pr(\delta_O>0)\ge0.95$ and the overlap term wins LOO; refuted when $\Pr(\delta_O>0)$ falls to $0.05$ or $\Pr(|\delta_O|<\log1.1)\ge0.95$ (added); the net reading must agree & the same contrast, read across geometries\\
+$H1$ representational & B & $e^{\theta_{\mathrm{lock}}}$ & $\Pr(\theta_{\mathrm{lock}}>\log1.2)\ge0.95$; refuted when that falls to $0.05$ or $\Pr(|\theta_{\mathrm{lock}}|<\log1.1)\ge0.95$ & prequential probe codelength in bits\\
+$H2$ & C & $\sigma_\phi$ & $\Pr(\sigma_\phi<\log1.1)\ge0.95$; refuted when that falls to $0.05$ & the per-phase deficit $y=-d$\\
+$H3$ location & D1 & $\theta_S,\theta_P$ & the two-label fit wins LOO and both are negative; refuted when the joint probability falls to $0.05$ or, on both generators, $\Pr(|\theta_S|<\log1.1\lor|\theta_P|<\log1.1)\ge0.95$ (added) & log token collapse on the union grid\\
+$H3a$, $H3b$ & D2 & $\kappa_S,\kappa_P$ & $\Pr(|\kappa_F-1|<0.1)\ge0.95$, after an identification gate of ten unambiguous sites; refuted when that falls to $0.05$ & detected site spacing\\
+\bottomrule
+\end{tabularx}
+\end{center}
+{\small\itshape Table 1. The claims as the notebook implements them. Every threshold is the one \code{tab:bayesDecisions} preregisters, including its refutation route through the support probability; the two equivalence rules marked ``added'' are new and follow the form of the $H1$ rules. None was chosen after a posterior was inspected.}
+
+\subsection{The erratum on the sign of the mitigation slope}
+Deliverable 2 prints the mitigation rule as $\Pr(\delta_O<0\mid D)\ge0.95$. The response of Eq.~(8) is a contrast that rises towards zero as recovery at a candidate frequency approaches recovery at its controls, so a geometry in which the loss is smaller has a higher contrast, and an overlap that mitigates therefore produces a positive slope. Deliverable 3 and its Appendix~E give the rule as $\Pr(\delta_O>0\mid D)\ge0.95$ and state that reasoning explicitly. The positive sign is implemented. The correction is carried in the notebook's own decision table and printed as a boxed note when that table is built, rather than applied silently.
+
+\subsection{Refutation: both routes of the decision table, and two added equivalence rules}
+The caption of \code{tab:bayesDecisions} refutes a claim when its support probability falls to $0.05$ or its equivalence rule reaches $0.95$. The first route covers an effect credibly in the opposite direction, the second an effect credibly too small to matter. The notebook applies both routes to every claim through one function, \code{refute\_probability}, which returns the larger of the two probabilities so that both are compared with the same $0.95$ cut. Deliverable 2 writes equivalence rules only for the two $H1$ claims; the notebook adds them, in the same form, for $M1$ and for $H3$ location, the two claims whose support rule is directional. $H2$, $H3a$ and $H3b$ need none, since their support rule is itself an equivalence band. No support rule is changed, and the prior probability of each added rule is recomputed and printed beside the others.
+
+\subsection{The design is checked against the documents before anything is measured}
+Four properties of the submitted report are recomputed from the arithmetic at the top of the notebook, so that a divergence between this implementation and the document appears before any observation exists. Each one stops the notebook if it fails.
+\begin{itemize}
+\item Fifteen geometries, every stride and every patch size dividing the $480$-sample context. This is the property that made p32-s28 ineligible: its stride does not divide the analysis context, so it can be swept but not fitted. Where $S\nmid P$, the $(480-P)\bmod S$ most recent samples still enter no token, up to sixteen on six geometries (\code{tab:sweepContext}).
+\item The exclusive-site counts of \code{tab:branchSites}. The notebook recomputes, per geometry, the frequencies one grid predicts and the other does not, and requires the totals to be $36$ stride-only against $102$ patch-only. Those $36$ are the entire identification budget of the stride branch, so reproducing them is not a formality.
+\item The correlation of the two centred configuration covariates. Appendix~E reports $0.43$ and uses it to argue that the overlap slope and the patch-size slope are separately estimable. The notebook recomputes it and refuses to continue if it differs by more than $0.01$.
+\item The prior probability of every decision rule. \code{tab:bayesDecisions} publishes, beside each rule, the probability that rule already scores under the priors. Those figures are recomputed analytically from the implemented priors and compared with the published ones. This is the single strongest check that the priors being fitted are the priors that were preregistered, and a mismatch stops the run.
+\end{itemize}
+
+\section{The models as implemented}
+\subsection{Models A and A$'$, the behavioural reading and the mitigation}
+\[
+d_i\sim\text{Student-}t_4(\mu_i,\sigma),\qquad \mu_i=\beta_{c[i]}+u_{k[i]}+u_{b[i]},\qquad \beta_c\sim\mathcal N(\bar\beta+\delta_O\widetilde O_c+\delta_P\widetilde{\log P}_c,\ \tau)
+\]
+One index per grouping the observation belongs to: $c$ for the configuration, $k$ for the lock harmonic, $b$ for the background realisation. $\widetilde O_c$ is the centred overlap ratio and $\widetilde{\log P}_c$ the centred log patch size, both averaged over the fifteen runs, which is what leaves $\bar\beta$ the baseline at the average configuration of the design rather than an extrapolation to zero overlap and a patch of one sample. The notebook calls it \code{beta\_bar}.
+
+The response is a paired difference rather than a level, so the effect of interest is the intercept and no lock indicator is needed: the differencing happens in the response and that is why $\bar\beta$ carries $H1$ directly. The likelihood is Student-$t_4$ rather than Gaussian because an arm whose forecast rebuilds nothing sends the logarithm of its recovery ratio far negative; a Gaussian charges such a residual quadratically and a handful of them would set the estimate, while the heavy tail admits them without obeying them. That is what lets every collected row stay in the fit, including the arms where the predicted loss should be largest.
+
+The background index is the pair (generator, realisation) rather than the realisation number alone. The two generators draw their realisation zero independently, so indexing on the number would place two unrelated signals in one level, and the scale $\sigma_b$, which Appendix~E says is what separates generator-specific variation from the phenomenon, would be measuring something else.
+
+\textbf{The background-only reading.} A line the model draws at a candidate site on its own raises the recovery of the lock arm for a reason unrelated to the injected tone, and the forecasts of the retrained models carry such lines. The collection therefore forecasts every background once with no tone. For each arm it records the amplitude that background-only forecast carries at the arm's frequency, \code{a\_null}, and the modulus of the forecast tone minus the background-only tone, \code{a\_net}, both from complex least-squares coefficients, so that two components of different phase are subtracted correctly. The same Model~A is fitted a second time on the contrast built from \code{a\_net} (\code{A\_net\_both}). For $H1$ behavioural and $M1$ the two readings must reach the same decision; a net fit that is missing or did not converge fails the gate, and a disagreement makes the verdict inconclusive.
+
+\subsection{The parameterisation Appendix~E requires, and what it fixes}
+Appendix~E states two rules that no earlier notebook in this project implemented. Both are implemented here, and the first is the reason the earlier fits failed.
+
+\textbf{Sum to zero.} Because the offsets enter the same linear predictor additively, a constant added to one set and subtracted from another leaves the likelihood unchanged, so each set is constrained to sum to zero; without that constraint the levels are identified only through their priors and the sampler is left to explore a ridge along which they trade off exactly. The earlier runs of this project reported $\hat R$ up to $2.23$ at an effective sample size of $5$ with zero divergences, which is the signature of exactly that ridge. A funnel announces itself through divergences; a ridge is a direction along which parameters compensate, which the sampler crosses slowly without ever failing a step.
+
+The constraint is applied to the offset sets: the harmonic and background offsets of Models A and C, the phase offsets of Model~C, and the probe-stage and geometry offsets of Model~B. It is deliberately not applied to $\beta_c$, which is the configuration level itself and carries $\bar\beta$, $\delta_O$ and $\delta_P$ through its prior mean. Constraining it to sum to zero would delete the regression $M1$ is read from.
+
+\textbf{Centred or non-centred, per group.} The configuration, harmonic and background effects are informed by hundreds to thousands of observations each and are written centred, while the eight phase offsets are written non-centred because $H2$ predicts their scale near zero, which is the regime the non-centred form exists for: $u_p=\sigma_\phi z_p$ with $z_p$ standard normal and sum-to-zero.
+
+One consequence is stated rather than glossed. A sum-to-zero normal of length $n$ and scale $\sigma$ has component standard deviation $\sigma\sqrt{1-1/n}$, so $\sigma_\phi$ is the scale parameter of the constrained distribution and not the realised spread of the eight offsets. The decision rule is applied to the parameter; the realised spread is reported alongside so the two cannot be confused.
+
+\subsection{Models B, C, D1 and D2}
+\[
+L_i\sim\text{Gamma}(r,r/\mu_i),\qquad \log\mu_i=\alpha_0+\theta_{\mathrm{lock}}\,\mathrm{IsLocked}_i+s_{\mathrm{st}[i]}+g_{\mathrm{geo}[i]}
+\]
+A codelength is strictly positive, right-skewed, and has a variance that grows with its mean, which is what the Gamma likelihood with a log link is for; the log link makes the estimand multiplicative. The stage and geometry offsets absorb level differences that run to several-fold between probe stages. The unadjusted form is fitted alongside and compared by leave-one-out, so the blocking decision is reported rather than assumed.
+
+\[
+y_i\sim\text{Student-}t_4(\mu_i,\sigma),\qquad \mu_i=\beta_{c[i]}+u_{k[i]}+u_{b[i]}+u_{p[i]},\qquad u_p=\sigma_\phi z_p
+\]
+Model~C is Model~A on the per-phase deficit with the configuration covariates dropped and the phase circle cut into eight equal slices. Slices presuppose no shape: any systematic pattern around the circle widens the spread. The magnitude reading $\Pr(\sigma_\phi<\log1.1)$ is the rule; the leave-one-out comparison against the same model without the phase term is reported beside the verdict and does not gate it. Where the population effect is itself indistinguishable from zero, little remains for phase to move, so $H2$ is read conditionally and the deficit scale of the same fit is printed for that purpose.
+
+\[
+\log z_g(f)\sim\mathcal N(\alpha_g+\theta_S\,\mathrm{OnStrideGrid}+\theta_P\,\mathrm{OnPatchGrid},\ \sigma)
+\]
+Four labellings of the same profiles are fitted and compared: both grids, stride only, patch only, neither. The support probability is that of the joint event $\theta_S<0\wedge\theta_P<0$, because the hypothesis is a conjunction and two marginals above the cutoff can accompany a joint probability below it. Each generator is fitted separately and the verdict takes the less favourable of the two.
+
+\[
+f_{1,gF}\sim\mathcal N\!\big(\kappa_F\Delta_{gF},\ \sqrt{\sigma_F^2+\Delta f^2}\big),\qquad \Delta_{gS}=f_s/S_g,\quad \Delta_{gP}=f_s/P_g
+\]
+The residual carries the floor $\Delta f$, the sweep step, because a spacing read off a discrete grid is no more precise than one step; without it the posterior develops a funnel at $\sigma_F\to0$. Both responses of Appendix~E are fitted: the fundamental, which is the specified one, and the median gap between successive sites as a robustness check.
+
+\section{The choices, and the reason for each}
+\subsection{Fixed by Appendix~E, and therefore not a choice}
+\begin{center}\small
+\begin{tabularx}{\textwidth}{@{}L{3.2cm}L{4cm}Y@{}}
+\toprule
+\textbf{Setting} & \textbf{Value} & \textbf{Why it is not free}\\
+\midrule
+Chains & 4 & Appendix~E, sampling and diagnostics.\\
+Warm-up draws & 2000 & Appendix~E. Used to adapt the step size, then discarded.\\
+Retained draws & 2000 & Appendix~E. 8000 posterior draws in total.\\
+Target acceptance & 0.9 & Appendix~E.\\
+Applied to & every fit & No model may receive a more or less careful exploration than another, so the auxiliary fits use the same settings.\\
+Diagnostics & $\hat R<1.01$, bulk and tail ESS $>1000$, zero divergences & Appendix~E, preregistered and gating interpretation.\\
+LOO reading rule & inconclusive below twice the paired standard error & Appendix~E.\\
+Sensitivity ladder & $\times0.5$, $\times1$, $\times2$ on every prior scale & Deliverable~3 §4: every effect prior is varied over $\{0.25,0.5,1.0\}$; as a factor it extends to the families whose tabulated scale is not $0.5$.\\
+Phase slices & 8 & Eq.~(11).\\
+Contrast stabiliser & $+0.01$ & Eq.~(8).\\
+D2 identification bar & 10 unambiguous sites per branch & \code{tab:bayesDecisions}, applied before either branch rule is read.\\
+\bottomrule
+\end{tabularx}
+\end{center}
+{\small\itshape Table 2. The notebook prints these at the top of every run, so the record says what was used rather than what was intended.}
+
+\subsection{What the amplitude recovery is measured against}
+Appendix~E defines $R$ as the ratio of the amplitude the forecast places at the frequency the arm carries to the amplitude injected there. The estimator in the shared probing library returns something else: the least-squares amplitude of the true continuation at that frequency, which is the injected tone plus whatever the background contributes there. A forecast that reproduces the tone exactly and none of the background scores $1$ under the first and less than $1$ under the second.
+
+The injected amplitude is one constant shared by all three arms of a triplet, so it would cancel from the contrast exactly without the stabiliser $+0.01$; with it, the cancellation is exact only where every recovery is well above $0.01$, and $d$ is otherwise a comparison of forecast amplitudes alone. The continuation's amplitude differs between the three arms, so dividing by it also controls for the background's differing energy at the three frequencies, at the price of carrying that background's noise into the response.
+
+The collection records \code{a\_pred}, \code{a\_true} and \code{amp\_injected} for every arm, and with the background-only arm also \code{a\_null} and \code{a\_net}, so every ratio is formed from one set of forward passes. \code{RECOVERY\_DENOMINATOR} selects the one that is fitted, enters the run fingerprint and defaults to the injected amplitude, which is what the document says. The other is computed alongside, and Part~2.4 prints what the choice does to the response before any model sees it. The net contrast uses the same denominator as the fitted one, so the two differ only in the background-only subtraction.
+
+\subsection{The tone amplitude: the one design constant the report does not fix}
+Neither deliverable states the amplitude at which the injected tone rides on the unit-variance background, so it is a genuine choice. It is $1.5$, set explicitly in the notebook's control panel rather than inherited from the shared library's default, and it enters the run fingerprint through \code{collect.Config.tone\_snr}, so a directory collected at one amplitude refuses a run that asks for another. A high amplitude makes the tone dominate its background, so recovery sits near one nearly everywhere and a real deficit has little room to show; a low one gives a candidate-specific deficit more room at the cost of a noisier recovery ratio. The pairing absorbs part of that noise.
+
+\subsection{Leave-one-out on the whole design rather than on a subsample}
+Models A and C carry $371{,}000$ observations. Their log likelihood at four chains and $2000$ retained draws is $23.7$\,GiB, against the $10$\,GB a hosted runtime has. Leave-one-out with Pareto-smoothed importance sampling is computed independently per observation, so the array never has to be resident: the notebook rebuilds the log likelihood from the posterior in slices sized to a memory budget and keeps only the three numbers per observation that the calculation needs. \code{elpd\_loo} is therefore that of the fitted population, and the paired standard error of a difference is computed over every observation. Both the reconstruction and the ported smoothing are proved against PyMC and ArviZ before anything depends on either (§9).
+
+\subsection{The grid labelling of Model D1}
+Appendix~E says a frequency counts as on a grid when its distance to the nearest member of that comb is within tolerance, and names no number. The sweep grid is the union of a uniform one-hertz grid with the exact predicted sites of every geometry, so exact membership is available, and the notebook requires it, to $10^{-6}$\,Hz for the rounding a Parquet round trip introduces. A one-hertz tolerance would also label the integer neighbours of a non-integer site, which lie on no comb; it is fitted as a declared robustness reading. Each collapse curve is normalised by its own off-grid median, as the appendix states.
+
+\subsection{Parameter recovery: two scenarios, and what the second one is}
+Two scenarios are run per family. The first simulates the effect the claim is about and asks whether the design can see it; the second simulates the state the claim denies and asks whether the model returns a posterior on that instead. For A, B, C and D1 the second state is no effect; for D2 it is a slope that is not one, $\kappa_F=0.65$. Coverage alone would be too weak a gate: an interval wide enough to contain both truths covers each of them. Each scenario's interval must therefore also exclude the other scenario's truth, in at least the same share of repeats. The group offsets are simulated sum-to-zero, matching the prior they are recovered under. Models A and C recover on a declared stratified subsample of $12{,}000$ rows.
+
+\subsection{Thresholds this notebook declares rather than inherits}
+\begin{center}\small
+\begin{tabularx}{\textwidth}{@{}L{3.3cm}L{1.8cm}Y@{}}
+\toprule
+\textbf{Threshold} & \textbf{Value} & \textbf{What it gates, and why this value}\\
+\midrule
+Predictive coverage & 0.90 & The share of the levels of every stratum whose observed statistic must fall inside the $95\%$ replicated interval; $0.95$ would be a coin flip at the nominal rate.\\
+Sensitivity band & 0.10 & The admissible excursion of a rule probability across the three rungs; the decision class must also be identical at every rung.\\
+Recovery coverage & 0.80 & The share of repeats whose $95\%$ interval must contain their own truth.\\
+Recovery discrimination & 0.80 & The share of repeats whose interval must exclude the other scenario's truth.\\
+Recovery subsample & 12{,}000 rows & Stratified, for Models A and C only.\\
+Predictive draws & 400 & Drawn in batches of 25.\\
+LOO slice budget & 192\,MiB & The resident size of one observation slice.\\
+\bottomrule
+\end{tabularx}
+\end{center}
+{\small\itshape Table 3. Operational thresholds; the notebook labels them as such in its own output and in the run manifest.}
+
+\subsection{The environment, and why not the project lock file}
+The notebook installs a short pinned list and restarts the runtime once, verifying the numpy, scipy, ArviZ and PyMC import chain in a clean subprocess before trusting it. Installing the whole project lock file is avoided because a hosted runtime imports numpy into the kernel before any user cell runs, and because a locked torch over the runtime's own build leaves torchvision with a mismatched ABI. The sampler implementation is a control: PyMC's own NUTS is the reference, and a Rust implementation of the same sampler is offered because it is several times faster; both target the same posterior and the choice is recorded in the run fingerprint.
+
+\subsection{Where the implementation interprets, corrects or departs from the documents}
+The notebook prints this list at the top of every run and saves it as \code{00\_specification\_notes.csv}.
+\begin{center}\small
+\begin{longtable}{@{}L{1.9cm}L{2.9cm}L{4.8cm}L{5.8cm}@{}}
+\toprule
+\textbf{Kind} & \textbf{Subject} & \textbf{What the document says} & \textbf{What is implemented}\\
+\midrule\endhead
+erratum & the $M1$ sign & Deliverable~2 prints $\Pr(\delta_O<0)\ge0.95$ & $\Pr(\delta_O>0)\ge0.95$, as Deliverable~3 and Appendix~E have it\\
+interpretation & sum-to-zero & Appendix~E: each set of offsets is constrained to sum to zero & applied to the offset sets, not to $\beta_c$\\
+choice & the denominator of $R$ & Appendix~E defines $R$ against the amplitude injected & both collected, the injected one fitted by default (§3.2)\\
+choice & the D1 grid tolerance & within tolerance, no number given & exact membership as primary, one hertz as a declared robustness reading (§3.5)\\
+departure & the D1 signal modes & all three modes are fitted & all three fitted and reported; the verdict is read from the two generator modes\\
+generalisation & the sensitivity ladder & every effect prior varied over $\{0.25,0.5,1.0\}$ & a factor of $0.5$, $1$ and $2$ on every prior scale\\
+addition & Model D2's two readings must agree & \code{tab:bayesDecisions} gates D2 on ten unambiguous sites only & the preregistered fit and the fit restricted to the replicates whose lowest detected site is the fundamental must be available, converged and in the same decision class (§6.1)\\
+addition & background-only reading of Model A & Appendix~E states the model's own lines at the sites as a limitation & every background is also forecast with no tone; Model~A is refitted on the net recovery and must reach the same decision for $H1$ behavioural and $M1$ (§2.1)\\
+addition & refutation & refuted when the support probability falls to $0.05$ or the equivalence rule reaches $0.95$; equivalence rules for $H1$ only & both routes applied to every claim; equivalence rules in the form of $H1$'s added for $M1$ and $H3$ location (§1.2)\\
+addition & operational thresholds & the report names the checks but not their thresholds & the values of Table~3, recorded in the run manifest\\
+\bottomrule
+\end{longtable}
+\end{center}
+{\small\itshape Table 4. Nothing in this list was decided after a posterior was seen.}
+
+\section{The fitting procedure, stage by stage}
+\begin{center}\small
+\begin{tabularx}{\textwidth}{@{}L{0.8cm}YL{5.2cm}@{}}
+\toprule
+\textbf{Part} & \textbf{What happens} & \textbf{What it produces}\\
+\midrule
+0 & Locate the checkout, install and verify the environment, resolve the run folder, check the design and the priors against the documents, resolve the stage, print the run plan. & \code{analysis\_manifest.json}, the prior and decision tables, the inventory of the run.\\
+1 & Prior predictive for all five families, on the real design axes, with the offsets drawn under the constrained prior. & Four figures and a summary table.\\
+2 & Collect the five tables from Chronos, one geometry at a time, including the background-only forecast of every realisation; derive the triplet contrast and its net form; gate the collected design. & Five Parquet tables with a manifest and per-file hashes, the contrast audit, the phase mapping, the design gate.\\
+3 & The likelihood checked against SciPy; the specifications; the chain-blocked sampler; the log-likelihood reconstruction and its proof; streaming PSIS-LOO and its proof; parameter recovery in two scenarios per family. & Two parity tables, the recovery table.\\
+4 & The fits: Model~A in four configuration levels and its net reading, Model~B adjusted and literal, Model~C with and without phase, Model~D1 in four labellings per generator plus the tolerance robustness, Model~D2 per branch and per response plus the per-replicate harmonic-order audit. & One checkpoint per fit and per pair of chains, the coefficient tables, the site audit.\\
+5 & Convergence; stratified posterior predictive checks; the sensitivity ladder; LOO over the whole design; the verdicts; the gate table of the report. & The convergence, predictive, sensitivity, LOO and verdict tables, \code{bayesGates.tex}, the run summary.\\
+6 & Reading the results from the saved artifacts alone. & Figures and the figure and table indices.\\
+\bottomrule
+\end{tabularx}
+\end{center}
+{\small\itshape Table 5. Each part is resumable on its own.}
+
+\section{The gates}
+Interpretation is fail-closed. A gate that fails does not weaken a claim into a hint: the estimand is reported as not reportable, and a branch below its site bar as not identified, and neither is a null result. Every gate is reported as its own column, so a failure is attributable rather than merely noted, and Part~5.5b writes the same columns, with the worst convergence numbers of every claim, as the table \code{bayesGates.tex} of the report.
+
+\begin{center}\small
+\begin{longtable}{@{}L{2.9cm}L{6.9cm}L{2.9cm}L{2.7cm}@{}}
+\toprule
+\textbf{Gate} & \textbf{What it requires} & \textbf{Threshold from} & \textbf{Applies to}\\
+\midrule\endhead
+Prior calibration & The prior probability of every rule reproduces the Prior column of \code{tab:bayesDecisions}, and the prior predictive of every family is finite. & preregistered & the whole run\\
+Design & Every geometry present in every table; both generators and all eight phase slices populated; both levels of the lock indicator in every geometry; the grid labels of full rank; positive dispersion in the fitted modes. & the models' own identifiability & per model\\
+Reconstruction parity & The rebuilt log likelihood agrees with \code{pm.compute\_log\_likelihood} to better than $10^{-8}$. & this implementation & the whole run\\
+PSIS parity & Every scalar, contribution and Pareto $k$ agrees with \code{az.loo} to better than $10^{-6}$. & this implementation & the whole run\\
+Convergence & $\hat R<1.01$, bulk and tail ESS $>1000$, zero divergences, four chains, over every parameter of every fit the claim reads. & preregistered & per claim\\
+Parameter recovery & Both scenarios ran, every fit converged, coverage and discrimination at least $0.80$. & preregistered step, operational threshold & per family\\
+Posterior predictive & Observed mean and standard deviation inside the $95\%$ replicated interval for at least $90\%$ of the levels of every stratum. & preregistered step, operational threshold & per model\\
+Prior sensitivity & All three rungs converged, the rule probability moving by at most $0.10$, the same decision class at every rung. & preregistered step, operational threshold & per claim\\
+LOO reliability & Every Pareto $k$ below threshold, and the required formulation leading by at least twice the paired standard error. & preregistered & $M1$ and $H3$ location only\\
+Identification & For a D2 branch, at least ten unambiguous sites. & preregistered & per branch\\
+D2 readings available & The preregistered fit and the fit restricted to replicates whose lowest site is the fundamental both exist and converged; if they disagree the verdict is inconclusive. & operational, §6.1 & $H3a$, $H3b$\\
+Net reading available & Model~A refitted net of the background-only forecast exists and converged; if it disagrees with the primary fit the verdict is inconclusive. & operational, §2.1 & $H1$ behavioural, $M1$\\
+\bottomrule
+\end{longtable}
+\end{center}
+{\small\itshape Table 6. The first four run once and stop the notebook outright. The rest are per claim and appear as columns of the verdict table and of \code{bayesGates.tex}.}
+
+Every gate is a conjunction over every fit the claim is read from, and a comparison the rule does not mention does not decide a verdict. In the verdict table a gate cell is a pass, a failure, or not applicable; a gate that applies and has no result is a failure, never a pass.
+
+\subsection{Why the convergence gate reads every parameter}
+A population effect can mix perfectly while a group scale does not, and the group scale is part of the model the estimand is conditional on. The notebook takes the maximum $\hat R$ and the minimum effective sample size over every posterior variable of a fit, iterating the variables rather than stacking them, because a dataset of variables with different dimensions broadcasts into their cartesian product.
+
+\subsection{Why the paired standard error}
+The comparison quantity is $\sum_i(L_{i1}-L_{i0})$ with standard error $\sqrt{N\,\mathrm{Var}(L_{i1}-L_{i0})}$, computed on differences taken at the same observation. A comparison is additionally gated on reliability: if any Pareto $k$ exceeds its threshold, it returns inconclusive whatever its margin.
+
+\section{The summary table: pre-gate, per-gate, post-gate}
+The final table has one row per claim and three readings of each: the pre-gate probability rule; each gate as its own column; and the post-gate verdict, resolved in a fixed order: a non-reportable mode first, then identification, then the gates, then the probability rule, then the comparison leg for the two claims whose rules include one, and last the agreement of the readings that must agree.
+
+\subsection{The readings that must agree}
+Model~D2 regresses the fundamental of a branch on the spacing that branch predicts. Where the first dip of a comb was not detected, the lowest detected site is a higher harmonic and pushes $\kappa$ towards an integer above one. The audit that decides the restricted fit is read row by row on the replicates the fits use, not on the averaged curves, and the restricted fit keeps exactly the replicates whose lowest site is the fundamental. Both readings must be available and converged, or the gate fails; if they reach different decisions the verdict is inconclusive. Model~A and its net reading follow the same rule (§2.1).
+
+\begin{center}\small
+\begin{tabularx}{\textwidth}{@{}L{3.2cm}Y@{}}
+\toprule
+\textbf{Verdict} & \textbf{Meaning}\\
+\midrule
+SUPPORTED & The support rule reached $0.95$ and every applicable gate held.\\
+REFUTED & The support probability fell to $0.05$ or the equivalence rule reached $0.95$, and every applicable gate held.\\
+INCONCLUSIVE & The gates held and the rule did not decide; also the verdict when a claim loses the comparison leg of its rule, or when two readings that must agree do not.\\
+NOT REPORTABLE & A gate failed, or the run is not in full mode. Not a null result.\\
+NOT IDENTIFIED & The design cannot answer the question, for a reason stated in the row. Not a null result.\\
+\bottomrule
+\end{tabularx}
+\end{center}
+{\small\itshape Table 7. The same five verdicts appear in the dashboard, the CSV tables, the run summary and \code{bayesGates.tex}.}
+
+\section{Memory, and resuming}
+The constraint that shaped the implementation is a $10$\,GB runtime against a Model~A design of $371{,}000$ observations. The log likelihood of one Model~A fit ($23.7$\,GiB) is never built: sampling runs with it switched off and it is rebuilt from the posterior in slices of at most $192$\,MiB. Posterior predictive replicates are drawn in batches of $25$ with only the per-stratum statistics accumulated. The collection processes candidate frequencies in blocks with resident memory reported as it goes; the background-only arm adds one forecast per realisation, $200$ per geometry.
+
+Resumption works at three granularities: the collection shards per table per geometry, each fit is drawn in blocks of two chains and each block is checkpointed, and each fit's per-observation leave-one-out contributions are checkpointed on their own. Every artifact is written atomically and recorded with its SHA-256 and byte count; a checkpoint is resumed only when its hash matches. The run fingerprint covers the seed, the sampler settings, the tone amplitude, every analysis constant, the hashes of the shared scripts and those of the functions that build models and datasets.
+
+\section{What the earlier notebooks did differently}
+\begin{center}\small
+\begin{tabularx}{\textwidth}{@{}YYY@{}}
+\toprule
+\textbf{What an earlier notebook did} & \textbf{What the documents say} & \textbf{What this notebook does}\\
+\midrule
+Plain normal priors on the harmonic and background offsets. & Each set of offsets is constrained to sum to zero. & Sum-to-zero on every offset set, not on the configuration level.\\
+A response filter applied after collection. & No response filter. & Every complete triplet with finite, non-negative recoveries is fitted.\\
+1500 warm-up and 1500 retained draws at $0.95$. & 2000 and 2000 at $0.9$ for every fit. & The appendix's settings for every fit.\\
+Two marginal probabilities for $H3$. & $H3$ is a conjunction. & The probability of the joint event.\\
+Two of the three signal modes fitted. & All three are fitted. & All three fitted and reported; verdict from the two generator modes.\\
+A one-hertz tolerance for the D1 grid labels. & Within tolerance, no number given. & Exact membership as primary, one hertz as robustness.\\
+\bottomrule
+\end{tabularx}
+\end{center}
+{\small\itshape Table 8. No earlier notebook is modified.}
+
+\subsection{Changes to the shared collection scripts}
+\begin{center}\small
+\begin{tabularx}{\textwidth}{@{}YYY@{}}
+\toprule
+\textbf{What was wrong} & \textbf{The change} & \textbf{Why in the library}\\
+\midrule
+The tone amplitude lived in a module constant, outside the collection's design fingerprint. & \code{Config.tone\_snr}, threaded through to \code{build\_context}. & A field of the configuration is checked by every entry point.\\
+\code{collect\_contrasts} built every context of a geometry before a single forward pass. & Candidate frequencies forwarded in blocks of \code{Config.sites\_per\_block}. & The blocks partition the candidate list in order, so the table is unchanged.\\
+\code{check\_design} gated every collection on criteria written for the hit indicator. & \code{check\_design}, \code{merge}, \code{load\_collection} and \code{collect\_all} take a response. & The library would otherwise stay wrong for the next analysis.\\
+A line the model draws at a site on its own was counted as recovery. & \code{Config.null\_arm}: one background-only forecast per realisation; \code{a\_null} and \code{a\_net} per arm, from \code{probe\_lib.fit\_complex} and \code{Probe.measure(return\_complex=True)}. & The subtraction needs the complex coefficients, which exist only at the forward pass.\\
+\bottomrule
+\end{tabularx}
+\end{center}
+{\small\itshape Table 9. \code{collect.py} and \code{probe\_lib.py} are hashed into every collection's design fingerprint, so editing them invalidates the manifest of every collection already on disk: an older run directory refuses to be resumed or merged, and says so.}
+
+The null arm was verified with a stub forecaster that draws a line of its own at a candidate site: \code{a\_pred} rises at that site, \code{a\_net} returns the injected tone alone at every arm, and the validation of the table accepts the new columns.
+
+\section{Verifying the implementation itself}
+Two pieces of this notebook are second implementations of something a library already provides, and both are proved inside the notebook before anything depends on them. The reconstructed log likelihood is checked against \code{pm.compute\_log\_likelihood} on the same posterior and rows, for every family and both of Model~A's likelihoods, to better than $10^{-8}$. The ported Pareto smoothing is checked against \code{az.loo} on those same fits to better than $10^{-6}$. The gate logic is exercised offline: a gate over several fits fails when any of them fails, an empty list of fits is a failure, the comparison decides only the two claims whose rule has a comparison leg, the readings that must agree are required to, and the verdict resolves mode, identification, gates, rule, comparison leg and agreement in that order. What none of that establishes is that the sampler will converge on these data; that is what the convergence gate is for.
+
+\section{Limitations no fit can remove}
+\begin{itemize}
+\item One training seed per geometry. A difference between two configurations is a difference between two trained models as well as between two geometries.
+\item The truncated analysis context. Of the $480$ samples supplied, the $(480-P)\bmod S$ most recent, up to sixteen on six geometries, enter no token. The truncation cancels within a triplet but not between geometries, and it is non-zero on exactly the six runs with $S\nmid P$ that identify the stride branch.
+\item The token count moves with the stride, so overlap and sequence length are not independently identified; neither confound could create a mitigation, but either could inflate one.
+\item $M1$ is a between-model comparison across fifteen independently trained variants, not the effect of changing the overlap of a trained model.
+\item Model~D2 is conditional on its own selection: each detected dip is assigned to the branch whose grid it is near. A supported $H3a$ or $H3b$ reads: given that dips were detected and fell near this branch's comb, their positions equal the spacing that branch predicts.
+\item The stride branch is identified only by pooling across the six geometries with $S\nmid P$.
+\item The background-only subtraction assumes that the tone and the model's own line add in the forecast. Where the tone changes what the model draws elsewhere, the net reading is an approximation, which is why it is required to agree with the primary one rather than replacing it.
+\item The tone amplitude is a choice, recorded in the collection's design fingerprint.
+\end{itemize}
+
+\section{What the run leaves behind}
+\begin{center}\small
+\begin{tabularx}{\textwidth}{@{}L{3.6cm}Y@{}}
+\toprule
+\textbf{Location} & \textbf{Contents}\\
+\midrule
+\code{analysis\_manifest.json} & The run specification and one entry per artifact, with its SHA-256 and byte count.\\
+\code{data/} & The five collected tables, their shards and the collection manifest.\\
+\code{tables/*.csv} & Every result table, including the verdicts, the gate report and \code{bayesGates.tex}.\\
+\code{figures/*.png} & Roughly thirty figures, indexed at the end of the run.\\
+\code{*.nc} & One checkpoint per fit and per pair of chains.\\
+\code{05\_run\_summary.json} & Mode, fingerprint, commit, amplitude, collection hashes, every gate result, every verdict, the timings and the limitations.\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\section{Running it}
+Open the notebook in Colab and choose Run all. The first cell installs the pinned environment and restarts the runtime once; choose Run all again and it steps past the install. From an empty folder it collects $1{,}116{,}000$ forecasts, $3{,}000$ of them the background-only arm, and then fits about sixty-six posteriors, twelve of them on the full $371{,}000$ observations.
+
+\begin{center}\small
+\begin{tabularx}{\textwidth}{@{}L{6cm}Y@{}}
+\toprule
+\textbf{To do this} & \textbf{Set this}\\
+\midrule
+The reportable run & \code{MODE = "full"}; the gate table is then written into the report.\\
+Rehearse the whole chain in minutes & \code{MODE = "smoke"}; three phases per candidate so that all eight phase slices are populated; every verdict is non-reportable by construction.\\
+Check the design, the priors and every gate's plumbing, with the short fits the parity checks and parameter recovery need & \code{MODE = "preflight"}; it stops at the start of Part~4 with a message saying so.\\
+Regenerate the figures alone & \code{STANDALONE\_FIGURES = True}.\\
+Split the fits across sessions & Turn off the \code{FIT\_MODEL\_*} flags this session should not fit.\\
+Use a different tone amplitude & Change \code{TONE\_SNR} and \code{RUN\_FOLDER}.\\
+\bottomrule
+\end{tabularx}
+\end{center}
+The notebook is deliberately willing to stop, and each stop names what failed and what to do about it. A verdict of NOT REPORTABLE is a statement about a gate rather than about Chronos.
+\end{document}

@@ -8,7 +8,7 @@
 ## What this fits
 
 The five model families of `coursework/deliverable2_v0`, stated in full in
-`coursework/deliverable3/sections/B_bayesian_appendix.tex`, on the fifteen retrained patch/stride
+`coursework/deliverable3/sections/E_bayesian_appendix.tex`, on the fifteen retrained patch/stride
 geometries of `tab:hfModels`.
 
 | Claim | Model | Estimand | Predicted |
@@ -38,7 +38,7 @@ which are themselves short fits, then stops before the reportable ones.
 `STANDALONE_FIGURES = True` regenerates Part 6 from the saved artifacts alone.
 
 `RECOVERY_DENOMINATOR` chooses what the amplitude recovery is measured against: `injected`, which
-is how Appendix B defines it and the default, or `true_continuation`, which is what the shared
+is how Appendix E defines it and the default, or `true_continuation`, which is what the shared
 estimator has always returned. Both are computed from the same collection and Part 2.4 prints the
 difference, so the choice can be changed without collecting again.
 

@@ -62,6 +62,11 @@ class RecoveryConfig:
     tolerance_hz: float = 1.
     control_guard_hz: float = 2.000001
     batch_size: int = 64
+    # Background-only arm. The retrained forecasts carry lines of their own on the candidate
+    # sites, so a line at the lock frequency can be present without any injection. The null arm
+    # forecasts the same background with nothing added, and the net count credits a recovery
+    # only when that background-only forecast has no line at the same frequency.
+    null_arm: bool = True
 
 
 @dataclass(frozen=True)
@@ -278,17 +283,24 @@ def injection_trials(backgrounds, seeds, p, s, cfg):
         if min(abs(fc-locks)) <= 2:
             raise AssertionError("Control overlaps a lock tolerance interval")
         amplitude = cfg.amplitude * float(np.std(bg, dtype=np.float64))
-        for arm, frequency in (("lock", fk), ("control", fc)):
+        arms = [("lock", fk, amplitude), ("control", fc, amplitude)]
+        if getattr(cfg, "null_arm", False):
+            # same background, nothing added; frequency_hz is left empty on purpose
+            arms.append(("null", np.nan, 0.))
+        for arm, frequency, arm_amplitude in arms:
             # Use the same sinusoid convention as the original notebook.
             if __package__:
                 from . import probe_lib as pl
             else:
                 import probe_lib as pl
-            signal = bg + pl.make_tone(float(frequency), float(phase), len(t), amplitude)
-            inputs.append(signal.astype(np.float32))
+            signal = np.asarray(bg, dtype=np.float64).copy()
+            if arm_amplitude > 0:
+                signal = bg + pl.make_tone(float(frequency), float(phase), len(t), arm_amplitude)
+            inputs.append(np.asarray(signal, dtype=np.float32))
             rows.append(dict(background=i, background_seed=int(seeds[i]), P=p, S=s,
                              arm=arm, frequency_hz=float(frequency), lock_hz=float(fk),
-                             amplitude=amplitude, phase=float(phase)))
+                             control_hz=float(fc), amplitude=float(arm_amplitude),
+                             phase=float(phase)))
     return np.array(inputs), pd.DataFrame(rows)
 
 
@@ -363,7 +375,17 @@ def run_recovery(root, cfg=RecoveryConfig(), models=MODELS, device=None):
             peaks = [select_peaks(y, cfg.n_peaks, cfg.spectral_cut)["frequencies"] for y in predictions]
             trials["model"] = spec.label
             trials["selected_peaks_hz"] = [json.dumps(p) for p in peaks]
-            trials["recovered"] = [recovered(p, f, cfg.tolerance_hz) for p, f in zip(peaks, trials.frequency_hz)]
+            trials["recovered"] = [bool(np.isfinite(f)) and recovered(p, f, cfg.tolerance_hz)
+                                   for p, f in zip(peaks, trials.frequency_hz)]
+            null_arm = bool(getattr(cfg, "null_arm", False))
+            if null_arm:
+                # What the background-only forecast already shows at the two frequencies of the pair
+                null = trials[trials.arm == "null"].set_index("background")
+                null_peaks = {b: json.loads(v) for b, v in null.selected_peaks_hz.items()}
+                trials["null_line_at_frequency"] = [
+                    (recovered(null_peaks[b], f, cfg.tolerance_hz) if arm != "null" else False)
+                    for b, f, arm in zip(trials.background, trials.frequency_hz, trials.arm)]
+                trials["net_recovered"] = trials.recovered & ~trials.null_line_at_frequency
             save_csv(out/spec.tag/"trials.csv", trials)
             row = dict(model=spec.label, P=spec.P, S=spec.S)
             for arm in ("lock", "control"):
@@ -373,9 +395,20 @@ def run_recovery(root, cfg=RecoveryConfig(), models=MODELS, device=None):
                 row[arm+"_recovered"] = int(part.recovered.sum())
                 row[arm+"_total"] = len(part)
                 row[arm+"_percent"] = 100*part.recovered.mean()
+                if null_arm:
+                    # line already present in the background-only forecast, and recovery net of it
+                    row[arm+"_null_percent"] = 100*part.null_line_at_frequency.mean()
+                    row[arm+"_net_percent"] = 100*part.net_recovered.mean()
+            if null_arm and (trials.arm == "null").sum() != cfg.n_backgrounds:
+                raise AssertionError("Wrong null-arm denominator")
             rows.append(row)
-            print(f"{family} {spec.label}: {row['lock_percent']:.1f}% lock, "
-                  f"{row['control_percent']:.1f}% control", flush=True)
+            msg = (f"{family} {spec.label}: {row['lock_percent']:.1f}% lock, "
+                   f"{row['control_percent']:.1f}% control")
+            if null_arm:
+                msg += (f" | background-only line {row['lock_null_percent']:.1f}% / "
+                        f"{row['control_null_percent']:.1f}% | net {row['lock_net_percent']:.1f}% / "
+                        f"{row['control_net_percent']:.1f}%")
+            print(msg, flush=True)
             save_csv(out/"summary.partial.csv", pd.DataFrame(rows))
         table = pd.DataFrame(rows)
         save_csv(out/"summary.csv", table)

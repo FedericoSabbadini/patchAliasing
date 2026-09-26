@@ -1,121 +1,59 @@
-This appendix states in full the five models summarised in \autoref{sec:models}, together with the reading of Model~A that carries the mitigation claim $M1$. For each, what follows gives what it measures, how the measurement is constructed, and what every parameter of it means. The equations are repeated here so that the appendix can be read on its own; the correspondence between claims, models, estimands and probing tables is the one given by \autoref{tab:bayesModels} in that section, and is not tabulated again here.
-
-\subsection{Sampling and diagnostics}
-
-Every model is fitted by the No-U-Turn sampler with the same settings, so that none receives a more or less careful exploration than another: four independent chains, $2000$ warm-up draws per chain used to adapt the step size and discarded, $2000$ retained draws per chain, and a target acceptance rate of $0.9$, which trades a shorter step for a more cautious traversal of the posterior geometry. Group effects admit two equivalent parameterisations, $u\sim\mathcal N(0,\sigma_u)$ and $u=\sigma_u z$ with $z\sim\mathcal N(0,1)$. They are the same distribution and differ only in the geometry the sampler traverses: the second is better conditioned when a group scale is small and each level is informed weakly, the first when each level is informed by many observations, in which case the second leaves a ridge along which scale and offset compensate exactly and the chains travel without crossing it, so the form is chosen per group. One further constraint applies to every model that carries more than one grouping. Because the offsets enter the same linear predictor additively, a constant added to one set and subtracted from another leaves the likelihood unchanged, so each set is constrained to sum to zero; without that constraint the levels are identified only through their priors and the sampler is left to explore a ridge along which they trade off exactly. The configuration, harmonic and background effects of Models~A and~C are informed by hundreds to thousands of observations each and are written in the first form; the eight phase offsets of Model~C are written in the second, since $H2$ predicts their scale $\sigma_\phi$ near zero, which is the regime the second form exists for.
-
-Three preregistered diagnostics gate interpretation: $\hat R<1.01$ measures agreement between the four chains, and values near one indicate that each has converged to the same distribution. Bulk and tail effective sample size above $1000$ counts the genuinely independent draws remaining after correcting for autocorrelation, the tail figure guarding the interval endpoints that the credible intervals are read from. Zero divergences requires that the sampler encountered no geometric pathology it could not traverse. A fit failing any of the three is not used to support a claim, although it may still be reported.
-
-The collection itself is fixed in advance: the configurations, the frequency grid and the coverage each geometry must reach are declared once, a session collecting only part of it records that as a limitation rather than a new design, and no response filter is applied afterwards. Every estimand is reported on its natural scale by its posterior median and $95\%$ credible interval.
-
-Where two formulations compete they are compared by leave-one-out cross-validation. The quantity read is the difference in expected log pointwise predictive density, $\mathrm{elpd\_diff}$, with its standard error $\mathrm{dse}$; a difference smaller than twice its standard error is reported as inconclusive rather than rounded into a decision, so that a nominal ranking is not mistaken for evidence.
+This appendix states in full the five models summarised in \autoref{sec:models} and the reading of Model~A that carries the mitigation claim $M1$, as they are implemented in the analysis notebook released with this report. For each model it gives what is measured and how, the likelihood and the linear predictor, the meaning, index and prior of every term, the estimand and the rule that decides it. The models are those of Deliverable~2; the few places where the implementation corrects or extends that plan are collected at the end, together with the validation every fit must pass before it is read.
 
 \subsection{Model A, the behavioural reading (H1)}
 
-Model~A is fitted to the paired recovery contrast of \autoref{eq:d2contrast},
-
+\paragraph{Measurement.} For every geometry, each candidate frequency $f_k\in\mathcal F_{\mathrm{lock}}$ is paired with two controls $f_k\pm\delta$, where $\delta$ is the largest offset not exceeding $0.25\,f_s/S$ that keeps both controls at least $1$\,Hz from every other candidate; a site with no such offset is dropped. The candidate is injected at its exact value, the non-integer sites included. Each of the three arms is a tone of amplitude $1.5$ added to a unit-variance background, with $100$ Light TSMixup and $100$ KernelSynth backgrounds and up to ten non-redundant starting phases per candidate. The three arms of a triplet share their background realisation and their phase, so only the frequency changes. The model receives the first $480$ samples and forecasts the next $64$, and the amplitude recovery of an arm is
+\begin{equation*}
+R=\frac{A_{\mathrm{pred}}}{A_{\mathrm{inj}}},
+\end{equation*}
+the least-squares amplitude of the median forecast at the arm's own frequency over the ratio to the amplitude injected there. The amplitude of the true continuation at that frequency is recorded as well, and the same contrast formed with it is reported beside the fitted one as a check on the choice of denominator. The triplet is reduced to one contrast,
 \begin{equation}
 \label{eq:appA:contrast}
 d = \log(R_k + 0.01) - \tfrac{1}{2}\left[\log(R_- + 0.01) + \log(R_+ + 0.01)\right],
-\qquad
-R = A_{\mathrm{pred}}/A_{\mathrm{true}},
 \end{equation}
+negative when the candidate recovers less than its neighbours. The stabiliser $0.01$ keeps the logarithm finite where a forecast rebuilds nothing, and every complete triplet is fitted: no response filter is applied after collection.
 
-where $R$ is the amplitude recovery of an arm, the ratio of the amplitude the forecast places at the frequency the arm carries to the amplitude injected there, and $R_k$, $R_-$ and $R_+$ are the recoveries of the candidate and of its two controls. The contrast is one number per triplet, negative when the candidate recovers less of its tone than its neighbours recover of theirs, and it can be formed only because the injected tone has a known frequency. The candidate is injected at its exact value, the non-integer sites included. The three members of a triplet share a background realisation and a phase, so a difference between them cannot be produced by the background or by the alignment of the window; only the frequency changes. The additive $0.01$ keeps the logarithm finite where a forecast rebuilds nothing measurable, which is a reading of the design and not a degenerate row.
-
-The fit is
-
+\paragraph{Model.}
 \begin{equation}
 \label{eq:appA:model}
 d_i \sim \text{Student-}t_4(\mu_i,\ \sigma),
 \quad
 \mu_i = \beta_{c[i]} + u_{k[i]} + u_{b[i]},
 \quad
-\beta_c \sim \mathcal{N}\!\left(\bar\beta + \delta_O \widetilde O_c + \delta_P \widetilde{\log P}_c,\ \tau\right),
+\beta_c \sim \mathcal{N}\!\left(\bar\beta + \delta_O \widetilde O_c + \delta_P \widetilde{\log P}_c,\ \tau\right).
 \end{equation}
+\autoref{tab:termsA} gives every term. The response is a paired difference rather than a level, so no lock indicator is needed and the effect of interest is the population intercept $\bar\beta$. The Student-$t_4$ likelihood admits the very negative contrasts of the arms that rebuild nothing without letting a handful of them set the estimate, which a Gaussian would. The configuration effects are drawn around a population mean, which makes the fifteen geometries instances of one phenomenon and gives each of them equal weight, however many triplets it contributes.
 
-and has four components, each motivated separately.
+\begin{table}[!htbp]
+    \centering
+    \small
+    \setlength{\tabcolsep}{4pt}
+    \begin{tabular}{@{}lM{9.6cm}l@{}}
+        \toprule
+        \textbf{Term} & \textbf{Meaning} & \textbf{Levels} \\
+        \midrule
+        $d_i$ & contrast of triplet $i$, \autoref{eq:appA:contrast} & one per triplet \\
+        $\beta_c$ & mean contrast of geometry $c$ & $15$ \\
+        $\bar\beta$ & \textbf{estimand of $H1$}: population contrast at the average configuration; $e^{\bar\beta}$ is recovery at a candidate relative to its controls & $1$ \\
+        $\delta_O$ & \textbf{estimand of $M1$}: change of $\beta_c$ per unit of centred overlap & $1$ \\
+        $\delta_P$ & change of $\beta_c$ per unit of centred $\log P$; keeps patch size from loading onto $\delta_O$ & $1$ \\
+        $\widetilde O_c$, $\widetilde{\log P}_c$ & $(O_c-\bar O)/0.5$ and $\log P_c-\overline{\log P}$, averages over the fifteen geometries & data \\
+        $\tau$ & spread of the geometries around the regression, what the two covariates leave unexplained & $1$ \\
+        $u_k$ & offset of candidate frequency $k$, a value shared by every geometry in which it is a candidate; sum to zero & one per frequency \\
+        $u_b$ & offset of background realisation $b$, indexed by generator and draw; sum to zero & $200$ \\
+        $\sigma_k$, $\sigma_b$ & scales of $u_k$ and $u_b$ & $1$ each \\
+        $\sigma$ & residual scale of the Student-$t_4$ likelihood & $1$ \\
+        \bottomrule
+    \end{tabular}
+    \caption{Terms of Model~A. Every prior is in \autoref{tab:bayesPriors}.}
+    \label{tab:termsA}
+\end{table}
 
-The linear predictor carries three offsets, one per grouping the observation belongs to: $\beta_c$ per configuration, $u_k$ per lock harmonic and $u_b$ per background draw, so that neither an unusual frequency nor a single corpus can be mistaken for the effect. The scale $\sigma_b$ of the background offset is what separates generator-specific variation from the phenomenon itself: a difference in recovery between Light TSMixup and KernelSynth backgrounds is attributed to the generator rather than inflating or deflating the population estimate.
-
-Two features of the response are deliberate: it is a paired difference rather than a level, so the effect of interest is the intercept and no separate lock indicator is needed: the differencing is done in \autoref{eq:appA:contrast} rather than in the linear predictor, which is why $\bar\beta$ carries $H1$ directly. And the likelihood is Student-$t_4$ rather than Gaussian, because where a forecast rebuilds nothing the logarithm returns very large negative contrasts; under a Gaussian a handful of those would determine the estimate, whereas the heavy tail admits them without letting them set it. Both choices keep every collected row in the fit, including the arms where the predicted loss should be largest.
-
-The configuration effects $\beta_c$ are in turn drawn around a population mean, which makes the geometries instances of one phenomenon rather than unrelated experiments, with two consequences. The first is that a population level exists as a parameter at all, which $H1$ requires, being a claim about patch-based tokenisation and not about a single checkpoint. The second is that each geometry contributes equal weight, so the largest design cannot dominate the estimate when the number of usable triplets varies several-fold with the in-band lock count.
-
-Two configuration-level covariates enter that population mean, and they are estimable together rather than confounded because the design varies overlap and patch size independently. Overlap enters as a ratio and patch size as $\log P$, because the patch grid has spacing $f_s/P$ and equal steps in $\log P$ are equal ratios of spacing. The tilde denotes centring on the design, $\widetilde O_c=(O_c-\bar O)/0.5$ and $\widetilde{\log P}_c=\log P_c-\overline{\log P}$, which leaves $\bar\beta$ the baseline at the average configuration rather than an extrapolation to $O=0$ and $P=1$.
-
-The estimand is $\bar\beta$, reported as $e^{\bar\beta}$: the factor by which amplitude recovery at a candidate differs from recovery at its controls, at the average configuration of the design. $e^{\bar\beta}<1$ is the loss $H1$ predicts and a posterior at or above one says that candidate frequencies are rebuilt as fully as their neighbours. The overlap slope $\delta_O$ of the same population mean is a second estimand of the same fit, and it carries $M1$; it is stated in full at the end of this appendix.
-
-\subsection{Model B, the representational reading (H1)}
-
-Model~B replaces the forecast with a measurement of the internal state. At each candidate frequency $f_c$, examples are drawn at $f_c-1$\,Hz and $f_c+1$\,Hz, the representation is captured, and a linear probe is charged the prequential description length of the labels\autocite{voitaInformationTheoreticProbingMinimum2020}: the data are split into successive chunks, each chunk encoded by a probe trained only on the chunks before it, and the cost accumulated in bits. A probe that memorises noise pays for itself and gains nothing, which is why description length is preferred to accuracy. The reading is direct: at a frequency whose neighbourhood has become linearly indistinguishable in representation space, the labels cost more bits. As in the sweep of \autoref{sec:appSweep}, the state is standardised and reduced to its leading twenty principal components inside each training chunk before the probe is fitted, so the codelength prices only what is linearly decodable from that subspace; low-variance directions that still carry frequency information may be discarded, and the measurement is a lower bound on what the state holds.
-
-Ten states are probed per geometry: the encoder $[\mathrm{REG}]$ token after each of the four encoder blocks, the decoder state after each of the four decoder blocks, the pre-projection vector and the output quantile head. The decoder-side vectors are named decoder states rather than $[\mathrm{REG}]$ tokens because Chronos-Bolt-Tiny carries $[\mathrm{REG}]$ in the encoder only and the decoder is entered through a single start token.
-
-The fit is
-
-\begin{equation*}
-L_i \sim \text{Gamma}\!\left(r,\ r/\mu_i\right),
-\qquad
-\log \mu_i = \alpha_0 + \theta_{\mathrm{lock}}\,\mathrm{IsLocked}_i + s_{\text{st}[i]} + g_{\text{geo}[i]}.
-\end{equation*}
-
-A codelength is strictly positive, right-skewed and has a variance that grows with its mean, which is what the Gamma likelihood with a log link is for; $r$ is its shape and carries the dispersion. The log link makes $\theta_{\mathrm{lock}}$ multiplicative, so $e^{\theta_{\mathrm{lock}}}$ is the factor by which the cost of the labels expands at a candidate frequency. The offsets $s_{\text{st}}$ and $g_{\text{geo}}$ are zero-mean and absorb the level differences between probe stages and between geometries, which run to several-fold and would otherwise be attributed to the lock indicator. The unadjusted form, without those offsets, is fitted alongside and compared by LOO, so the blocking decision is reported rather than assumed.
-
-The scope of the probe task is deliberately narrow, because the seven hierarchical band tasks used in the exploratory sweep of \autoref{sec:appSweep} each summarise hundreds of frequencies in one codelength, so the lock indicator has nothing to attach to; they are retained as a descriptive cross-check of overall decodability and are not fitted by any Bayesian model.
-
-\subsection{Model C, the phase reading (H2)}
-
-Model~C is Model~A on the per-phase deficit $y_i=-d_i$, positive when the candidate is worse, with the phase index retained rather than marginalised. The configuration-level covariates are dropped, because $H2$ is not a question about the design axes, and the phase circle is cut into eight equal slices, each given its own offset:
-
-\begin{equation*}
-y_i \sim \text{Student-}t_4(\mu_i,\ \sigma),
-\qquad
-\mu_i = \beta_{c[i]} + u_{k[i]} + u_{b[i]} + u_{p[i]},
-\qquad
-u_p \sim \mathcal{N}(0, \sigma_\phi).
-\end{equation*}
-
-The estimand $\sigma_\phi$ is the spread of the eight offsets and reduces the hypothesis to one number. Slices are preferred to a fitted sinusoidal or polynomial term because they assume nothing about the shape a phase dependence might take: any systematic pattern across the circle, of whatever form, widens the spread. Two readings are reported and can disagree, which is itself informative. The magnitude reading is $\Pr(\sigma_\phi<\log 1.1)$, whether phase dependence is practically negligible; the evidential reading is the LOO comparison against the same model with $u_p$ removed, whether allowing phase to matter predicts held-out data better. A small but consistently detected dependence would show a low equivalence probability together with a LOO preference for the phase model.
-
-The configuration, harmonic and background effects of both models are written in the first of the two forms above, which is the one the equations print. The phase offsets $u_p$ are the exception, and are written $u_p=\sigma_\phi z_p$ with $z_p\sim\mathcal N(0,1)$: $\sigma_\phi$ is the estimand of $H2$ and is predicted near zero, which is the one place in either model where the funnel the second form removes is the one actually at risk. The rule and its motivation are stated in \autoref{sec:appBayes} under sampling and diagnostics.
-
-\subsection{Model D1, the location of the sites (H3)}
-
-The measurement is the token collapse $z_g(f)$: the input patches of one context are embedded, and the standard deviation of those embeddings across patches is averaged over the embedding dimensions. It is exactly zero when consecutive patches embed to the same vector, which is the degeneracy the stride condition predicts, and it is read before any transformer block, so it measures the tokenisation and not what the network subsequently does with it. Each curve is normalised by its own off-grid median, so that dip depth is comparable across geometries and signal families.
-
-Three signal modes are swept: on a pure sinusoid the collapse is exact and $z$ reaches zero at a locked frequency; on a Light TSMixup or KernelSynth background the background breaks patch identity, so the collapse appears as a deep local minimum instead. Fitting all three is what shows that the conclusion is not an artefact of noise-free inputs.
-
-The fit is a regression of the log profile on two indicator labels,
-
-\begin{equation*}
-\log z_g(f) \sim \mathcal{N}\!\left(
-\alpha_g + \theta_S \cdot \text{OnStrideGrid} + \theta_P \cdot \text{OnPatchGrid},\ \sigma
-\right),
-\end{equation*}
-
-where a frequency counts as on a grid when its distance to the nearest member of that comb is within tolerance. The logarithm makes the labels multiplicative on the per-geometry off-grid level $\alpha_g$, so $\theta_S$ and $\theta_P$ are depths relative to that level rather than absolute values, and geometries whose dispersion sits at different scales remain comparable. Four labellings are fitted to the same profiles and compared by LOO --- stride only, patch only, both, neither --- and the comparison is meaningful only because the sweep grid is a one-hertz grid in union with the exact predicted sites of all fifteen geometries, the non-integer ones such as $42.\overline{6}$\,Hz for $S=12$ and $21.\overline{3}$\,Hz for $S=24$ included, so each labelling is scored where its rival predicts a dip as well as where it does. It is identified only because the design contains configurations with $S \nmid P$: on the $P=S$ diagonal the two combs coincide by construction and no amount of data can separate them.
-
-\subsection{Model D2, the movement of the sites (H3a, H3b)}
-
-Where D1 says where the dips sit, D2 asks whether they move. Sites are detected on each swept profile, adjacent detections are merged so that one dip straddling two grid points is not counted twice, and each site is assigned to the branch that predicts it; sites predicted by both branches are set aside, because $\mathcal F_{\mathrm{lock}}$ is a union and the union of two combs has two interlaced spacings rather than one. The fundamental of each branch, the lowest of its detected sites, is then regressed on the spacing that branch predicts:
-
-\begin{equation*}
-\hat f^{\,F}_{1,g} \sim \mathcal{N}\!\left(
-\kappa_F \,\Delta^F_g,\ \sqrt{\sigma_F^2+\Delta f^2}
-\right),
-\qquad
-\Delta^S_g=\frac{f_s}{S_g}, \quad \Delta^P_g=\frac{f_s}{P_g}.
-\end{equation*}
-
-The slope $\kappa_F$ is the estimand: measured spacing per unit of predicted spacing, so $\kappa_F=1$ is a branch that tracks its own arithmetic one for one, and its prior is centred on zero, that is on no relationship at all, so the hypothesis has to be earned from the data. The residual carries the floor $\Delta f$, the sweep step, because a spacing read off a discrete grid is no more precise than one step; without it, sites landing exactly on the prediction drive $\sigma_F$ to zero and the posterior develops a funnel the sampler cannot traverse. With the floor, a near-zero $\sigma_F$ is a result rather than a sampler failure.
-
-Both the fundamental and the median gap between successive sites are fitted. With three or four sites in band a single spurious detection inserts a short interval and flips the median, to which the fundamental is immune, so a disagreement between the two is itself informative about the stability of the detection.
+\paragraph{Estimand and rule.} $H1$ predicts $e^{\bar\beta}<1$; it is supported when $\Pr(\bar\beta<\log 0.8\mid D)\ge0.95$, a recovery at a candidate of at most four fifths of its controls, and refuted when $\Pr(|\bar\beta|<\log1.1\mid D)\ge0.95$. Centring the covariates is what makes $\bar\beta$ the effect at the average geometry of the design rather than an extrapolation to $O=0$ and a patch of one sample.
 
 \subsection{\texorpdfstring{Model A$'$}{Model A'}, the mitigation claim (M1)}
 
-$M1$ claims that the loss Model~A measures is smaller where consecutive patches overlap more. It is not a separate fit but the configuration level of \autoref{eq:appA:model} read as an estimand, so the posterior that decides it is drawn from the same chains, on the same rows, as the posterior for $\bar\beta$; the prime in Model~A$'$ marks a reading of Model~A and not a second model. Written on its own, that level is
-
+$M1$ claims that the loss Model~A measures is smaller where consecutive patches overlap more. It is not a separate fit but the configuration level of \autoref{eq:appA:model} read as an estimand, drawn from the same chains and the same rows as $\bar\beta$:
 \begin{equation}
 \label{eq:appM1:model}
 \beta_c \sim \mathcal{N}\!\left(\bar\beta + \delta_O \widetilde O_c + \delta_P \widetilde{\log P}_c,\ \tau\right),
@@ -124,26 +62,138 @@ $M1$ claims that the loss Model~A measures is smaller where consecutive patches 
 \qquad
 \widetilde{\log P}_c=\log P_c-\overline{\log P},
 \end{equation}
+with $O_c$ the overlap ratio of \autoref{eq:overlap}. One unit of $\widetilde O$ is half of the raw ratio, so the design spans from $\widetilde O=-0.66$ at $O=0$ to $0.84$ at $O=0.75$. The response rises towards zero as recovery at a candidate approaches recovery at its controls, so an overlap that mitigates raises $\beta_c$ and $M1$ predicts $\delta_O>0$; Deliverable~2 printed the opposite sign, which is corrected here. Patch size enters as $\log P$ because the patch comb has spacing $f_s/P$, so equal steps in $\log P$ are equal ratios of spacing. The two covariates are estimable together because \autoref{tab:hfModels} varies $S$ at fixed $P$ and $P$ at fixed $S$: their correlation across the fifteen runs is $0.43$, far from the degeneracy of a design in which overlap could be raised only by enlarging the patch.
 
-with $O_c=(P_c-S_c)/P_c$ the overlap ratio of \autoref{eq:overlap} and the averages $\bar O$ and $\overline{\log P}$ taken over the fifteen configurations of \autoref{tab:hfModels}.
+The rule has two legs, both required: $\Pr(\delta_O>0\mid D)\ge0.95$, and the model with the overlap term must win the leave-one-out comparison against the same model without it. $M1$ is refuted when $\Pr(\delta_O>0\mid D)$ falls to $0.05$ or when the equivalence rule $\Pr(|\delta_O|<\log1.1\mid D)\ge0.95$ holds, half a unit of overlap moving the loss by under ten per cent; the equivalence rule is added to Deliverable~2 in the form of the one for $H1$. The second leg is needed because a sign probability starts at $0.50$ under a prior symmetric about zero, so a small but consistently signed slope would otherwise count as a mitigation. The slope compares independently trained variants over fifteen design points, so a supported $M1$ is evidence that the effect varies with geometry in the predicted direction across this grid, not the effect of changing the overlap of one trained model.
 
-Each term of \autoref{eq:appM1:model} has a distinct role: the response $\beta_c$ is the configuration effect of \autoref{eq:appA:model}, the mean contrast under geometry $c$ on the scale of \autoref{eq:appA:contrast}, so a lower $\beta_c$ is a geometry that recovers candidate frequencies less fully overall. The intercept $\bar\beta$ is that baseline at the average configuration of the design rather than at $O=0$ and $P=1$, which is what the centring buys: an uncentred fit would report an intercept extrapolated to a geometry that is not in the grid and is not meaningful for a patch size of one sample.
+\subsection{Model B, the representational reading (H1)}
 
-The slope $\delta_O$ is the estimand of $M1$: the change in the configuration effect per unit of centred overlap, one unit being half of the raw ratio, so that the design spans about a unit and a half, from $\widetilde O=-0.66$ at $O=0$ to $\widetilde O=0.84$ at $O=0.75$. Its sign is the whole claim: the response is the contrast of \autoref{eq:appA:contrast}, which rises towards zero as recovery at a candidate approaches recovery at its controls, so an overlap that mitigates raises it and $\delta_O>0$ is what $M1$ predicts. Every model in this appendix reads the same indicator on the same orientation, so no convention has to be carried between them and the rule of \autoref{tab:bayesDecisions} applies as written. A slope indistinguishable from zero says that overlap does not move the effect at all.
+\paragraph{Measurement.} A cell is one geometry, one probe stage and one centre frequency $f_c$. The centres are exactly the frequencies the triplets visit, every candidate and its two controls, so locked and non-locked centres stand in the ratio $1{:}2$ by construction. In each cell a linear probe must tell a tone at $f_c-1$\,Hz from one at $f_c+1$\,Hz, both added at amplitude $1.5$ to backgrounds of the two generators, with forty examples per class spread over ten background draws and ten phases per generator. The state is read at ten stages: the encoder $[\mathrm{REG}]$ token after each of the four encoder blocks, the decoder state after each of the four decoder blocks, the pre-projection vector and the output quantile head. The decoder vectors are called decoder states because Chronos-Bolt-Tiny carries $[\mathrm{REG}]$ in the encoder only and enters the decoder through a single start token. The probe is scored by its prequential description length\autocite{voitaInformationTheoreticProbingMinimum2020}: the examples are shuffled and split into five chunks, the first is charged one bit per label, and each later chunk is encoded by a probe trained only on the chunks before it, so a probe that memorises noise pays for itself. Inside each training chunk the state is standardised and reduced to its leading twenty principal components before a logistic regression is fitted, so the codelength prices only what is linearly decodable from that subspace; low-variance directions that still carry frequency information may be discarded, and the measurement is a lower bound on what the state holds.
 
-The slope $\delta_P$ carries patch size, entered as $\log P$ because the patch comb has spacing $f_s/P$ and equal steps in $\log P$ are equal ratios of spacing rather than equal numbers of hertz. It is not the object of any claim, but it must be in the model: overlap and patch size are two coordinates of the same pair $(P,S)$, and omitting one would load its variation onto the other. The scale $\tau$ is what remains of the spread between configurations once both covariates have been removed, so a $\tau$ that has not shrunk away from its prior is a report that the two design axes explain little of what separates the geometries, however large the slopes.
+\paragraph{Model.}
+\begin{equation*}
+L_i \sim \text{Gamma}\!\left(r,\ r/\mu_i\right),
+\qquad
+\log \mu_i = \alpha_0 + \theta_{\mathrm{lock}}\,\mathrm{IsLocked}_i + s_{\text{st}[i]} + g_{\text{geo}[i]}.
+\end{equation*}
+A codelength is strictly positive, right-skewed and has a variance that grows with its mean, which is what a Gamma likelihood in its shape--rate form with a log link is for; its mean is $\mu_i$ and its coefficient of variation $1/\sqrt r$. \autoref{tab:termsB} gives the terms.
 
-Identification is a property of the grid rather than of the model. Because \autoref{tab:hfModels} varies $S$ at fixed $P$ and $P$ at fixed $S$, the two centred covariates are not collinear across the fifteen runs: their correlation is $0.43$, high enough to matter but far from the degeneracy of a design in which overlap could only be raised by enlarging the patch, where a single direction would be estimable and its decomposition into $\delta_O$ and $\delta_P$ arbitrary. The prior on both slopes is $\text{Student-}t_4(0,0.5)$, centred on no effect and varied over the sensitivity ladder $\{0.25,0.5,1.0\}$ with the rest of Model~A, so a mitigation reported at one scale and absent at another is detected as a property of the prior.
+\begin{table}[!htbp]
+    \centering
+    \small
+    \setlength{\tabcolsep}{4pt}
+    \begin{tabular}{@{}lM{9.6cm}l@{}}
+        \toprule
+        \textbf{Term} & \textbf{Meaning} & \textbf{Levels} \\
+        \midrule
+        $L_i$ & prequential codelength of cell $i$, in bits & one per cell \\
+        $\mathrm{IsLocked}_i$ & $1$ when the centre $f_c$ is a candidate of that geometry, $0$ when it is a control & data \\
+        $\theta_{\mathrm{lock}}$ & \textbf{estimand}: log expansion of the codelength at a candidate; $e^{\theta_{\mathrm{lock}}}$ is the factor by which the labels cost more & $1$ \\
+        $\alpha_0$ & baseline log codelength; prior centred on the log of the mean observed codelength & $1$ \\
+        $s_{\text{st}}$ & offset of the probe stage; sum to zero, scale $\sigma_{st}$ & $10$ \\
+        $g_{\text{geo}}$ & offset of the geometry; sum to zero, scale $\sigma_{geo}$ & $15$ \\
+        $r$ & Gamma shape, which carries the dispersion & $1$ \\
+        \bottomrule
+    \end{tabular}
+    \caption{Terms of Model~B.}
+    \label{tab:termsB}
+\end{table}
+
+\paragraph{Estimand and rule.} $H1$ predicts $e^{\theta_{\mathrm{lock}}}>1$, more bits to read a candidate frequency. It is supported when $\Pr(\theta_{\mathrm{lock}}>\log1.2\mid D)\ge0.95$, at least twenty per cent more code, and refuted when $\Pr(|\theta_{\mathrm{lock}}|<\log1.1\mid D)\ge0.95$. The stage and geometry offsets absorb level differences that run to several-fold and would otherwise be available to the lock indicator; the unadjusted form without them is fitted alongside and compared by leave-one-out, and the comparison is reported beside the verdict without deciding it. The seven hierarchical band tasks of \autoref{sec:appSweep} each summarise hundreds of frequencies in one codelength, so the lock indicator has nothing to attach to there; they remain a descriptive cross-check and are not fitted.
+
+\subsection{Model C, the phase reading (H2)}
+
+\paragraph{Model.} Model~C uses the triplets of Model~A with the phase kept rather than pooled. Its response is the per-phase deficit $y_i=-d_i$, positive when the candidate is worse, and the phase angle, taken modulo $2\pi$, is cut into eight equal slices, each with its own offset:
+\begin{equation*}
+y_i \sim \text{Student-}t_4(\mu_i,\ \sigma),
+\qquad
+\mu_i = \beta_{c[i]} + u_{k[i]} + u_{b[i]} + u_{p[i]},
+\qquad
+u_p = \sigma_\phi z_p .
+\end{equation*}
+The terms $\beta_c$, $u_k$, $u_b$, $\sigma$ and the scales are those of \autoref{tab:termsA}, read on the deficit and therefore with the opposite sign; $\beta_c$ is drawn around $\bar\beta$ alone, because $H2$ is not a question about the design axes and the covariates are dropped. The slice offsets $u_p$, eight levels, are written in non-centred form, with $z_p$ standard normal and constrained to sum to zero, and $\sigma_\phi$ is their scale. Slices are preferred to a fitted sinusoid because they presuppose no shape: any systematic dependence on the starting phase widens the spread.
+
+\paragraph{Estimand and rule.} The estimand is $\sigma_\phi$, and $H2$ is supported when $\Pr(\sigma_\phi<\log1.1\mid D)\ge0.95$, a phase that moves the deficit by under ten per cent, and refuted when that probability falls to $0.05$. Under the sum-to-zero constraint each offset has standard deviation $\sigma_\phi\sqrt{7/8}$, so $\sigma_\phi$ is the scale parameter and not the realised spread of the eight offsets; the rule is applied to the parameter and the realised spread is reported beside it. The leave-one-out comparison against the same model without $u_p$ is the evidential reading and is reported without deciding the verdict. Where the population deficit is itself indistinguishable from zero little remains for phase to move, so $H2$ is read conditionally on it.
+
+\subsection{Model D1, the location of the sites (H3)}
+
+\paragraph{Measurement.} The token collapse $z_g(f)$ is the standard deviation of the input-patch embeddings across the patches of one context, averaged over the $256$ embedding dimensions. It is read before any transformer block, so it measures the tokenisation and not what the network does with it, and it is zero when every patch embeds to the same vector, the degeneracy the stride condition predicts. It is swept on a one-hertz grid in union with the exact predicted sites of all fifteen geometries, the non-integer ones such as $42.\overline{6}$\,Hz for $S=12$ and $21.\overline{3}$\,Hz for $S=24$ included, in three signal modes: a pure sinusoid, and a tone of amplitude $1.5$ on a Light TSMixup or a KernelSynth background, three replicates each. Every curve is divided by its own off-grid median, so dip depths are comparable across geometries and replicates.
+
+\paragraph{Model.}
+\begin{equation*}
+\log z_g(f) \sim \mathcal{N}\!\left(
+\alpha_g + \theta_S \cdot \text{OnStrideGrid} + \theta_P \cdot \text{OnPatchGrid},\ \sigma
+\right),
+\end{equation*}
+with the terms of \autoref{tab:termsD}. A frequency is on a grid when it coincides with a member of that comb to within $10^{-6}$\,Hz, which the union grid makes possible; a one-hertz tolerance would also label the integer neighbours of a non-integer site, which lie on no comb, and it is fitted only as a declared robustness reading. The logarithm makes the labels multiplicative on the per-geometry off-grid level. On a pure sinusoid the collapse is exactly zero at a stride site, so that mode is floored at $0.01$ of the off-grid median before the logarithm; it is fitted and reported, but the verdict is read from the two generator modes, because on the pure mode the response at a site depends on the floor and a stratum of identical values has no dispersion for a predictive check to reproduce.
+
+\paragraph{Estimand and rule.} Four labellings are fitted to the same profiles, both grids, stride only, patch only and neither, separately for each generator. $H3$ is supported when the two-label fit wins the leave-one-out comparison against the others and the joint posterior probability $\Pr(\theta_S<0\wedge\theta_P<0\mid D)$ reaches $0.95$, on both generators; the verdict takes the less favourable of the two. The joint event is used because the hypothesis is a conjunction, and two marginals above $0.95$ can accompany a joint probability below it. $H3$ is refuted when the joint probability falls to $0.05$, or by the equivalence rule added here in the form of the one for $H1$: on both generators, $\Pr(|\theta_S|<\log1.1\lor|\theta_P|<\log1.1\mid D)\ge0.95$, one of the two grids carrying a practically nil dip, which denies the conjunction. The two coefficients separate only where one label applies without the other, which for $\theta_S$ means the six geometries with $S\nmid P$: on the $P=S$ diagonal the combs coincide by construction.
+
+\subsection{Model D2, the movement of the sites (H3a, H3b)}
+
+\paragraph{Measurement.} Sites are detected on each collapse profile of the two generator modes as local minima reaching at most three quarters of the median of the profile within $\pm6$\,Hz, and detections closer than $1.5$\,Hz are merged. Each site is assigned to the branch whose comb lies within $1.5$\,Hz of it; a site compatible with both branches to within $0.25$\,Hz is set aside, because $\mathcal F_{\mathrm{lock}}$ is a union and the union of two combs has two interlaced spacings rather than one. The fundamental $\hat f^{\,F}_{1,g}$ of branch $F$ is its lowest assigned site on one replicate.
+
+\paragraph{Model.}
+\begin{equation*}
+\hat f^{\,F}_{1,g} \sim \mathcal{N}\!\left(
+\kappa_F \,\Delta^F_g,\ \sqrt{\sigma_F^2+\Delta f^2}
+\right),
+\qquad
+\Delta^S_g=\frac{f_s}{S_g}, \quad \Delta^P_g=\frac{f_s}{P_g},
+\end{equation*}
+with the terms of \autoref{tab:termsD}. The slope $\kappa_F$ is measured spacing per unit of predicted spacing, and its prior is centred on zero, that is on no relationship, so the hypothesis has to be earned from the data. The floor $\Delta f=1$\,Hz, the sweep step, is part of the residual because a spacing read off a discrete grid is no more precise than one step; without it, sites landing exactly on the prediction drive $\sigma_F$ to zero and the posterior develops a funnel the sampler cannot traverse. The median gap between successive sites is fitted in the same form as a robustness reading.
+
+\begin{table}[!htbp]
+    \centering
+    \small
+    \setlength{\tabcolsep}{4pt}
+    \begin{tabular}{@{}lM{9.6cm}l@{}}
+        \toprule
+        \textbf{Term} & \textbf{Meaning} & \textbf{Levels} \\
+        \midrule
+        \multicolumn{3}{@{}l}{\textit{Model D1, one fit per signal mode and labelling}}\\
+        $\log z_g(f)$ & log token collapse of geometry $g$ at swept frequency $f$, one replicate & one per row \\
+        $\alpha_g$ & off-grid level of geometry $g$ & $15$ \\
+        $\theta_S$, $\theta_P$ & \textbf{estimands}: log depth of the dip on the stride and on the patch grid & $1$ each \\
+        OnStrideGrid, OnPatchGrid & $1$ when $f$ is a member of $\mathcal F_S$, of $\mathcal F_P$ & data \\
+        $\sigma$ & residual scale & $1$ \\
+        \midrule
+        \multicolumn{3}{@{}l}{\textit{Model D2, one fit per branch $F\in\{S,P\}$}}\\
+        $\hat f^{\,F}_{1,g}$ & lowest detected site of branch $F$ on one replicate of geometry $g$ & one per replicate \\
+        $\Delta^F_g$ & spacing branch $F$ predicts, $f_s/S_g$ or $f_s/P_g$ & data \\
+        $\kappa_F$ & \textbf{estimand}: measured over predicted spacing; $\kappa_S$ for $H3a$, $\kappa_P$ for $H3b$ & $1$ \\
+        $\sigma_F$ & scatter beyond the resolution floor & $1$ \\
+        $\Delta f$ & sweep step, $1$\,Hz, fixed & constant \\
+        \bottomrule
+    \end{tabular}
+    \caption{Terms of Models~D1 and~D2.}
+    \label{tab:termsD}
+\end{table}
+
+\paragraph{Estimand and rule.} A branch is first required to supply at least ten unambiguous sites on the replicate-averaged curves of the two generator modes; below that it is reported as not identified, which is not a null result, and the stride branch reaches the bar only across the six geometries with $S\nmid P$ taken together. An identified branch is supported when $\Pr(|\kappa_F-1|<0.1\mid D)\ge0.95$ and refuted when that probability falls to $0.05$. Where the first dip of a comb is not detected, the lowest site is a higher harmonic and pulls $\kappa_F$ towards an integer above one, so the fit is repeated on the replicates whose lowest site is the fundamental. Both readings must be available and converged, and if they reach different decisions the verdict is inconclusive. Neither reading is an independent test of the movement law, because the branch assignment already used the predicted grid: a supported $H3a$ or $H3b$ says that, given that dips were detected and fell near a branch's comb, their spacing is the one that branch predicts.
 
 \input{tables/bayesPriors.tex}
 
-The decision rule has two legs, and the second is not decoration. A posterior sign probability starts at $0.50$ under a prior symmetric about zero, so $\Pr(\delta_O>0\mid D)\ge 0.95$ alone would let a slope that is small but consistently signed count as mitigation; the rule therefore also requires that the model carrying the overlap term win the leave-one-out comparison against the same model without it, under the reading rule stated above. Both legs must hold, and the verdict is otherwise inconclusive.
+\subsection{Sampling, validation and verdicts}
 
-One limit is worth stating explicitly, since it bounds what $M1$ can license. The slope is a comparison between independently trained variants, not the effect of changing the overlap of a trained model: the fifteen runs share their budget, their seed and their data, so a difference between them is a difference of geometry, but the estimate remains a regression over fifteen design points and inherits their leverage. A mitigation supported here is evidence that the effect varies with geometry in the direction predicted across this grid, which is what a deployment decision about patch and stride requires, and not a within-model intervention.
+\paragraph{Sampling.} Every model, including the auxiliary fits, is sampled by the No-U-Turn sampler with the same settings, so that none receives a more or less careful exploration than another: four chains, $2000$ warm-up draws per chain to adapt the step size, $2000$ retained draws per chain and a target acceptance rate of $0.9$. Offsets that enter one linear predictor additively can trade a constant against each other without changing the likelihood, so every offset set, $u_k$, $u_b$, $u_p$, $s_{\text{st}}$ and $g_{\text{geo}}$, is constrained to sum to zero; the configuration level $\beta_c$ is not, because it carries $\bar\beta$ and the $M1$ regression through its mean. The offsets informed by many observations are written in centred form and the phase offsets of Model~C in non-centred form, since $H2$ predicts their scale near zero, where the centred form develops a funnel. Every prior is given in \autoref{tab:bayesPriors}.
 
-\subsection{Two limitations of the collected design}
+\paragraph{Validation.} The checks listed in Deliverable~2 are implemented as gates, and a claim is read only if every gate that applies to it holds.
+\begin{itemize}
+\item Prior predictive checks: before any observation exists, each model is simulated on the real design axes, and the probability each decision rule already scores under the priors is recomputed and must reproduce the Prior column of \autoref{tab:bayesDecisions}.
+\item Parameter recovery: every model is fitted to data simulated with a known effect and to data simulated under the state its claim denies, no effect for Models~A to D1 and $\kappa_F=0.65$ for D2. At least eighty per cent of the repeats must cover their own truth and exclude the other scenario's, so that a wide interval covering both cannot pass. Models~A and~C recover on a stratified subsample of twelve thousand triplets, the others on their whole tables.
+\item Posterior predictive checks: from $400$ posterior draws, the observed mean and standard deviation must fall inside the $95\%$ replicated interval for at least ninety per cent of the levels of every stratum, which are frequency, phase slice, $P$, $S$ and generator as they apply to each model.
+\item Prior sensitivity: every prior scale is multiplied by $0.5$, $1$ and $2$, which gives the ladder $\{0.25,0.5,1.0\}$ of \autoref{sec:models}; every rung must converge, the rule probability may move by at most $0.10$, and the decision class must be the same at every rung.
+\item Convergence: $\hat R<1.01$, bulk and tail effective sample size above $1000$ and no divergences, over every parameter of every fit a claim reads, group scales included.
+\item Readings that must agree: the two readings of Model~D2, and Model~A with its refit net of the background-only forecast for $H1$ behavioural and $M1$; a missing or unconverged reading fails the gate, and a disagreement makes the verdict inconclusive.
+\item Leave-one-out cross-validation, by Pareto-smoothed importance sampling over the whole design. A difference in expected log predictive density is read as inconclusive when it is within twice its paired standard error, or when any Pareto $k$ exceeds its threshold. The comparison decides only the two rules that contain it, $M1$ and $H3$ location, and is reported beside the others.
+\end{itemize}
+Two implementation checks precede the fits and stop the run if they fail: the log likelihood rebuilt for leave-one-out must agree with the one PyMC computes, and the ported Pareto smoothing with ArviZ.
 
-Neither of the following is a property of the estimators, and both are reported rather than adjusted for. The first is the truncated context of \autoref{sec:geometries}: every geometry receives $480$ samples, and the patch grid spans only $P+S\lfloor(480-P)/S\rfloor$ of them, so the last $r=(480-P)\bmod S$ enter no token; $r$ is zero exactly when $S \mid P$, and reaches sixteen samples on two geometries. The truncation is constant within a geometry and identical for a candidate and its two controls, which share the context length, the background and the phase, so it cancels in the within-triplet comparison of \autoref{eq:appA:contrast} on which $H1$ and $H2$ are read. It does not cancel between geometries, and because $r$ is non-zero on precisely the six runs with $S \nmid P$, it is collinear with the split that identifies the stride branch: any quantity read across configurations, the overlap and patch-size covariates of Model~A and the branch slopes of Model~D2 among them, admits a truncated tail as an alternative account of a between-geometry difference.
+\paragraph{Verdicts.} Every claim is reported by the posterior median and $95\%$ credible interval of its estimand on its natural scale, with the rule probability before any gate, each gate on its own, and the verdict after the gates, resolved in a fixed order: identification, then the gates, then the probability rule, then the comparison leg where the rule has one. The verdict is supported, refuted or inconclusive when every gate holds; not identified when the design cannot answer, as for a D2 branch below its site bar; and not reportable when a gate fails, with the failing condition named in \autoref{tab:bayesGates}. Neither of the last two is a null result. Every claim is refuted when its support probability falls to $0.05$ or when its equivalence rule reaches $0.95$. The configurations, the frequency grid and the coverage are fixed before any measurement, and a session collecting only part of them records that as a limitation rather than a new design.
 
-The second is the single training seed: one instance is trained per geometry, so a difference between two configurations is a difference between two trained models as well as between two geometries, and the design cannot separate the two. An effect large relative to the spread of the posterior is unlikely to be an artefact of that choice, but an effect near the decision threshold could be, and is read accordingly.
+\subsection{Departures from Deliverable 2 and limitations}
 
+Five places differ from the plan approved in Deliverable~2, and each is stated rather than applied silently. The sign of the $M1$ rule is corrected from $\delta_O<0$ to $\delta_O>0$, as explained above. A fit that fails a gate is reported as not reportable, where Deliverable~2 proposed to report it as provisional after a cross-check against converged models and the frequentist probes. Equivalence rules in the form of those for $H1$ are added to $M1$ and $H3$ location, so that an effect credibly too small to matter refutes them as it refutes $H1$; every support rule is unchanged. Model~A is also read net of the forecast of the background alone, as described below, and the two readings must agree. And a set of readings is added, each declared as such: the rules for $H1$ on the representation, the identification bar of Model~D2 and the agreement of its two readings, the unadjusted form of Model~B, the one-hertz labelling of Model~D1, the median-gap response of Model~D2, and the reading of the $H3$ location verdict on the two generator modes through the joint probability of both coefficients.
+
+Four limitations are properties of the collected design; the first three are reported rather than adjusted for, and the fourth is read through a second fit. The first is the truncated context: every geometry receives $480$ samples, and the $(480-P)\bmod S$ most recent ones, up to sixteen, enter no token (\autoref{tab:sweepContext}). The truncation is identical for a candidate and its two controls, so it cancels within a triplet, but not between geometries, and it is non-zero on precisely the six runs with $S\nmid P$ that identify the stride branch, so any quantity read across configurations, the covariates of Model~A and the slopes of Model~D2 among them, admits it as an alternative account. The second is the single training seed: a difference between two configurations is also a difference between two trained models, so an effect near a decision threshold may be an artefact of that choice. The third is that the token count $1+\lfloor(L-P)/S\rfloor$ moves with the stride, so the $M1$ slope cannot separate overlap from sequence length; neither confound could create a mitigation, but either could inflate one. The fourth concerns the amplitude $A_{\mathrm{pred}}$ of Model~A: it counts every line the forecast places at the arm's frequency, and the forecasts of the retrained models carry lines of their own on the candidate sites (\autoref{sec:appDecomp}), which would raise $R_k$ and move $d$ towards zero independently of the injected tone. The collection therefore also forecasts every background with no tone, subtracts that forecast's least-squares tone from the arm's as complex coefficients, and refits Model~A on the resulting net contrast; for $H1$ behavioural and $M1$ the net reading must be available, converged and in the same decision class as the primary one, and a disagreement makes the verdict inconclusive.

@@ -99,6 +99,10 @@ class Config:
                                     # TSMixup and 100 KernelSynth signals; these are those signals,
                                     # and they are also the u_background levels of Eq. (9).
     generators: tuple[str, ...] = pl.GENERATORS
+    # Item 68: forecast every background once with no tone added, and record the tone the model
+    # puts at each arm's frequency on its own (`a_null`) and the forecast tone net of it (`a_net`).
+    # One extra forward pass per background and geometry; it enters the design fingerprint.
+    null_arm: bool = True
 
     #, frequency-local MDL cells (H1 representational),
     #, localisation estimator (H1 behavioural / H2),
@@ -162,7 +166,13 @@ def collect_contrasts(probe: "pl.Probe", cfg: Config) -> pd.DataFrame:
         has always returned, but the paired contrast of Eq. (8) can be formed downstream from
         either denominator because both are kept; the appendix defines the recovery against the
         injected amplitude, and the two are not the same quantity;
-      * `h`, the localisation indicator 1[|f_hat - f| <= tol], for the models fitted to a hit.
+      * `h`, the localisation indicator 1[|f_hat - f| <= tol], for the models fitted to a hit;
+      * with `cfg.null_arm`, `a_null` and `a_net`: the same background is forecast once with no
+        tone, `a_null` is the amplitude that background-only forecast carries at the arm's
+        frequency, and `a_net` is the modulus of the forecast tone minus the background-only tone,
+        both as complex least-squares coefficients. `a_net` is the recovery the injected tone is
+        responsible for; `a_pred` also counts a line the model draws at a candidate site on its
+        own, which is the confound Appendix E states for Model A.
 
     Nothing is discarded. An arm whose forecast rebuilds nothing measurable returns a small R and
     h = 0, which is a reading and not a degenerate row, so no response filter is applied here or
@@ -189,6 +199,12 @@ def collect_contrasts(probe: "pl.Probe", cfg: Config) -> pd.DataFrame:
     frames: list[pd.DataFrame] = []
     for gen in cfg.generators:
         pool = pl.background_pool(gen, cfg.n_bg, pl.CTX + pl.PRED)
+        null_forecasts = None
+        if cfg.null_arm:
+            # one forward pass per background: the forecast of the background alone
+            null_forecasts = probe.forecast(np.stack([np.asarray(bg[:pl.CTX], np.float32)
+                                                      for bg in pool]))
+            t_fut = np.arange(pl.CTX, pl.CTX + null_forecasts.shape[1]) / pl.FS
         for start in range(0, len(sites), block_size):
             block = sites[start:start + block_size]
             contexts, futures, freqs, meta = [], [], [], []
@@ -211,10 +227,15 @@ def collect_contrasts(probe: "pl.Probe", cfg: Config) -> pd.DataFrame:
             if not contexts:
                 continue
 
-            R, dphase, f_hat, f_hat_truth, a_pred, a_true = probe.measure(
+            R, dphase, f_hat, f_hat_truth, a_pred, a_true, c_pred = probe.measure(
                 np.stack(contexts), np.stack(futures), np.array(freqs), k=cfg.fhat_topk,
-                return_amplitudes=True)
+                return_amplitudes=True, return_complex=True)
             frame = pd.DataFrame(meta)
+            if null_forecasts is not None:
+                c_null = np.array([pl.fit_complex(null_forecasts[m["bg_id"]], t_fut, m["f"])
+                                   for m in meta])
+                frame["a_null"] = np.abs(c_null)
+                frame["a_net"] = np.abs(c_pred - c_null)
             # Both amplitudes are recorded, not only their ratio. The denominator of the recovery
             # is a choice, the appendix and this estimator do not make the same one, and after the
             # forward pass the two cannot be separated again; see Probe.measure.
@@ -231,7 +252,7 @@ def collect_contrasts(probe: "pl.Probe", cfg: Config) -> pd.DataFrame:
             frame["h_truth"] = pl.localisation_hit(f_hat_truth, frame["f"].to_numpy(float),
                                                    tol=cfg.fhat_tol_hz)
             frames.append(frame)
-            del contexts, futures, freqs, meta, R, dphase, f_hat, f_hat_truth, a_pred, a_true
+            del contexts, futures, freqs, meta, R, dphase, f_hat, f_hat_truth, a_pred, a_true, c_pred
             print(f"      {gen}: candidates {start + 1}-{start + len(block)} of {len(sites)}, "
                   f"{sum(len(x) for x in frames):,} rows so far, peak RSS "
                   f"{_peak_resident_gib():.1f} GiB", flush=True)
@@ -246,9 +267,12 @@ def collect_contrasts(probe: "pl.Probe", cfg: Config) -> pd.DataFrame:
     out["overlap"] = (P - S) / P                 # O_c of Eq. (9)
     out["cpp"] = out["f_lock"] * P / pl.FS       # cycles per patch
     out["family"] = [pl.lock_family(f, P, S) for f in out["f_lock"]]
-    return out[["model", "P", "S", "overlap", "generator", "bg_id", "f_lock", "family", "cpp",
-                "delta", "phase_idx", "phase", "role", "f", "is_lock",
-                "a_pred", "a_true", "amp_injected", "R", "dphase", "f_hat", "h", "h_truth"]]
+    columns = ["model", "P", "S", "overlap", "generator", "bg_id", "f_lock", "family", "cpp",
+               "delta", "phase_idx", "phase", "role", "f", "is_lock",
+               "a_pred", "a_true", "amp_injected", "R", "dphase", "f_hat", "h", "h_truth"]
+    if cfg.null_arm:
+        columns += ["a_null", "a_net"]
+    return out[columns]
 
 
 # --------------------------------------------------------------------------------- #
@@ -608,6 +632,9 @@ def _validate_frame(frame: pd.DataFrame, table: str, tag: str | None = None) -> 
         "collapse": ("f", "z", "z_norm"),
         "sites": ("n_sites",),
     }[table]
+    if table == "contrasts":
+        # the background-only columns exist only when the collection ran with `null_arm`
+        finite_columns = finite_columns + tuple(c for c in ("a_null", "a_net") if c in frame)
     for column in finite_columns:
         if not np.isfinite(pd.to_numeric(frame[column], errors="coerce")).all():
             raise ValueError(f"{table}.{column} contains non-finite values")
