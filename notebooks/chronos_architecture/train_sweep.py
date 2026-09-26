@@ -30,28 +30,25 @@ import numpy as np   # numerical operations: array math, NaN handling, loss hist
 #  EXPERIMENTAL CONFIGURATION                                                   #
 # ============================================================================ #
 
-# The (P, S) grid to sweep. It is designed along two independent axes so that
-# the effect of each parameter can be isolated:
+# The (P, S) grid to sweep: the fifteen geometries of Deliverable 3 (tab:hfModels), the same list
+# as probe_lib.DELIVERABLE3_MODELS. The design crosses two axes so that each parameter can be
+# isolated: at fixed P the stride varies, which moves the overlap O = (P - S) / P, and at fixed S
+# the patch size varies, with the P = S runs as contiguous baselines.
 #
-#   Overlap axis: P is fixed at 16, S varies.
-#     - (16,16): overlap ratio = 0.00, contiguous patches (the stock Bolt-Tiny geometry)
-#     - (16,12): overlap ratio = 0.25, each patch overlaps the next by 4 samples
-#     - (16, 8): overlap ratio = 0.50, each patch overlaps the next by 8 samples
+#   P =  8: S = 8
+#   P = 16: S = 8, 12, 16
+#   P = 24: S = 8, 12, 16, 20, 24
+#   P = 32: S = 8, 12, 16, 20, 24, 32
 #
-#   Patch-size axis: S = P (contiguous, no overlap), P varies.
-#     - ( 8, 8): smaller patch window, finer temporal resolution per token
-#     - (16,16): the baseline again (shared with the overlap axis)
-#     - (24,24): larger patch window, coarser temporal resolution per token
-#
-# Note: S = 4 (overlap ratio 0.75) is excluded by design because its stride-lock
-# class F_lock = {c * fs/S} = {128, 256, ...} has no member inside the valid
-# forecast band, so it would contribute no informative H1 or H3 test.
+# S > P is excluded, because a gap between patches discards input samples. p32-s28 was trained in
+# the published sweep but is not listed: its stride does not divide the 480-sample analysis
+# context, so it can be swept but not fitted. S = 4 is not part of the design: the largest
+# overlap, 0.75, is reached at P = 32, S = 8.
 PS_GRID: list[tuple[int, int]] = [
-    (16, 16),   # baseline: the stock Bolt-Tiny geometry, contiguous (no overlap)
-    (16, 12),   # overlap ratio = 0.25
-    (16, 8),    # overlap ratio = 0.50
-    (8, 8),     # smaller patch, contiguous
-    (24, 24),   # larger patch, contiguous
+    (8, 8),
+    (16, 8), (16, 12), (16, 16),
+    (24, 8), (24, 12), (24, 16), (24, 20), (24, 24),
+    (32, 8), (32, 12), (32, 16), (32, 20), (32, 24), (32, 32),
 ]
 
 # A single seed per configuration. With the full official data diet (11 million series),

@@ -10,29 +10,30 @@ Patch-based tokenisation splits a time series into overlapping windows of size P
 
 ```
 patchAliasing/
-├── notebooks/                  # code, notebooks and data
-│   ├── chronos_architecture/   # architecture notebook, training and model upload
-│   │   └── weights/            # local checkpoints (gitignored)
-│   ├── bayesian/               # Deliverable 2 Bayesian notebook and companion report
-│   ├── signal_analysis/        # reconstruction, decomposition and solar notebooks
-│   ├── support_scripts/        # shared collection, comparison and model-loading modules
-│   ├── data/
-│   │   ├── synthetic/          # TSMixup and KernelSynth signal generators
-│   │   └── Dataset-SolarTechLab.csv
-│   └── _run/                  # local analysis outputs and caches (gitignored)
-├── coursework/                 # LaTeX deliverables and report
-│   ├── _coursework_/           # current working report
-│   │   ├── main.tex
-│   │   └── sections/
-│   ├── delivered/              # submitted deliverables (frozen)
-│   │   ├── deliverable_1/      # formalisation, 5 models, probing, security
-│   │   └── deliverable_2/      # extended analysis, Bayesian models, ontology
-│   └── bayesian/               # standalone Bayesian coursework notebooks
+├── notebooks/                    # code, notebooks and data behind Deliverable 3
+│   ├── chronos_architecture/     # architecture notebook, training sweep (train_sweep.py), model upload
+│   ├── bayesian/                 # Bayesian notebook, its README and the implementation report
+│   ├── signal_analysis/          # sweep (App. F), decomposition (App. G) and solar (App. H) notebooks
+│   ├── support_scripts/          # probe_lib, collect, comparison and model-loading modules
+│   └── data/
+│       ├── synthetic/            # Light TSMixup and KernelSynth generators
+│       └── Dataset-SolarTechLab.csv
+├── coursework/
+│   ├── deliverable1_v0/, deliverable1_v1/, deliverable2_v0/   # submitted deliverables (frozen)
+│   └── deliverable3/             # current report: main.tex, sections/, tables/, figures/
 ├── pyproject.toml
-└── LICENSE                     # MIT
+└── LICENSE                       # MIT
 ```
 
-Current report work should happen in `coursework/_coursework_`. The directories under `coursework/delivered` are submitted snapshots and should be treated as frozen references unless a comparison or packaging task explicitly targets them.
+Which notebook produces which part of the report:
+
+| Report part | Notebook |
+|---|---|
+| Figure 1 and Appendix F sweep | `signal_analysis/single_reconstruction_figures.ipynb`, `signal_analysis/appendix_reconstruction.ipynb` |
+| Table 5 and Appendix G | `signal_analysis/appendix_decomposition_comparison.ipynb` |
+| Table 6 and Appendix H | `signal_analysis/solar_telemetry_comparison.ipynb` |
+| Section 5.4, Appendix E, Table 7 | `bayesian/deliverable2_bayesian_models.ipynb` |
+| Appendix B | `chronos_architecture/train_sweep.py` |
 
 ## Hypotheses
 
@@ -66,13 +67,11 @@ python support_scripts/collect.py --out ./results           # full design
 
 Then open `notebooks/bayesian/deliverable2_bayesian_models.ipynb` for the PyMC inference. See the [Bayesian guide](notebooks/bayesian/README.md) for its setup and execution modes.
 
-## Key findings (provisional)
+## Status
 
-- **Representation penalised, forecast intact**: locked frequencies show higher MDL codelength (representational loss confirmed), but forecast amplitude recovery is not systematically attenuated.
-- **Phase-invariant deficit** (H2 supported): the deficit does not depend on where in its cycle the signal starts.
-- **Stride sites track fs/S** (H3a supported): collapse dips shift proportionally when the stride changes.
-- **Patch branch not yet identified** (H3b): the scaling law requires more geometries with varying P at fixed S.
-- **Overlap as mitigation**: shorter stride at fixed P raises the lowest stride-lock frequency and thins the in-band family, but cannot affect the patch branch.
+The theory, the design and the descriptive readings are in the report. The hypotheses are decided only by
+the Bayesian notebook, under the rules of Deliverable 2 fixed before any posterior is read; until its full
+run is complete, no hypothesis is reported as supported or refuted.
 
 ## Licensing
 

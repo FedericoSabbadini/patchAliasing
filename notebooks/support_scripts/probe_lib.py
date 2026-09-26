@@ -937,8 +937,8 @@ class Probe:
         recording because R's denominator is a choice and the two candidates cannot be told apart
         after the fact: `a_true` is the least-squares amplitude of the TRUE continuation at the
         arm's frequency, which is the injected tone plus whatever the background contributes
-        there, while the deliverable's appendix defines the recovery against the amplitude
-        INJECTED. Keeping both amplitudes lets either ratio be formed downstream from one
+        there, which is the recovery Deliverable 2 and Appendix E define; the alternative is the
+        amplitude INJECTED. Keeping both amplitudes lets either ratio be formed downstream from one
         collection, instead of fixing the choice at the only point where a forward pass happens.
 
         Chronos is the whole cost of collection, so they share a single call to `forecast` rather

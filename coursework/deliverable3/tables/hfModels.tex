@@ -25,6 +25,6 @@
         $15$ & $32$ & $32$ & $0.00$ & $64$ & $480$ \\
         \bottomrule
     \end{tabular}
-\caption{The fifteen configurations carried into the analysis, with the overlap ratio $O=(P-S)/P$ and the number of patch tokens at the $2048$-sample training context, where the five $P=24$ geometries are left-padded to $2064$ because $2048$ is not a multiple of their patch size. Every geometry is analysed on a context of $480$ samples, a multiple of every $P$, so no padding is added; the patches then cover $L_{\mathrm{tok}}=P+S\lfloor(480-P)/S\rfloor$ samples, and the $(480-P)\bmod S$ most recent samples, non-zero only when $S\nmid P$, enter no token (\autoref{tab:sweepContext}).}
+\caption{The fifteen configurations carried into the analysis, with the overlap ratio $O=(P-S)/P$ and the number of patch tokens at the $2048$-sample training context, where the five $P=24$ geometries are left-padded to $2064$ because $2048$ is not a multiple of their patch size; Deliverable~2 omitted that padding and printed one or two tokens fewer for them. Every geometry is analysed on a context of $480$ samples, a multiple of every $P$, so no padding is added; the patches then cover $L_{\mathrm{tok}}=P+S\lfloor(480-P)/S\rfloor$ samples, and the $(480-P)\bmod S$ most recent samples, non-zero only when $S\nmid P$, enter no token (\autoref{tab:sweepContext}).}
     \label{tab:hfModels}
 \end{table*}

@@ -71,9 +71,6 @@ twoside, % Two side traditional mode where headers and footers change between od
 
 % Segnaposto per una figura non ancora disponibile: compila, occupa lo spazio che occupera'
 % la figura vera, e si vede a colpo d'occhio che manca. L'argomento opzionale e' l'altezza.
-\newcommand{\placeholderfig}[2][0.30\textheight]{%
-  \fbox{\parbox[c][#1][c]{\dimexpr\linewidth-2\fboxsep-2\fboxrule\relax}{%
-    \centering\textcolor{red}{\textbf{Placeholder figure.} #2}}}}
 \newcommand{\valueof}[1]{\textsf{#1}}
 
 % Tabelle in cui una riga occupa piu' di una linea: le righe vanno distinte fra loro senza

@@ -164,8 +164,9 @@ def collect_contrasts(probe: "pl.Probe", cfg: Config) -> pd.DataFrame:
         forecast and in the true continuation, together with `amp_injected`, the amplitude the
         tone was injected at. `R` is recorded as a_pred / a_true, which is what this estimator
         has always returned, but the paired contrast of Eq. (8) can be formed downstream from
-        either denominator because both are kept; the appendix defines the recovery against the
-        injected amplitude, and the two are not the same quantity;
+        either denominator because both are kept; Deliverable 2 and Appendix E define the recovery
+        against the true continuation, the injected amplitude is the alternative, and the two are
+        not the same quantity;
       * `h`, the localisation indicator 1[|f_hat - f| <= tol], for the models fitted to a hit;
       * with `cfg.null_arm`, `a_null` and `a_net`: the same background is forecast once with no
         tone, `a_null` is the amplitude that background-only forecast carries at the arm's

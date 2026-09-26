@@ -28,8 +28,8 @@ geometries of `tab:hfModels`.
 3. The notebook decides for itself whether it needs to collect observations or only analyse them,
    resumes any stage already finished, and stops with a named reason if a gate fails.
 
-From an empty folder a full run collects 1,113,000 forecasts and then fits about sixty-five
-posteriors, so it is a day of wall time on a CPU runtime and rather less on a GPU one. Every stage
+From an empty folder a full run collects 1,116,000 forecasts, 3,000 of them the background-only
+arm, and then fits about sixty-six posteriors, so it is a day of wall time on a CPU runtime and rather less on a GPU one. Every stage
 is checkpointed; an interrupted session costs only the table or the pair of chains it was writing.
 
 `MODE = "preflight"` runs everything up to and including the parity gates and parameter recovery,
@@ -37,9 +37,10 @@ which are themselves short fits, then stops before the reportable ones.
 `MODE = "smoke"` rehearses the whole chain in minutes and can never produce a verdict.
 `STANDALONE_FIGURES = True` regenerates Part 6 from the saved artifacts alone.
 
-`RECOVERY_DENOMINATOR` chooses what the amplitude recovery is measured against: `injected`, which
-is how Appendix E defines it and the default, or `true_continuation`, which is what the shared
-estimator has always returned. Both are computed from the same collection and Part 2.4 prints the
+`RECOVERY_DENOMINATOR` chooses what the amplitude recovery is measured against:
+`true_continuation`, the default, which is how Deliverable 2 and Appendix E define it
+(R = A_pred / A_true), or `injected`, the amplitude the tone was injected at, kept as a robustness
+reading. Both are computed from the same collection and Part 2.4 prints the
 difference, so the choice can be changed without collecting again.
 
 Part 0.8 prints, and saves as `00_specification_notes.csv`, every place the implementation
@@ -75,6 +76,7 @@ changes will refuse to be resumed or merged, and will say so.
 - No notebook is modified. This one is new and stands on its own.
 - The verdict table reports, per claim, the **pre-gate** reading, **each gate independently**, and
   the **post-gate** verdict. `NOT REPORTABLE` and `NOT IDENTIFIED` are not null results.
-- The tone amplitude is the one design constant the report does not fix. It is set in Part 0.4,
-  recorded beside the collected data, and a run at a different amplitude is refused rather than
+- The tone amplitude, 1.5 over a unit-variance background, is the one design constant Deliverable 2
+  does not fix; Appendix E of Deliverable 3 reports it. It is set in Part 0.4, recorded beside the
+  collected data, and a run at a different amplitude is refused rather than
   merged.
