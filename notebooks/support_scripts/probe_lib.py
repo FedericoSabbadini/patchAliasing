@@ -444,8 +444,11 @@ def background_pool_quality(signals: list[np.ndarray]) -> dict:
         "minimum_effective_rank": minimum_rank,
     }
 
+REGENERATION_TOLERANCE = 1e-3   # max |regenerated - archived| still read as the same draw
+
+
 def save_signal_pool(out_dir, generators=GENERATORS, n_bg: int = 6,
-                     seed0: int = 10_000) -> "object":
+                     seed0: int = 10_000, regenerate: bool = False) -> "object":
     """Write the generated backgrounds -- and a few complete model inputs -- to disk.
 
     The backgrounds are the actual signals every posterior in this analysis is computed from, so
@@ -457,6 +460,14 @@ def save_signal_pool(out_dir, generators=GENERATORS, n_bg: int = 6,
     signal is the whole realisation: the shorter versions used by the MDL cells, the band tasks and
     the collapse sweep are its leading samples, so nothing further needs storing.
 
+    With `regenerate=True` every draw is generated again from its seed, whatever the process has
+    cached. Without an archive that is simply how the archive is written. With one, each
+    regenerated draw is compared with its archived file and the largest difference is returned in
+    `meta.attrs["max_regeneration_difference"]`; the ARCHIVED draw is then the one placed in the
+    cache, because it is the one every result already computed in this directory used. A
+    difference above `REGENERATION_TOLERANCE` (a different BLAS can turn the SVD inside the
+    KernelSynth sampler) is reported, not silently mixed.
+
     Returns a dataframe of the metadata, and writes `<out_dir>/signals/`.
     """
     import pandas as pd
@@ -465,6 +476,15 @@ def save_signal_pool(out_dir, generators=GENERATORS, n_bg: int = 6,
     out.mkdir(parents=True, exist_ok=True)
     index_path = out / "signals_index.parquet"
     expected = {(gen, i, seed0 + i) for gen in generators for i in range(n_bg)}
+
+    regenerated: dict[tuple[str, int], np.ndarray] = {}
+    if regenerate:
+        for gen in generators:
+            for i in range(n_bg):
+                _bg_cache.pop((gen, seed0 + i), None)
+                _bg_meta.pop((gen, seed0 + i), None)
+            for i, x in enumerate(background_pool(gen, n_bg, CANON_LEN, seed0)):
+                regenerated[(gen, seed0 + i)] = np.asarray(x, np.float32).copy()
 
     # Reuse only a complete archive whose recipe and per-file hashes still match.  A rejected
     # archive is regenerated below; individual files are replaced atomically.
@@ -497,9 +517,20 @@ def save_signal_pool(out_dir, generators=GENERATORS, n_bg: int = 6,
                         for draws in loaded.values()
                     )
                     if quality_ok:
+                        worst = 0.0
                         for generator, draws in loaded.items():
                             for _, seed, x in draws:
+                                if (generator, seed) in regenerated:
+                                    worst = max(worst, float(np.max(np.abs(
+                                        regenerated[(generator, seed)] - x))))
                                 _bg_cache[(generator, seed)] = x
+                        if regenerated:
+                            old.attrs["max_regeneration_difference"] = worst
+                            state = ("identical to the archive" if worst <= REGENERATION_TOLERANCE
+                                     else "DIFFERENT from the archive; the archived draws, which "
+                                          "every result in this directory used, are kept")
+                            print(f"  regenerated {len(regenerated)} backgrounds from their seeds: "
+                                  f"max |difference| {worst:.2e}, {state}")
                         return old
         except (OSError, ValueError, KeyError, AttributeError):
             pass
@@ -529,6 +560,9 @@ def save_signal_pool(out_dir, generators=GENERATORS, n_bg: int = 6,
                              pool_quality_ok=quality["quality_ok"]))
 
     meta = pd.DataFrame(rows)
+    if regenerated:
+        meta.attrs["max_regeneration_difference"] = 0.0
+        print(f"  generated {len(regenerated)} backgrounds from their seeds and archived them")
     cp.atomic_parquet(index_path, meta)
     cp.atomic_json(out / "signals_manifest.json", {
         "schema_version": 1,
