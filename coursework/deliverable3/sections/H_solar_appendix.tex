@@ -32,7 +32,7 @@ The tokeniser sees a sequence of samples and has no notion of seconds, so the se
 
 \subsection{One forecast in detail}
 
-A single forecast is first examined in detail, issued at 13:00 on 5 July 2017, the day with the longest valid run, and repeated for the published checkpoint and for every retrained geometry on the same context. It is complemented by the winter forecast of \autoref{fig:solarForecast19} in the benchmark below, and is a summer day of a different kind: the context starts at 02:52 on the previous day, $1377$ of its $2048$ minutes are measured, $634$ night-time minutes are set to zero, $37$ minutes of short daylight gaps are bridged, and all $64$ horizon minutes are measured.
+A single forecast is first examined in detail, issued at 13:00 on 5 July 2017, the day with the longest valid run, and repeated for the published checkpoint and for every retrained geometry on the same context. It is complemented by the winter forecast of \autoref{fig:solarForecast19} in the benchmark below, and is a summer day of a different kind. The context starts at 02:52 on the previous day; $1377$ of its $2048$ minutes are measured, $634$ night-time minutes are set to zero, $37$ minutes of short daylight gaps are bridged, and all $64$ horizon minutes are measured.
 
 \begin{figure}[!htbp]
     \centering
@@ -61,7 +61,7 @@ Across the fifteen geometries the same cut gives errors between $5.3$ and $15.9$
 
 \subsection{The benchmark over the year}
 
-The benchmark draws $150$ windows of $2048+64$ minutes each, chosen at random over the whole year under the constraint that no two windows share a minute, from a fixed seed so that the selection can be reproduced. Each draw removes every start that would overlap it, so the selection is a seeded random packing rather than a uniform sample of all disjoint sets, and it is not balanced by hour of day. Every model forecasts exactly the same windows from exactly the same contexts, and every model is scored on the same minutes. Each window is assigned, by the solar elevation at the time its forecast is issued, to one of three regimes, night at or below $0^\circ$, the transition around sunrise and sunset up to $10^\circ$, and day above it, and all its scored minutes are counted in that regime, so that the near-zero night-time error does not dilute the daytime one.
+The benchmark draws $150$ windows of $2048+64$ minutes each, chosen at random over the whole year under the constraint that no two windows share a minute, from a fixed seed so that the selection can be reproduced. Each draw removes every start that would overlap it, so the selection is a seeded random packing rather than a uniform sample of all disjoint sets, and it is not balanced by hour of day. Every model forecasts exactly the same windows from exactly the same contexts, and every model is scored on the same minutes. Each window is assigned to one of three regimes by the solar elevation at the time its forecast is issued: night at or below $0^\circ$, the transition around sunrise and sunset up to $10^\circ$, and day above it. All its scored minutes are counted in that regime, so that the near-zero night-time error does not dilute the daytime one.
 
 The point forecast is the median of the nine quantiles each model returns. For each model the mean absolute error, the mean error or bias, the variance of the error and the root mean square error are computed over all scored minutes, and the weighted quantile loss is computed over all nine quantiles to judge the forecast distribution rather than its median alone. Each model is also compared with two references, the published checkpoint and the retrained $P=S=16$, through the paired difference in mean absolute error. Its $95\%$ interval runs from the $2.5$th to the $97.5$th percentile of a bootstrap that resamples whole weeks, $51$ of them, $2000$ times, so that windows falling in the same week are not treated as independent. An interval that contains zero means the two models cannot be told apart on this series; it does not mean that they are equal.
 
@@ -76,7 +76,7 @@ The point forecast is the median of the nine quantiles each model returns. For e
     \label{fig:solarForecast19}
 \end{figure}
 
-The forecast of \autoref{fig:solarForecast19}, issued on a winter afternoon at the reference geometry, illustrates that behaviour on one window: both checkpoints prolong the level of the last hour while the measured power begins its afternoon decline, so the error grows along the horizon, and only the wider interval of the retrained model keeps the measurement within its bounds until the end.
+The forecast of \autoref{fig:solarForecast19}, issued on a winter afternoon at the reference geometry, illustrates that behaviour on one window. Both checkpoints prolong the level of the last hour while the measured power begins its afternoon decline, so the error grows along the horizon, and only the wider interval of the retrained model keeps the measurement within its bounds until the end.
 
 \begin{figure}[!htbp]
     \centering
@@ -102,4 +102,4 @@ To place each window in the units of \autoref{sec:tokenisation}, the strongest n
 
 \subsection{Limits}
 
-The benchmark covers one plant and one year, and the published checkpoint was trained with a larger budget and a recipe that is not fully published, possibly on series of this kind, whereas the retrained models follow the published Chronos recipe, so its advantage cannot be attributed to geometry; only the comparison among the retrained models isolates the geometry, and on this series it shows no geometry better than the $P=S=16$ baseline. The zero-filling of night-time minutes is exact, but the zero-filling of long daytime gaps in the context is an assumption.
+The benchmark covers one plant and one year. The published checkpoint was trained with a larger budget and a recipe that is not fully published, possibly on series of this kind, whereas the retrained models follow the published Chronos recipe, so its advantage cannot be attributed to geometry; only the comparison among the retrained models isolates the geometry, and on this series it shows no geometry better than the $P=S=16$ baseline. The zero-filling of night-time minutes is exact, but the zero-filling of long daytime gaps in the context is an assumption.
