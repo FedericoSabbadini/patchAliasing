@@ -10,7 +10,7 @@ Testing the claims of \autoref{sec:agent} requires a design in which the two bra
 
 The fifteen geometries of \autoref{sec:geometries} vary $P$ and $S$ independently, which is what lets Models~D1 and~D2 separate the branches and Model~A estimate the overlap and patch-size covariates without confounding them. Synthetic signals are sampled at $f_s=512$\,Hz and analysed over $[2,250]$\,Hz, strictly inside the Nyquist limit, whereas the telemetry is recorded once per minute, so the quantity transferred between the two is the dimensionless count of cycles per patch or per stride rather than a frequency in hertz.
 
-One limit of the design is arithmetic rather than empirical. Where $S \mid P$ every stride site is also a patch site, so nine of the fifteen runs, the four $P=S$ baselines among them, yield no stride-only frequency (\autoref{tab:branchSites}). The stride branch therefore rests on the six runs with $S \nmid P$, which together supply thirty-six stride-only frequencies against one hundred and two patch-only ones, never more than eight per geometry, and which are also the runs whose context is truncated (\autoref{sec:geometries}). Both facts are fixed by the choice of $(P,S)$ before anything is measured, and they bound what the stride-branch estimates can settle.
+One limit of the design is arithmetic rather than empirical. Where $S \mid P$ every stride site is also a patch site, so nine of the fifteen runs, the four $P=S$ baselines among them, yield no stride-only frequency (\autoref{tab:branchSites}). The stride branch therefore rests on the six runs with $S \nmid P$, which together supply thirty-six stride-only frequencies against one hundred and two patch-only ones over the whole design, never more than eight per geometry, and which are also the runs whose context is truncated (\autoref{sec:geometries}). Both facts are fixed by the choice of $(P,S)$ before anything is measured, and they bound what the stride-branch estimates can settle.
 
 \subsection{Step one: the frequency sweep}
 
@@ -26,13 +26,15 @@ The third step gives the photovoltaic telemetry to every geometry and to the pub
 
 \subsection{Step four: the Bayesian analysis}
 
-The three steps above cannot separate a loss at a candidate frequency from one the model would show anywhere. The inferential step therefore places every candidate beside two controls under one geometry, one background and one phase, so that only the frequency changes, and fits the models of \autoref{sec:models} to the resulting contrasts. The configurations, the frequency grid and the coverage each geometry must reach are declared before anything is measured, and no response filter is applied afterwards, so the arms where the forecast rebuilds nothing, where the loss should be largest, are kept. Interpretation is fail-closed: convergence, parameter recovery, posterior predictive adequacy, prior sensitivity and the reliability of the leave-one-out comparisons are gates, and an estimand that fails one is reported as not reportable, and a branch with fewer than ten unambiguous sites as not identified, neither of which is a null result. \autoref{sec:appBayes} states the gates, the sampler settings and how the context truncation enters each comparison.
+The three steps above cannot separate a loss at a candidate frequency from one the model would show anywhere. The inferential step therefore places every candidate beside two controls under one geometry, one background and one phase, so that only the frequency changes, and fits the models of \autoref{sec:models} to the resulting contrasts. The configurations, the frequency grid and the coverage each geometry must reach are declared before anything is measured, and no response filter is applied afterwards, so the arms where the forecast rebuilds nothing, where the loss should be largest, are kept. Interpretation is fail-closed: convergence, parameter recovery, posterior predictive adequacy, prior sensitivity, the reliability of the leave-one-out comparisons and the agreement of two readings where the design offers them are gates, and an estimand that fails one is reported as not reportable, and a branch with fewer than ten unambiguous sites as not identified, neither of which is a null result. \autoref{sec:appBayes} states the gates, the sampler settings and how the context truncation enters each comparison.
 \endgroup
 
 \input{tables/bayesModels.tex}
 
 \subsection{Models and estimands}\label{sec:models}
-Bayesian inference represents uncertainty about unknown quantities through probability distributions and updates prior beliefs when data are observed\autocite{murphyProbabilisticMachineLearning2023}. It suits this study because the hypotheses concern the size of an effect and the uncertainty about it, which a posterior quantifies directly against thresholds declared in advance. Every effect prior is centred on no effect and its scale is varied over the sensitivity ladder $\{0.25,0.5,1.0\}$, so that a conclusion resting on the prior rather than on the data is detected as such. Five models carry the claims, one estimand each, as paired in \autoref{tab:bayesModels}; the priors and the role of every term are given in \autoref{sec:appBayes}.
+Bayesian inference represents uncertainty about unknown quantities through probability distributions and updates prior beliefs when data are observed\autocite{murphyProbabilisticMachineLearning2023}. It suits this study because the hypotheses concern the size of an effect and the uncertainty about it, which a posterior quantifies directly against thresholds declared in advance. Every effect prior is centred on no effect and its scale is halved and doubled in a sensitivity check, so that a conclusion resting on the prior rather than on the data is detected as such. Five models carry the claims, one estimand per claim, as paired in \autoref{tab:bayesModels}; the priors and the role of every term are given in \autoref{sec:appBayes}.
+
+\input{tables/bayesDecisions.tex}
 
 \begingroup
 \let\subsubsection\paragraph
@@ -77,7 +79,7 @@ y_i \sim \text{Student-}t_4(\mu_i,\ \sigma),
 \qquad
 u_p \sim \mathcal{N}(0, \sigma_\phi),
 \end{equation}
-where the spread $\sigma_\phi$ is near zero when geometry alone sets the deficit, as $H2$ predicts. Where the population effect is itself indistinguishable from zero little remains for phase to move, so $H2$ is read conditionally on $H1$.
+where the eight offsets sum to zero and the spread $\sigma_\phi$ is near zero when geometry alone sets the deficit, as $H2$ predicts. Where the population effect is itself indistinguishable from zero little remains for phase to move, so $H2$ is read conditionally on that effect.
 
 \subsection*{Model D1, where the sites are (H3)}
 Both branches are read on the token collapse $z_g(f)$, the dispersion of the input-patch embeddings across the patches of one context, which is zero when consecutive patches are identical. Model~D1 regresses it on two labels marking whether a swept frequency lies on $\mathcal F_S$ or on $\mathcal F_P$,
@@ -87,7 +89,7 @@ Both branches are read on the token collapse $z_g(f)$, the dispersion of the inp
 \alpha_g + \theta_S \cdot \text{OnStrideGrid} + \theta_P \cdot \text{OnPatchGrid},\ \sigma
 \right),
 \end{equation}
-and $H3$ predicts both coefficients negative, with the two-label fit winning the leave-one-out comparison against each one-label alternative.
+and $H3$ predicts both coefficients negative, with the two-label fit winning the leave-one-out comparison against the one-label and no-label alternatives.
 
 \subsection*{Model D2, whether the sites move (H3a, H3b)}
 Dips on a grid fixed once and for all would satisfy \autoref{eq:d2sites} as well, so Model~D2 regresses the measured fundamental of each branch on the spacing $\Delta^F_g$ that branch predicts,
@@ -103,6 +105,5 @@ where $\kappa_F=1$ is the claim ($H3a$ for the stride branch, $H3b$ for the patc
 
 \subsection{Decisions and validation}\label{sec:decisions}
 
-Every threshold in \autoref{tab:bayesDecisions} is fixed before a posterior is inspected, and beside each rule the table records the probability that the rule already scores under the prior, so that a posterior counts as evidence only in so far as it has moved away from that value. A claim is supported when its rule reaches $0.95$, refuted when its support probability falls to $0.05$ or its equivalence rule reaches $0.95$, and otherwise inconclusive, a verdict in its own right. Interpretation is gated by three preregistered convergence diagnostics, and competing formulations are compared by leave-one-out cross-validation, with a difference within twice its standard error read as inconclusive. The stride branch reaches the identification gate of Model~D2 only across the six geometries with $S\nmid P$ taken together (\autoref{tab:branchSites}).
+Every threshold in \autoref{tab:bayesDecisions} is fixed before a posterior is inspected, and beside each rule the table records the probability that the rule already scores under the prior, so that a posterior counts as evidence only in so far as it has moved away from that value. A claim is supported when its rule reaches $0.95$, refuted when its support probability falls to $0.05$ or its equivalence rule reaches $0.95$, and otherwise inconclusive, a verdict in its own right. Convergence is judged by three pre-registered diagnostics, and competing formulations are compared by leave-one-out cross-validation, with a difference within twice its standard error read as inconclusive. The stride branch reaches the identification gate of Model~D2 only across the six geometries with $S\nmid P$ taken together (\autoref{tab:branchSites}).
 
-\input{tables/bayesDecisions.tex}

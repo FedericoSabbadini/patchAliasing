@@ -96,16 +96,29 @@ twoside, % Two side traditional mode where headers and footers change between od
 \renewcommand{\bottomfraction}{0.6}
 \renewcommand{\dbltopfraction}{0.9}
 \renewcommand{\textfraction}{0.07}
-\renewcommand{\floatpagefraction}{0.75}
-\renewcommand{\dblfloatpagefraction}{0.75}
+\renewcommand{\floatpagefraction}{0.4}
+\renewcommand{\dblfloatpagefraction}{0.4}
 \setcounter{topnumber}{3}
 \setcounter{bottomnumber}{2}
 \setcounter{totalnumber}{5}
 \setcounter{dbltopnumber}{3}
 
+% A float page, one holding floats and no text, centres its content vertically.
+\makeatletter
+\setlength{\@fptop}{0pt plus 1fil}\setlength{\@fpsep}{12pt plus 2fil}\setlength{\@fpbot}{0pt plus 1fil}
+\setlength{\@dblfptop}{0pt plus 1fil}\setlength{\@dblfpsep}{12pt plus 2fil}\setlength{\@dblfpbot}{0pt plus 1fil}
+\makeatother
+
 % Float-heavy pages were being justified to full height by stretching the glue between
 % a top float and the text under it, which opened gaps mid-page. Let short pages end short.
 \raggedbottom
+
+% At the end of a section block or appendix every deferred float is flushed onto float pages,
+% which are vertically centred, instead of being set as a lone top float on a text page.
+\newcommand{\flushfloatpages}{%
+  \renewcommand{\floatpagefraction}{0.01}\renewcommand{\dblfloatpagefraction}{0.01}%
+  \clearpage
+  \renewcommand{\floatpagefraction}{0.4}\renewcommand{\dblfloatpagefraction}{0.4}}
 
 \runninghead{Frequency Information Degeneracies in Chronos-Bolt-Tiny Learned Representation} % A shortened article title to appear in the running head, leave this command empty for no running head
 
@@ -167,42 +180,42 @@ twoside, % Two side traditional mode where headers and footers change between od
 \section{Conclusions}\label{sec:conclusions}
 \input{sections/7_conclusion.tex}
 
-\clearpage
+\flushfloatpages
 \printbibliography[]
 
 \setcounter{secnumdepth}{0} % appendices and their subdivisions stay unnumbered
 
-\clearpage
+\flushfloatpages
 \appendixsection{Ontology of the Photovoltaic Application Domain}{sec:appOntology}
 \begingroup \let\section\subsection \let\subsection\subsubsection
 \input{sections/A_ontology_appendix.tex}
 \endgroup
 
-\clearpage
+\flushfloatpages
 \appendixsection{Chronos-Bolt-Tiny Retraining Procedure}{sec:appRetraining}
 \input{sections/B_retraining_appendix.tex}
 
-\clearpage
+\flushfloatpages
 \appendixsection{Light TSMixup}{sec:appTSMixup}
 \input{sections/C_lighttsmixup_appendix.tex}
 
-\clearpage
+\flushfloatpages
 \appendixsection{KernelSynth}{sec:appKernelSynth}
 \input{sections/D_kernelsynth_appendix.tex}
 
-\clearpage
+\flushfloatpages
 \appendixsection{Bayesian Model Specifications}{sec:appBayes}
 \input{sections/E_bayesian_appendix.tex}
 
-\clearpage
+\flushfloatpages
 \appendixsection{The Exploratory Frequency Sweep}{sec:appSweep}
 \input{sections/F_sweep_appendix.tex}
 
-\clearpage
+\flushfloatpages
 \appendixsection{Decomposition of Generated Signals}{sec:appDecomp}
 \input{sections/G_decomposition_appendix.tex}
 
-\clearpage
+\flushfloatpages
 \appendixsection{The Photovoltaic Series}{sec:appSolar}
 \input{sections/H_solar_appendix.tex}
 

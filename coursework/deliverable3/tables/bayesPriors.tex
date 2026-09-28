@@ -9,10 +9,10 @@
         A    & $\delta_O$                      & $\text{Student-}t_4(0,0.5)$      & slope in $\widetilde O_c$, the centred overlap; one unit $=0.5$ of $O$ \\
         A    & $\delta_P$                      & $\text{Student-}t_4(0,0.5)$      & slope in $\widetilde{\log P}_c$, the centred log patch size \\
         A, C & $\tau,\sigma_k,\sigma_b,\sigma$ & $\text{Half-Student-}t_4(0,0.5)$ & configuration, harmonic, background and residual scales \\
-        C    & $\sigma_\phi$                   & $\text{Half-}\mathcal N(0,0.25)$ & spread of the eight per-phase offsets \\
-        B    & $\alpha_0$                      & $\mathcal N(\log \bar y, 1)$     & baseline log codelength \\
+        C    & $\sigma_\phi$                   & $\text{Half-}\mathcal N(0,0.25)$ & scale of the eight per-phase offsets \\
+        B    & $\alpha_0$                      & $\mathcal N(\log \bar L, 1)$     & baseline log codelength, centred on the log of the mean codelength $\bar L$ \\
         B    & $\theta_{\mathrm{lock}}$        & $\mathcal N(0,0.5)$              & log codelength expansion at a lock \\
-        B    & $r$                             & $\text{Gamma}(2,0.1)$            & Gamma shape (dispersion) \\
+        B    & $r$                             & $\text{Gamma}(2,0.1)$            & Gamma shape (dispersion); prior in shape and rate \\
         B    & $\sigma_{st},\sigma_{geo}$      & $\text{Half-}\mathcal N(0,1)$    & spread of the probe-stage and geometry offsets \\
         D1   & $\alpha_g,\theta_S,\theta_P$    & $\mathcal N(0,1)$                & off-grid level and labels for deterministic token-collapse grids \\
         D1   & $\sigma$                        & $\text{Half-}\mathcal N(0,1)$    & residual scale of $\log z_g(f)$ \\
@@ -20,6 +20,6 @@
         D2   & $\sigma_F$                      & $\text{Half-}\mathcal N(0,5)$\,Hz & scatter beyond the sweep-resolution floor $\Delta f$ \\
         \bottomrule
     \end{tabular}
-\caption{Every parameter with its prior and its role. The effect priors use reference values corresponding to no directional effect, and their scales are varied over the sensitivity ladder stated in the text. A posterior that remains similar to its prior indicates limited updating under the observed data; it is not, by itself, evidence that an effect is absent. Support or refutation instead requires the corresponding decision rule in \autoref{tab:bayesDecisions} and a fit that passes the preregistered diagnostics.}
+\caption{Every parameter with its prior and its role. The effect priors use reference values corresponding to no directional effect, and their scales are varied over the sensitivity ladder stated in the text. A posterior that remains similar to its prior indicates limited updating under the observed data; it is not, by itself, evidence that an effect is absent. Support or refutation instead requires the corresponding decision rule in \autoref{tab:bayesDecisions} and a fit that passes the pre-registered diagnostics.}
     \label{tab:bayesPriors}
 \end{table}

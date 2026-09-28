@@ -1,20 +1,20 @@
 \begin{table*}[!htbp]
     \centering
     \footnotesize
-    \setlength{\tabcolsep}{3pt}
-    \begin{tabular}{@{}llrrrccccccclp{2.3cm}@{}}
+    \setlength{\tabcolsep}{2.6pt}
+    \begin{tabular}{@{}llrrrcccccccll@{}}
         \toprule
         \textbf{Claim} & \textbf{Model} & $\max\hat R$ & \textbf{min ESS} & \textbf{Div.} & \textbf{Conv.} & \textbf{Recov.} & \textbf{PPC} & \textbf{Sens.} & \textbf{LOO} & \textbf{D2} & \textbf{Net} & \textbf{Verdict} & \textbf{Decided by} \\
         \midrule
-        $H1$ behav. & A & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & -- & -- & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} \\
-        $M1$ & A$'$ & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & -- & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} \\
-        $H1$ repr. & B & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & -- & -- & -- & \textcolor{red}{?} & \textcolor{red}{?} \\
-        $H2$ & C & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & -- & -- & -- & \textcolor{red}{?} & \textcolor{red}{?} \\
-        $H3$ location & D1 & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & -- & -- & \textcolor{red}{?} & \textcolor{red}{?} \\
-        $H3a$ & D2 & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & -- & \textcolor{red}{?} & -- & \textcolor{red}{?} & \textcolor{red}{?} \\
-        $H3b$ & D2 & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & \textcolor{red}{?} & -- & \textcolor{red}{?} & -- & \textcolor{red}{?} & \textcolor{red}{?} \\
+        $H1$ behav. & A & 1.004 & 4637 & 0 & \checkmark & \textbf{fail} & \textbf{fail} & \checkmark & -- & -- & \checkmark & not reportable & PPC, Recov. \\
+        $M1$ & A$'$ & 1.004 & 4490 & 0 & \checkmark & \textbf{fail} & \textbf{fail} & \checkmark & \checkmark & -- & \checkmark & not reportable & PPC, Recov. \\
+        $H1$ repr. & B & 1.003 & 2724 & 0 & \checkmark & \textbf{fail} & \textbf{fail} & \checkmark & -- & -- & -- & not reportable & PPC, Recov. \\
+        $H2$ & C & 1.004 & 2457 & 0 & \checkmark & \textbf{fail} & \textbf{fail} & \checkmark & -- & -- & -- & not reportable & PPC, Recov. \\
+        $H3$ location & D1 & 1.002 & 4935 & 0 & \checkmark & \checkmark & \textbf{fail} & \checkmark & \checkmark & -- & -- & not reportable & PPC \\
+        $H3a$ & D2 & 1.003 & 1751 & 0 & \checkmark & \checkmark & \textbf{fail} & \checkmark & -- & \checkmark & -- & not reportable & PPC \\
+        $H3b$ & D2 & 1.002 & 3214 & 0 & \checkmark & \textbf{fail} & \textbf{fail} & \checkmark & -- & \textbf{fail} & -- & not identified & 0 of 10 sites \\
         \bottomrule
     \end{tabular}
-\caption{Convergence and gates of every claim. Convergence columns give the worst value over every fit the claim is read from ($\hat R<1.01$, bulk and tail effective sample size, ESS, $>1000$, no divergences); PPC is the posterior predictive check and Recov.\ the parameter recovery; each gate is shown on its own, and the last column names the condition that set the verdict. A claim that fails any gate is not reportable, which is not a null result; -- marks a gate that does not apply; Net is Model~A refitted net of the background-only forecast. \textcolor{red}{Placeholder: the notebook writes this table, with its values, at the end of the full run.}}
+\caption{Convergence and gates of every claim in the final run. Convergence columns give the worst value over every fit the claim is read from ($\hat R<1.01$, bulk and tail effective sample size, ESS, $>1000$, no divergences); Recov.\ is the parameter recovery, PPC the posterior predictive check, Sens.\ the prior sensitivity, LOO the reliability of the leave-one-out comparison where the rule contains one, D2 the agreement of the two Model~D2 readings and Net that of Model~A with its refit net of the background-only forecast. Each gate is shown on its own and the last column names the condition that set the verdict, the failed gates or, for $H3b$, the unambiguous patch-only sites against the identification bar; a claim that fails any gate is not reportable, which is not a null result, and -- marks a gate that does not apply. The estimates behind each verdict are in \autoref{tab:bayesEstimates}.}
     \label{tab:bayesGates}
 \end{table*}
