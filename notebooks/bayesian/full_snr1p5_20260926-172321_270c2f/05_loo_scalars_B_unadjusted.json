@@ -1,0 +1,12 @@
+{
+  "label": "B_unadjusted",
+  "elpd_loo": -30530.04288370694,
+  "se": 80.14898324717285,
+  "p_loo": 4.753516584325553,
+  "n_samples": 8000,
+  "n_obs": 5830,
+  "good_k": 0.7,
+  "max_pareto_k": 0.002495812625425433,
+  "warning": false,
+  "reliable": true
+}

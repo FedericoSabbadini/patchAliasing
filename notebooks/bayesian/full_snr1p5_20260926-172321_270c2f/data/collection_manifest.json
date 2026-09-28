@@ -1,0 +1,1628 @@
+{
+  "created_utc": "2026-09-26T17:23:53.261508+00:00",
+  "design": {
+    "checkpoints": {
+      "p16-s12": {
+        "geometry": {
+          "P": 16,
+          "S": 12
+        },
+        "identity_sha256": "a6850a755a05afe1b2a7cf384634d61e1f1f11727ce905dad4d95fb021365c54",
+        "repo": "federicosabbadini/chronos-bolt-patch-sweep",
+        "revision": "230ea28278a3c60621964b920e9778c0ba73337e",
+        "source": "huggingface",
+        "subfolder": "p16-s12-seed42"
+      },
+      "p16-s16": {
+        "geometry": {
+          "P": 16,
+          "S": 16
+        },
+        "identity_sha256": "eb3006c11e560a5146b7a420415da1ad2632417a75d59b0eee7fdc7ea1d16237",
+        "repo": "federicosabbadini/chronos-bolt-patch-sweep",
+        "revision": "230ea28278a3c60621964b920e9778c0ba73337e",
+        "source": "huggingface",
+        "subfolder": "p16-s16-seed42"
+      },
+      "p16-s8": {
+        "geometry": {
+          "P": 16,
+          "S": 8
+        },
+        "identity_sha256": "c512ebd47cabf9aa2726464124589df4bb47124d03f32060548d39caad63efe8",
+        "repo": "federicosabbadini/chronos-bolt-patch-sweep",
+        "revision": "230ea28278a3c60621964b920e9778c0ba73337e",
+        "source": "huggingface",
+        "subfolder": "p16-s8-seed42"
+      },
+      "p24-s12": {
+        "geometry": {
+          "P": 24,
+          "S": 12
+        },
+        "identity_sha256": "7b90cd7fcdecbb4b9d4dc1d8ee2d01ca8c8a7dcc2696e7e2a6f4cc4c8d80ea51",
+        "repo": "federicosabbadini/chronos-bolt-patch-sweep",
+        "revision": "230ea28278a3c60621964b920e9778c0ba73337e",
+        "source": "huggingface",
+        "subfolder": "p24-s12-seed42"
+      },
+      "p24-s16": {
+        "geometry": {
+          "P": 24,
+          "S": 16
+        },
+        "identity_sha256": "a564791d45511c5939765cee3a5dcb1c416aec2b0b10bd2f135094b8deecbb46",
+        "repo": "federicosabbadini/chronos-bolt-patch-sweep",
+        "revision": "230ea28278a3c60621964b920e9778c0ba73337e",
+        "source": "huggingface",
+        "subfolder": "p24-s16-seed42"
+      },
+      "p24-s20": {
+        "geometry": {
+          "P": 24,
+          "S": 20
+        },
+        "identity_sha256": "a5101b5ede96855a7e0e8d8669750e131a700e2270b6cbb7218fedcb0d9ac890",
+        "repo": "federicosabbadini/chronos-bolt-patch-sweep",
+        "revision": "230ea28278a3c60621964b920e9778c0ba73337e",
+        "source": "huggingface",
+        "subfolder": "p24-s20-seed42"
+      },
+      "p24-s24": {
+        "geometry": {
+          "P": 24,
+          "S": 24
+        },
+        "identity_sha256": "b7a30a68413728e9d43aec4169bcdf72e1eba3e316665f5109c3321589bf6e1e",
+        "repo": "federicosabbadini/chronos-bolt-patch-sweep",
+        "revision": "230ea28278a3c60621964b920e9778c0ba73337e",
+        "source": "huggingface",
+        "subfolder": "p24-s24-seed42"
+      },
+      "p24-s8": {
+        "geometry": {
+          "P": 24,
+          "S": 8
+        },
+        "identity_sha256": "f9944f63e3a2db3a2a62d317bbe009e21e404d0a7c328a08018afb4ca52357a2",
+        "repo": "federicosabbadini/chronos-bolt-patch-sweep",
+        "revision": "230ea28278a3c60621964b920e9778c0ba73337e",
+        "source": "huggingface",
+        "subfolder": "p24-s8-seed42"
+      },
+      "p32-s12": {
+        "geometry": {
+          "P": 32,
+          "S": 12
+        },
+        "identity_sha256": "679e56f2f038caf0dc862c835554fb790da9053ed3e2c371969b9866be43bb89",
+        "repo": "federicosabbadini/chronos-bolt-patch-sweep",
+        "revision": "230ea28278a3c60621964b920e9778c0ba73337e",
+        "source": "huggingface",
+        "subfolder": "p32-s12-seed42"
+      },
+      "p32-s16": {
+        "geometry": {
+          "P": 32,
+          "S": 16
+        },
+        "identity_sha256": "40384515c1d1ee03ec19420ec086b4fb1a3bc92e9b8570da0ce67888f4ba4280",
+        "repo": "federicosabbadini/chronos-bolt-patch-sweep",
+        "revision": "230ea28278a3c60621964b920e9778c0ba73337e",
+        "source": "huggingface",
+        "subfolder": "p32-s16-seed42"
+      },
+      "p32-s20": {
+        "geometry": {
+          "P": 32,
+          "S": 20
+        },
+        "identity_sha256": "33325a67c34c4691a5d66b4f83c6721f0977c4a76a823bb5d5c5cf5c66ba2be4",
+        "repo": "federicosabbadini/chronos-bolt-patch-sweep",
+        "revision": "230ea28278a3c60621964b920e9778c0ba73337e",
+        "source": "huggingface",
+        "subfolder": "p32-s20-seed42"
+      },
+      "p32-s24": {
+        "geometry": {
+          "P": 32,
+          "S": 24
+        },
+        "identity_sha256": "5c4bdbdc1b1db7cff8fe318f0883d4d5961afe337e7e044572559c165fd892bb",
+        "repo": "federicosabbadini/chronos-bolt-patch-sweep",
+        "revision": "230ea28278a3c60621964b920e9778c0ba73337e",
+        "source": "huggingface",
+        "subfolder": "p32-s24-seed42"
+      },
+      "p32-s32": {
+        "geometry": {
+          "P": 32,
+          "S": 32
+        },
+        "identity_sha256": "21a7dca436800d6d387bf1f59d11b5991092d0645b5fdf318a8b997b4b9578cc",
+        "repo": "federicosabbadini/chronos-bolt-patch-sweep",
+        "revision": "230ea28278a3c60621964b920e9778c0ba73337e",
+        "source": "huggingface",
+        "subfolder": "p32-s32-seed42"
+      },
+      "p32-s8": {
+        "geometry": {
+          "P": 32,
+          "S": 8
+        },
+        "identity_sha256": "b67fc8d2bd91ec6a64d66493e20c8b12fc5cf169b83565b798f21da5abd9e437",
+        "repo": "federicosabbadini/chronos-bolt-patch-sweep",
+        "revision": "230ea28278a3c60621964b920e9778c0ba73337e",
+        "source": "huggingface",
+        "subfolder": "p32-s8-seed42"
+      },
+      "p8-s8": {
+        "geometry": {
+          "P": 8,
+          "S": 8
+        },
+        "identity_sha256": "4ae55f9a706e8d2a0da5459d23f3bdb2f101a4cf6ebc9bd80d0e4558f0374a96",
+        "repo": "federicosabbadini/chronos-bolt-patch-sweep",
+        "revision": "230ea28278a3c60621964b920e9778c0ba73337e",
+        "source": "huggingface",
+        "subfolder": "p8-s8-seed42"
+      }
+    },
+    "config": {
+      "band_tasks": true,
+      "bt_n_phase": 4,
+      "bt_random_init": true,
+      "bt_step": 2.0,
+      "collapse_modes": [
+        "pure",
+        "tsmixup",
+        "kernelsynth"
+      ],
+      "collapse_reps": 3,
+      "collapse_step": 1.0,
+      "fhat_tol_hz": 1.0,
+      "fhat_topk": 3,
+      "generators": [
+        "tsmixup",
+        "kernelsynth"
+      ],
+      "mdl_delta_f": 1.0,
+      "mdl_n_bg": 10,
+      "mdl_n_per_class": 40,
+      "mdl_n_phase": 10,
+      "min_d2_sites": 10,
+      "min_sites_per_geometry": 2,
+      "n_bg": 100,
+      "n_phase_contrast": 10,
+      "null_arm": true,
+      "seed": 42,
+      "site_ambiguity_hz": 0.25,
+      "site_assignment_tol_hz": 1.5,
+      "site_merge_tol_hz": 1.5,
+      "smoke": false,
+      "tone_snr": 1.5
+    },
+    "deliverable": "coursework/deliverable3",
+    "manifest_schema_version": 1,
+    "package_versions": {
+      "chronos-forecasting": "2.3.2",
+      "numpy": "2.1.3",
+      "pandas": "2.2.3",
+      "pyarrow": "23.0.1",
+      "torch": "2.11.0+cpu"
+    },
+    "planned_models": [
+      "p8-s8",
+      "p16-s8",
+      "p16-s12",
+      "p16-s16",
+      "p24-s8",
+      "p24-s12",
+      "p24-s16",
+      "p24-s20",
+      "p24-s24",
+      "p32-s8",
+      "p32-s12",
+      "p32-s16",
+      "p32-s20",
+      "p32-s24",
+      "p32-s32"
+    ],
+    "reportable": true,
+    "source_sha256": {
+      "notebooks/data/synthetic/generators/kernelsynth_generator.py": "ce12439bc3a9a467d135dd436a43bd5d04ba03d5a42672e589d91f9441ce59b6",
+      "notebooks/support_scripts/collect.py": "bbc0336cd5af28c470d71180a3659991bce8745fda6a78e9386e0de220f9d542",
+      "notebooks/support_scripts/model_loader.py": "2917d0967ab842113fc1465a15ecefbb331b77c238d23554463dfc343efb5068",
+      "notebooks/support_scripts/probe_lib.py": "e9b064faa6075b3f28c42cfec9f248339094bc725ba3c32bb73a53c0d9bd50ae"
+    }
+  },
+  "design_check": {
+    "d2_identification": {
+      "patch": {
+        "identified": false,
+        "unambiguous_sites": 0
+      },
+      "stride": {
+        "identified": true,
+        "unambiguous_sites": 21
+      }
+    },
+    "expected_models": [
+      "p16-s12",
+      "p16-s16",
+      "p16-s8",
+      "p24-s12",
+      "p24-s16",
+      "p24-s20",
+      "p24-s24",
+      "p24-s8",
+      "p32-s12",
+      "p32-s16",
+      "p32-s20",
+      "p32-s24",
+      "p32-s32",
+      "p32-s8",
+      "p8-s8"
+    ],
+    "failures": [],
+    "ok": true,
+    "response": "contrast"
+  },
+  "design_fingerprint": "db3cb5d008c5c094e7dc4d3916dda4c8e1ea4e151ba6b03b03634dcd24bf0688",
+  "merged": {
+    "collapse": {
+      "file": "02_collapse.parquet",
+      "rows": 35775,
+      "sha256": "3b78eaadf0159113adcc31d95e9e8dadf434ea7a5e582aa4016c60f58f2c0628"
+    },
+    "contrasts": {
+      "file": "02_contrasts.parquet",
+      "rows": 1113000,
+      "sha256": "90173d63e68a070e1a1bfa84eecc7a96a7baa1e31b6697eba998048ecec4cd57"
+    },
+    "mdl_bandtasks": {
+      "file": "02_mdl_bandtasks.parquet",
+      "rows": 1050,
+      "sha256": "4643c86a076ef669edf4cbf69cf9031e2a470eb68765ea3f51459a0d4ce15053"
+    },
+    "mdl_cells": {
+      "file": "02_mdl_cells.parquet",
+      "rows": 5830,
+      "sha256": "aa79da160fe22ad367a0292250b14337911f979c9db9c16e190ac2a056f81bcc"
+    },
+    "sites": {
+      "file": "02_sites.parquet",
+      "rows": 360,
+      "sha256": "edde6f0766866108d32362da2c5599904df0cf743f7e69eda2dda7bdc773c9a0"
+    }
+  },
+  "schema_version": 1,
+  "sessions": [
+    {
+      "package_versions": {
+        "chronos-forecasting": "2.3.2",
+        "numpy": "2.1.3",
+        "pandas": "2.2.3",
+        "pyarrow": "23.0.1",
+        "torch": "2.11.0+cpu"
+      },
+      "started_utc": "2026-09-26T17:23:53.343827+00:00"
+    }
+  ],
+  "shards": {
+    "collapse__p16-s12": {
+      "checkpoint_identity_sha256": "a6850a755a05afe1b2a7cf384634d61e1f1f11727ce905dad4d95fb021365c54",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "mode",
+        "rep",
+        "f",
+        "z",
+        "z_norm"
+      ],
+      "file": "raw/collapse__p16-s12.parquet",
+      "rows": 2385,
+      "sha256": "ee9fc759770e7735a3a266ed3df884bdf0d8f5ddae035c7484c97c4e87b0836c"
+    },
+    "collapse__p16-s16": {
+      "checkpoint_identity_sha256": "eb3006c11e560a5146b7a420415da1ad2632417a75d59b0eee7fdc7ea1d16237",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "mode",
+        "rep",
+        "f",
+        "z",
+        "z_norm"
+      ],
+      "file": "raw/collapse__p16-s16.parquet",
+      "rows": 2385,
+      "sha256": "ece1224e37305986b1016b7e7ffcabeda95308de8ce0fdf0923019c8ffb85ec1"
+    },
+    "collapse__p16-s8": {
+      "checkpoint_identity_sha256": "c512ebd47cabf9aa2726464124589df4bb47124d03f32060548d39caad63efe8",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "mode",
+        "rep",
+        "f",
+        "z",
+        "z_norm"
+      ],
+      "file": "raw/collapse__p16-s8.parquet",
+      "rows": 2385,
+      "sha256": "735b8ab0b62423d98ed1154f1d85548adae7501b1f2e12083180490e1e364dec"
+    },
+    "collapse__p24-s12": {
+      "checkpoint_identity_sha256": "7b90cd7fcdecbb4b9d4dc1d8ee2d01ca8c8a7dcc2696e7e2a6f4cc4c8d80ea51",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "mode",
+        "rep",
+        "f",
+        "z",
+        "z_norm"
+      ],
+      "file": "raw/collapse__p24-s12.parquet",
+      "rows": 2385,
+      "sha256": "146eaaa3385848fd761195d1d0f95cf578668a67375a4b6886a9d5bae6b736d1"
+    },
+    "collapse__p24-s16": {
+      "checkpoint_identity_sha256": "a564791d45511c5939765cee3a5dcb1c416aec2b0b10bd2f135094b8deecbb46",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "mode",
+        "rep",
+        "f",
+        "z",
+        "z_norm"
+      ],
+      "file": "raw/collapse__p24-s16.parquet",
+      "rows": 2385,
+      "sha256": "908c024bcf5b2378312cb22479a3f9e918a27ecf16a014ae1134b20073d1466f"
+    },
+    "collapse__p24-s20": {
+      "checkpoint_identity_sha256": "a5101b5ede96855a7e0e8d8669750e131a700e2270b6cbb7218fedcb0d9ac890",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "mode",
+        "rep",
+        "f",
+        "z",
+        "z_norm"
+      ],
+      "file": "raw/collapse__p24-s20.parquet",
+      "rows": 2385,
+      "sha256": "c35fda0df52ad0b1ddbea04412ddc2e86543258307ee5ef65dd4e5ad0186d59a"
+    },
+    "collapse__p24-s24": {
+      "checkpoint_identity_sha256": "b7a30a68413728e9d43aec4169bcdf72e1eba3e316665f5109c3321589bf6e1e",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "mode",
+        "rep",
+        "f",
+        "z",
+        "z_norm"
+      ],
+      "file": "raw/collapse__p24-s24.parquet",
+      "rows": 2385,
+      "sha256": "9eb9a6ba4d284d98174ad3c8104f4e499b83ca717df3ca314b7a741614b2514a"
+    },
+    "collapse__p24-s8": {
+      "checkpoint_identity_sha256": "f9944f63e3a2db3a2a62d317bbe009e21e404d0a7c328a08018afb4ca52357a2",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "mode",
+        "rep",
+        "f",
+        "z",
+        "z_norm"
+      ],
+      "file": "raw/collapse__p24-s8.parquet",
+      "rows": 2385,
+      "sha256": "98a639e4ff53bb69a7fb567d5984ad647673b6e37dadf4eac13ba4cd66fde3be"
+    },
+    "collapse__p32-s12": {
+      "checkpoint_identity_sha256": "679e56f2f038caf0dc862c835554fb790da9053ed3e2c371969b9866be43bb89",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "mode",
+        "rep",
+        "f",
+        "z",
+        "z_norm"
+      ],
+      "file": "raw/collapse__p32-s12.parquet",
+      "rows": 2385,
+      "sha256": "affc44e06284d39e55b6a0233ac7ce72796ed9456773c29404b07064d44d081f"
+    },
+    "collapse__p32-s16": {
+      "checkpoint_identity_sha256": "40384515c1d1ee03ec19420ec086b4fb1a3bc92e9b8570da0ce67888f4ba4280",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "mode",
+        "rep",
+        "f",
+        "z",
+        "z_norm"
+      ],
+      "file": "raw/collapse__p32-s16.parquet",
+      "rows": 2385,
+      "sha256": "ae7eb5443ac06af617d9b3125e9ae5ffe0332ca988d63768c6ae742db487938e"
+    },
+    "collapse__p32-s20": {
+      "checkpoint_identity_sha256": "33325a67c34c4691a5d66b4f83c6721f0977c4a76a823bb5d5c5cf5c66ba2be4",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "mode",
+        "rep",
+        "f",
+        "z",
+        "z_norm"
+      ],
+      "file": "raw/collapse__p32-s20.parquet",
+      "rows": 2385,
+      "sha256": "18927caead3f42a5cc3ec3b03b8d510df45314897d350b2908bc9d8e2e7f99aa"
+    },
+    "collapse__p32-s24": {
+      "checkpoint_identity_sha256": "5c4bdbdc1b1db7cff8fe318f0883d4d5961afe337e7e044572559c165fd892bb",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "mode",
+        "rep",
+        "f",
+        "z",
+        "z_norm"
+      ],
+      "file": "raw/collapse__p32-s24.parquet",
+      "rows": 2385,
+      "sha256": "fb0a5ca5e70aa95919d4737b3d1241ac23c0a1c09cf9788a0fc7cdd77e10703e"
+    },
+    "collapse__p32-s32": {
+      "checkpoint_identity_sha256": "21a7dca436800d6d387bf1f59d11b5991092d0645b5fdf318a8b997b4b9578cc",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "mode",
+        "rep",
+        "f",
+        "z",
+        "z_norm"
+      ],
+      "file": "raw/collapse__p32-s32.parquet",
+      "rows": 2385,
+      "sha256": "b84e650636e0c48ae729bb050d3c645a8c8c22468a20f361ab5fdaa51f1d7940"
+    },
+    "collapse__p32-s8": {
+      "checkpoint_identity_sha256": "b67fc8d2bd91ec6a64d66493e20c8b12fc5cf169b83565b798f21da5abd9e437",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "mode",
+        "rep",
+        "f",
+        "z",
+        "z_norm"
+      ],
+      "file": "raw/collapse__p32-s8.parquet",
+      "rows": 2385,
+      "sha256": "af9664182769ac0fd2917cfb9bd7fa311779b89493640455a11bd778051581cf"
+    },
+    "collapse__p8-s8": {
+      "checkpoint_identity_sha256": "4ae55f9a706e8d2a0da5459d23f3bdb2f101a4cf6ebc9bd80d0e4558f0374a96",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "mode",
+        "rep",
+        "f",
+        "z",
+        "z_norm"
+      ],
+      "file": "raw/collapse__p8-s8.parquet",
+      "rows": 2385,
+      "sha256": "0c67738c95547170e4e950156dea4b4965e219e0743b7b82c6bf42b78bac8558"
+    },
+    "contrasts__p16-s12": {
+      "checkpoint_identity_sha256": "a6850a755a05afe1b2a7cf384634d61e1f1f11727ce905dad4d95fb021365c54",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "overlap",
+        "generator",
+        "bg_id",
+        "f_lock",
+        "family",
+        "cpp",
+        "delta",
+        "phase_idx",
+        "phase",
+        "role",
+        "f",
+        "is_lock",
+        "a_pred",
+        "a_true",
+        "amp_injected",
+        "R",
+        "dphase",
+        "f_hat",
+        "h",
+        "h_truth",
+        "a_null",
+        "a_net"
+      ],
+      "file": "raw/contrasts__p16-s12.parquet",
+      "rows": 58200,
+      "sha256": "50317e29509fc5283121f6ee1ace3dd28da18116c9634575c38397c70ad9b6c0"
+    },
+    "contrasts__p16-s16": {
+      "checkpoint_identity_sha256": "eb3006c11e560a5146b7a420415da1ad2632417a75d59b0eee7fdc7ea1d16237",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "overlap",
+        "generator",
+        "bg_id",
+        "f_lock",
+        "family",
+        "cpp",
+        "delta",
+        "phase_idx",
+        "phase",
+        "role",
+        "f",
+        "is_lock",
+        "a_pred",
+        "a_true",
+        "amp_injected",
+        "R",
+        "dphase",
+        "f_hat",
+        "h",
+        "h_truth",
+        "a_null",
+        "a_net"
+      ],
+      "file": "raw/contrasts__p16-s16.parquet",
+      "rows": 34200,
+      "sha256": "b2cc02560d0c0a6d6f009fbcd503a99a71b4e41ade3f1803c6be0628b499ca71"
+    },
+    "contrasts__p16-s8": {
+      "checkpoint_identity_sha256": "c512ebd47cabf9aa2726464124589df4bb47124d03f32060548d39caad63efe8",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "overlap",
+        "generator",
+        "bg_id",
+        "f_lock",
+        "family",
+        "cpp",
+        "delta",
+        "phase_idx",
+        "phase",
+        "role",
+        "f",
+        "is_lock",
+        "a_pred",
+        "a_true",
+        "amp_injected",
+        "R",
+        "dphase",
+        "f_hat",
+        "h",
+        "h_truth",
+        "a_null",
+        "a_net"
+      ],
+      "file": "raw/contrasts__p16-s8.parquet",
+      "rows": 34200,
+      "sha256": "8e5b09e9db2a790997edd62a471b0a99f7039a35a742e3fe6d18164d1995feca"
+    },
+    "contrasts__p24-s12": {
+      "checkpoint_identity_sha256": "7b90cd7fcdecbb4b9d4dc1d8ee2d01ca8c8a7dcc2696e7e2a6f4cc4c8d80ea51",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "overlap",
+        "generator",
+        "bg_id",
+        "f_lock",
+        "family",
+        "cpp",
+        "delta",
+        "phase_idx",
+        "phase",
+        "role",
+        "f",
+        "is_lock",
+        "a_pred",
+        "a_true",
+        "amp_injected",
+        "R",
+        "dphase",
+        "f_hat",
+        "h",
+        "h_truth",
+        "a_null",
+        "a_net"
+      ],
+      "file": "raw/contrasts__p24-s12.parquet",
+      "rows": 58200,
+      "sha256": "05102959459978b76ad05b10f6c85cb54e8409d168c54c83db468b6cf0d95836"
+    },
+    "contrasts__p24-s16": {
+      "checkpoint_identity_sha256": "a564791d45511c5939765cee3a5dcb1c416aec2b0b10bd2f135094b8deecbb46",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "overlap",
+        "generator",
+        "bg_id",
+        "f_lock",
+        "family",
+        "cpp",
+        "delta",
+        "phase_idx",
+        "phase",
+        "role",
+        "f",
+        "is_lock",
+        "a_pred",
+        "a_true",
+        "amp_injected",
+        "R",
+        "dphase",
+        "f_hat",
+        "h",
+        "h_truth",
+        "a_null",
+        "a_net"
+      ],
+      "file": "raw/contrasts__p24-s16.parquet",
+      "rows": 82200,
+      "sha256": "3063a9d0b48b2c4437e5056276176f76ac772d31ff48f83bef52f9c246b429a5"
+    },
+    "contrasts__p24-s20": {
+      "checkpoint_identity_sha256": "a5101b5ede96855a7e0e8d8669750e131a700e2270b6cbb7218fedcb0d9ac890",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "overlap",
+        "generator",
+        "bg_id",
+        "f_lock",
+        "family",
+        "cpp",
+        "delta",
+        "phase_idx",
+        "phase",
+        "role",
+        "f",
+        "is_lock",
+        "a_pred",
+        "a_true",
+        "amp_injected",
+        "R",
+        "dphase",
+        "f_hat",
+        "h",
+        "h_truth",
+        "a_null",
+        "a_net"
+      ],
+      "file": "raw/contrasts__p24-s20.parquet",
+      "rows": 106200,
+      "sha256": "5f6f467fdd8332db7c6897872fb05847adc092d5d024b23f7e83a4b426a667dc"
+    },
+    "contrasts__p24-s24": {
+      "checkpoint_identity_sha256": "b7a30a68413728e9d43aec4169bcdf72e1eba3e316665f5109c3321589bf6e1e",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "overlap",
+        "generator",
+        "bg_id",
+        "f_lock",
+        "family",
+        "cpp",
+        "delta",
+        "phase_idx",
+        "phase",
+        "role",
+        "f",
+        "is_lock",
+        "a_pred",
+        "a_true",
+        "amp_injected",
+        "R",
+        "dphase",
+        "f_hat",
+        "h",
+        "h_truth",
+        "a_null",
+        "a_net"
+      ],
+      "file": "raw/contrasts__p24-s24.parquet",
+      "rows": 58200,
+      "sha256": "a9292d8c9d069c3130c72912b343a5b75e5552e31f9039799a177712ad06e6b4"
+    },
+    "contrasts__p24-s8": {
+      "checkpoint_identity_sha256": "f9944f63e3a2db3a2a62d317bbe009e21e404d0a7c328a08018afb4ca52357a2",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "overlap",
+        "generator",
+        "bg_id",
+        "f_lock",
+        "family",
+        "cpp",
+        "delta",
+        "phase_idx",
+        "phase",
+        "role",
+        "f",
+        "is_lock",
+        "a_pred",
+        "a_true",
+        "amp_injected",
+        "R",
+        "dphase",
+        "f_hat",
+        "h",
+        "h_truth",
+        "a_null",
+        "a_net"
+      ],
+      "file": "raw/contrasts__p24-s8.parquet",
+      "rows": 58200,
+      "sha256": "e5ff015cc1182be34be025aa8e9e97cf510f2c7f9144d9b0527a9571613315cc"
+    },
+    "contrasts__p32-s12": {
+      "checkpoint_identity_sha256": "679e56f2f038caf0dc862c835554fb790da9053ed3e2c371969b9866be43bb89",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "overlap",
+        "generator",
+        "bg_id",
+        "f_lock",
+        "family",
+        "cpp",
+        "delta",
+        "phase_idx",
+        "phase",
+        "role",
+        "f",
+        "is_lock",
+        "a_pred",
+        "a_true",
+        "amp_injected",
+        "R",
+        "dphase",
+        "f_hat",
+        "h",
+        "h_truth",
+        "a_null",
+        "a_net"
+      ],
+      "file": "raw/contrasts__p32-s12.parquet",
+      "rows": 106200,
+      "sha256": "8d204f783c16e0431d0cf4c5921d2cb43cf544fa7b7480435c49f311727b259b"
+    },
+    "contrasts__p32-s16": {
+      "checkpoint_identity_sha256": "40384515c1d1ee03ec19420ec086b4fb1a3bc92e9b8570da0ce67888f4ba4280",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "overlap",
+        "generator",
+        "bg_id",
+        "f_lock",
+        "family",
+        "cpp",
+        "delta",
+        "phase_idx",
+        "phase",
+        "role",
+        "f",
+        "is_lock",
+        "a_pred",
+        "a_true",
+        "amp_injected",
+        "R",
+        "dphase",
+        "f_hat",
+        "h",
+        "h_truth",
+        "a_null",
+        "a_net"
+      ],
+      "file": "raw/contrasts__p32-s16.parquet",
+      "rows": 82200,
+      "sha256": "3f27ce38fb4bfb96f06eb408f152ec6579a791d19805b577d6d101f81be192dc"
+    },
+    "contrasts__p32-s20": {
+      "checkpoint_identity_sha256": "33325a67c34c4691a5d66b4f83c6721f0977c4a76a823bb5d5c5cf5c66ba2be4",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "overlap",
+        "generator",
+        "bg_id",
+        "f_lock",
+        "family",
+        "cpp",
+        "delta",
+        "phase_idx",
+        "phase",
+        "role",
+        "f",
+        "is_lock",
+        "a_pred",
+        "a_true",
+        "amp_injected",
+        "R",
+        "dphase",
+        "f_hat",
+        "h",
+        "h_truth",
+        "a_null",
+        "a_net"
+      ],
+      "file": "raw/contrasts__p32-s20.parquet",
+      "rows": 130200,
+      "sha256": "6959980c248afe9b2784f466226a6497ae0b672db9dd98da20ce2c338fd605b2"
+    },
+    "contrasts__p32-s24": {
+      "checkpoint_identity_sha256": "5c4bdbdc1b1db7cff8fe318f0883d4d5961afe337e7e044572559c165fd892bb",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "overlap",
+        "generator",
+        "bg_id",
+        "f_lock",
+        "family",
+        "cpp",
+        "delta",
+        "phase_idx",
+        "phase",
+        "role",
+        "f",
+        "is_lock",
+        "a_pred",
+        "a_true",
+        "amp_injected",
+        "R",
+        "dphase",
+        "f_hat",
+        "h",
+        "h_truth",
+        "a_null",
+        "a_net"
+      ],
+      "file": "raw/contrasts__p32-s24.parquet",
+      "rows": 130200,
+      "sha256": "a2f150dee3c1c3e241236d943f2ab1522c11758bb12bd5f8f48112de7708cec4"
+    },
+    "contrasts__p32-s32": {
+      "checkpoint_identity_sha256": "21a7dca436800d6d387bf1f59d11b5991092d0645b5fdf318a8b997b4b9578cc",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "overlap",
+        "generator",
+        "bg_id",
+        "f_lock",
+        "family",
+        "cpp",
+        "delta",
+        "phase_idx",
+        "phase",
+        "role",
+        "f",
+        "is_lock",
+        "a_pred",
+        "a_true",
+        "amp_injected",
+        "R",
+        "dphase",
+        "f_hat",
+        "h",
+        "h_truth",
+        "a_null",
+        "a_net"
+      ],
+      "file": "raw/contrasts__p32-s32.parquet",
+      "rows": 82200,
+      "sha256": "1c307a494a443663d1dff1e8006708b733e56d631abeb5e4197da5beff825603"
+    },
+    "contrasts__p32-s8": {
+      "checkpoint_identity_sha256": "b67fc8d2bd91ec6a64d66493e20c8b12fc5cf169b83565b798f21da5abd9e437",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "overlap",
+        "generator",
+        "bg_id",
+        "f_lock",
+        "family",
+        "cpp",
+        "delta",
+        "phase_idx",
+        "phase",
+        "role",
+        "f",
+        "is_lock",
+        "a_pred",
+        "a_true",
+        "amp_injected",
+        "R",
+        "dphase",
+        "f_hat",
+        "h",
+        "h_truth",
+        "a_null",
+        "a_net"
+      ],
+      "file": "raw/contrasts__p32-s8.parquet",
+      "rows": 82200,
+      "sha256": "940a94426679e60a269f31405d68975435bda3f2785c5a477133c72f016c2f1d"
+    },
+    "contrasts__p8-s8": {
+      "checkpoint_identity_sha256": "4ae55f9a706e8d2a0da5459d23f3bdb2f101a4cf6ebc9bd80d0e4558f0374a96",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "overlap",
+        "generator",
+        "bg_id",
+        "f_lock",
+        "family",
+        "cpp",
+        "delta",
+        "phase_idx",
+        "phase",
+        "role",
+        "f",
+        "is_lock",
+        "a_pred",
+        "a_true",
+        "amp_injected",
+        "R",
+        "dphase",
+        "f_hat",
+        "h",
+        "h_truth",
+        "a_null",
+        "a_net"
+      ],
+      "file": "raw/contrasts__p8-s8.parquet",
+      "rows": 10200,
+      "sha256": "6316f32c6769f94dfb1f050d32677508b17bfaaedc633f888ff5e9aaa49133e5"
+    },
+    "mdl_bandtasks__p16-s12": {
+      "checkpoint_identity_sha256": "a6850a755a05afe1b2a7cf384634d61e1f1f11727ce905dad4d95fb021365c54",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "stage",
+        "task",
+        "n",
+        "L_bits",
+        "SV",
+        "SV_shuffled",
+        "SV_random_init"
+      ],
+      "file": "raw/mdl_bandtasks__p16-s12.parquet",
+      "rows": 70,
+      "sha256": "e55f02f39074b2e570db4fc472c9d446135385f037892f8a4c7e2779f588f7ec"
+    },
+    "mdl_bandtasks__p16-s16": {
+      "checkpoint_identity_sha256": "eb3006c11e560a5146b7a420415da1ad2632417a75d59b0eee7fdc7ea1d16237",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "stage",
+        "task",
+        "n",
+        "L_bits",
+        "SV",
+        "SV_shuffled",
+        "SV_random_init"
+      ],
+      "file": "raw/mdl_bandtasks__p16-s16.parquet",
+      "rows": 70,
+      "sha256": "8e15e96729261cc59be99858cc33b43dcefd716b4d193833a59f74ff349bdc36"
+    },
+    "mdl_bandtasks__p16-s8": {
+      "checkpoint_identity_sha256": "c512ebd47cabf9aa2726464124589df4bb47124d03f32060548d39caad63efe8",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "stage",
+        "task",
+        "n",
+        "L_bits",
+        "SV",
+        "SV_shuffled",
+        "SV_random_init"
+      ],
+      "file": "raw/mdl_bandtasks__p16-s8.parquet",
+      "rows": 70,
+      "sha256": "697c29a8230c66adc13916c86cb2c04747cbac6d7c008dca26e78f1b5934678a"
+    },
+    "mdl_bandtasks__p24-s12": {
+      "checkpoint_identity_sha256": "7b90cd7fcdecbb4b9d4dc1d8ee2d01ca8c8a7dcc2696e7e2a6f4cc4c8d80ea51",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "stage",
+        "task",
+        "n",
+        "L_bits",
+        "SV",
+        "SV_shuffled",
+        "SV_random_init"
+      ],
+      "file": "raw/mdl_bandtasks__p24-s12.parquet",
+      "rows": 70,
+      "sha256": "217503e9f83328499cb3e7cfc05462fef2f0b1515329f8052be69644716fae40"
+    },
+    "mdl_bandtasks__p24-s16": {
+      "checkpoint_identity_sha256": "a564791d45511c5939765cee3a5dcb1c416aec2b0b10bd2f135094b8deecbb46",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "stage",
+        "task",
+        "n",
+        "L_bits",
+        "SV",
+        "SV_shuffled",
+        "SV_random_init"
+      ],
+      "file": "raw/mdl_bandtasks__p24-s16.parquet",
+      "rows": 70,
+      "sha256": "47faed944952b9cdd2ef7fd81bf9033105e7c159f6602f34bf94595dd551e3e7"
+    },
+    "mdl_bandtasks__p24-s20": {
+      "checkpoint_identity_sha256": "a5101b5ede96855a7e0e8d8669750e131a700e2270b6cbb7218fedcb0d9ac890",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "stage",
+        "task",
+        "n",
+        "L_bits",
+        "SV",
+        "SV_shuffled",
+        "SV_random_init"
+      ],
+      "file": "raw/mdl_bandtasks__p24-s20.parquet",
+      "rows": 70,
+      "sha256": "6fa602775c8c0e51df64078ca32adad187782370966c4b6837011d7f4abab457"
+    },
+    "mdl_bandtasks__p24-s24": {
+      "checkpoint_identity_sha256": "b7a30a68413728e9d43aec4169bcdf72e1eba3e316665f5109c3321589bf6e1e",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "stage",
+        "task",
+        "n",
+        "L_bits",
+        "SV",
+        "SV_shuffled",
+        "SV_random_init"
+      ],
+      "file": "raw/mdl_bandtasks__p24-s24.parquet",
+      "rows": 70,
+      "sha256": "3362d4a483d522c140c0251666524853e3ba27d6a86e6a318dc35737da4073c8"
+    },
+    "mdl_bandtasks__p24-s8": {
+      "checkpoint_identity_sha256": "f9944f63e3a2db3a2a62d317bbe009e21e404d0a7c328a08018afb4ca52357a2",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "stage",
+        "task",
+        "n",
+        "L_bits",
+        "SV",
+        "SV_shuffled",
+        "SV_random_init"
+      ],
+      "file": "raw/mdl_bandtasks__p24-s8.parquet",
+      "rows": 70,
+      "sha256": "b7a71d35edc0662ef6fb9fb07626fc9a8d93b2b63147ddfbce328b41776f44d0"
+    },
+    "mdl_bandtasks__p32-s12": {
+      "checkpoint_identity_sha256": "679e56f2f038caf0dc862c835554fb790da9053ed3e2c371969b9866be43bb89",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "stage",
+        "task",
+        "n",
+        "L_bits",
+        "SV",
+        "SV_shuffled",
+        "SV_random_init"
+      ],
+      "file": "raw/mdl_bandtasks__p32-s12.parquet",
+      "rows": 70,
+      "sha256": "c221cf80bc9c6d656302a4bca4be3767e2231228ea0b8fbda043e8d48735e5bc"
+    },
+    "mdl_bandtasks__p32-s16": {
+      "checkpoint_identity_sha256": "40384515c1d1ee03ec19420ec086b4fb1a3bc92e9b8570da0ce67888f4ba4280",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "stage",
+        "task",
+        "n",
+        "L_bits",
+        "SV",
+        "SV_shuffled",
+        "SV_random_init"
+      ],
+      "file": "raw/mdl_bandtasks__p32-s16.parquet",
+      "rows": 70,
+      "sha256": "718c34ab86eb6dadbf7dab8359f8b23213969cecd369419e0b0697f24da937a1"
+    },
+    "mdl_bandtasks__p32-s20": {
+      "checkpoint_identity_sha256": "33325a67c34c4691a5d66b4f83c6721f0977c4a76a823bb5d5c5cf5c66ba2be4",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "stage",
+        "task",
+        "n",
+        "L_bits",
+        "SV",
+        "SV_shuffled",
+        "SV_random_init"
+      ],
+      "file": "raw/mdl_bandtasks__p32-s20.parquet",
+      "rows": 70,
+      "sha256": "ec2eba0b4b6dcecd52d4beb22f00d61cb5b37e890307b1d431d6cb8680665374"
+    },
+    "mdl_bandtasks__p32-s24": {
+      "checkpoint_identity_sha256": "5c4bdbdc1b1db7cff8fe318f0883d4d5961afe337e7e044572559c165fd892bb",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "stage",
+        "task",
+        "n",
+        "L_bits",
+        "SV",
+        "SV_shuffled",
+        "SV_random_init"
+      ],
+      "file": "raw/mdl_bandtasks__p32-s24.parquet",
+      "rows": 70,
+      "sha256": "fb48997aeff3f49851fffbc28a286210c58ce40abc8e3e5b69eb28a8ce816095"
+    },
+    "mdl_bandtasks__p32-s32": {
+      "checkpoint_identity_sha256": "21a7dca436800d6d387bf1f59d11b5991092d0645b5fdf318a8b997b4b9578cc",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "stage",
+        "task",
+        "n",
+        "L_bits",
+        "SV",
+        "SV_shuffled",
+        "SV_random_init"
+      ],
+      "file": "raw/mdl_bandtasks__p32-s32.parquet",
+      "rows": 70,
+      "sha256": "95ea2ae7be500abf380f491534fdc618690e158312050ba19b812c8a6ffa0645"
+    },
+    "mdl_bandtasks__p32-s8": {
+      "checkpoint_identity_sha256": "b67fc8d2bd91ec6a64d66493e20c8b12fc5cf169b83565b798f21da5abd9e437",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "stage",
+        "task",
+        "n",
+        "L_bits",
+        "SV",
+        "SV_shuffled",
+        "SV_random_init"
+      ],
+      "file": "raw/mdl_bandtasks__p32-s8.parquet",
+      "rows": 70,
+      "sha256": "a1675ce545da3b767950500dc047386bb4a663f87baa2ffd5be744ae03441da2"
+    },
+    "mdl_bandtasks__p8-s8": {
+      "checkpoint_identity_sha256": "4ae55f9a706e8d2a0da5459d23f3bdb2f101a4cf6ebc9bd80d0e4558f0374a96",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "stage",
+        "task",
+        "n",
+        "L_bits",
+        "SV",
+        "SV_shuffled",
+        "SV_random_init"
+      ],
+      "file": "raw/mdl_bandtasks__p8-s8.parquet",
+      "rows": 70,
+      "sha256": "42ae66dbd457be6e2b46eee1ad59bbf88b941902db8019a9122d9c6a53b79a6f"
+    },
+    "mdl_cells__p16-s12": {
+      "checkpoint_identity_sha256": "a6850a755a05afe1b2a7cf384634d61e1f1f11727ce905dad4d95fb021365c54",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "stage",
+        "f_center",
+        "is_locked",
+        "dist_to_lock",
+        "n",
+        "L_bits",
+        "L_uniform",
+        "SV",
+        "family"
+      ],
+      "file": "raw/mdl_cells__p16-s12.parquet",
+      "rows": 330,
+      "sha256": "673ff9316019f287b8779517e23867f2cc6f41c2f1427ecfcfca05264598dcde"
+    },
+    "mdl_cells__p16-s16": {
+      "checkpoint_identity_sha256": "eb3006c11e560a5146b7a420415da1ad2632417a75d59b0eee7fdc7ea1d16237",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "stage",
+        "f_center",
+        "is_locked",
+        "dist_to_lock",
+        "n",
+        "L_bits",
+        "L_uniform",
+        "SV",
+        "family"
+      ],
+      "file": "raw/mdl_cells__p16-s16.parquet",
+      "rows": 210,
+      "sha256": "d214fdcbac6676ffd33977d6f34bb915b6df20f68f8787df5e379f11a558e82b"
+    },
+    "mdl_cells__p16-s8": {
+      "checkpoint_identity_sha256": "c512ebd47cabf9aa2726464124589df4bb47124d03f32060548d39caad63efe8",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "stage",
+        "f_center",
+        "is_locked",
+        "dist_to_lock",
+        "n",
+        "L_bits",
+        "L_uniform",
+        "SV",
+        "family"
+      ],
+      "file": "raw/mdl_cells__p16-s8.parquet",
+      "rows": 150,
+      "sha256": "dce1c0a91ca2458069d959b58ee9fd54e2210109a41175f43204028172245bd2"
+    },
+    "mdl_cells__p24-s12": {
+      "checkpoint_identity_sha256": "7b90cd7fcdecbb4b9d4dc1d8ee2d01ca8c8a7dcc2696e7e2a6f4cc4c8d80ea51",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "stage",
+        "f_center",
+        "is_locked",
+        "dist_to_lock",
+        "n",
+        "L_bits",
+        "L_uniform",
+        "SV",
+        "family"
+      ],
+      "file": "raw/mdl_cells__p24-s12.parquet",
+      "rows": 290,
+      "sha256": "492313c375ef4c4e3eb8b46bbac0fbc825ef58b3247f05b08b1e594be0133014"
+    },
+    "mdl_cells__p24-s16": {
+      "checkpoint_identity_sha256": "a564791d45511c5939765cee3a5dcb1c416aec2b0b10bd2f135094b8deecbb46",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "stage",
+        "f_center",
+        "is_locked",
+        "dist_to_lock",
+        "n",
+        "L_bits",
+        "L_uniform",
+        "SV",
+        "family"
+      ],
+      "file": "raw/mdl_cells__p24-s16.parquet",
+      "rows": 450,
+      "sha256": "236eb052174a9e20145bded76479a907f42fb81592c7bfe58943ef810d7c0a55"
+    },
+    "mdl_cells__p24-s20": {
+      "checkpoint_identity_sha256": "a5101b5ede96855a7e0e8d8669750e131a700e2270b6cbb7218fedcb0d9ac890",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "stage",
+        "f_center",
+        "is_locked",
+        "dist_to_lock",
+        "n",
+        "L_bits",
+        "L_uniform",
+        "SV",
+        "family"
+      ],
+      "file": "raw/mdl_cells__p24-s20.parquet",
+      "rows": 530,
+      "sha256": "430b386bf238739bd442f97ae1f615ec2ea18e20961b87cb72de81dcd976ba3c"
+    },
+    "mdl_cells__p24-s24": {
+      "checkpoint_identity_sha256": "b7a30a68413728e9d43aec4169bcdf72e1eba3e316665f5109c3321589bf6e1e",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "stage",
+        "f_center",
+        "is_locked",
+        "dist_to_lock",
+        "n",
+        "L_bits",
+        "L_uniform",
+        "SV",
+        "family"
+      ],
+      "file": "raw/mdl_cells__p24-s24.parquet",
+      "rows": 330,
+      "sha256": "a7907cd8f30290f341618f9624438a65561061da2ffae6245f8c442e578c9f10"
+    },
+    "mdl_cells__p24-s8": {
+      "checkpoint_identity_sha256": "f9944f63e3a2db3a2a62d317bbe009e21e404d0a7c328a08018afb4ca52357a2",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "stage",
+        "f_center",
+        "is_locked",
+        "dist_to_lock",
+        "n",
+        "L_bits",
+        "L_uniform",
+        "SV",
+        "family"
+      ],
+      "file": "raw/mdl_cells__p24-s8.parquet",
+      "rows": 330,
+      "sha256": "315107b079e741394ef3df2832fc79af957cfa946b8bc78ccbf06b04bdad4cd3"
+    },
+    "mdl_cells__p32-s12": {
+      "checkpoint_identity_sha256": "679e56f2f038caf0dc862c835554fb790da9053ed3e2c371969b9866be43bb89",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "stage",
+        "f_center",
+        "is_locked",
+        "dist_to_lock",
+        "n",
+        "L_bits",
+        "L_uniform",
+        "SV",
+        "family"
+      ],
+      "file": "raw/mdl_cells__p32-s12.parquet",
+      "rows": 570,
+      "sha256": "207092bc5f523cebf502d5f74b69654a2c595757bcc775072a68c8b86ebbd8ab"
+    },
+    "mdl_cells__p32-s16": {
+      "checkpoint_identity_sha256": "40384515c1d1ee03ec19420ec086b4fb1a3bc92e9b8570da0ce67888f4ba4280",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "stage",
+        "f_center",
+        "is_locked",
+        "dist_to_lock",
+        "n",
+        "L_bits",
+        "L_uniform",
+        "SV",
+        "family"
+      ],
+      "file": "raw/mdl_cells__p32-s16.parquet",
+      "rows": 310,
+      "sha256": "348f9fe69ca45a0aacfda12aa128e639a11d798b1bb785f1ac39718e2a922ea8"
+    },
+    "mdl_cells__p32-s20": {
+      "checkpoint_identity_sha256": "33325a67c34c4691a5d66b4f83c6721f0977c4a76a823bb5d5c5cf5c66ba2be4",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "stage",
+        "f_center",
+        "is_locked",
+        "dist_to_lock",
+        "n",
+        "L_bits",
+        "L_uniform",
+        "SV",
+        "family"
+      ],
+      "file": "raw/mdl_cells__p32-s20.parquet",
+      "rows": 650,
+      "sha256": "266985dcfe271dd6d1ccb63fa9651bc13005f32640658094b694b710ef0475e4"
+    },
+    "mdl_cells__p32-s24": {
+      "checkpoint_identity_sha256": "5c4bdbdc1b1db7cff8fe318f0883d4d5961afe337e7e044572559c165fd892bb",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "stage",
+        "f_center",
+        "is_locked",
+        "dist_to_lock",
+        "n",
+        "L_bits",
+        "L_uniform",
+        "SV",
+        "family"
+      ],
+      "file": "raw/mdl_cells__p32-s24.parquet",
+      "rows": 690,
+      "sha256": "b4e5dbcd21dee5c86f6220bb7c2d2f7ec526495f518d3915df87fec01e3c26a6"
+    },
+    "mdl_cells__p32-s32": {
+      "checkpoint_identity_sha256": "21a7dca436800d6d387bf1f59d11b5991092d0645b5fdf318a8b997b4b9578cc",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "stage",
+        "f_center",
+        "is_locked",
+        "dist_to_lock",
+        "n",
+        "L_bits",
+        "L_uniform",
+        "SV",
+        "family"
+      ],
+      "file": "raw/mdl_cells__p32-s32.parquet",
+      "rows": 450,
+      "sha256": "a554099099a5cfa30a7c19776055b9417d2bee4310f461bf06f4ca4896af4935"
+    },
+    "mdl_cells__p32-s8": {
+      "checkpoint_identity_sha256": "b67fc8d2bd91ec6a64d66493e20c8b12fc5cf169b83565b798f21da5abd9e437",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "stage",
+        "f_center",
+        "is_locked",
+        "dist_to_lock",
+        "n",
+        "L_bits",
+        "L_uniform",
+        "SV",
+        "family"
+      ],
+      "file": "raw/mdl_cells__p32-s8.parquet",
+      "rows": 450,
+      "sha256": "c803bf94aa7a1f951ac05aa9d14eb4e2902c65aa8f42425771d9a63fc46a016a"
+    },
+    "mdl_cells__p8-s8": {
+      "checkpoint_identity_sha256": "4ae55f9a706e8d2a0da5459d23f3bdb2f101a4cf6ebc9bd80d0e4558f0374a96",
+      "columns": [
+        "model",
+        "P",
+        "S",
+        "stage",
+        "f_center",
+        "is_locked",
+        "dist_to_lock",
+        "n",
+        "L_bits",
+        "L_uniform",
+        "SV",
+        "family"
+      ],
+      "file": "raw/mdl_cells__p8-s8.parquet",
+      "rows": 90,
+      "sha256": "10d3443ec8a0bbf9a1db42ad5f027fe38e00110f5b089f066ae4bffef910a7c6"
+    }
+  },
+  "signals": {
+    "file": "signals/signals_index.parquet",
+    "max_regeneration_difference": 0.0,
+    "regenerated_this_session": true,
+    "rows": 200,
+    "sha256": "12f2358ab3b99c50157526e3af16bf80966041add0137e9b3bfec958cf8f3ffa"
+  },
+  "status": "complete",
+  "updated_utc": "2026-09-26T19:56:12.612338+00:00"
+}

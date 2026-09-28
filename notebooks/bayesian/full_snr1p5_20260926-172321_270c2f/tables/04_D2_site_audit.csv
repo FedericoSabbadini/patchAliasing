@@ -1,0 +1,31 @@
+model,branch,P,S,predicted_spacing,f1,n_sites,harmonic_order,harmonic_order_min,modes,status
+p16-s12,patch,16,12,32.0,,0,0,0,2,no site detected
+p16-s12,stride,16,12,42.666666666666664,42.666667,4,1,1,2,lowest site is the fundamental
+p16-s16,patch,16,16,32.0,,0,0,0,2,no site detected
+p16-s16,stride,16,16,32.0,,0,0,0,2,no site detected
+p16-s8,patch,16,8,32.0,,0,0,0,2,no site detected
+p16-s8,stride,16,8,64.0,,0,0,0,2,no site detected
+p24-s12,patch,24,12,21.333333333333332,,0,0,0,2,no site detected
+p24-s12,stride,24,12,42.666666666666664,,0,0,0,2,no site detected
+p24-s16,patch,24,16,21.333333333333332,,0,0,0,2,no site detected
+p24-s16,stride,24,16,32.0,32.0,2,1,1,2,lowest site is the fundamental
+p24-s20,patch,24,20,21.333333333333332,,0,0,0,2,no site detected
+p24-s20,stride,24,20,25.6,25.6,3,1,1,2,lowest site is the fundamental
+p24-s24,patch,24,24,21.333333333333332,,0,0,0,2,no site detected
+p24-s24,stride,24,24,21.333333333333332,,0,0,0,2,no site detected
+p24-s8,patch,24,8,21.333333333333332,,0,0,0,2,no site detected
+p24-s8,stride,24,8,64.0,,0,0,0,2,no site detected
+p32-s12,patch,32,12,16.0,,0,0,0,2,no site detected
+p32-s12,stride,32,12,42.666666666666664,42.666667,4,1,1,2,lowest site is the fundamental
+p32-s16,patch,32,16,16.0,,0,0,0,2,no site detected
+p32-s16,stride,32,16,32.0,,0,0,0,2,no site detected
+p32-s20,patch,32,20,16.0,,0,0,0,2,no site detected
+p32-s20,stride,32,20,25.6,25.6,2,1,1,2,lowest site is the fundamental
+p32-s24,patch,32,24,16.0,,0,0,0,2,no site detected
+p32-s24,stride,32,24,21.333333333333332,21.333333,6,1,1,2,lowest site is the fundamental
+p32-s32,patch,32,32,16.0,,0,0,0,2,no site detected
+p32-s32,stride,32,32,16.0,,0,0,0,2,no site detected
+p32-s8,patch,32,8,16.0,,0,0,0,2,no site detected
+p32-s8,stride,32,8,64.0,,0,0,0,2,no site detected
+p8-s8,patch,8,8,64.0,,0,0,0,2,no site detected
+p8-s8,stride,8,8,64.0,,0,0,0,2,no site detected

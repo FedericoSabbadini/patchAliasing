@@ -1,0 +1,20 @@
+\begin{table*}[!htbp]
+    \centering
+    \footnotesize
+    \setlength{\tabcolsep}{3pt}
+    \begin{tabular}{@{}llrrrccccccclp{2.3cm}@{}}
+        \toprule
+        \textbf{Claim} & \textbf{Model} & $\max\hat R$ & \textbf{min ESS} & \textbf{Div.} & \textbf{Conv.} & \textbf{Recov.} & \textbf{PPC} & \textbf{Sens.} & \textbf{LOO} & \textbf{D2} & \textbf{Net} & \textbf{Verdict} & \textbf{Decided by} \\
+        \midrule
+        $H1$ behav. & A & 1.004 & 4637 & 0 & \checkmark & \textbf{fail} & \textbf{fail} & \checkmark & -- & -- & \checkmark & not reportable & failed: ppc, recovery \\
+        $M1$ & A' & 1.004 & 4490 & 0 & \checkmark & \textbf{fail} & \textbf{fail} & \checkmark & \checkmark & -- & \checkmark & not reportable & failed: ppc, recovery \\
+        $H1$ repr. & B & 1.003 & 2724 & 0 & \checkmark & \textbf{fail} & \textbf{fail} & \checkmark & -- & -- & -- & not reportable & failed: ppc, recovery \\
+        $H2$ & C & 1.004 & 2457 & 0 & \checkmark & \textbf{fail} & \textbf{fail} & \checkmark & -- & -- & -- & not reportable & failed: ppc, recovery \\
+        $H3$ location & D1 & 1.002 & 4935 & 0 & \checkmark & \checkmark & \textbf{fail} & \checkmark & \checkmark & -- & -- & not reportable & failed: ppc \\
+        $H3a$ & D2 & 1.003 & 1751 & 0 & \checkmark & \checkmark & \textbf{fail} & \checkmark & -- & \checkmark & -- & not reportable & failed: ppc \\
+        $H3b$ & D2 & 1.002 & 3214 & 0 & \checkmark & \textbf{fail} & \textbf{fail} & \checkmark & -- & \textbf{fail} & -- & not identified & identification: 0 unambiguous sites against a bar of 10 \\
+        \bottomrule
+    \end{tabular}
+\caption{Convergence and gates of every claim, as produced by the run full\_snr1p5\_20260926-172321\_270c2f. Convergence columns give the worst value over every fit the claim is read from; each gate is shown on its own, and the last column names the condition that set the verdict. A claim that fails any gate is not reportable, which is not a null result; -- marks a gate that does not apply; Net is Model~A refitted net of the background-only forecast.}
+    \label{tab:bayesGates}
+\end{table*}

@@ -1,0 +1,12 @@
+{
+  "label": "A_overlap",
+  "elpd_loo": -337964.1586673013,
+  "se": 774.7395970964304,
+  "p_loo": 207.06844484788598,
+  "n_samples": 8000,
+  "n_obs": 371000,
+  "good_k": 0.7,
+  "max_pareto_k": 0.32962940391360773,
+  "warning": false,
+  "reliable": true
+}

@@ -1,0 +1,154 @@
+{
+  "run_id": "full_snr1p5_20260926-172321_270c2f",
+  "mode": "full",
+  "reportable": true,
+  "analysis_fingerprint": "62cc3ec197ccd72755d5f7436a09250f56a53983122630b698e1375d2dcfe4a1",
+  "repository_commit": "4f098ac48f66c7b9cbb7d891c9166a9a21755221",
+  "tone_snr": 1.5,
+  "collection": {
+    "directory": "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/data",
+    "hashes": {
+      "collapse": "3b78eaadf0159113adcc31d95e9e8dadf434ea7a5e582aa4016c60f58f2c0628",
+      "contrasts": "90173d63e68a070e1a1bfa84eecc7a96a7baa1e31b6697eba998048ecec4cd57",
+      "mdl_bandtasks": "4643c86a076ef669edf4cbf69cf9031e2a470eb68765ea3f51459a0d4ce15053",
+      "mdl_cells": "aa79da160fe22ad367a0292250b14337911f979c9db9c16e190ac2a056f81bcc",
+      "sites": "edde6f0766866108d32362da2c5599904df0cf743f7e69eda2dda7bdc773c9a0",
+      "collection_manifest": "e961c6c83a6c3ddb3b791ba679a3c2c5569062db1a6356053172ffc89d18ff3d"
+    },
+    "triplets": 371000,
+    "mdl_rows": 5830,
+    "collapse_rows": 35775
+  },
+  "sampling": {
+    "chains": 4,
+    "block_chains": 2,
+    "draws": 2000,
+    "tune": 2000,
+    "target_accept": 0.9,
+    "backend": "pymc"
+  },
+  "gates": {
+    "prior_calibration": true,
+    "design": false,
+    "reconstruction_parity": true,
+    "psis_parity": true,
+    "recovery": {
+      "A": false,
+      "B": false,
+      "C": false,
+      "D1_tsmixup": true,
+      "D2_patch_f1": false,
+      "D2_stride_f1": true,
+      "D2_stride_delta_hat": true,
+      "D1_kernelsynth": true,
+      "D1_pure": true
+    },
+    "convergence": {
+      "A_both": true,
+      "A_overlap": true,
+      "A_patch": true,
+      "A_none": true,
+      "A_net_both": true,
+      "B_adjusted": true,
+      "B_unadjusted": true,
+      "C_phase": true,
+      "C_nophase": true,
+      "D1_kernelsynth_both": true,
+      "D1_kernelsynth_stride": true,
+      "D1_kernelsynth_patch": true,
+      "D1_kernelsynth_none": true,
+      "D1_pure_both": true,
+      "D1_pure_stride": true,
+      "D1_pure_patch": true,
+      "D1_pure_none": true,
+      "D1_tsmixup_both": true,
+      "D1_tsmixup_stride": true,
+      "D1_tsmixup_patch": true,
+      "D1_tsmixup_none": true,
+      "D1_tsmixup_both_alt": true,
+      "D1_kernelsynth_both_alt": true,
+      "D2_stride_f1": true,
+      "D2_stride_delta_hat": true,
+      "D2_patch_f1": true
+    },
+    "ppc": {
+      "A_both": false,
+      "B_adjusted": false,
+      "C_phase": false,
+      "D1_kernelsynth_both": false,
+      "D1_pure_both": false,
+      "D1_tsmixup_both": false,
+      "D2_patch_f1": false,
+      "D2_stride_f1": false
+    },
+    "sensitivity": {
+      "H1_behavioural": true,
+      "H1_representational": true,
+      "H2": true,
+      "H3_location:kernelsynth": true,
+      "H3_location:tsmixup": true,
+      "H3a": true,
+      "H3b": true,
+      "M1": true,
+      "H3_location": true
+    },
+    "loo_reliable": {
+      "M1": true,
+      "M1_fourway": true,
+      "H2": true,
+      "B_blocking": true,
+      "H3_location:kernelsynth": true,
+      "H3_location:pure": true,
+      "H3_location:tsmixup": true,
+      "H3_location": true
+    }
+  },
+  "verdicts": {
+    "H1_behavioural": "NOT REPORTABLE",
+    "M1": "NOT REPORTABLE",
+    "H1_representational": "NOT REPORTABLE",
+    "H2": "NOT REPORTABLE",
+    "H3_location": "NOT REPORTABLE",
+    "H3a": "NOT REPORTABLE",
+    "H3b": "NOT IDENTIFIED"
+  },
+  "d2_identification": {
+    "stride": {
+      "unambiguous_sites": 21,
+      "identified": true
+    },
+    "patch": {
+      "unambiguous_sites": 0,
+      "identified": false
+    }
+  },
+  "timings_seconds": {
+    "part1_prior_predictive": 0.414715051651001,
+    "part2_collection": 9139.48294210434,
+    "part3_parity": 224.9085350036621,
+    "part3_recovery": 4147.755501270294,
+    "fit_A_both": 9.79666256904602,
+    "fit_A_overlap": 6.208318710327148,
+    "fit_A_patch": 6.040093183517456,
+    "fit_A_none": 6.0149993896484375,
+    "fit_A_net": 5.807116508483887,
+    "fit_B_adjusted": 1.1773273944854736,
+    "fit_B_unadjusted": 0.7694487571716309,
+    "fit_C_phase": 7.706545352935791,
+    "fit_C_nophase": 4416.255066156387,
+    "fit_D1": 830.6623339653015,
+    "fit_D1_alt_tol": 158.05421543121338,
+    "fit_D2": 89.386066198349,
+    "part5_ppc": 181.1617443561554,
+    "part5_sensitivity": 24656.846667289734,
+    "part5_loo": 3339.1474056243896
+  },
+  "limitations": [
+    "One training seed per geometry, so a difference between two configurations is a difference between two trained models as well as between two geometries, and the design cannot separate them. An effect large relative to its posterior spread is unlikely to be an artefact of that choice; an effect near a decision threshold could be.",
+    "The analysis context is truncated: of the 480 samples the patch grid spans only L_tok, and the remainder enters no token. The truncation cancels within a triplet, which shares context length, background and phase, but not between geometries, and it is non-zero on exactly the six runs with S not dividing P, which are the runs that identify the stride branch.",
+    "The token count N = 1 + floor((L - P)/S) moves with the stride, so the M1 slope cannot separate overlap from sequence length; lowering S also changes the mixture of stride- and patch-derived candidates along the same axis. Neither confound could create a mitigation, but either could inflate one.",
+    "Model D2's sites are detected from the profile alone but assigned to a branch using that branch's own grid, so kappa_F is conditional on that selection. Part 4.5 reports the harmonic-order audit and a restricted fit rather than correcting the slope.",
+    "The tone amplitude is a choice, not a quantity the report fixes. It is a field of the collection's configuration, so it enters the collection's design fingerprint, and a run at a different amplitude is refused rather than merged.",
+    "M1's slope is a comparison between independently trained variants over fifteen design points, not the effect of changing the overlap of a trained model."
+  ]
+}

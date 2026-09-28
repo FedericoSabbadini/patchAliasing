@@ -1,0 +1,1482 @@
+{
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/00_prior_spec.parquet": [
+    3713,
+    1790504111.0,
+    "5ac42ccc469d948716b5bc70639f9d9eba1c1eb75c51939af055e8dbbc6dbe24"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/00_decision_spec.parquet": [
+    6044,
+    1790504112.0,
+    "72ca002a5a91da0e8a154883363229d7e676c97fd5304196c15995204d2ea44a"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/00_specification_notes.parquet": [
+    6165,
+    1790504112.0,
+    "6dd3505eb0d9b5bfe8ab319a5ebcb18ffe50e0d21d28f8a4bfd28944cab34489"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/01_prior_predictive.parquet": [
+    2711,
+    1790504122.0,
+    "8f88f9016de418ce57c8a3f00f7d659e9741b605e6b40192c3d5319427e1f596"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/00_timings.json": [
+    806,
+    1790538038.0,
+    "94616156f8953a5056b4c80545cd194ac5bfa535b2527a26081791b69eb845ca"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/02_phase_map.parquet": [
+    6245,
+    1790504173.0,
+    "e72b727e78c352f55a089255e920194357aeaf815ea5d86e5d30319c3f5e3da2"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/02_contrasts.parquet": [
+    43083812,
+    1790504174.0,
+    "137250b54595c9eb128bfd7ddfb76eed0e58649de3db39342d0acdd1a6398488"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/02_contrast_audit.json": [
+    357,
+    1790504205.0,
+    "456e542fe4c3abb0b8bfac1c4bd4b6abc7960a1cc4357a88a1850a1763b44ff6"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/02_denominator_comparison.parquet": [
+    3554,
+    1790504205.0,
+    "2bf0970043d0c24f61c13393caac7866b12ea0b7a4f822e8fd1297a0246f93c7"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/02_design_check.parquet": [
+    3230,
+    1790504209.0,
+    "655de279bcc6390a2a6f2fd190467ecc574906a1eb59e979f65c6a5d9c4a3465"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_fit_identity.json": [
+    719,
+    1790452618.0,
+    "a5824badd0fbae94296da7cc44c85e26ba8d0f62f6b49c8cb77dcaf767adb3bb"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_parity_A__chains00.nc": [
+    1159928,
+    1790452673.0,
+    "7fbdedcd8968acf15eaefb076688a86ef7a9b45314ddf428e8cb9f00101b4734"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_parity_A__chains02.nc": [
+    1158382,
+    1790452687.0,
+    "5951f31352f02b23fb471c6f66ba2f7bdb6746ca48b2d2cef512f052866c53e8"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_parity_A.nc": [
+    2162307,
+    1790452688.0,
+    "468cf2b6b6aa0d01ccd6eba593b3f1f1274ae85aa6d12f351fc15e6e822ef7ec"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_parity_A_normal__chains00.nc": [
+    1142656,
+    1790452705.0,
+    "f992be774f7184bc7b860ec487bf8355e44436d2f41be1aeae9ee1161a0a452a"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_parity_A_normal__chains02.nc": [
+    1158169,
+    1790452717.0,
+    "d193e03d2dd28687ef36ef6f7e0baefbfab5c99b1112f5fecb7f0af29b204775"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_parity_A_normal.nc": [
+    2143547,
+    1790452719.0,
+    "4d8a5605f8726aea5595f19870a5fff59a6024195b6d2de35501e267c80e3b35"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_parity_C__chains00.nc": [
+    1220245,
+    1790452750.0,
+    "f75d64182bf277c7cb3981c17d3e9cfe5899e37f26245a5a2c4de9139d3a121e"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_parity_C__chains02.nc": [
+    1222501,
+    1790452765.0,
+    "aaf6ccc659b327776a18f82230c687d4553958d4e9ac402f04a38e2823b4efc1"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_parity_C.nc": [
+    2280698,
+    1790452766.0,
+    "cd5a36565e03d7c1ab34033a35be6c34bdf60197fbce0a68797542271288d430"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_parity_B__chains00.nc": [
+    279729,
+    1790452795.0,
+    "52c3f8b76ea3b33b103df77a8a9ff5c1fcc189b65f63276ef412b3dd9025b911"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_parity_B__chains02.nc": [
+    279545,
+    1790452803.0,
+    "a68c78c1dd8f77e97cd3e9442eac9656ee18bb5cbf37835a7769453d6ea766e4"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_parity_B.nc": [
+    424776,
+    1790452804.0,
+    "da2604e24702197b1a6557a5b24bde48bbc02fef7fcee62eebf3c595da9598f5"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_parity_D1_tsmixup__chains00.nc": [
+    214581,
+    1790452818.0,
+    "1c1b70e54b755df551a2e6d94abb868b4f9cd0b94f0a3f32adec1850f08e8b21"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_parity_D1_tsmixup__chains02.nc": [
+    214579,
+    1790452822.0,
+    "dfee7085e12e6a9628af817706ff86643b3cb37d4ee9e4dc96dd3063ee5ecd31"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_parity_D1_tsmixup.nc": [
+    312946,
+    1790452823.0,
+    "98075f88a5700a2e257daa21eb80f0b7c1087cc08ff2d915b6872624e8e1dce7"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_parity_D2_stride_f1__chains00.nc": [
+    140689,
+    1790452834.0,
+    "6149f8b7b873aeb303a426f8abc433d0f6070ef715bd68baef5a76f63d03a91d"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_parity_D2_stride_f1__chains02.nc": [
+    141064,
+    1790452839.0,
+    "3bf1aa267d80dbc8271660f0adf6070abb4158ec800571b959911d4e16b47511"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_parity_D2_stride_f1.nc": [
+    176210,
+    1790452840.0,
+    "bcf51bbf1005b9ab8b6c767881b6b2f9e2b3b53f63db9038049db0833ac641d8"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_parity.parquet": [
+    4059,
+    1790452843.0,
+    "c910373a52123138939e24e230ac7c16b323261b93f887b12d53195827c6e4df"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_psis_parity.parquet": [
+    4617,
+    1790452865.0,
+    "a9efc1fa9d9cb1cf9832b9a54865bc8d69d114d1fdd00c7500b72d71963c9373"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_A_near_null_0__chains00.nc": [
+    8276541,
+    1790452979.0,
+    "6ea3bc0d8855af3179384d73e7181a74a585a1505fa6c66ade06e8b4d087ff48"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_A_near_null_0__chains02.nc": [
+    8276322,
+    1790453092.0,
+    "ff3ff0e87da4b599eaabac759b817e36b2861434e13c1cf9b88a70e858772bb2"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_A_near_null_0.nc": [
+    16269930,
+    1790453093.0,
+    "3bf5698496726c623c36c4c77625cfa360a5ed75845adf6c7b1fc57ebf520f97"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_A_near_null_1__chains00.nc": [
+    8279323,
+    1790453212.0,
+    "395f9b5af572dd292c63cfbaa08f63982f2efc251c2cc8b3ad69afa18f8f0e75"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_A_near_null_1__chains02.nc": [
+    8278533,
+    1790453325.0,
+    "de1a47a835af48a04ffbe7ac9d483af687bb0ab96faf0f371da4e21013a99196"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_A_near_null_1.nc": [
+    16274928,
+    1790453327.0,
+    "5a2ba58d4393571889c8ea6323bcd2f77ea922be53229fbe6deb8bd03ee1803a"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_A_effect_0__chains00.nc": [
+    8267320,
+    1790453443.0,
+    "10ce3bbf51d81fc6580f9c04b95ed08e8ebe47e569f2a7f06044c1ac9c4a8cf8"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_A_effect_0__chains02.nc": [
+    8269383,
+    1790453555.0,
+    "183688e44f8b97cd661234ccb929e2de4e4fc063a8d2565b1439da3bd5ce0cf5"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_A_effect_0.nc": [
+    16253934,
+    1790453558.0,
+    "84243c0d12eb8a723ce98b81a5225d203fe3ef3ed78ed213e2cd166ae094fcae"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_A_effect_1__chains00.nc": [
+    8270442,
+    1790453675.0,
+    "251d3afe3148b373a34e537e3b1a398ae3df4b77e16143a31c252ebbcf1119d1"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_A_effect_1__chains02.nc": [
+    8270285,
+    1790453785.0,
+    "52b6bf565d76f5ffaa2b658fb33497433cdca6634f3701a20fad9f243cf9575e"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_A_effect_1.nc": [
+    16258478,
+    1790453787.0,
+    "605b5923e1a23e74f9d54d3824df99ac22da51e7e002602370815965a542fe30"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_C_near_null_0__chains00.nc": [
+    8741008,
+    1790453916.0,
+    "cb04f4bdb469465a38c2198bb1096a4824c3171c9ac36bd26dc251ba3ddd362f"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_C_near_null_0__chains02.nc": [
+    8736969,
+    1790454042.0,
+    "f41c82806893047e5f92b4af85bd7b415645cfb55b9844e4ca96974b057bc2ed"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_C_near_null_0.nc": [
+    17193319,
+    1790454044.0,
+    "994fd5d2fe39d8e46da207ac611d72527f489effcfaeb76f3ccbdb2a421fd142"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_C_near_null_1__chains00.nc": [
+    8734483,
+    1790454173.0,
+    "136b5b24379607879304ae6499711f65e09d1fb1239062f6ea0dbf256d7b08d0"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_C_near_null_1__chains02.nc": [
+    8740088,
+    1790454297.0,
+    "8603261961680cc1b5aae222de90e3884054280e6a587baec601a56af3c8533c"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_C_near_null_1.nc": [
+    17189769,
+    1790454299.0,
+    "79499f06517e77364a02cd6bfef886264dcf1a7f9cfdfcb36cc694bcbdd8b13e"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_C_effect_0__chains00.nc": [
+    8731765,
+    1790454750.0,
+    "f9caa0bd9975489c37134a17a0995a90a4154b5154def93f75daa6e7ca4f9971"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_C_effect_0__chains02.nc": [
+    8729213,
+    1790455204.0,
+    "22653e0c8d455646e7256a59ebef67862e8649251e4c5f2bc8d249acc37469e0"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_C_effect_0.nc": [
+    17176444,
+    1790455207.0,
+    "d9e6f61c5465d72d332279cde51a3e7b0b98de4c3b9c21d379390816f568058b"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_C_effect_1__chains00.nc": [
+    8731744,
+    1790455648.0,
+    "0fe120a9d92e3f4f8fecbdf9dbd1c3c56a8534a606dfa206a97f1debeabe1285"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_C_effect_1__chains02.nc": [
+    8732364,
+    1790456087.0,
+    "f92b9f84f7b9a6707ebb8ee43610194a037ffb968cc6eea1dbbf09ae2983e032"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_C_effect_1.nc": [
+    17179207,
+    1790456090.0,
+    "c08ea485aec3a4a190ea0687ed44d71236c9862c4c1d46ccb217a6ffd5ded2a8"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_B_near_null_0__chains00.nc": [
+    1325777,
+    1790456151.0,
+    "e4e61ce1a853aee8a6eb4e7653b9ca8ef5e44e94ce6488e866856ea32e512f65"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_B_near_null_0__chains02.nc": [
+    1326614,
+    1790456211.0,
+    "716185d2f7743753d5b8129fad9c6ef8e2d822a30a66a7ae150e2244c2c163b4"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_B_near_null_0.nc": [
+    2468271,
+    1790456212.0,
+    "7df4ff17b69c77e9f52d7d5ab4113ab6fa24df2ad4c6dae6ccd1a39cb10f5fdf"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_B_near_null_1__chains00.nc": [
+    1325524,
+    1790456271.0,
+    "cea823ee99891054b0acb31137be2eafa3770afdc60b712f054b68c202ec978e"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_B_near_null_1__chains02.nc": [
+    1325843,
+    1790456330.0,
+    "9b45b0ec74ed51a3324ef1f19fd16fb4f7891a9f1e035e395955123e4fd62949"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_B_near_null_1.nc": [
+    2467163,
+    1790456331.0,
+    "b44725160d2f65295bea1bc617dbe2203ddb861b9859971230c8ba2a13ed8333"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_B_effect_0__chains00.nc": [
+    1327116,
+    1790456393.0,
+    "28dcbc76ba0cd448f23ca2c4576a7dd7334166c029815cc59e2417d102d51764"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_B_effect_0__chains02.nc": [
+    1326662,
+    1790456449.0,
+    "e99d70c27dd2d1c0fc6d06209192c42d08f7b0a439c5c9f5e6d28f203e26cd69"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_B_effect_0.nc": [
+    2468174,
+    1790456450.0,
+    "c70d8345ca7e86f771c1efc1b32e8815f1bdb12a9ec464b877eb95a4b5ba7bc8"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_B_effect_1__chains00.nc": [
+    1325160,
+    1790456511.0,
+    "54c58a46e5139eb1779a390dcc1eac821111cb39aa05a076cf909a0d61eea34c"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_B_effect_1__chains02.nc": [
+    1325021,
+    1790456569.0,
+    "19b4099bd2c251ed4d143992a0d998c216b4224ddf9fe41b0a3743d225630c76"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_B_effect_1.nc": [
+    2466632,
+    1790456570.0,
+    "f5d35c5c2b784c4f764c2919eab360b0d5ed8fa6be5fe4f7fa717da11963b39b"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_D1_tsmixup_near_null_0__chains00.nc": [
+    978198,
+    1790456607.0,
+    "1071945150eaf6d83e7c253233cbc0da65b0767a69f027501153b934dc84a326"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_D1_tsmixup_near_null_0__chains02.nc": [
+    977526,
+    1790456641.0,
+    "4a08cfbcf29cfd749e1fa2531d80a24877aecf8d6337d61c4938a1a73eb4bd68"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_D1_tsmixup_near_null_0.nc": [
+    1726887,
+    1790456641.0,
+    "35e0a1f6387482c9881e18ee92fc58d11d0f9600ee8f6c42e54f1a930a6abc8b"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_D1_tsmixup_near_null_1__chains00.nc": [
+    978859,
+    1790456676.0,
+    "36c6d931485630379d33cdb7db194833a50d2caf36ea91853681bc672b659c53"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_D1_tsmixup_near_null_1__chains02.nc": [
+    978953,
+    1790456710.0,
+    "8f7d3c7b357c4ba7f8a44d69f00181303634741b8132ce81f1cf00a06064d02e"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_D1_tsmixup_near_null_1.nc": [
+    1728925,
+    1790456710.0,
+    "0a6ae6b83461ac5a70cd2dfaf81f340d46ad2b4fe95ada5c0313304d192628e9"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_D1_tsmixup_effect_0__chains00.nc": [
+    978391,
+    1790456745.0,
+    "a3a73178dbf27c7507e5557c81ad96c1fb56298debf946167d2eace8956a6346"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_D1_tsmixup_effect_0__chains02.nc": [
+    977899,
+    1790456778.0,
+    "247f6a1fcd134ed6cc6b1bbff8df305809cd49a4d9c77a3b5522cfb1a22a7bc1"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_D1_tsmixup_effect_0.nc": [
+    1727405,
+    1790456779.0,
+    "a1330e518ffb1069498a1701e1c8906826dd5cc64cab2d521595eddf46a3b6b0"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_D1_tsmixup_effect_1__chains00.nc": [
+    980541,
+    1790456813.0,
+    "4ee5ab7b95a544b22503888497d8213397b76dfc20e0e12db0d25d8b446231c4"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_D1_tsmixup_effect_1__chains02.nc": [
+    979872,
+    1790456846.0,
+    "e1c5e9d20f376a2e50b8f29b770165b576e718682973f0809f571814cd65ef81"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_D1_tsmixup_effect_1.nc": [
+    1731506,
+    1790456848.0,
+    "26b52c81c86e46340d5a5804ff5e09932660c3579cb73dd96bf604ab0fe3c5a0"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_D2_stride_f1_near_null_0__chains00.nc": [
+    380390,
+    1790456858.0,
+    "bdfe364d4cb214c2b0a16a13705297ed517497f26d78c6cb5d19b5941960a095"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_D2_stride_f1_near_null_0__chains02.nc": [
+    381595,
+    1790456868.0,
+    "a79f40b46d05b66d712c7d32f554ca9a07090e138bd5d5cce107abd6fd3b1328"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_D2_stride_f1_near_null_0.nc": [
+    651518,
+    1790456869.0,
+    "d5a22be35064084f1276a7a8c9cea9443da21f93537699b0c46df566babd9024"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_D2_stride_f1_near_null_1__chains00.nc": [
+    377647,
+    1790456877.0,
+    "2b16fe75e8dbe56510060f6aff84965171bb34e633eda42813024caeac4071cc"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_D2_stride_f1_near_null_1__chains02.nc": [
+    379683,
+    1790456887.0,
+    "afbb563bad651749f171662d056034bf3b6901a3fd62c17521b9f539405cb186"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_D2_stride_f1_near_null_1.nc": [
+    646871,
+    1790456888.0,
+    "75a3ba89eb4b7783af69836cbcf3914de0162f542afb9b4bb67e0298dcaecd2e"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_D2_stride_f1_effect_0__chains00.nc": [
+    379673,
+    1790456897.0,
+    "63cb0caaa1ea9a50ff8c6efbe869a59195044f47b1093e6a0afd5c1c9f5f367d"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_D2_stride_f1_effect_0__chains02.nc": [
+    378205,
+    1790456906.0,
+    "df09663652587cc8d2fc5f2568ec753032214b4dfc910e8ba721b32d18d0b3e6"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_D2_stride_f1_effect_0.nc": [
+    646947,
+    1790456907.0,
+    "f27bfe295e8cdfbf4556b0e729c9fe0e12ccfda780ae00fab54b0a7d6c78b27f"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_D2_stride_f1_effect_1__chains00.nc": [
+    380530,
+    1790456917.0,
+    "bb37e082c28b328a0df391fd0ef88885b7d8179153348dea4b1798b3a648cb67"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_D2_stride_f1_effect_1__chains02.nc": [
+    378999,
+    1790456925.0,
+    "f2748ebf8e88f553aa75ce16dd19c375032244bc2dc5d9a2185cab072e035192"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_D2_stride_f1_effect_1.nc": [
+    648802,
+    1790456926.0,
+    "e14513bf0b38062fb61c893bcc550f272fb2961756a77191bd3f93be4c7ec304"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_D2_patch_f1_near_null_0__chains00.nc": [
+    386783,
+    1790456937.0,
+    "f3085d055a99a7e174f4361f50891f10ade9c9b6bfcae94d7d83245a62634237"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_D2_patch_f1_near_null_0__chains02.nc": [
+    388381,
+    1790456947.0,
+    "b559eeb33a59f2fc12b9259c601046ad65f71b6d3067838f724a59276c3f1e25"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_D2_patch_f1_near_null_0.nc": [
+    664872,
+    1790456948.0,
+    "a78486a111841adcd4f38e38a7c60463c3fb9e108bb205b30bdd68b9bb3c13a5"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_D2_patch_f1_near_null_1__chains00.nc": [
+    384944,
+    1790456959.0,
+    "5d1742b41e0906825b9d8baf8973ef147d6997b08c7f7a02476fdd3c5df9ecf9"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_D2_patch_f1_near_null_1__chains02.nc": [
+    389553,
+    1790456968.0,
+    "469834a544c290d02b1ee7a9b1fb802953ce5d276f2618514167addefa5a014d"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_D2_patch_f1_near_null_1.nc": [
+    663639,
+    1790456969.0,
+    "806061f4c202cd4e14e91cd0928aab3591bad0854bcec5cf0732c40ea4ac05e0"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_D2_patch_f1_effect_0__chains00.nc": [
+    388828,
+    1790456980.0,
+    "d24b17c769ed1bde2067c8f5aad94c3669f8898ecd009b9e8b0a5ed4a7fa91fc"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_D2_patch_f1_effect_0__chains02.nc": [
+    390202,
+    1790456991.0,
+    "a24599264c38d54704ec1286fb827564b83d584ab45eab2b605a6f4789291530"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_D2_patch_f1_effect_0.nc": [
+    668674,
+    1790456992.0,
+    "c3dfc1fcef390ec2198d72a2e29bdde48c0afe412eaa9752cb64b90bc8b26231"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_D2_patch_f1_effect_1__chains00.nc": [
+    388876,
+    1790457001.0,
+    "ef8672ab0809575718ab6d62a4036a6d69e5949c2886c5bffe073b7a5d00ab5a"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_D2_patch_f1_effect_1__chains02.nc": [
+    386478,
+    1790457011.0,
+    "4086f3389804c58e292b5fb88bd093c05e7ed06c40d5c53c7e3396976b0c2a20"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_D2_patch_f1_effect_1.nc": [
+    665045,
+    1790457012.0,
+    "7a5bfeca0f2dc612614a71e81885b4fd001f68e58ffbc70deb097cec4f6a3d4a"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery.parquet": [
+    11181,
+    1790457013.0,
+    "678a245b1775412acf52db6d486bfc5b346c25b7a31a8ea9b49df96d5fab9450"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/03_recovery_summary.parquet": [
+    5192,
+    1790504226.0,
+    "facd23e43bcf7c62272b28e8af74d394d3064c15d13f6ba74491c33a329b1684"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_A_both__chains00.nc": [
+    11237489,
+    1790459287.0,
+    "90206f1cf064aece3b205352f68793da0ab8b8cd33613e3bb86f49b83ac2dc64"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_A_both__chains02.nc": [
+    11236264,
+    1790461585.0,
+    "8e5cf8b354a6198548ee5b91889f62617dece30a57b27db5f4cca4dcfaf7695e"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_A_both.nc": [
+    19172236,
+    1790461588.0,
+    "fcb3e422a144dcaf73cf96e59df43b784511574f9c847c01925e858ab0ff0b25"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_A_overlap__chains00.nc": [
+    11200357,
+    1790463844.0,
+    "42661619254a32833f2c193fbcb4d7f80202a27ce049940bc4cd7c6444c652f0"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_A_overlap__chains02.nc": [
+    11200264,
+    1790466142.0,
+    "1a6e25175862ada8b01502f8bce1f3bc922109ea906fbbea23bd8c42dd87b530"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_A_overlap.nc": [
+    19105580,
+    1790466145.0,
+    "0b0fc41b1c3d50c3501346bb20c7b01b8867c9c6bb8331aa728acc89030c3bbe"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_A_patch__chains00.nc": [
+    11200990,
+    1790468422.0,
+    "fc6cc4f26be9f6436e9a3e9998f6f893540e5e7aeb69ff4d9a689c2ae02ad8dc"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_A_patch__chains02.nc": [
+    11200947,
+    1790470654.0,
+    "f82d78fa3a5fff74259c78250a5bb2f38b42bc91fd0a227b059ae4f53ad3d7d9"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_A_patch.nc": [
+    19106795,
+    1790470657.0,
+    "353bcba8a28bb64997462ee9156ffae1e15347fd6195fd8c885732bba69f80f3"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_A_none__chains00.nc": [
+    11166305,
+    1790472882.0,
+    "931a8d17f24af84a2d9fd82d0bbfdba17e4b5e2033469aebe19f597c6fc92300"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_A_none__chains02.nc": [
+    11166500,
+    1790475166.0,
+    "3b34b204cf3ff4d8795dddda14f32545f98f9482fd02a1b546ee98f980022631"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_A_none.nc": [
+    19041622,
+    1790475171.0,
+    "74ec48eb9dd0ff8b67f0a121063f8f36a8e3e12f0f4a215719d4b7bc6198ac31"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_A_net_both__chains00.nc": [
+    11237977,
+    1790477424.0,
+    "8131d8cd2cf4e12a4fd8690ef38ffc6fbcd05bea417689e007b201074af7d1a2"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_A_net_both__chains02.nc": [
+    11238204,
+    1790479737.0,
+    "e8d610af0462349fc3401e47231fda8f38b16f7f6a159b57c1acf99f5c6ae6c2"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_A_net_both.nc": [
+    19178328,
+    1790479740.0,
+    "7f47d319da2d54491f85ce747e2647a6faa8345e326106fedb1513327f3d069a"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_B_adjusted__chains00.nc": [
+    1327411,
+    1790479802.0,
+    "e5d73a6cef3a044f5471f970b7d124dc347947b007ceb1ae2bc5c973964b2aee"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_B_adjusted__chains02.nc": [
+    1328524,
+    1790479860.0,
+    "0e8eb5f5b4dc79cd606d604846f62b64fa9fffb42fb99ef6290b1f3fd7ea3296"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_B_adjusted.nc": [
+    2469256,
+    1790479862.0,
+    "d9f122e75a157190e751dc78e1b80df54be920f6a85f6aab62acd922908dc737"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_B_unadjusted__chains00.nc": [
+    480293,
+    1790479897.0,
+    "bd5434a12839884e58a70bcc97642d03c7cd37993b99e99f727f785bd898f553"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_B_unadjusted__chains02.nc": [
+    480029,
+    1790479925.0,
+    "c5da98c656e8c7a2f5df98b13f5928cf8b4316d205f8a5ef7e16ceac4bce379e"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_B_unadjusted.nc": [
+    792946,
+    1790479926.0,
+    "b7c26bc895460c1d3de56c427e07f6c408c74a5b2249e80e57bf9974d206391a"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_C_phase__chains00.nc": [
+    11687537,
+    1790482532.0,
+    "0d818f3aa2a638d9bfd67201b8327bfa4d1f6414a38eb641e3b1989211634e9b"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_C_phase__chains02.nc": [
+    11691910,
+    1790485164.0,
+    "bf940e23f9badce4c5fabd10d71b643c828f830fe1d8f694622851822a4a2bf0"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_C_phase.nc": [
+    20075562,
+    1790485167.0,
+    "62d79a2e15574ae85d1bd633a5bf7cede365d73dbcd3aceba7db3ae256322eca"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_C_nophase__chains00.nc": [
+    11136700,
+    1790506549.0,
+    "3f50b355a9b017a701bed67e7c67d34f9066fd0e86e95447495eac5d06dd4dbe"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_C_nophase__chains02.nc": [
+    11135259,
+    1790508684.0,
+    "09a0dc8ad9cdaecf185d0748650b0e4b6c16b27bfbdb2734d7f69a0679de9353"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_C_nophase.nc": [
+    18983952,
+    1790508686.0,
+    "7a63873b3a142173b983260b2267f153d5c9b98ea1b01e1f459305c6ebecafd3"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D1_kernelsynth_both__chains00.nc": [
+    985768,
+    1790508735.0,
+    "6d1b88ee6577d6a69b062416a3ef9d126b81305469e354bdc1fda947c0f58c4a"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D1_kernelsynth_both__chains02.nc": [
+    985573,
+    1790508771.0,
+    "b73cec79211c1c4a2da251bcc0950cf37942d6b3fc751a0c5a4611f4da62565c"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D1_kernelsynth_both.nc": [
+    1742482,
+    1790508772.0,
+    "c2b430c681485e0162d50759925f415f129e173dda03e86381df269227526cdc"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D1_kernelsynth_stride__chains00.nc": [
+    951697,
+    1790508808.0,
+    "f97f1812477864a669d56ff3910f1474aec3154ca321931a56a73ae19aa8aa1b"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D1_kernelsynth_stride__chains02.nc": [
+    951595,
+    1790508841.0,
+    "107664ad7bf14607e6c1182217504d87d4e99727ead0134717c9fe7021cdedaf"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D1_kernelsynth_stride.nc": [
+    1677336,
+    1790508842.0,
+    "032ac6268e3a664bf13f30d66fdccbf4773f0288730cabc345d4f25dc9ec5156"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D1_kernelsynth_patch__chains00.nc": [
+    949794,
+    1790508874.0,
+    "e40344d99492077e3f0bb2019a52ea66f09699e266394a1fa6be55e668747038"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D1_kernelsynth_patch__chains02.nc": [
+    949659,
+    1790508905.0,
+    "03a8a1bcd30318e6df57364d77073c443791eb36ecea0b24606dc8c52e622591"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D1_kernelsynth_patch.nc": [
+    1673489,
+    1790508906.0,
+    "67ebd42e4932d20b49d63a18ccd59db69767118c917617a405a16c3a7bbc1d1b"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D1_kernelsynth_none__chains00.nc": [
+    916340,
+    1790508935.0,
+    "b79aff43c36f47eb5cd256ca52ff94705401ac5cb0f2acc81a46ddf8fd8c412e"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D1_kernelsynth_none__chains02.nc": [
+    916504,
+    1790508962.0,
+    "e7e43a303028b86e1ee10b692ba7a898c8765f3ca2a82c4ff49c0d7f6802c5b3"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D1_kernelsynth_none.nc": [
+    1610609,
+    1790508963.0,
+    "aa4609c0270bba4483d6f135b78d834cf63b428f64a853644b651904e6b4fd68"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D1_pure_both__chains00.nc": [
+    973703,
+    1790508998.0,
+    "8092c9a633e19ed553bea9aa5cac5a15b424038853e263326f16a00cd0c9b631"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D1_pure_both__chains02.nc": [
+    973890,
+    1790509038.0,
+    "0b0159fe321e41242b9c19d65a7f429481f7ff16c3c82741d5ec39921b49849d"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D1_pure_both.nc": [
+    1720458,
+    1790509040.0,
+    "27ab5f86e8ecc7eb5ac84bcce6ec15a59038f2694df5541d01b54d6d9765a0e7"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D1_pure_stride__chains00.nc": [
+    940914,
+    1790509078.0,
+    "d8afdd4de92f570ea0c4b2ad5dd5c081e60a1a8101c08c65fcd20ca425ab16da"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D1_pure_stride__chains02.nc": [
+    940235,
+    1790509114.0,
+    "27bcc0b301e2d48f58eea94926ce66b6dcf1b41134ac72e8dfe4926adc108508"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D1_pure_stride.nc": [
+    1656916,
+    1790509115.0,
+    "5096fe7596b68c8f799c1b2e2c47b7ea43be8f3bdd8b34666a550052b2032024"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D1_pure_patch__chains00.nc": [
+    944423,
+    1790509150.0,
+    "a18717f6ff071fa88aec9230478d5cfe02d7a1a2b4f79a09442c5d778c8846ae"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D1_pure_patch__chains02.nc": [
+    944274,
+    1790509185.0,
+    "06036defb5d9d7f5a26b71dfad40f414be258a0a47d93094967a69fd75604bdb"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D1_pure_patch.nc": [
+    1664477,
+    1790509186.0,
+    "25d233d28a01f62e92736394e0479e1cddeabc7b77ed4bf332ef28ed18ac4b69"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D1_pure_none__chains00.nc": [
+    912157,
+    1790509214.0,
+    "5249ebe259cbec84f44daa9cd166a66b4ff3ccb571788cfb5cc467cd16d48254"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D1_pure_none__chains02.nc": [
+    913196,
+    1790509245.0,
+    "ca90bf873ac1ab2b4d3865e8da3ad18a1842b61dcfb81ab1a86c225eadd78f62"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D1_pure_none.nc": [
+    1604854,
+    1790509246.0,
+    "d08f69c4482349b2483f3e4163385e9cba8ee93e69ead715a1bbf47560ff75ee"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D1_tsmixup_both__chains00.nc": [
+    987742,
+    1790509287.0,
+    "b0365aab35365768a24b40f7c11948bf35f878786d8cbd1eb68e1d07cc26d765"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D1_tsmixup_both__chains02.nc": [
+    987714,
+    1790509326.0,
+    "10677819fa73a966dc880532091ce0c779b01dcfc021c11c8afcd10312564510"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D1_tsmixup_both.nc": [
+    1746576,
+    1790509327.0,
+    "7e79052616c5b433a62ea40d5a483e4caa3491a8b28c3d04e708860d5a47c185"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D1_tsmixup_stride__chains00.nc": [
+    953229,
+    1790509361.0,
+    "1e437ce3bc86857d5d0797cbd709e7360991aa7f7ef75a0c22c0ca5fe63d34df"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D1_tsmixup_stride__chains02.nc": [
+    953398,
+    1790509394.0,
+    "bda637ae80338756890d987fbb4f0eef8172d6e112fe18c4590c25905e1a1ab0"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D1_tsmixup_stride.nc": [
+    1680668,
+    1790509395.0,
+    "7b3bc687735514e741e0d07c616c9643b2c323426a53243f48108b130625b3c9"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D1_tsmixup_patch__chains00.nc": [
+    952998,
+    1790509428.0,
+    "c5942be14385fe9f84a44517de9c0d6fc0ff18c6448f71bee90b659bf712318a"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D1_tsmixup_patch__chains02.nc": [
+    953166,
+    1790509462.0,
+    "62ef40b01d6cd943067f11b4c3000feda88a96416c92e0e10e2720a00186905f"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D1_tsmixup_patch.nc": [
+    1680223,
+    1790509464.0,
+    "1a4ce3ea0abfb4ec818d95aa95540dfcb439d8ea271f0111ae81a182a64803cd"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D1_tsmixup_none__chains00.nc": [
+    920945,
+    1790509490.0,
+    "16eb135737c0411494003410426a007681ad1add05032216bb51b9180fe4e12d"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D1_tsmixup_none__chains02.nc": [
+    921998,
+    1790509520.0,
+    "e6941021c46f0901f21474a2664cb8cd1b5c3fc251bdf4aeca5dbb971844631b"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D1_tsmixup_none.nc": [
+    1620709,
+    1790509521.0,
+    "98137614f2c68a1ae63c872f9ff4540b0ac0c918b9172691ddc758410e9f5658"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D1_tsmixup_both_alt__chains00.nc": [
+    988357,
+    1790509562.0,
+    "3f18f3d3cfc367621750abd33f7618506d1aa72afeeb12785169e640c86668cc"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D1_tsmixup_both_alt__chains02.nc": [
+    987740,
+    1790509599.0,
+    "501d0e13800eda65bde94e7a28d9fcc708ed2e52fd48ce48271b540481e93fd0"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D1_tsmixup_both_alt.nc": [
+    1747230,
+    1790509601.0,
+    "ecb2923defcd6157f33b16c5a8deb63d9efe2a903726d408ea41aaed064cd0a3"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D1_kernelsynth_both_alt__chains00.nc": [
+    986137,
+    1790509641.0,
+    "c5c7a28950e43dc0cff572b9c4d8e3230d6e27b426f59aefd0133249cc08d929"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D1_kernelsynth_both_alt__chains02.nc": [
+    986075,
+    1790509678.0,
+    "9f75e8118527854cdac7d59c488f4931ded14bb2a6e1affad254d396a505ca79"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D1_kernelsynth_both_alt.nc": [
+    1743350,
+    1790509680.0,
+    "fdcf7e34caa6fdabda6d52b7179c9ec9d804e18ef985f1636d5a326735e038e1"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D1_coefficients.parquet": [
+    8685,
+    1790509681.0,
+    "642a26c70a2009b7de34e2780f57e4579a78dd350cd699917a3d1f7da5233d0b"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D2_site_audit.parquet": [
+    7086,
+    1790509682.0,
+    "522118b769acba39a3cc4bdaaa33b5af6a09cb04c3c7bd67a34baac35eecd44b"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D2_replicate_audit.parquet": [
+    2432,
+    1790509682.0,
+    "cf5a934c214d1a12a80cd3dd277fa36fe1cf6ef9ad983f1de2fb91ce7417916c"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D2_stride_f1__chains00.nc": [
+    385566,
+    1790509704.0,
+    "309ee7de2f44a615c67fbea05efdfe4170a1c5ec88a07c1b9e7347c60993c3ff"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D2_stride_f1__chains02.nc": [
+    385601,
+    1790509718.0,
+    "34e724fc198034db2b2619dc9aaa13ffad1026e3ec0f591ed1afcf3ab4803426"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D2_stride_f1.nc": [
+    660871,
+    1790509719.0,
+    "0180a98d367d116e3b8fb4606c1c3be329cb23e350cf35f2f6d5d20b705aff68"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D2_stride_delta_hat__chains00.nc": [
+    381356,
+    1790509732.0,
+    "1da84e16fa7fe610777a852c7a42b92bc16a34d7b27de6b7747a12433828efb4"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D2_stride_delta_hat__chains02.nc": [
+    380269,
+    1790509742.0,
+    "84f5bb109cd26a14c821de7a23cc7de3abb046a720ce253b649bb19fbdf1415e"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D2_stride_delta_hat.nc": [
+    650874,
+    1790509743.0,
+    "6b40666adacbeaf4df91f6174512264a75c73cf3ceac3ebbb364e570f1b4ca43"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D2_patch_f1__chains00.nc": [
+    381240,
+    1790509756.0,
+    "cf6841c65eae8774e103e138bf9f071ceff769fb24a684d97a3b8642b8734ec0"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D2_patch_f1__chains02.nc": [
+    380968,
+    1790509769.0,
+    "4155512913fe3cbdf77fb9e7e38bbc6ce375bb23bdbc0cb8866ff8b1c8cb1016"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D2_patch_f1.nc": [
+    651915,
+    1790509770.0,
+    "f4c9199decb2abb58368456bcd7947f27ef4630522fb87f19ee108f6d9bf458a"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_D2_coefficients.parquet": [
+    6308,
+    1790509771.0,
+    "fac2e7217025d0bf6b43e8cf274be242ecf00d82bb9643e4f48023c0a8c10ea5"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/04_estimands.parquet": [
+    5086,
+    1790509772.0,
+    "d63a2f55ba2b2f2b55841d2618dadbac78d362e6f2411116c770ac0548f434ab"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_convergence.parquet": [
+    8137,
+    1790509773.0,
+    "6106c37d65dafacb6e72973cfd62d17806b5c33edc419dd0619592f113cdb3e2"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_ppc_A_both.parquet": [
+    8943,
+    1790509823.0,
+    "7b51567cfe53f4f3eae2d6d64d5b64bcdfcddadbb46d3f955cdc1e04561f9f38"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_ppc_B_adjusted.parquet": [
+    6798,
+    1790509836.0,
+    "839de1e0d310420b5ccd67e4c37143bb06677762b8b5fa4848ea99bd3ecb8467"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_ppc_C_phase.parquet": [
+    8948,
+    1790509885.0,
+    "a901edfe61744364eb25e63bb64dcf334df278c89d20299c9c8daf0f6717da03"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_ppc_D1_kernelsynth_both.parquet": [
+    6583,
+    1790509900.0,
+    "e396ded1f5dfbb876641bbc086d9156d49b127fa60b4ebd55fec96a3bd5c4a36"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_ppc_D1_pure_both.parquet": [
+    6548,
+    1790509914.0,
+    "77ca167700520b7807522176cd68f8418b2763355c2bc048bac62c59ba16e69d"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_ppc_D1_tsmixup_both.parquet": [
+    6563,
+    1790509928.0,
+    "ff8464e0bc44809dec535ac00ba646c2096517100482cd8bfa3b4b8e2245b702"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_ppc_D2_stride_f1.parquet": [
+    5349,
+    1790509941.0,
+    "8847b847951d87d7810974ab362668633b63fd7a69de809a8df32f3f9e47cb57"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_ppc_D2_patch_f1.parquet": [
+    5026,
+    1790509955.0,
+    "db064c85f4c2709e8135d9a7cf6debcbbe852dc92d5e2ea701fd6c5d4fc8553c"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_ppc.parquet": [
+    20089,
+    1790509956.0,
+    "b9b8e417eef867e7e313473f4a7c333a6105f50ac0023876ad3d4f72b7afdc0f"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_ppc_rates.parquet": [
+    3192,
+    1790509956.0,
+    "218075c14206e1fee31a1184efa8a3ed5f463142d74024445f424d927b2fe398"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_sens_A_both_f0p5__chains00.nc": [
+    11238705,
+    1790512344.0,
+    "3a19bbc25a163157d4171401ecfce2abf9406fb57786696aaad38259f94f0d86"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_sens_A_both_f0p5__chains02.nc": [
+    11238672,
+    1790514713.0,
+    "afbb382ee6cb6c13effcebe1432ab6a10c943d21c0fbeab1594dfa894df1613a"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_sens_A_both_f0p5.nc": [
+    19175696,
+    1790514717.0,
+    "1b1862b7a8ce11bb1056e1c8fdc42fae2db3237336e39e3fc9a04f9cea43cf06"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_sens_A_both_f2__chains00.nc": [
+    11236895,
+    1790517047.0,
+    "1624f999adfe41c0b73e5428387293fdb70cb79fdadba6331d1a2831c4d7eb05"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_sens_A_both_f2__chains02.nc": [
+    11236351,
+    1790519249.0,
+    "56bf9de5fb9a852476c76842bb5128a9ab64eb9a6b881c99ca4e9a7a8d0dff5c"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_sens_A_both_f2.nc": [
+    19171444,
+    1790519254.0,
+    "0d721d36e886ab27e16545cadf50e3fcac0e0a1bbcda45340e2b10283d26d95c"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_sens_B_adjusted_f0p5__chains00.nc": [
+    1330831,
+    1790519366.0,
+    "965b2f39a926b571fb12ab2771fb8c17e42ea4cf386da4fbb0abed926f9583c1"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_sens_B_adjusted_f0p5__chains02.nc": [
+    1330798,
+    1790519428.0,
+    "632df9c977706737e3f3e75aa2537b0475356c902e1567705fb000ba1a4aa72c"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_sens_B_adjusted_f0p5.nc": [
+    2474912,
+    1790519430.0,
+    "f75aec295560ab03a58c6e6c644f03922c72703f8efb69849ced889c5bf7acc0"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_sens_B_adjusted_f2__chains00.nc": [
+    1330451,
+    1790519498.0,
+    "98a06bd76e30482cac838d0eadf10a84e2614e27d850e5673bdb9307d053ae34"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_sens_B_adjusted_f2__chains02.nc": [
+    1330506,
+    1790519560.0,
+    "1f2cc46fa9e422c357e5ec390bc382bb800e92fa5dbc4effbb88be090e6a9a7e"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_sens_B_adjusted_f2.nc": [
+    2474257,
+    1790519561.0,
+    "9abc80268a4ae90212eac545a3cce971e541c298af039c75d3a3a279722f8d40"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_sens_C_phase_f0p5__chains00.nc": [
+    11674045,
+    1790522374.0,
+    "15d41799fe025ce3881c334c1c8be596de92e98554d8c3b90955a31c260526fd"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_sens_C_phase_f0p5__chains02.nc": [
+    11698955,
+    1790525133.0,
+    "37075f146fd9b2fcb4c1d0bd39926970a9537e72a61bf3148ee8e1afe1c2ae51"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_sens_C_phase_f0p5.nc": [
+    20069270,
+    1790525138.0,
+    "3ffb10ea52f424ee8c49253edb45f1c8a3ed6dada3741f2991c66d3b34481322"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_sens_C_phase_f2__chains00.nc": [
+    11689764,
+    1790528023.0,
+    "8d9d7efd6cfee3d001ade510cad506c9de04b7e3dcafe187f474c2d463455cf1"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_sens_C_phase_f2__chains02.nc": [
+    11701301,
+    1790531005.0,
+    "20e30ec70db7ce579cd0ada7def3d17997c679eef468124e7131dec90ec2540d"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_sens_C_phase_f2.nc": [
+    20087512,
+    1790531011.0,
+    "99bcd20f43c3908752396c104f0a7643c391037bd398ee893835a09fe7f13c44"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_sens_D1_tsmixup_both_f0p5__chains00.nc": [
+    983820,
+    1790531060.0,
+    "b66038a672f42b0306361c7cf56e81c1d2c4b9af98a345e4366c10ae7db1d2bd"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_sens_D1_tsmixup_both_f0p5__chains02.nc": [
+    983774,
+    1790531097.0,
+    "719134f1b1a2f665757d1550ab759e9a556a400f06269e4450f88dc45dc3195a"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_sens_D1_tsmixup_both_f0p5.nc": [
+    1738711,
+    1790531098.0,
+    "07f29d21cf9035b141d3f4d67d7bc662c37d734f503c49427ca538f1770d777c"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_sens_D1_tsmixup_both_f2__chains00.nc": [
+    983876,
+    1790531143.0,
+    "7adebe38fac99366ccb89c12b6f71fa6651bd1cbab2a1e3bebe32c422432ff05"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_sens_D1_tsmixup_both_f2__chains02.nc": [
+    983613,
+    1790531180.0,
+    "5eba9a87482dd51cf7fc4d7389a1668f12a1e8086a5b62250a106392a589a557"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_sens_D1_tsmixup_both_f2.nc": [
+    1738623,
+    1790531182.0,
+    "a391a5a73211e62774f84ef3da97200447d1d989c1c0a62b58e4d95bd836f7d6"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_sens_D1_kernelsynth_both_f0p5__chains00.nc": [
+    982180,
+    1790531220.0,
+    "9879685273d75a3a08fc60a53a8c46f6fc9746ae49ac9be38aeb2260239e9914"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_sens_D1_kernelsynth_both_f0p5__chains02.nc": [
+    981958,
+    1790531257.0,
+    "885e0f9f21d2f24a0f0010da20eb8bad2ed01e36663466e48b24a94c7ad38bfe"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_sens_D1_kernelsynth_both_f0p5.nc": [
+    1735272,
+    1790531258.0,
+    "3e0b0e540183339bbd006c2396358a35ca733b26b9966ea658c86e00b0644aab"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_sens_D1_kernelsynth_both_f2__chains00.nc": [
+    982288,
+    1790531299.0,
+    "7b2962bd7fd0de9bca0ba04cf4452a9dfd36c2bf9f4b97acf941fd8f550a9965"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_sens_D1_kernelsynth_both_f2__chains02.nc": [
+    982214,
+    1790531337.0,
+    "e8be45b450ab92e85ec90619a761b74b411736046aa6ec713983e5dd18557f9a"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_sens_D1_kernelsynth_both_f2.nc": [
+    1735632,
+    1790531338.0,
+    "045f329e290a37074dabf31918945812829e3d430fb58b1787a826563f1dce0e"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_sens_D2_stride_f1_f0p5__chains00.nc": [
+    382864,
+    1790531355.0,
+    "b6f0c1988afa3ce8787e9b06b2b04981144aa2416fde84b38b21a4caea024f16"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_sens_D2_stride_f1_f0p5__chains02.nc": [
+    382521,
+    1790531370.0,
+    "d00edb2e662cfee7cfbee52a1a82fd0ded6d6271240102993a45baa0d323ec99"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_sens_D2_stride_f1_f0p5.nc": [
+    655167,
+    1790531372.0,
+    "d85a51410920e5cde39ae1a06f3e6ef7e04ce29ae30deeff8a6f422f51bd538f"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_sens_D2_stride_f1_f2__chains00.nc": [
+    381333,
+    1790531391.0,
+    "507afb99750fca4c0908ec234165be991ce06f9e716e367472807620355b1d4a"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_sens_D2_stride_f1_f2__chains02.nc": [
+    383956,
+    1790531407.0,
+    "ea71f3337813fc9cfb7a64d01dd204b097bfab9be26b22211117a60ef373f5c3"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_sens_D2_stride_f1_f2.nc": [
+    655001,
+    1790531409.0,
+    "b52831ac7903f430ffc3920f0b3bbe737b26758b63f4b5751d68586bb4e73862"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_sens_D2_patch_f1_f0p5__chains00.nc": [
+    381335,
+    1790531423.0,
+    "6d144fb588e7284d47898a4b54d3c85a521f54035601487c463f0fb17fbb25b4"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_sens_D2_patch_f1_f0p5__chains02.nc": [
+    379328,
+    1790531438.0,
+    "8589bfdb40b24c4e25a0174f30667eb4477d4b9c5db5250bf3522319ce322f29"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_sens_D2_patch_f1_f0p5.nc": [
+    650395,
+    1790531439.0,
+    "6d700305fae4d5732ae2f5313ca9373d9e46e8b6189bbe5b93590d93cc92d6cb"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_sens_D2_patch_f1_f2__chains00.nc": [
+    383291,
+    1790531453.0,
+    "eb06741619d5c86113ad4426f0efb62428fb1228f4cef516cc43d0e37783b315"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_sens_D2_patch_f1_f2__chains02.nc": [
+    382238,
+    1790531463.0,
+    "440f4ef64491daad219de976fe232a17f63d8f577af4bcedf6e0eac449c3a039"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_sens_D2_patch_f1_f2.nc": [
+    655289,
+    1790531465.0,
+    "fb10470b7a43a41d053508246732db54ea8e763d38c55d2246884e0ab2773cb2"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_A_gaussian__chains00.nc": [
+    11239549,
+    1790533041.0,
+    "f15eb43d59626455d580c3e18b3946998806b50fb600ce0d8e77f1c53c7c9734"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_A_gaussian__chains02.nc": [
+    11239061,
+    1790534605.0,
+    "e091cc8f87722befe14f36a63cbf0bf10d4cfe4b74ff0404dd344890894b1626"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_A_gaussian.nc": [
+    19176114,
+    1790534610.0,
+    "772e8d60a3ea39b9da178ebfe4a589902a0cfb673a73d3e23d08f65405fe4d02"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_sensitivity.parquet": [
+    7734,
+    1790534615.0,
+    "c83454328776fc96b97f057b10b8b883f002003c9c7b660ad42e42e1e77895b7"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_loo_pointwise_A_both.parquet": [
+    6332294,
+    1790535125.0,
+    "27faf6091a5a7f60dc22b947550a91fda16a562ebb609999e06762304ba747af"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_loo_scalars_A_both.json": [
+    251,
+    1790535125.0,
+    "e4e6913310234d02925c541724ad714fc19d0182fa7eb6f1b7c0a2a1366a1c90"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_loo_pointwise_A_patch.parquet": [
+    6332991,
+    1790535642.0,
+    "ef2f9d18b2bf95a32bd5044ed14e8077deaffa93b5340bbf8703b8d95db0cac1"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_loo_scalars_A_patch.json": [
+    251,
+    1790535642.0,
+    "356d62c2a90dec5b88a54787fb51bcbfa315f2eccebae4b566513de2cac42fdd"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_loo_pointwise_A_overlap.parquet": [
+    6332432,
+    1790536156.0,
+    "6bd19fad08a264dcebd8e15f93eb9d1ea2974cc5e4657b4fed57b3963bb13192"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_loo_scalars_A_overlap.json": [
+    254,
+    1790536156.0,
+    "933cbba3171a291bb6c3a75191b35a6ef25b77e85d61ed8cb85a3ed233859017"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_loo_pointwise_A_none.parquet": [
+    6332012,
+    1790536672.0,
+    "58d5c4e99babd64637d2273d7c0e3216c29cdf4387f26c2e80881afece97fe81"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_loo_scalars_A_none.json": [
+    250,
+    1790536673.0,
+    "8ea7c7b2b90fa301e9bebb212563c09e547134efa7adfcaf0a2e16b14f25db76"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_loo_pointwise_C_phase.parquet": [
+    6340172,
+    1790537215.0,
+    "6b736679448125886fa10c5bbb1b48c3af0aa1d0ca06ba3b3ab4ca01c1963f28"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_loo_scalars_C_phase.json": [
+    252,
+    1790537215.0,
+    "2f74ac1e9eda92bb227ce7cde4be5bf2f05e1dd7f25543fe4348e9293efa7e08"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_loo_pointwise_C_nophase.parquet": [
+    6332529,
+    1790537725.0,
+    "dd0c001b179480bb9dd4a60b1118b27a24c9db1c854ed9302b2d9eff11ae8f69"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_loo_scalars_C_nophase.json": [
+    255,
+    1790537725.0,
+    "d8fa09e5216f1ecfe9fb9434c5aaa74f53c2d83865263cbcf9ad34858ebf9919"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_loo_pointwise_B_adjusted.parquet": [
+    114068,
+    1790537738.0,
+    "9880ea81cd08214644560fae7b48a269615da52de1a640fdc183c4f2d4eb73c3"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_loo_scalars_B_adjusted.json": [
+    252,
+    1790537738.0,
+    "8e7fd6f4519acd11f13d5336a0cec69ac96a3c94a3194e2cf5c51641e3a54a83"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_loo_pointwise_B_unadjusted.parquet": [
+    114068,
+    1790537750.0,
+    "41bb0f54ab6cb67166cfd6ba9f39e3954feee7fc89d61eee72b71c58202fa8ae"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_loo_scalars_B_unadjusted.json": [
+    255,
+    1790537750.0,
+    "d09cafbc1fc2382cbb1d06b744cc95c611557ae82ab84f0a0e2ff90ec43f10a2"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_loo_pointwise_D1_kernelsynth_both.parquet": [
+    234410,
+    1790537769.0,
+    "bf7d7057e0cc1d4c8e255b5c44c89c77f2a88b96dae213bb566b1c4d4f7e1551"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_loo_scalars_D1_kernelsynth_both.json": [
+    263,
+    1790537770.0,
+    "ad224eedca6a6f0dec7dcd78858465ab5172f8e9051c8bd854de47ddb8700a22"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_loo_pointwise_D1_kernelsynth_stride.parquet": [
+    234410,
+    1790537787.0,
+    "0a850d6cf3a64731465526e19be8195b17ae1de20b06e790865860522d1997e5"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_loo_scalars_D1_kernelsynth_stride.json": [
+    266,
+    1790537787.0,
+    "73651cf514f76aadfa8210a226f79bd0cce0e50c8721718b75f372da493e9a8f"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_loo_pointwise_D1_kernelsynth_patch.parquet": [
+    234410,
+    1790537804.0,
+    "b76508abc4548975103074055867d6629a4a203891970e5178555be7e656124c"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_loo_scalars_D1_kernelsynth_patch.json": [
+    265,
+    1790537804.0,
+    "b9034720f832bba66b8e64e960fc2263ab8f1725cd3774a4db3bf67ef3286978"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_loo_pointwise_D1_kernelsynth_none.parquet": [
+    234410,
+    1790537819.0,
+    "f6840b5acbc11700c24053136455305b66067ee469c244d4457cdebe2c8136e3"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_loo_scalars_D1_kernelsynth_none.json": [
+    264,
+    1790537819.0,
+    "e65458e799201eaaebe08610d625abcc92c7793e94be94b297cf33d054775120"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_loo_pointwise_D1_pure_both.parquet": [
+    229802,
+    1790537838.0,
+    "f04855b478d5ccf36e72365efa8af57d580e47281a5d7a7bd75ead1e5957e9db"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_loo_scalars_D1_pure_both.json": [
+    256,
+    1790537838.0,
+    "13aa0b2da41b7c263a8696f6914198955ef235c9df42cf6784f22cc95d9549d4"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_loo_pointwise_D1_pure_stride.parquet": [
+    229706,
+    1790537854.0,
+    "3ad7c500e39fb3e8a67684944db3e9220cd6d8e66692ee9087fb65fcb9e886d4"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_loo_scalars_D1_pure_stride.json": [
+    254,
+    1790537855.0,
+    "f87681f684ce4621b46cbdcfa6f5f7d22f1035e01717351808b52c6d39fc723d"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_loo_pointwise_D1_pure_patch.parquet": [
+    229802,
+    1790537871.0,
+    "e18bb88140f598281f17a88cfa12f3238a167a890da7b0642f525bf6de382b46"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_loo_scalars_D1_pure_patch.json": [
+    259,
+    1790537871.0,
+    "4f9679ccc59e6897b0fdc5e846cb84d182e0c550e2053454764c9ac5835eb4b5"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_loo_pointwise_D1_pure_none.parquet": [
+    229706,
+    1790537886.0,
+    "ff89ea03a8443f105be3ca7db736ebbe6966147224691c59508eca576831aed6"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_loo_scalars_D1_pure_none.json": [
+    258,
+    1790537886.0,
+    "bb32d3a6da60c84c4e7c3cf8bb496a87030923262dc8b7696d03872f4eea4ab9"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_loo_pointwise_D1_tsmixup_both.parquet": [
+    234426,
+    1790537906.0,
+    "9765a3b7967e1b19923131037dadfb922e3e32743a2390fb31d3149970bfaf88"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_loo_scalars_D1_tsmixup_both.json": [
+    259,
+    1790537906.0,
+    "63cf18ef3c1e423dead9d2377818af04e164c23aa980b96b320c31a52952160a"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_loo_pointwise_D1_tsmixup_stride.parquet": [
+    234426,
+    1790537923.0,
+    "7dfa98b62de77fcd351fe9e98880388d0e2c813b266fa6e70b5348cd9e4ec3b4"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_loo_scalars_D1_tsmixup_stride.json": [
+    259,
+    1790537923.0,
+    "f7d79eb081256195c79e50b53212722517a1768fd76fb2e2d031aeb0e1d04931"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_loo_pointwise_D1_tsmixup_patch.parquet": [
+    234426,
+    1790537940.0,
+    "822d27cbda7540c0b5393b241b630390e991e8bcc146881ecdf2f5127314a7d4"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_loo_scalars_D1_tsmixup_patch.json": [
+    260,
+    1790537940.0,
+    "523552ff79e92b160fc2521cad02cd0e77b86e30e868862b25300e2e7493f534"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_loo_pointwise_D1_tsmixup_none.parquet": [
+    234428,
+    1790537955.0,
+    "331ea6eaa725f6dbedb3f6f40753b95bdcd7bb8fc948bc62fa799f37ea2669ab"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_loo_scalars_D1_tsmixup_none.json": [
+    257,
+    1790537955.0,
+    "43272d83a9db6c7242221b1a4c104756f608712173cf97406a5129c5ebd2b439"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_loo.parquet": [
+    10250,
+    1790537955.0,
+    "d357453bc467eea8357b1ea664fd791c0cb958735e8d24b171090dccf5951210"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_loo_decisions.json": [
+    2425,
+    1790537955.0,
+    "44e139e8e247c04a922abeb4b4ca809356903b81fc109309ded4eabf8a27eb1a"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_verdicts.parquet": [
+    15751,
+    1790537956.0,
+    "dcd776242677cbfa7cb3a509e1fa7e5e1d5f5830af08de6be9678fc64c1ea6b0"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_gate_report.parquet": [
+    9321,
+    1790537956.0,
+    "b74249a3d1f4c6e36e0b0c633053f34fa3faf152ad20fb5dffeab10ec38c09f4"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/05_run_summary.json": [
+    6011,
+    1790537956.0,
+    "243137ba3e48dcf4c1345fbf404e56c89ae6fb0c55ef65afe83fc9010931176e"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/06_updating.parquet": [
+    3913,
+    1790537962.0,
+    "1f2b01c4c0dc150c72061789c36aac0a178b5e8572ecdce9beb88e3fb06a817d"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/06_figure_index.parquet": [
+    2440,
+    1790537986.0,
+    "fa852c951485562f02bd01faa0b595656c07395af1e79373d7c4306aa9e5d5dc"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/07_fit_summary.parquet": [
+    8457,
+    1790537986.0,
+    "8cf154a720f0da5386319228b961ea497f08628d19614d2910b2720f8cec8a1f"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/07_claim_summary.parquet": [
+    14399,
+    1790537986.0,
+    "a966e3d7985c8dac8b2605dd98731725247cd794b63bf2145ba00d7ad48eaf55"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/07_prior_posterior.parquet": [
+    11684,
+    1790538026.0,
+    "8806239e91a2bc6b133c557a19c5c379b1cfcbfb43ad0b913b2aef16bfaa92a7"
+  ],
+  "/content/drive/MyDrive/patchAliasing_D3_final/full_snr1p5_20260926-172321_270c2f/07_rule_probabilities.parquet": [
+    5093,
+    1790538026.0,
+    "49e2a5c0854a351ecfe222cdb8f655fd00b15c7331436e4b0df9919ba6978535"
+  ]
+}

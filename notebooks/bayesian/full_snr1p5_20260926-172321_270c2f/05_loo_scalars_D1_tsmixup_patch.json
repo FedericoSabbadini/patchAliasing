@@ -1,0 +1,12 @@
+{
+  "label": "D1_tsmixup_patch",
+  "elpd_loo": 285.38028588445354,
+  "se": 73.84280103671733,
+  "p_loo": 17.014731174296912,
+  "n_samples": 8000,
+  "n_obs": 11925,
+  "good_k": 0.7,
+  "max_pareto_k": 0.17520407031743732,
+  "warning": false,
+  "reliable": true
+}

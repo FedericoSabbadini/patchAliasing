@@ -1,0 +1,20 @@
+model,parameter,prior,role
+"A, C",beta_bar,"StudentT(4, 0, 0.5)","population phase-lock effect, on the log-recovery scale"
+A,delta_O,"StudentT(4, 0, 0.5)",slope in the centred overlap; one unit is 0.5 of O
+A,delta_P,"StudentT(4, 0, 0.5)",slope in the centred log patch size
+"A, C",tau,"HalfStudentT(4, 0.5)",spread of the configuration effects
+"A, C",sigma_harm,"HalfStudentT(4, 0.5)",spread across lock harmonics (sum-to-zero)
+"A, C",sigma_bg,"HalfStudentT(4, 0.5)",spread across background realisations (sum-to-zero)
+"A, C",sigma,"HalfStudentT(4, 0.5)",residual scale of the contrast
+C,sigma_phase,HalfNormal(0.25),spread of the eight per-phase offsets (sum-to-zero)
+B,alpha_0,"Normal(log mean L, 1)",baseline log codelength
+B,theta_lock,"Normal(0, 0.5)",log codelength expansion at a lock
+B,r,"Gamma(2, 0.1)","Gamma shape, carrying the dispersion"
+B,sigma_st,HalfNormal(1),spread of the probe-stage offsets (sum-to-zero)
+B,sigma_geo,HalfNormal(1),spread of the geometry offsets (sum-to-zero)
+D1,alpha_g,"Normal(0, 1)",per-geometry off-grid level of log z
+D1,theta_S,"Normal(0, 1)",dip depth on the stride grid
+D1,theta_P,"Normal(0, 1)",dip depth on the patch grid
+D1,sigma,HalfNormal(1),residual scale of log z
+D2,kappa,"Normal(0, 1)",measured spacing per unit of predicted spacing
+D2,sigma_F,HalfNormal(5) Hz,scatter beyond the sweep-resolution floor

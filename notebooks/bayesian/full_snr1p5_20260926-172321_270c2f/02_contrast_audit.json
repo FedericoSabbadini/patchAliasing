@@ -1,0 +1,13 @@
+{
+  "arms": 1113000,
+  "triplets_formed": 371000,
+  "triplets_incomplete": 0,
+  "legacy_live_rows": null,
+  "recovery_denominator": "true_continuation",
+  "background_only_arm": true,
+  "rule": "every complete triplet with finite, non-negative recoveries; no response filter",
+  "backgrounds": 200,
+  "harmonics": 31,
+  "phase_bins": 8,
+  "geometries": 15
+}

@@ -1,0 +1,18 @@
+quantity,value,model
+P(beta_bar < 0),0.5,A
+P(attenuation >= 20%),0.33585,A
+P(attenuation >= 50%),0.1218,A
+P(delta_O > 0),0.496,A
+ratio 2.5%,0.25471150100666284,A
+ratio 97.5%,4.028071936019148,A
+d 2.5%,-3.377377579005916,A
+d 97.5%,3.427093490495185,A
+P(theta_lock > 0),0.49425,B
+P(expansion >= 20%),0.35745,B
+P(|theta| < log 1.1),0.15055,B
+P(sigma_phase < log 1.1),0.2987,C
+P(|kappa - 1| < 0.1),0.048,D2
+P(prior predictive f1 < 0),0.4957,D2
+skeleton triplets,22260.0,design
+full design triplets,371000.0,design
+distinct harmonics,31.0,design

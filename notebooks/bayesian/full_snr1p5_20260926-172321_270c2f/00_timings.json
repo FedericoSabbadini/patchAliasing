@@ -1,0 +1,23 @@
+{
+  "part1_prior_predictive": 0.414715051651001,
+  "part2_collection": 9139.48294210434,
+  "part3_parity": 224.9085350036621,
+  "part3_recovery": 4147.755501270294,
+  "fit_A_both": 9.79666256904602,
+  "fit_A_overlap": 6.208318710327148,
+  "fit_A_patch": 6.040093183517456,
+  "fit_A_none": 6.0149993896484375,
+  "fit_A_net": 5.807116508483887,
+  "fit_B_adjusted": 1.1773273944854736,
+  "fit_B_unadjusted": 0.7694487571716309,
+  "fit_C_phase": 7.706545352935791,
+  "fit_C_nophase": 4416.255066156387,
+  "fit_D1": 830.6623339653015,
+  "fit_D1_alt_tol": 158.05421543121338,
+  "fit_D2": 89.386066198349,
+  "part5_ppc": 181.1617443561554,
+  "part5_sensitivity": 24656.846667289734,
+  "part5_loo": 3339.1474056243896,
+  "part6_figures": 28.55910873413086,
+  "part7_summary_and_report_figures": 51.63732385635376
+}

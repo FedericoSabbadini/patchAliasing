@@ -1,0 +1,12 @@
+{
+  "label": "D1_kernelsynth_none",
+  "elpd_loo": -1198.9515726867673,
+  "se": 137.48830674924386,
+  "p_loo": 18.250343272242617,
+  "n_samples": 8000,
+  "n_obs": 11925,
+  "good_k": 0.7,
+  "max_pareto_k": 0.2129030386400924,
+  "warning": false,
+  "reliable": true
+}

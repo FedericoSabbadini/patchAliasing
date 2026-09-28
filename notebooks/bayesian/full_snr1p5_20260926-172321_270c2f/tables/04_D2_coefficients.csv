@@ -1,0 +1,4 @@
+fit,branch,response,subset,observations,kappa median,kappa low,kappa high,P(|kappa-1|<0.1),identified
+D2_stride_f1,stride,f1,all detected,34,1.0001343959803997,0.9895860893175057,1.0109978154346047,1.0,True
+D2_stride_delta_hat,stride,delta_hat,all detected,21,1.131820355197938,0.938394865868383,1.3180787784664876,0.360875,True
+D2_patch_f1,patch,f1,all detected,3,4.396116901192812,2.7814437035428825,5.962519041167244,0.000125,False

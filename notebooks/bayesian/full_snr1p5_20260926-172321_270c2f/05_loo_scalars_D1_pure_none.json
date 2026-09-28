@@ -1,0 +1,12 @@
+{
+  "label": "D1_pure_none",
+  "elpd_loo": -15718.288990948851,
+  "se": 220.44305200767388,
+  "p_loo": 23.381008017649947,
+  "n_samples": 8000,
+  "n_obs": 11925,
+  "good_k": 0.7,
+  "max_pareto_k": 0.16695944044410452,
+  "warning": false,
+  "reliable": true
+}

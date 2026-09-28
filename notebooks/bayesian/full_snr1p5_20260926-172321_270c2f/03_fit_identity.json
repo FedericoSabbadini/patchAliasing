@@ -1,0 +1,12 @@
+{
+  "analysis_fingerprint": "62cc3ec197ccd72755d5f7436a09250f56a53983122630b698e1375d2dcfe4a1",
+  "collection": {
+    "collapse": "3b78eaadf0159113adcc31d95e9e8dadf434ea7a5e582aa4016c60f58f2c0628",
+    "contrasts": "90173d63e68a070e1a1bfa84eecc7a96a7baa1e31b6697eba998048ecec4cd57",
+    "mdl_bandtasks": "4643c86a076ef669edf4cbf69cf9031e2a470eb68765ea3f51459a0d4ce15053",
+    "mdl_cells": "aa79da160fe22ad367a0292250b14337911f979c9db9c16e190ac2a056f81bcc",
+    "sites": "edde6f0766866108d32362da2c5599904df0cf743f7e69eda2dda7bdc773c9a0",
+    "collection_manifest": "e961c6c83a6c3ddb3b791ba679a3c2c5569062db1a6356053172ffc89d18ff3d"
+  },
+  "builders": "6c8609a83ea0510c9ca7018c7bc4d024ae3654bcab3e22c4f73be0b9a2b91d75"
+}

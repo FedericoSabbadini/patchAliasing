@@ -1,0 +1,79 @@
+{
+  "M1": {
+    "group": "M1",
+    "reference": "overlap + patch size",
+    "best": "patch size only",
+    "loo_reliable": true,
+    "reference_wins": false,
+    "best_margin": 0.7071833021594323,
+    "best_dse": 0.15409003913618907,
+    "separated_2dse": true,
+    "reading": "patch size only preferred"
+  },
+  "M1_fourway": {
+    "group": "M1_fourway",
+    "reference": "overlap + patch size",
+    "best": "overlap only",
+    "loo_reliable": true,
+    "reference_wins": false,
+    "best_margin": 0.06772099692710754,
+    "best_dse": 0.19205299485267807,
+    "separated_2dse": false,
+    "reading": "INCONCLUSIVE: the best model leads by 0.1 against a 2*dse of 0.4"
+  },
+  "H2": {
+    "group": "H2",
+    "reference": "phase-dependent",
+    "best": "phase-dependent",
+    "loo_reliable": true,
+    "reference_wins": true,
+    "best_margin": 11.864882235700039,
+    "best_dse": 4.430529838249747,
+    "separated_2dse": true,
+    "reading": "phase-dependent preferred"
+  },
+  "B_blocking": {
+    "group": "B_blocking",
+    "reference": "stage and geometry adjusted",
+    "best": "stage and geometry adjusted",
+    "loo_reliable": true,
+    "reference_wins": true,
+    "best_margin": 255.15128232086013,
+    "best_dse": 20.97029583083242,
+    "separated_2dse": true,
+    "reading": "stage and geometry adjusted preferred"
+  },
+  "H3_location:kernelsynth": {
+    "group": "H3_location:kernelsynth",
+    "reference": "both grids",
+    "best": "stride only",
+    "loo_reliable": true,
+    "reference_wins": false,
+    "best_margin": 0.5685359220795458,
+    "best_dse": 1.3056578819607336,
+    "separated_2dse": false,
+    "reading": "INCONCLUSIVE: the best model leads by 0.6 against a 2*dse of 2.6"
+  },
+  "H3_location:pure": {
+    "group": "H3_location:pure",
+    "reference": "both grids",
+    "best": "both grids",
+    "loo_reliable": true,
+    "reference_wins": false,
+    "best_margin": 4.688147618711394,
+    "best_dse": 3.611792726013391,
+    "separated_2dse": false,
+    "reading": "INCONCLUSIVE: the best model leads by 4.7 against a 2*dse of 7.2"
+  },
+  "H3_location:tsmixup": {
+    "group": "H3_location:tsmixup",
+    "reference": "both grids",
+    "best": "stride only",
+    "loo_reliable": true,
+    "reference_wins": false,
+    "best_margin": 0.14373811932111558,
+    "best_dse": 1.4402424376450707,
+    "separated_2dse": false,
+    "reading": "INCONCLUSIVE: the best model leads by 0.1 against a 2*dse of 2.9"
+  }
+}

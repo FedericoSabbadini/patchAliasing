@@ -1,0 +1,12 @@
+{
+  "label": "D1_pure_patch",
+  "elpd_loo": -14552.416075335554,
+  "se": 191.02262048550816,
+  "p_loo": 28.197201655340905,
+  "n_samples": 8000,
+  "n_obs": 11925,
+  "good_k": 0.7,
+  "max_pareto_k": 0.13530999669739657,
+  "warning": false,
+  "reliable": true
+}

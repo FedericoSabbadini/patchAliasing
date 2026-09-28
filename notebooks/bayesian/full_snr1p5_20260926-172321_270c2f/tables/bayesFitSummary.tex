@@ -1,0 +1,57 @@
+\begin{table*}[!htbp]
+    \centering
+    \footnotesize
+    \setlength{\tabcolsep}{3pt}
+    \begin{tabular}{@{}llrrrrcccc@{}}
+        \toprule
+        \textbf{Fit} & \textbf{Role} & \textbf{Obs.} & $\max\hat R$ & \textbf{min ESS} & \textbf{Div.} & \textbf{Conv.} & \textbf{Recov.} & \textbf{PPC} & \textbf{LOO} \\
+        \midrule
+        A\_both & verdict of H1\_behavioural; verdict of M1; LOO M1 (reference); LOO M1\_fourway (reference) & 371\,000 & 1.004 & 4637 & 0 & \checkmark & \textbf{fail} & \textbf{fail} & \checkmark \\
+        A\_overlap & LOO M1\_fourway & 371\,000 & 1.003 & 4600 & 0 & \checkmark & \textbf{fail} & -- & \checkmark \\
+        A\_patch & verdict of M1; LOO M1; LOO M1\_fourway & 371\,000 & 1.003 & 4490 & 0 & \checkmark & \textbf{fail} & -- & \checkmark \\
+        A\_none & LOO M1\_fourway & 371\,000 & 1.003 & 4583 & 0 & \checkmark & \textbf{fail} & -- & \checkmark \\
+        A\_net\_both & net reading of H1\_behavioural and M1 & 371\,000 & 1.004 & 4752 & 0 & \checkmark & \textbf{fail} & -- & -- \\
+        B\_adjusted & verdict of H1\_representational; LOO B\_blocking (reference) & 5\,830 & 1.003 & 2724 & 0 & \checkmark & \textbf{fail} & \textbf{fail} & \checkmark \\
+        B\_unadjusted & LOO B\_blocking & 5\,830 & 1.001 & 4890 & 0 & \checkmark & \textbf{fail} & -- & \checkmark \\
+        C\_phase & verdict of H2; LOO H2 (reference) & 371\,000 & 1.004 & 2457 & 0 & \checkmark & \textbf{fail} & \textbf{fail} & \checkmark \\
+        C\_nophase & LOO H2 & 371\,000 & 1.004 & 4402 & 0 & \checkmark & \textbf{fail} & -- & \checkmark \\
+        D1\_kernelsynth\_both & verdict of H3\_location; LOO H3\_location:kernelsynth (reference) & 11\,925 & 1.002 & 5460 & 0 & \checkmark & \checkmark & \textbf{fail} & \checkmark \\
+        D1\_kernelsynth\_stride & verdict of H3\_location; LOO H3\_location:kernelsynth & 11\,925 & 1.002 & 5320 & 0 & \checkmark & \checkmark & -- & \checkmark \\
+        D1\_kernelsynth\_patch & verdict of H3\_location; LOO H3\_location:kernelsynth & 11\,925 & 1.002 & 5165 & 0 & \checkmark & \checkmark & -- & \checkmark \\
+        D1\_kernelsynth\_none & verdict of H3\_location; LOO H3\_location:kernelsynth & 11\,925 & 1.002 & 4935 & 0 & \checkmark & \checkmark & -- & \checkmark \\
+        D1\_pure\_both & LOO H3\_location:pure (reference) & 11\,925 & 1.001 & 5000 & 0 & \checkmark & \checkmark & \textbf{fail} & \checkmark \\
+        D1\_pure\_stride & LOO H3\_location:pure & 11\,925 & 1.002 & 5402 & 0 & \checkmark & \checkmark & -- & \checkmark \\
+        D1\_pure\_patch & LOO H3\_location:pure & 11\,925 & 1.002 & 5234 & 0 & \checkmark & \checkmark & -- & \checkmark \\
+        D1\_pure\_none & LOO H3\_location:pure & 11\,925 & 1.003 & 5337 & 0 & \checkmark & \checkmark & -- & \checkmark \\
+        D1\_tsmixup\_both & verdict of H3\_location; LOO H3\_location:tsmixup (reference) & 11\,925 & 1.001 & 5277 & 0 & \checkmark & \checkmark & \textbf{fail} & \checkmark \\
+        D1\_tsmixup\_stride & verdict of H3\_location; LOO H3\_location:tsmixup & 11\,925 & 1.001 & 5277 & 0 & \checkmark & \checkmark & -- & \checkmark \\
+        D1\_tsmixup\_patch & verdict of H3\_location; LOO H3\_location:tsmixup & 11\,925 & 1.002 & 5309 & 0 & \checkmark & \checkmark & -- & \checkmark \\
+        D1\_tsmixup\_none & verdict of H3\_location; LOO H3\_location:tsmixup & 11\,925 & 1.001 & 5361 & 0 & \checkmark & \checkmark & -- & \checkmark \\
+        D1\_tsmixup\_both\_alt & alternative grid tolerance (robustness) & 11\,925 & 1.002 & 5261 & 0 & \checkmark & \checkmark & -- & -- \\
+        D1\_kernelsynth\_both\_alt & alternative grid tolerance (robustness) & 11\,925 & 1.001 & 5162 & 0 & \checkmark & \checkmark & -- & -- \\
+        D2\_stride\_f1 & verdict of H3a & 34 & 1.003 & 1751 & 0 & \checkmark & \checkmark & \textbf{fail} & -- \\
+        D2\_stride\_delta\_hat & description & 21 & 1.000 & 4965 & 0 & \checkmark & -- & -- & -- \\
+        D2\_patch\_f1 & verdict of H3b & 3 & 1.002 & 3214 & 0 & \checkmark & \textbf{fail} & \textbf{fail} & -- \\
+        05\_sens\_A\_both\_f0p5 & sensitivity rung x0.5 of H1\_behavioural & -- & 1.004 & 4195 & 0 & \checkmark & -- & -- & -- \\
+        05\_sens\_A\_both\_f2 & sensitivity rung x2 of H1\_behavioural & -- & 1.002 & 4697 & 0 & \checkmark & -- & -- & -- \\
+        05\_sens\_A\_both\_f0p5 & sensitivity rung x0.5 of M1 & -- & 1.004 & 4195 & 0 & \checkmark & -- & -- & -- \\
+        05\_sens\_A\_both\_f2 & sensitivity rung x2 of M1 & -- & 1.002 & 4697 & 0 & \checkmark & -- & -- & -- \\
+        05\_sens\_B\_adjusted\_f0p5 & sensitivity rung x0.5 of H1\_representational & -- & 1.002 & 2566 & 0 & \checkmark & -- & -- & -- \\
+        05\_sens\_B\_adjusted\_f2 & sensitivity rung x2 of H1\_representational & -- & 1.001 & 3022 & 0 & \checkmark & -- & -- & -- \\
+        05\_sens\_C\_phase\_f0p5 & sensitivity rung x0.5 of H2 & -- & 1.003 & 2853 & 0 & \checkmark & -- & -- & -- \\
+        05\_sens\_C\_phase\_f2 & sensitivity rung x2 of H2 & -- & 1.003 & 2753 & 0 & \checkmark & -- & -- & -- \\
+        05\_sens\_D1\_tsmixup\_both\_f0p5 & sensitivity rung x0.5 of H3\_location:tsmixup & -- & 1.002 & 5424 & 0 & \checkmark & -- & -- & -- \\
+        05\_sens\_D1\_tsmixup\_both\_f2 & sensitivity rung x2 of H3\_location:tsmixup & -- & 1.002 & 5455 & 0 & \checkmark & -- & -- & -- \\
+        05\_sens\_D1\_kernelsynth\_both\_f0p5 & sensitivity rung x0.5 of H3\_location:kernelsynth & -- & 1.001 & 5516 & 0 & \checkmark & -- & -- & -- \\
+        05\_sens\_D1\_kernelsynth\_both\_f2 & sensitivity rung x2 of H3\_location:kernelsynth & -- & 1.001 & 5192 & 0 & \checkmark & -- & -- & -- \\
+        05\_sens\_D2\_stride\_f1\_f0p5 & sensitivity rung x0.5 of H3a & -- & 1.002 & 1983 & 0 & \checkmark & -- & -- & -- \\
+        05\_sens\_D2\_stride\_f1\_f2 & sensitivity rung x2 of H3a & -- & 1.001 & 1903 & 0 & \checkmark & -- & -- & -- \\
+        05\_sens\_D2\_patch\_f1\_f0p5 & sensitivity rung x0.5 of H3b & -- & 1.001 & 3769 & 0 & \checkmark & -- & -- & -- \\
+        05\_sens\_D2\_patch\_f1\_f2 & sensitivity rung x2 of H3b & -- & 1.001 & 4339 & 0 & \checkmark & -- & -- & -- \\
+        05\_A\_gaussian & Gaussian-likelihood robustness of H1\_behavioural & -- & 1.003 & 4420 & 0 & \checkmark & -- & -- & -- \\
+        05\_A\_gaussian & Gaussian-likelihood robustness of M1 & -- & 1.003 & 4420 & 0 & \checkmark & -- & -- & -- \\
+        \bottomrule
+    \end{tabular}
+\caption{Every fit of the run full\_snr1p5\_20260926-172321\_270c2f, with its convergence diagnostics and the gates it feeds. -- marks a gate that does not read the fit.}
+    \label{tab:bayesFitSummary}
+\end{table*}

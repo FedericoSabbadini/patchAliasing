@@ -1,0 +1,12 @@
+{
+  "label": "D1_kernelsynth_stride",
+  "elpd_loo": -877.5302225953471,
+  "se": 111.06697934681075,
+  "p_loo": 20.256082540168677,
+  "n_samples": 8000,
+  "n_obs": 11925,
+  "good_k": 0.7,
+  "max_pareto_k": 0.37183945899924564,
+  "warning": false,
+  "reliable": true
+}

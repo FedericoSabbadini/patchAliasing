@@ -1,0 +1,12 @@
+{
+  "label": "C_nophase",
+  "elpd_loo": -337964.93213662907,
+  "se": 774.7601981863554,
+  "p_loo": 208.15554024430458,
+  "n_samples": 8000,
+  "n_obs": 371000,
+  "good_k": 0.7,
+  "max_pareto_k": 0.31830855793375523,
+  "warning": false,
+  "reliable": true
+}

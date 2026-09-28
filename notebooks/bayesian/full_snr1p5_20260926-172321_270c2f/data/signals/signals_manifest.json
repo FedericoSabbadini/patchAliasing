@@ -1,0 +1,28 @@
+{
+  "index_sha256": "12f2358ab3b99c50157526e3af16bf80966041add0137e9b3bfec958cf8f3ffa",
+  "pool_quality": {
+    "kernelsynth": {
+      "effective_rank": 28.21815898124147,
+      "finite": true,
+      "max_abs_mean": 2.728056107812068e-09,
+      "max_abs_pairwise_correlation": 0.9982697483454576,
+      "max_abs_std_error": 4.5376036261757235e-09,
+      "minimum_effective_rank": 2.4000000000000004,
+      "n_draws": 100,
+      "quality_ok": true,
+      "unique_draws": 100
+    },
+    "tsmixup": {
+      "effective_rank": 74.62684329420487,
+      "finite": true,
+      "max_abs_mean": 8.214984143919804e-09,
+      "max_abs_pairwise_correlation": 0.861651550431558,
+      "max_abs_std_error": 1.2688176953545849e-08,
+      "minimum_effective_rank": 2.4000000000000004,
+      "n_draws": 100,
+      "quality_ok": true,
+      "unique_draws": 100
+    }
+  },
+  "schema_version": 1
+}

@@ -1,0 +1,12 @@
+{
+  "label": "B_adjusted",
+  "elpd_loo": -30274.89160138608,
+  "se": 91.52643241154858,
+  "p_loo": 20.13193470632541,
+  "n_samples": 8000,
+  "n_obs": 5830,
+  "good_k": 0.7,
+  "max_pareto_k": 0.20920433940323593,
+  "warning": false,
+  "reliable": true
+}

@@ -4,7 +4,7 @@ Coursework project for the *Computer Science and Digital Technologies* programme
 
 ## What is structural aliasing?
 
-Patch-based tokenisation splits a time series into overlapping windows of size P with stride S. When a signal's frequency satisfies the phase-locking condition f = c·fs/S or f = k·fs/P, consecutive patches become identical and the model's representation degenerates. The set of such frequencies is F_lock. Structural aliasing is the empirical phenomenon in which this degeneracy propagates to the learned latent space, making distinct inputs indistinguishable.
+Patch-based tokenisation splits a time series into windows of size P cut every S samples. When a signal completes a whole number of cycles in one stride, f = c·fs/S, consecutive patches are identical; when it completes a whole number in one patch, f = k·fs/P, the token sequence repeats every P/gcd(P,S) tokens. The union of the two combs is the closed-form candidate set F_lock. For S ≤ P the raw token sequence still determines the signal, so a candidate frequency is a place where a loss could sit, not a proof of one. Structural aliasing is the representation-level proposition that a model trained on such sequences nevertheless fails to make those frequencies readable from its internal state.
 
 ## Repository layout
 
@@ -32,17 +32,20 @@ Which notebook produces which part of the report:
 | Figure 1 and Appendix F sweep | `signal_analysis/single_reconstruction_figures.ipynb`, `signal_analysis/appendix_reconstruction.ipynb` |
 | Table 5 and Appendix G | `signal_analysis/appendix_decomposition_comparison.ipynb` |
 | Table 6 and Appendix H | `signal_analysis/solar_telemetry_comparison.ipynb` |
-| Section 5.4, Appendix E, Table 7 | `bayesian/deliverable2_bayesian_models.ipynb` |
+| Section 5.4, Appendix E, Tables 7-8 and Figure 2 | `bayesian/deliverable3_bayesian_models.ipynb` |
+| Figure 4 (Appendix E) | `bayesian/figure_ppc_dispersion.py`, from the `tables/05_ppc.csv` the notebook writes |
 | Appendix B | `chronos_architecture/train_sweep.py` |
 
 ## Hypotheses
 
 | ID | Claim | Test |
 |----|-------|------|
-| **H1** | Locked frequencies suffer localised information loss | Paired log-contrast d < 0 (behavioural) + higher MDL codelength (representational) |
-| **H2** | The deficit is phase-invariant | Per-phase offset spread sigma_phi near zero |
-| **H3a** | Stride-branch sites track fs/S | Detected collapse sites move with 1/S at fixed P |
-| **H3b** | Patch-branch sites track fs/P | Detected collapse sites move with 1/P at fixed S |
+| **H1** | Candidate frequencies suffer a localised information loss | Model A: recovery at a candidate relative to its controls, exp(beta_bar) < 0.8 (behavioural); Model B: probe codelength expansion exp(theta_lock) > 1.2 (representational) |
+| **H2** | The deficit is phase-invariant | Model C: per-phase offset scale sigma_phi < log 1.1 |
+| **H3** | Dips sit on both predicted grids | Model D1: theta_S < 0 and theta_P < 0 jointly, and the two-label fit wins leave-one-out |
+| **H3a** | Stride-branch sites track fs/S | Model D2: \|kappa_S - 1\| < 0.1 |
+| **H3b** | Patch-branch sites track fs/P | Model D2: \|kappa_P - 1\| < 0.1, once at least ten unambiguous sites exist |
+| **M1** | More overlap mitigates the loss | Model A': overlap slope delta_O > 0 and the overlap term wins leave-one-out |
 
 ## Models
 
@@ -65,13 +68,15 @@ python support_scripts/collect.py --out ./results --smoke   # pipeline check
 python support_scripts/collect.py --out ./results           # full design
 ```
 
-Then open `notebooks/bayesian/deliverable2_bayesian_models.ipynb` for the PyMC inference. See the [Bayesian guide](notebooks/bayesian/README.md) for its setup and execution modes.
+Then open `notebooks/bayesian/deliverable3_bayesian_models.ipynb` for the PyMC inference. See the [Bayesian guide](notebooks/bayesian/README.md) for its setup and execution modes.
 
 ## Status
 
-The theory, the design and the descriptive readings are in the report. The hypotheses are decided only by
-the Bayesian notebook, under the rules of Deliverable 2 fixed before any posterior is read; until its full
-run is complete, no hypothesis is reported as supported or refuted.
+The full Bayesian run is complete and reported in Section 5.4 and Appendix E of Deliverable 3. Every fit
+converged, but none passes the pre-registered posterior predictive check and Models A to C also fail
+parameter recovery, so under the rules fixed before any posterior was read every claim is not reportable
+and H3b is not identified. Before the gates the readings point away from a blind spot: a tone at a
+candidate frequency is recovered better than at its controls, and the stride sites move as fs/S predicts.
 
 ## Licensing
 
@@ -85,4 +90,4 @@ The written report is licensed under [CC BY 4.0](https://creativecommons.org/lic
 
 ## Acknowledgements
 
-During the preparation of this work, the authors used AI-based tools (GPT-5.5, Gemini 3.6 Flash, Sonnet 5, Opus 4.6) to support language refinement and improve clarity. All generated content was reviewed, revised and validated by the authors.
+The use of AI-based tools in this work, which tools, for which parts and to what extent, is declared in the title footnote of the Deliverable 3 report. All generated content was reviewed, revised and validated by the authors.

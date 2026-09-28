@@ -1,0 +1,12 @@
+{
+  "label": "D1_kernelsynth_patch",
+  "elpd_loo": -1112.8349341583776,
+  "se": 132.52793314190166,
+  "p_loo": 19.928215354967506,
+  "n_samples": 8000,
+  "n_obs": 11925,
+  "good_k": 0.7,
+  "max_pareto_k": 0.2041171297745746,
+  "warning": false,
+  "reliable": true
+}

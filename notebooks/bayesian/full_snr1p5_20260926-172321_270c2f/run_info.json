@@ -1,0 +1,56 @@
+{
+  "run_id": "full_snr1p5_20260926-172321_270c2f",
+  "mode": "full",
+  "tone_snr": 1.5,
+  "created_utc": "2026-09-26T17:23:21Z",
+  "repository_url": "https://github.com/FedericoSabbadini/patchAliasing.git",
+  "repository_ref": "main",
+  "repository_commit": "4f098ac48f66c7b9cbb7d891c9166a9a21755221",
+  "status": "complete",
+  "sessions": [
+    {
+      "started_utc": "2026-09-26T17:23:21Z",
+      "origin": "new",
+      "repository_commit": "4f098ac48f66c7b9cbb7d891c9166a9a21755221",
+      "versions": {
+        "pymc": "5.28.5",
+        "arviz": "0.22.0",
+        "numpy": "2.1.3",
+        "pandas": "2.2.3",
+        "scipy": "1.16.3",
+        "pytensor": "2.38.3",
+        "xarray": "2025.12.0"
+      },
+      "on_colab": true,
+      "nuts_backend": "pymc",
+      "cpu_count": 2
+    },
+    {
+      "started_utc": "2026-09-27T10:15:10Z",
+      "origin": "resumed through ACTIVE_RUN_full_snr1p5.json",
+      "repository_commit": "4f098ac48f66c7b9cbb7d891c9166a9a21755221",
+      "versions": {
+        "pymc": "5.28.5",
+        "arviz": "0.22.0",
+        "numpy": "2.1.3",
+        "pandas": "2.2.3",
+        "scipy": "1.16.3",
+        "pytensor": "2.38.3",
+        "xarray": "2025.12.0"
+      },
+      "on_colab": true,
+      "nuts_backend": "pymc",
+      "cpu_count": 2
+    }
+  ],
+  "completed_utc": "2026-09-27T19:40:38Z",
+  "verdicts": {
+    "H1_behavioural": "NOT REPORTABLE",
+    "M1": "NOT REPORTABLE",
+    "H1_representational": "NOT REPORTABLE",
+    "H2": "NOT REPORTABLE",
+    "H3_location": "NOT REPORTABLE",
+    "H3a": "NOT REPORTABLE",
+    "H3b": "NOT IDENTIFIED"
+  }
+}

@@ -1,0 +1,7 @@
+spec,both_scenarios,all_converged,min_coverage,min_discrimination,mean_width,mean_separation,recovery_ok
+A,True,True,1.0,0.0,0.2821038423702181,0.24999999999999992,False
+B,True,True,0.5,1.0,0.023888301028073378,0.35,False
+C,True,False,1.0,1.0,0.1755120997737546,0.23,False
+D1_tsmixup,True,True,1.0,1.0,0.0938043110528988,0.6,True
+D2_patch_f1,True,False,1.0,1.0,0.5249959191822628,0.35,False
+D2_stride_f1,True,True,1.0,1.0,0.049492340986462185,0.35,True

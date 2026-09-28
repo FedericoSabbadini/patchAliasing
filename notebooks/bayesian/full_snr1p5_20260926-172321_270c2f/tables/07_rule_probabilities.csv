@@ -1,0 +1,9 @@
+claim,reading,fit,prior_p_support,prior_p_refute,posterior_p_support,posterior_p_refute
+H1_behavioural,beta_bar,A_both,0.339835,0.660165,0.0,1.0
+M1,delta_O,A_both,0.499615,0.5003850000000001,0.0525,0.9475
+H1_representational,theta_lock,B_adjusted,0.357865,0.642135,0.0,1.0
+H2,sigma_phase,C_phase,0.294495,0.705505,1.0,0.0
+H3_location,tsmixup,D1_tsmixup_both,0.24955,0.7504500000000001,0.91725,1.0
+H3_location,kernelsynth,D1_kernelsynth_both,0.24955,0.7504500000000001,0.8405,1.0
+H3a,kappa,D2_stride_f1,0.048565,0.951435,1.0,0.0
+H3b,kappa,D2_patch_f1,0.048565,0.951435,0.000125,0.999875

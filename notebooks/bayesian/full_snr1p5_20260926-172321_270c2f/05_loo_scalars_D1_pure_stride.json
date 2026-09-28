@@ -1,0 +1,12 @@
+{
+  "label": "D1_pure_stride",
+  "elpd_loo": -8839.35521190245,
+  "se": 60.5039779784384,
+  "p_loo": 15.651719341405624,
+  "n_samples": 8000,
+  "n_obs": 11925,
+  "good_k": 0.7,
+  "max_pareto_k": 0.161406992303723,
+  "warning": false,
+  "reliable": true
+}

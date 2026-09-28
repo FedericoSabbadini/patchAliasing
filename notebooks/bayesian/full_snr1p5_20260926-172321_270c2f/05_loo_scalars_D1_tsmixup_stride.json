@@ -1,0 +1,12 @@
+{
+  "label": "D1_tsmixup_stride",
+  "elpd_loo": 426.1760243316826,
+  "se": 73.33548064211094,
+  "p_loo": 16.21963980128595,
+  "n_samples": 8000,
+  "n_obs": 11925,
+  "good_k": 0.7,
+  "max_pareto_k": 0.17159079183644635,
+  "warning": false,
+  "reliable": true
+}

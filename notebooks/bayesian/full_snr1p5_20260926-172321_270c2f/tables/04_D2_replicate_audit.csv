@@ -1,0 +1,7 @@
+branch,first_harmonic,replicate_rows
+patch,0,87
+patch,1,1
+patch,11,1
+patch,14,1
+stride,0,56
+stride,1,34

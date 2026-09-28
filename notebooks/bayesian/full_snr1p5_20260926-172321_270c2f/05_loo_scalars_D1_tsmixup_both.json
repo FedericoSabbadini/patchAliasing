@@ -1,0 +1,12 @@
+{
+  "label": "D1_tsmixup_both",
+  "elpd_loo": 426.03228621236167,
+  "se": 73.33369163567941,
+  "p_loo": 17.336488449161436,
+  "n_samples": 8000,
+  "n_obs": 11925,
+  "good_k": 0.7,
+  "max_pareto_k": 0.22226636233604286,
+  "warning": false,
+  "reliable": true
+}

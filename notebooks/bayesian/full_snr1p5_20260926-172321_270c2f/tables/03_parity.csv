@@ -1,0 +1,7 @@
+family,observations,samples,max_abs_difference,tolerance,agrees
+A,384,1000,5.617275533609245e-10,1e-08,True
+A_normal,384,1000,0.0,1e-08,True
+C,384,1000,5.617275533609245e-10,1e-08,True
+B,384,1000,3.375077994860476e-14,1e-08,True
+D1_tsmixup,384,1000,0.0,1e-08,True
+D2_stride_f1,34,1000,2.4424906541753444e-15,1e-08,True
