@@ -1,10 +1,3 @@
-claim,leg,model,rule,prior_probability,reported_in_tex,reads_as,reproduces_tex
-H1_behavioural,supported,A,Pr(beta_bar < log 0.8) >= 0.95,0.33924202909562623,0.34,recovery at a candidate falls to at most four fifths of its controls,True
-H1_behavioural,refuted,A,Pr(|beta_bar| < log 1.1) >= 0.95,0.14189324225076966,0.14,any effect on that recovery is under 10 per cent,True
-H1_representational,supported,B,Pr(theta_lock > log 1.2) >= 0.95,0.35768891376316037,0.36,at least 20 per cent more code,True
-H1_representational,refuted,B,Pr(|theta_lock| < log 1.1) >= 0.95,0.15117696198829167,0.15,any expansion is under 10 per cent,True
-H2,supported,C,Pr(sigma_phase < log 1.1) >= 0.95,0.29697536303522964,0.3,phase moves the deficit by under 10 per cent,True
-H3a_H3b,supported,D2,Pr(|kappa_F - 1| < 0.1) >= 0.95,0.04839406440037686,0.05,an identified branch tracks its own parameter,True
-M1,supported,A',Pr(delta_O > 0) >= 0.95 and the overlap term wins LOO,0.5,0.5,overlap is associated with a smaller loss,True
-M1,refuted,A',Pr(|delta_O| < log 1.1) >= 0.95,0.14189324225076966,0.14,half a unit of overlap moves the loss by under 10 per cent,True
-H3_location,refuted,D1,Pr(|theta_S| < log 1.1 or |theta_P| < log 1.1) >= 0.95,0.1460974864990029,0.15,"on each generator, at least one grid carries a dip under 10 per cent",True
+version https://git-lfs.github.com/spec/v1
+oid sha256:97d84cea9247893ce5ad541d36b65ad96ac0d4b96dd5ee506861777635304d42
+size 1319

@@ -1,7 +1,3 @@
-branch,first_harmonic,replicate_rows
-patch,0,87
-patch,1,1
-patch,11,1
-patch,14,1
-stride,0,56
-stride,1,34
+version https://git-lfs.github.com/spec/v1
+oid sha256:e432c66b4f1bf78587af584c8b9d91043aa316c448adc50789bb5c2eaea3c318
+size 104

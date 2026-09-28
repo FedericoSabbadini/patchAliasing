@@ -1,21 +1,3 @@
-check,ok,detail
-coverage:contrasts,True,all fifteen geometries present
-coverage:mdl_cells,True,all fifteen geometries present
-coverage:collapse,True,all fifteen geometries present
-coverage:sites,True,all fifteen geometries present
-A/C:triplets per geometry,True,"minimum 3,400 triplets in one geometry"
-A/C:every configured generator everywhere,True,2 configured; per geometry [np.int64(2)]
-A/C:eight phase slices populated,True,8 of 8 slices carry data
-A/C:contrast finite,True,every d is finite
-A':covariates vary and are not collinear,True,corr = +0.425
-B:both lock levels in every geometry,True,geometries with one level only: []
-B:codelength positive and finite,True,"L_bits in [19.6, 269.7] bits"
-B:probe stages present,True,"10 stages: ['dec_0', 'dec_1', 'dec_2', 'dec_3'] ..."
-D1:kernelsynth labels separable from geometry,True,rank 17 of 17 columns
-D1:kernelsynth dispersion finite and non-negative,True,"z in [1.855e-01, 7.271e+00], 0 row(s) at the floor"
-D1:pure labels separable from geometry,True,rank 17 of 17 columns
-D1:pure dispersion finite and non-negative,True,"z in [2.918e-07, 6.534e+00], 309 row(s) at the floor"
-D1:tsmixup labels separable from geometry,True,rank 17 of 17 columns
-D1:tsmixup dispersion finite and non-negative,True,"z in [8.026e-01, 6.141e+00], 0 row(s) at the floor"
-D2:stride identified,True,21 unambiguous sites against a bar of 10
-D2:patch identified,False,0 unambiguous sites against a bar of 10
+version https://git-lfs.github.com/spec/v1
+oid sha256:b10a9b4747922582e0bbb7ae93dfadae9976044fbd6c5d317862b0b78bb5661e
+size 1441

@@ -1,8 +1,3 @@
-claim,model,max_rhat,min_ess,divergences,fits_missing,Conv.,Recov.,PPC,Sens.,LOO,D2,Net,pre_gate,post_gate,decided_by
-H1_behavioural,A,1.0036402948101193,4637.178643375156,0,-,pass,FAIL,FAIL,pass,n/a,n/a,pass,REFUTED,NOT REPORTABLE,"failed: ppc, recovery"
-M1,A',1.0036402948101193,4489.953789645572,0,-,pass,FAIL,FAIL,pass,pass,n/a,pass,INCONCLUSIVE,NOT REPORTABLE,"failed: ppc, recovery"
-H1_representational,B,1.0025700808141405,2724.4536741586744,0,-,pass,FAIL,FAIL,pass,n/a,n/a,n/a,REFUTED,NOT REPORTABLE,"failed: ppc, recovery"
-H2,C,1.0036143284392403,2456.5752523053675,0,-,pass,FAIL,FAIL,pass,n/a,n/a,n/a,SUPPORTED,NOT REPORTABLE,"failed: ppc, recovery"
-H3_location,D1,1.0022403251902636,4934.977618294369,0,-,pass,pass,FAIL,pass,pass,n/a,n/a,REFUTED,NOT REPORTABLE,failed: ppc
-H3a,D2,1.0028632960455333,1751.4420283910956,0,-,pass,pass,FAIL,pass,n/a,pass,n/a,SUPPORTED,NOT REPORTABLE,failed: ppc
-H3b,D2,1.0018970454531535,3214.1473480473487,0,-,pass,FAIL,FAIL,pass,n/a,FAIL,n/a,REFUTED,NOT IDENTIFIED,identification: 0 unambiguous sites against a bar of 10
+version https://git-lfs.github.com/spec/v1
+oid sha256:92b5871c4be465df0695bc95dff52f73bc9a58b03fe606c8a69fcdaaa3ccd799
+size 1064
