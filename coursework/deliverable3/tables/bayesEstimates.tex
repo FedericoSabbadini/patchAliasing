@@ -3,25 +3,25 @@
     \footnotesize
     \setlength{\tabcolsep}{4pt}
     \renewcommand{\arraystretch}{1.15}
-    \begin{tabular}{@{}lllccll@{}}
+    \begin{tabular}{@{}llrlccll@{}}
         \toprule
-        \textbf{Claim} & \textbf{Estimand} & \textbf{Median [95\% CrI]} & $\Pr(\text{support})$ & $\Pr(\text{refute})$ & \textbf{Pre-gate} & \textbf{Post-gate} \\
+        \textbf{Claim} & \textbf{Estimand} & \textbf{Median} & \textbf{95\% CrI} & {\boldmath$P(\textbf{support})$} & {\boldmath$P(\textbf{refute})$} & \textbf{Pre-gate} & \textbf{Post-gate} \\
         \midrule
-        $H1$ behav. & $e^{\bar\beta}$ & $1.35\ [1.25,\,1.45]$ & $0.00$ & $1.00$ & refuted & not reportable \\
-        & \quad net of the background & $1.38\ [1.28,\,1.50]$ & $0.00$ & $1.00$ & refuted & \\
-        $M1$ & $\delta_O$ & $-0.13\ [-0.29,\,0.03]$ & $0.053$ & $0.947^{\ddagger}$ & inconclusive & not reportable \\
-        & \quad net of the background & $-0.12\ [-0.28,\,0.05]$ & $0.07$ & $0.93$ & inconclusive & \\
-        & $\delta_P$ (descriptive) & $-0.05\ [-0.26,\,0.16]$ & -- & -- & -- & -- \\
-        $H1$ repr. & $e^{\theta_{\mathrm{lock}}}$ & $1.059\ [1.043,\,1.075]$ & $0.00$ & $1.00$ & refuted & not reportable \\
-        $H2$ & $\sigma_\phi$ & $0.006\ [0.003,\,0.014]$ & $1.00$ & $0.00$ & supported & not reportable \\
-        $H3$ location & $\theta_S$, Light TSMixup & $-0.26\ [-0.29,\,-0.23]$ & $0.92^{\S}$ & $1.00$ & refuted & not reportable \\
-        & $\theta_P$, Light TSMixup & $-0.017\ [-0.041,\,0.007]$ & & & & \\
-        & $\theta_S$, KernelSynth & $-0.38\ [-0.41,\,-0.34]$ & $0.84^{\S}$ & $1.00$ & & \\
-        & $\theta_P$, KernelSynth & $-0.014\ [-0.040,\,0.013]$ & & & & \\
-        $H3a$ & $\kappa_S$ & $1.000\ [0.990,\,1.011]$ & $1.00$ & $0.00$ & supported & not reportable \\
-        $H3b$ & $\kappa_P$ (three detections)$^{\P}$ & $4.4\ [2.8,\,6.0]$ & $0.00$ & $1.00$ & not identified & not identified \\
+        $H1$ behav. & $e^{\bar\beta}$ & $1.35$ & $[1.25,\,1.45]$ & $0.00$ & $1.00$ & refuted & not reportable \\
+        & \quad net of the background & $1.38$ & $[1.28,\,1.50]$ & $0.00$ & $1.00$ & refuted & \\
+        $M1$ & $\delta_O$ & $-0.13$ & $[-0.29,\,0.03]$ & $0.053$ & $0.947^{\ddagger}$ & inconclusive & not reportable \\
+        & \quad net of the background & $-0.12$ & $[-0.28,\,0.05]$ & $0.07$ & $0.93$ & inconclusive & \\
+        & $\delta_P$ (descriptive) & $-0.05$ & $[-0.26,\,0.16]$ & -- & -- & -- & -- \\
+        $H1$ repr. & $e^{\theta_{\mathrm{lock}}}$ & $1.059$ & $[1.043,\,1.075]$ & $0.00$ & $1.00$ & refuted & not reportable \\
+        $H2$ & $\sigma_\phi$ & $0.006$ & $[0.003,\,0.014]$ & $1.00$ & $0.00$ & supported & not reportable \\
+        $H3$ location & $\theta_S$, Light TSMixup & $-0.26$ & $[-0.29,\,-0.23]$ & $0.92^{\S}$ & $1.00$ & refuted & not reportable \\
+        & $\theta_P$, Light TSMixup & $-0.017$ & $[-0.041,\,0.007]$ & & & & \\
+        & $\theta_S$, KernelSynth & $-0.38$ & $[-0.41,\,-0.34]$ & $0.84^{\S}$ & $1.00$ & & \\
+        & $\theta_P$, KernelSynth & $-0.014$ & $[-0.040,\,0.013]$ & & & & \\
+        $H3a$ & $\kappa_S$ & $1.000$ & $[0.990,\,1.011]$ & $1.00$ & $0.00$ & supported & not reportable \\
+        $H3b$ & $\kappa_P$ (three detections)$^{\P}$ & $4.4$ & $[2.8,\,6.0]$ & $0.00$ & $1.00$ & not identified & not identified \\
         \bottomrule
     \end{tabular}
-\caption{Posterior median and $95\%$ credible interval (CrI) of every estimand of \autoref{tab:bayesModels}, with the probability of its support rule of \autoref{tab:bayesDecisions} and its refutation probability, the larger of one minus the support probability and the probability of its equivalence rule, the verdict those rules give before any gate, and the verdict after the gates of \autoref{tab:bayesGates}. The rows marked net are Model~A refitted on the recovery net of the background-only forecast, which must reach the same decision. $^{\ddagger}$Support probability $0.0525$ and refutation probability $0.9475$, each within $0.003$ of its cut without reaching it. $^{\P}$The lowest patch-branch site of the only three replicate curves on which one was detected, at the first, eleventh and fourteenth harmonic; none is unambiguous on the replicate-averaged curves, so the identification bar of ten sites is not met and the rule is not applied. $^{\S}$Joint probability that both coefficients are negative on that generator.}
+\caption{Posterior median and $95\%$ credible interval (CrI) of every estimand, the probabilities that its claim is supported and refuted, and its verdict before and after the gates. The net rows refit Model~A on the recovery net of the background-only forecast. $^{\ddagger}$Both probabilities lie within $0.003$ of their cuts. $^{\S}$Joint probability that both coefficients are negative on that generator. $^{\P}$Only three replicate curves show a patch-branch site, below the identification bar.}
     \label{tab:bayesEstimates}
 \end{table*}

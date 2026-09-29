@@ -4,7 +4,7 @@ This appendix states how the decomposition reading of \autoref{sec:results} is p
 
 A realisation is drawn from one of the two generators and normalised to unit variance. Light TSMixup follows \autoref{sec:appTSMixup} with two changes made for this reading: the number of components is drawn between one and four rather than up to ten, and no two drawn frequencies may lie closer than $10$\,Hz, so that every component can be told apart at the resolution the horizon allows. KernelSynth follows \autoref{sec:appKernelSynth} with at most five kernels per draw, and in both cases the first $480$ samples are supplied as context and the following $64$ are kept as the real continuation.
 
-The same context is given to two checkpoints: a retrained geometry of \autoref{tab:hfModels} and the published Chronos-Bolt-Tiny, which is itself $P=S=16$ but was trained with a larger budget and a recipe that is not fully published (\autoref{sec:appRetraining}). Each returns its native $64$-sample horizon in a single pass, and the median quantile is kept. Nothing is fed back into the context, so the reading concerns the forecast a deployment actually receives rather than the rollout of \autoref{sec:appSweep}. The real continuation covers the same $64$ instants as the two forecasts, so the three windows share their length, their position in time and their resolution, and a difference between them is not a difference of window.
+The same context is given to two checkpoints: a retrained geometry of \autoref{tab:hfModels} and the published Chronos-Bolt-Tiny, which is itself $P=S=16$ but was trained with a larger budget and a recipe that is not fully published (\autoref{sec:appRetraining}). Each returns its native $64$-sample horizon in a single pass, and the median quantile is kept. Nothing is fed back into the context, so the reading concerns the forecast a deployment actually receives rather than the rollout of \autoref{sec:appSweep}.\footnote{Deliverable~2 read the forecast only through the $512$-sample rollout. The native horizon is added because the rollout feeds the model its own output, so an error at one step is carried into the next, as the review of Deliverable~2 noted; the single-pass forecast is free of that accumulation and is the output a deployed forecaster actually delivers.} The real continuation covers the same $64$ instants as the two forecasts, so the three windows share their length, their position in time and their resolution, and a difference between them is not a difference of window.
 
 \subsection{From a window to its components}
 
@@ -29,7 +29,7 @@ Frequencies below are in cycles per patch, equal to cycles per stride at this ge
 \begin{figure*}[p]
     \centering
     \includegraphics[width=\textwidth,height=0.86\textheight,keepaspectratio]{figures/FIG_G_kernelsynth_p16-s16_seed85_components.png}
-\caption{KernelSynth draw at the reference geometry $P=S=16$, components. Columns, left to right: the real continuation, the forecast of the retrained model and that of the published checkpoint, each headed by its $64$-sample window; each row below is one retained component, titled with its frequency in hertz, in cycles per patch and per stride, and its fitted amplitude, and marked when it lies within one hertz of a candidate site. Both sides are estimated, since the generator names no frequencies. Illustrative only: the aggregate is \autoref{tab:decomposition}.}
+\caption{KernelSynth draw at the reference geometry $P=S=16$, components. Columns, left to right: the real continuation, the forecast of the retrained model and that of the published checkpoint, each headed by its $64$-sample window; each row below is one retained component, titled with its frequency in hertz, in cycles per patch and per stride, and its fitted amplitude, and marked when it lies within one hertz of a candidate site. Both sides are estimated, since the generator names no frequencies. Illustrative only.}
     \label{fig:decompKS}
 \end{figure*}
 
@@ -45,7 +45,7 @@ The first Light TSMixup draw carries a single injected tone at $6.16$\,cpp with 
 \begin{figure*}[p]
     \centering
     \includegraphics[width=\textwidth,height=0.70\textheight,keepaspectratio]{figures/FIG_G_tsmixup_p16-s16_seed42_components.png}
-\caption{Light TSMixup draw with a single high-frequency injected tone at $6.16$\,cpp, reference geometry $P=S=16$, components, read as \autoref{fig:decompKS}. The real side lists the frequencies the generator drew rather than estimating them. Every component panel shares the vertical scale of the strongest real component, so the residual forecast lines, about a hundredth of the input, read as nearly flat. Illustrative only: the aggregate is \autoref{tab:decomposition}.}
+\caption{Light TSMixup draw with a single high-frequency injected tone at $6.16$\,cpp, reference geometry $P=S=16$, components, read as \autoref{fig:decompKS}. The real side lists the frequencies the generator drew rather than estimating them. Every component panel shares the vertical scale of the strongest real component, so the residual forecast lines, about a hundredth of the input, read as nearly flat. Illustrative only.}
     \label{fig:decompTS}
 \end{figure*}
 
@@ -59,7 +59,7 @@ The first Light TSMixup draw carries a single injected tone at $6.16$\,cpp with 
 \begin{figure*}[p]
     \centering
     \includegraphics[width=\textwidth,height=0.70\textheight,keepaspectratio]{figures/FIG_G_tsmixup_p16-s16_seed17_components.png}
-\caption{Light TSMixup draw with a low-frequency injected tone at $1.30$\,cpp in a background that also holds components at $0.88$ and $6.69$\,cpp, reference geometry $P=S=16$, components, read as \autoref{fig:decompKS}. Both checkpoints return the injected tone, at $1.34$\,cpp, and neither returns the $6.69$\,cpp component. Illustrative only: the aggregate is \autoref{tab:decomposition}.}
+\caption{Light TSMixup draw with a low-frequency injected tone at $1.30$\,cpp in a background that also holds components at $0.88$ and $6.69$\,cpp, reference geometry $P=S=16$, components, read as \autoref{fig:decompKS}. Both checkpoints return the injected tone, at $1.34$\,cpp, and neither returns the $6.69$\,cpp component. Illustrative only.}
     \label{fig:decompTSlow}
 \end{figure*}
 
