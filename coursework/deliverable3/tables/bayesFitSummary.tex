@@ -8,20 +8,35 @@
         \textbf{Model} & \textbf{Fits} & \textbf{N} & \textbf{Role} & \textbf{Obs.} & $\max\hat R$ & \textbf{min ESS} & \textbf{Div.} \\
         \midrule
         A & both covariates, overlap only, patch size only, neither & 4 & $H1$ behav., $M1$; LOO of $M1$ & 371\,000 & $1.004$ & $4490$ & $0$ \\
+        \rowsep
         A & net of the background-only forecast & 1 & agreement reading of $H1$ behav.\ and $M1$ & 371\,000 & $1.004$ & $4752$ & $0$ \\
+        \rowsep
         A & Gaussian likelihood & 1 & robustness & 371\,000 & $1.003$ & $4420$ & $0$ \\
+        \rowsep
         A & prior scales $\times0.5$, $\times2$ & 2 & sensitivity & 371\,000 & $1.004$ & $4195$ & $0$ \\
+        \midrule
         B & adjusted, unadjusted & 2 & $H1$ repr.; LOO of the stage and geometry offsets & 5\,830 & $1.003$ & $2724$ & $0$ \\
+        \rowsep
         B & prior scales $\times0.5$, $\times2$ & 2 & sensitivity & 5\,830 & $1.002$ & $2566$ & $0$ \\
+        \midrule
         C & with and without phase & 2 & $H2$; LOO of the phase term & 371\,000 & $1.004$ & $2457$ & $0$ \\
+        \rowsep
         C & prior scales $\times0.5$, $\times2$ & 2 & sensitivity & 371\,000 & $1.003$ & $2753$ & $0$ \\
+        \midrule
         D1 & four labellings, Light TSMixup and KernelSynth & 8 & $H3$ location; LOO & 11\,925 each & $1.002$ & $4935$ & $0$ \\
+        \rowsep
         D1 & one-hertz labels, both generators & 2 & robustness & 11\,925 each & $1.002$ & $5162$ & $0$ \\
+        \rowsep
         D1 & four labellings, pure sinusoid & 4 & reference & 11\,925 & $1.003$ & $5000$ & $0$ \\
+        \rowsep
         D1 & prior scales $\times0.5$, $\times2$ & 4 & sensitivity & 11\,925 each & $1.002$ & $5192$ & $0$ \\
+        \midrule
         D2 & stride branch, fundamental & 1 & $H3a$ & 34 & $1.003$ & $1751$ & $0$ \\
+        \rowsep
         D2 & stride branch, median gap & 1 & robustness & 21 & $1.000$ & $4965$ & $0$ \\
+        \rowsep
         D2 & patch branch, fundamental & 1 & $H3b$ & 3 & $1.002$ & $3214$ & $0$ \\
+        \rowsep
         D2 & prior scales $\times0.5$, $\times2$ & 4 & sensitivity & 34, 3 & $1.002$ & $1903$ & $0$ \\
         \bottomrule
     \end{tabular}

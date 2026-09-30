@@ -6,21 +6,37 @@
 \textbf{Property} & \textbf{Domain} & \textbf{Range or meaning} \\
 \midrule
 \pv{hasAsset} & \pv{PVSystem} & \pv{EnergyAsset} \\
+\rowsep
 \pv{managedBy} & \pv{PVSystem} & exactly one \pv{ControlAgent} \\
+\rowsep
 \pv{hasObservation} & \pv{PVSystem} & \pv{SystemObservation} \\
+\rowsep
 \pv{hasSignal} & \pv{PhotovoltaicArray} & \pv{TimeSeriesSignal} \\
+\midrule
 \pv{hasRepresentation} & \pv{TimeSeriesSignal} & \pv{PatchedRepresentation} \\
+\rowsep
 \pv{forecastFrom} & \pv{Forecast} & exactly one \pv{PatchedRepresentation} \\
+\rowsep
 \pv{informsAnomaly} & \pv{Forecast} & \pv{AnomalyState} \\
+\rowsep
 \pv{assessesRepresentation} & \pv{ObservabilityAssessment} & exactly one \pv{PatchedRepresentation} \\
+\rowsep
 \pv{hasGenerationContext} & \pv{SystemObservation} & zero or one \pv{GenerationContext} value \\
+\rowsep
 \pv{hasAnomaly} & \pv{SystemObservation} & zero or more \pv{AnomalyState} values \\
+\rowsep
 \pv{hasObservabilityState} & \pv{ObservabilityAssessment} & one \pv{ObservabilityState} value \\
+\midrule
 \pv{selectsMode} & \pv{PowerRoutingDecision} & exactly one \pv{ControlMode} value \\
+\rowsep
 \pv{makesDecision} & \pv{ControlAgent} & \pv{PowerRoutingDecision} \\
+\rowsep
 \pv{basedOn} & \pv{PowerRoutingDecision} & observation, assessment, or inferred state \\
+\rowsep
 \pv{hasRoute} & \pv{PowerRoutingDecision} & zero or one \pv{PowerRoute} value \\
+\rowsep
 \pv{hasSourceAsset} & \pv{PowerRoutingDecision} & zero or one \pv{EnergyAsset} \\
+\rowsep
 \pv{hasDestinationAsset} & \pv{PowerRoutingDecision} & zero or one \pv{EnergyAsset} \\
 \bottomrule
 \end{tabular}

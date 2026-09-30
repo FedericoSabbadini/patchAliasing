@@ -2,6 +2,7 @@
 \begin{table}[!t]
 \small
 \centering
+\renewcommand{\arraystretch}{1.25}
 \begin{tabular}{M{0.21\linewidth} M{0.38\linewidth} M{0.32\linewidth}}
 \toprule
 Kernel & Formula & Hyperparameters \\
@@ -9,18 +10,23 @@ Kernel & Formula & Hyperparameters \\
 Constant &
 $\kappa_{\mathrm{Const}}(x,x')=C$ &
 $C=1$ \\
+\rowsep
 White Noise &
 $\kappa_{\mathrm{White}}(x,x')=\sigma_n \cdot \mathbf{1}_{x=x'}$ &
 $\sigma_n \in \{0.1,1\}$ \\
+\rowsep
 Linear &
 $\kappa_{\mathrm{Lin}}(x,x')=\sigma_0^2+x\cdot x'$ &
 $\sigma_0 \in \{0,1,10\}$ \\
+\rowsep
 RBF &
 $\kappa_{\mathrm{RBF}}(x,x')=\exp\!\left(-\frac{\lVert x-x'\rVert^2}{2l^2}\right)$ &
 $l \in \{0.1,1,10\}$ \\
+\rowsep
 Rational Quadratic &
 $\kappa_{\mathrm{RQ}}(x,x')=\left(1+\frac{\lVert x-x'\rVert^2}{2\alpha}\right)^{-\alpha}$ &
 $\alpha \in \{0.1,1,10\}$, $l=1$ \\
+\rowsep
 Periodic &
 $\kappa_{\mathrm{Per}}(x,x')=\exp\!\left(-2\sin^2\!\left(\pi\frac{\lVert x-x'\rVert}{p/l_{\mathrm{syn}}}\right)\right)$ &
 \begin{tabular}[t]{@{}l@{}}

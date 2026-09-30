@@ -6,17 +6,29 @@
         \textbf{Model} & \textbf{Parameter} & \textbf{Prior} & \textbf{Role} \\
         \midrule
         A, C & $\bar\beta$                     & $\text{Student-}t_4(0,0.5)$      & population phase-lock effect, on the log-recovery scale of the paired contrast \\
+        \rowsep
         A    & $\delta_O$                      & $\text{Student-}t_4(0,0.5)$      & slope in $\widetilde O_c$, the centred overlap; one unit $=0.5$ of $O$ \\
+        \rowsep
         A    & $\delta_P$                      & $\text{Student-}t_4(0,0.5)$      & slope in $\widetilde{\log P}_c$, the centred log patch size \\
+        \rowsep
         A, C & $\tau,\sigma_k,\sigma_b,\sigma$ & $\text{Half-Student-}t_4(0,0.5)$ & configuration, harmonic, background and residual scales \\
+        \rowsep
         C    & $\sigma_\phi$                   & $\text{Half-}\mathcal N(0,0.25)$ & scale of the eight per-phase offsets \\
+        \midrule
         B    & $\alpha_0$                      & $\mathcal N(\log \bar L, 1)$     & baseline log codelength, centred on the log of the mean codelength $\bar L$ \\
+        \rowsep
         B    & $\theta_{\mathrm{lock}}$        & $\mathcal N(0,0.5)$              & log codelength expansion at a lock \\
+        \rowsep
         B    & $r$                             & $\text{Gamma}(2,0.1)$            & Gamma shape (dispersion); prior in shape and rate \\
+        \rowsep
         B    & $\sigma_{st},\sigma_{geo}$      & $\text{Half-}\mathcal N(0,1)$    & spread of the probe-stage and geometry offsets \\
+        \midrule
         D1   & $\alpha_g,\theta_S,\theta_P$    & $\mathcal N(0,1)$                & off-grid level and labels for deterministic token-collapse grids \\
+        \rowsep
         D1   & $\sigma$                        & $\text{Half-}\mathcal N(0,1)$    & residual scale of $\log z_g(f)$ \\
+        \midrule
         D2   & $\kappa_S,\kappa_P$             & $\mathcal N(0,1)$                & measured deterministic site spacing per unit of predicted spacing \\
+        \rowsep
         D2   & $\sigma_F$                      & $\text{Half-}\mathcal N(0,5)$\,Hz & scatter beyond the sweep-resolution floor $\Delta f$ \\
         \bottomrule
     \end{tabular}

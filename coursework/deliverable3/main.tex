@@ -107,6 +107,19 @@ twoside, % Two side traditional mode where headers and footers change between od
 \setcounter{totalnumber}{5}
 \setcounter{dbltopnumber}{3}
 
+% Room to stretch around floats. A page is filled to the full text height (\flushbottom), so the missing
+% space is taken from the glue on it; with the LaTeX defaults (2\,pt) the glue around a table or a figure
+% runs out and the page is either stretched unevenly or reported as underfull.
+\setlength{\floatsep}{12pt plus 8pt minus 2pt}
+\setlength{\textfloatsep}{20pt plus 10pt minus 4pt}
+\setlength{\intextsep}{12pt plus 8pt minus 2pt}
+\setlength{\dblfloatsep}{12pt plus 8pt minus 2pt}
+\setlength{\dbltextfloatsep}{20pt plus 10pt minus 4pt}
+% A page stretched to the full text height by \flushbottom is a normal page of this layout, and a mild stretch
+% (badness of a few thousand) is not a defect; the pages were inspected one by one. Without this line the editor
+% lists each of them as an "Underfull \vbox" that depends on where the lines happen to break.
+\vbadness=10000
+
 % A float page, one holding floats and no text, centres its content vertically.
 \makeatletter
 \setlength{\@fptop}{0pt plus 1fil}\setlength{\@fpsep}{12pt plus 2fil}\setlength{\@fpbot}{0pt plus 1fil}
@@ -124,6 +137,12 @@ twoside, % Two side traditional mode where headers and footers change between od
   \clearpage
   \renewcommand{\floatpagefraction}{0.4}\renewcommand{\dblfloatpagefraction}{0.4}}
 
+% The tables of Appendices B and E are tall, from a third to two thirds of a page. Under the low fraction above a
+% table that does not fit under its text is given a page of its own and leaves it mostly blank; under this one it
+% waits for the top of the next text page, and only a table that really fills a page is set alone. The next
+% \flushfloatpages restores the low fraction.
+\newcommand{\tablesbelowtext}{\renewcommand{\floatpagefraction}{0.6}}
+
 \runninghead{Searching for Evidence of Structural Aliasing in Chronos-Bolt Time-Series Forecasting} % A shortened article title to appear in the running head, leave this command empty for no running head
 
 % \footertext{\textit{Journal of ...}} % Text to appear in the footer, leave this command empty for no footer text
@@ -139,7 +158,10 @@ twoside, % Two side traditional mode where headers and footers change between od
 
 % Authors are listed in a comma-separated list with superscript numbers indicating affiliations
 % \thanks{} is used for any text that should be placed in a footnote on the first page, such as the corresponding author's email, journal acceptance dates, a copyright/license notice, keywords, etc
-\author{ Matteo Boniotti, Gianluca Brignoli and Federico Sabbadini\thanks{This work is licensed under the Creative Commons Attribution 4.0 International License. Concurrently, all associated source code, probing scripts, and software artifacts generated throughout the project lifecycle are released under the open-source MIT license. \newline Copyright for any third-party material included in this work remains with its respective owners and must be respected accordingly. Every script, notebook and source file behind this work is available in the project repository\autocite{brignoliPatchAliasingRepository2026}. \newline \newline During the preparation of this work, the authors used AI-based tools, namely GPT-6 Astra, GPT-5.6 Sol, and Opus 5.5 in distinct roles. The tools supported language refinement and clarity throughout the report, and assisted with the implementation and refactoring of the probing, data-collection and analysis code released with this work, including the Bayesian model descriptions in Appendix~E and the figure-generating scripts. The tools were not used to generate experimental results, which come from the recorded runs in the accompanying repository. All generated or suggested content was reviewed, revised where necessary and validated by the authors, who assume full responsibility for the final content of this work.} }
+\author{ Matteo Boniotti, Gianluca Brignoli and Federico Sabbadini\thanks{This work is licensed under the Creative Commons Attribution 4.0 International License. Concurrently, all associated source code, probing scripts, and software artifacts generated throughout the project lifecycle are released under the open-source MIT license. \newline Copyright for any third-party material included in this work remains with its respective owners and must be respected accordingly. Every script, notebook and source file behind this work is available in the project repository\autocite{brignoliPatchAliasingRepository2026}. \newline \mbox{}\newline During the preparation of this work, the authors used AI-based tools, namely GPT-6 Astra, GPT-5.6 Sol, and Opus 5.5 in distinct roles. The tools supported language refinement and clarity throughout the report, and assisted with the implementation and refactoring of the probing, data-collection and analysis code released with this work, including the Bayesian model descriptions in Appendix~E and the figure-generating scripts. The tools were not used to generate experimental results, which come from the recorded runs in the accompanying repository. All generated or suggested content was reviewed, revised where necessary and validated by the authors, who assume full responsibility for the final content of this work.} }
+
+% The class reserves 3\,pt for the footnote mark of \thanks, which is 4.2\,pt wide (an overfull box).
+\setlength{\thanksmarkwidth}{4.2pt}\setlength{\thanksmargin}{-4.2pt}
 
 \renewcommand{\maketitlehookd}{
 	\begin{abstract}
@@ -184,6 +206,9 @@ twoside, % Two side traditional mode where headers and footers change between od
 \section{Security Risk Assessment}\label{sec:security}
 \input{sections/7_ai_risk_assessment.tex}
 
+% The Conclusions open a page: the last page of the Security Risk Assessment ends at its natural height
+% instead of being stretched to the full one.
+\newpage
 \section{Conclusions}\label{sec:conclusions}
 \input{sections/8_conclusion.tex}
 
@@ -199,6 +224,7 @@ twoside, % Two side traditional mode where headers and footers change between od
 \endgroup
 
 \flushfloatpages
+\tablesbelowtext
 \appendixsection{Chronos-Bolt-Tiny Retraining Procedure}{sec:appRetraining}
 \input{sections/B_retraining_appendix.tex}
 
@@ -211,6 +237,7 @@ twoside, % Two side traditional mode where headers and footers change between od
 \input{sections/D_kernelsynth_appendix.tex}
 
 \flushfloatpages
+\tablesbelowtext
 \appendixsection{Bayesian Model Specifications}{sec:appBayes}
 \input{sections/E_bayesian_appendix.tex}
 

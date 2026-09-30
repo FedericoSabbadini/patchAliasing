@@ -7,13 +7,13 @@
         \textbf{Element} & \textbf{Reading for this system} \\
         \midrule
         Adversary capabilities & No model access of any kind and no knowledge of the training corpus, only knowledge of the configuration $(f_s,P,S)$ and the ability to drive a periodic load on the photovoltaic plant, which an inverter switching schedule or a switchable load already provides. \\
-        \addlinespace[3pt]
+        \rowsep
         Attack surface & The raw telemetry stream before tokenisation, reached by acting on the physical process or on the data path. \\
-        \addlinespace[3pt]
+        \rowsep
         Manipulation of telemetry & A small periodic component at a candidate frequency, which is legitimate plant behaviour and survives any plausibility check on the raw signal. \\
-        \addlinespace[3pt]
+        \midrule
         Operational consequence & The component is present in the plant and, if structural aliasing is confirmed, under-represented in the model, so dispatch and curtailment are decided on an incomplete picture, and a detector reading the forecast residual is looking through the same tokeniser that lost it. \\
-        \addlinespace[3pt]
+        \rowsep
         Residual risk & The pre-registered mitigation raises overlap by shortening the stride at fixed patch size, so it thins the stride branch alone and $\mathcal{F}_{P}$ survives at every deployed configuration. Shrinking the patch instead thins $\mathcal{F}_{P}$, and with it $\mathcal{F}_{S}$ once $S \le P$ forces the stride down as well; but that raises both fundamentals rather than closing either comb, so the candidate set is relocated and thinned, not removed. \\
         \bottomrule
     \end{tabular}
