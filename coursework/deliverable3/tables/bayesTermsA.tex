@@ -1,0 +1,35 @@
+\begin{table}[!tbp]
+    \centering
+    \small
+    \setlength{\tabcolsep}{4pt}
+    \renewcommand{\arraystretch}{1.2}
+    \begin{tabular}{@{}lM{9.6cm}l@{}}
+        \toprule
+        \textbf{Term} & \textbf{Meaning} & \textbf{Levels} \\
+        \midrule
+        $d_i$ & contrast of triplet $i$, \autoref{eq:appA:contrast} & one per triplet \\
+        \rowsep
+        $\beta_c$ & mean contrast of geometry $c$ & $15$ \\
+        \rowsep
+        $\bar\beta$ & \textbf{estimand of $H1$}: population contrast at the average configuration; $e^{\bar\beta}$ is recovery at a candidate relative to its controls & $1$ \\
+        \rowsep
+        $\delta_O$ & \textbf{estimand of $M1$}: change of $\beta_c$ per unit of centred overlap & $1$ \\
+        \rowsep
+        $\delta_P$ & change of $\beta_c$ per unit of centred $\log P$; keeps patch size from loading onto $\delta_O$ & $1$ \\
+        \rowsep
+        $\widetilde O_c$, $\widetilde{\log P}_c$ & $(O_c-\bar O)/0.5$ and $\log P_c-\overline{\log P}$, averages over the fifteen geometries & data \\
+        \rowsep
+        $\tau$ & spread of the geometries around the regression, what the two covariates leave unexplained & $1$ \\
+        \midrule
+        $u_k$ & offset of candidate frequency $k$, a value shared by every geometry in which it is a candidate; sum to zero & one per frequency \\
+        \rowsep
+        $u_b$ & offset of background realisation $b$, indexed by generator and draw; sum to zero & $200$ \\
+        \rowsep
+        $\sigma_k$, $\sigma_b$ & scales of $u_k$ and $u_b$ & $1$ each \\
+        \rowsep
+        $\sigma$ & residual scale of the Student-$t_4$ likelihood & $1$ \\
+        \bottomrule
+    \end{tabular}
+    \caption{Terms of Model~A.}
+    \label{tab:termsA}
+\end{table}

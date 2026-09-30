@@ -226,7 +226,7 @@ P_{\mathrm{def}}=(P_{\mathrm{load}}-P_{\mathrm{pv}})^{+}.
 \end{equation}
 Here daylight abbreviates \{\valueof{ClearSky}, \valueof{PartialCloud}, \valueof{Overcast}\}. \autoref{fig:routing-policy} shows the priority scan as a single pass: the modes are tested in a fixed order and no later branch can override an earlier one, so the policy is deterministic, and degrading authority narrows the same policy instead of substituting a different one. \autoref{tab:routing} states the boundary cases the figure cannot show, each row pairing a triggering condition with the routes it admits and the guard that blocks it: a daylight deficit, a negative ramp whose reference is missing, stale or non-finite, which disables export catch-up, and the conservative and safe modes.
 
-\begin{figure}[!htbp]
+\begin{figure}[!tbp]
 \centering
 \includegraphics[width=\textwidth]{figures/routing.png}
 \caption{The routing policy as a priority scan. The control mode is read first, so a safe-mode cycle never reaches the ordinary branches; the ramp branch is available only in \valueof{NormalMode}, and the conservative branch rejoins the ordinary load-first router under its reduced cap. Below that the surplus and deficit decide which of the seven admissible routes a cycle issues, always serving the internal load before charging the battery or exporting. A cycle issues a route only for a strictly positive transfer and may issue several co-mode decisions, and every setpoint is clipped to the state of charge, the capacity and the charge and discharge limits.}

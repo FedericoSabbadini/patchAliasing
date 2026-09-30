@@ -24,41 +24,7 @@ d_i \sim \text{Student-}t_4(\mu_i,\ \sigma),
 \end{equation}
 \autoref{tab:termsA} gives every term with its meaning and number of levels. It separates the two estimands the claims read, $\bar\beta$ for $H1$ and $\delta_O$ for $M1$, from the patch-size slope $\delta_P$ that keeps patch size apart from overlap, and from the offsets and scales that absorb what a triplet does not cancel: the candidate frequency, the background realisation and the residual. The response is a paired difference rather than a level, so no lock indicator is needed and the effect of interest is the population intercept $\bar\beta$. The Student-$t_4$ likelihood admits the very negative contrasts of the arms that rebuild nothing without letting a handful of them set the estimate, which a Gaussian would. The configuration effects are drawn around a population mean, which makes the fifteen geometries instances of one phenomenon and gives each of them equal weight, however many triplets it contributes.
 
-\begin{table}[!htbp]
-    \centering
-    \small
-    \setlength{\tabcolsep}{4pt}
-    \renewcommand{\arraystretch}{1.2}
-    \begin{tabular}{@{}lM{9.6cm}l@{}}
-        \toprule
-        \textbf{Term} & \textbf{Meaning} & \textbf{Levels} \\
-        \midrule
-        $d_i$ & contrast of triplet $i$, \autoref{eq:appA:contrast} & one per triplet \\
-        \rowsep
-        $\beta_c$ & mean contrast of geometry $c$ & $15$ \\
-        \rowsep
-        $\bar\beta$ & \textbf{estimand of $H1$}: population contrast at the average configuration; $e^{\bar\beta}$ is recovery at a candidate relative to its controls & $1$ \\
-        \rowsep
-        $\delta_O$ & \textbf{estimand of $M1$}: change of $\beta_c$ per unit of centred overlap & $1$ \\
-        \rowsep
-        $\delta_P$ & change of $\beta_c$ per unit of centred $\log P$; keeps patch size from loading onto $\delta_O$ & $1$ \\
-        \rowsep
-        $\widetilde O_c$, $\widetilde{\log P}_c$ & $(O_c-\bar O)/0.5$ and $\log P_c-\overline{\log P}$, averages over the fifteen geometries & data \\
-        \rowsep
-        $\tau$ & spread of the geometries around the regression, what the two covariates leave unexplained & $1$ \\
-        \midrule
-        $u_k$ & offset of candidate frequency $k$, a value shared by every geometry in which it is a candidate; sum to zero & one per frequency \\
-        \rowsep
-        $u_b$ & offset of background realisation $b$, indexed by generator and draw; sum to zero & $200$ \\
-        \rowsep
-        $\sigma_k$, $\sigma_b$ & scales of $u_k$ and $u_b$ & $1$ each \\
-        \rowsep
-        $\sigma$ & residual scale of the Student-$t_4$ likelihood & $1$ \\
-        \bottomrule
-    \end{tabular}
-    \caption{Terms of Model~A.}
-    \label{tab:termsA}
-\end{table}
+\input{tables/bayesTermsA.tex}
 
 \paragraph{Estimand and rule.} $H1$ predicts $e^{\bar\beta}<1$; it is supported when $\Pr(\bar\beta<\log 0.8\mid D)\ge0.95$, a recovery at a candidate of at most four fifths of its controls, and refuted when $\Pr(|\bar\beta|<\log1.1\mid D)\ge0.95$. Centring the covariates is what makes $\bar\beta$ the effect at the average geometry of the design rather than an extrapolation to $O=0$ and a patch of one sample.
 
@@ -75,7 +41,7 @@ $M1$ claims that the loss Model~A measures is smaller where consecutive patches 
 \end{equation}
 with $O_c$ the overlap ratio of \autoref{eq:overlap}. One unit of $\widetilde O$ corresponds to $0.5$ of $O$, so the design spans from $\widetilde O=-0.66$ at $O=0$ to $0.84$ at $O=0.75$. The response rises towards zero as recovery at a candidate approaches recovery at its controls, so an overlap that mitigates raises $\beta_c$ and $M1$ predicts $\delta_O>0$.\footnote{Deliverable~2 printed this rule with the opposite sign, $\delta_O<0$, an inconsistency the review of Deliverable~2 pointed out. With the contrast defined as the candidate minus its controls, a mitigation raises it, so only the positive sign reads as a mitigation. Deliverable~2 also read a supported $M1$ as overlap reducing the deficit; it is read here as an association across geometries, because each geometry is a separately trained model from a single seed, so the slope compares different models rather than measuring what a change of overlap does to one of them.} This reading of the sign presumes a loss at the candidates, $\bar\beta<0$; where candidates recover more than their controls, a positive $\delta_O$ would instead mean that overlap enlarges the gain, so $M1$ is read conditionally on the direction of $\bar\beta$, as $H2$ is on the size of its effect. Patch size enters as $\log P$ because the patch comb has spacing $f_s/P$, so equal steps in $\log P$ are equal ratios of spacing. The two covariates are estimable together because \autoref{tab:hfModels} varies $S$ at fixed $P$ and $P$ at fixed $S$: their correlation across the fifteen runs is $0.43$, far from the degeneracy of a design in which overlap could be raised only by enlarging the patch.
 
-The rule has two legs, both required: $\Pr(\delta_O>0\mid D)\ge0.95$, and the model with the overlap term must win the leave-one-out comparison against the same model without it. $M1$ is refuted when $\Pr(\delta_O>0\mid D)$ falls to $0.05$ or when the equivalence rule $\Pr(|\delta_O|<\log1.1\mid D)\ge0.95$ holds, half a unit of overlap moving the loss by under ten per cent. The equivalence rule takes the form of the one for $H1$, so that an effect credibly too small to matter refutes $M1$ as it refutes $H1$.\footnote{Deliverable~2 gave no equivalence rule for $M1$ or for $H3$ location; its support rules are unchanged. The rule is added because, for these two directional claims, an effect credibly too small to matter would otherwise leave the claim inconclusive rather than refuted.} The second leg is needed because a sign probability starts at $0.50$ under a prior symmetric about zero, so a small but consistently signed slope would otherwise count as a mitigation. The slope compares independently trained variants over fifteen design points, so a supported $M1$ is evidence that the effect varies with geometry in the predicted direction across this grid, not the effect of changing the overlap of one trained model.
+The rule has two legs, both required: $\Pr(\delta_O>0\mid D)\ge0.95$, and the model with the overlap term must win the leave-one-out comparison against the same model without it. $M1$ is refuted when $\Pr(\delta_O>0\mid D)$ falls to $0.05$ or when the equivalence rule $\Pr(|\delta_O|<\log1.1\mid D)\ge0.95$ holds, half a unit of overlap moving the loss by under ten per cent. The equivalence rule takes the form of the one for $H1$, so that an effect credibly too small to matter refutes $M1$ as it refutes $H1$. The second leg is needed because a sign probability starts at $0.50$ under a prior symmetric about zero, so a small but consistently signed slope would otherwise count as a mitigation. The slope compares independently trained variants over fifteen design points, so a supported $M1$ is evidence that the effect varies with geometry in the predicted direction across this grid, not the effect of changing the overlap of one trained model.
 
 \subsection{Model B, the representational reading (H1)}
 
@@ -89,33 +55,7 @@ L_i \sim \text{Gamma}\!\left(r,\ r/\mu_i\right),
 \end{equation*}
 A codelength is strictly positive, right-skewed and has a variance that grows with its mean, which is what a Gamma likelihood in its shape--rate form with a log link is for; its mean is $\mu_i$ and its coefficient of variation $1/\sqrt r$. \autoref{tab:termsB} gives the terms and their levels. The estimand is $\theta_{\mathrm{lock}}$, read on the lock indicator; the baseline $\alpha_0$, the stage offsets $s_{\text{st}}$ and the geometry offsets $g_{\text{geo}}$ absorb level differences unrelated to locking, and the shape $r$ carries the dispersion of the codelength.
 
-\begin{table}[!htbp]
-    \centering
-    \small
-    \setlength{\tabcolsep}{4pt}
-    \renewcommand{\arraystretch}{1.2}
-    \begin{tabular}{@{}lM{9.6cm}l@{}}
-        \toprule
-        \textbf{Term} & \textbf{Meaning} & \textbf{Levels} \\
-        \midrule
-        $L_i$ & prequential codelength of cell $i$, in bits & one per cell \\
-        \rowsep
-        $\mathrm{IsLocked}_i$ & $1$ when the centre $f_c$ is a candidate of that geometry, $0$ when it is a control & data \\
-        \rowsep
-        $\theta_{\mathrm{lock}}$ & \textbf{estimand}: log expansion of the codelength at a candidate; $e^{\theta_{\mathrm{lock}}}$ is the factor by which the labels cost more & $1$ \\
-        \midrule
-        $\alpha_0$ & baseline log codelength; prior centred on the log of the mean observed codelength & $1$ \\
-        \rowsep
-        $s_{\text{st}}$ & offset of the probe stage; sum to zero, scale $\sigma_{st}$ & $10$ \\
-        \rowsep
-        $g_{\text{geo}}$ & offset of the geometry; sum to zero, scale $\sigma_{geo}$ & $15$ \\
-        \rowsep
-        $r$ & Gamma shape, which carries the dispersion & $1$ \\
-        \bottomrule
-    \end{tabular}
-    \caption{Terms of Model~B.}
-    \label{tab:termsB}
-\end{table}
+\input{tables/bayesTermsB.tex}
 
 \paragraph{Estimand and rule.} $H1$ predicts $e^{\theta_{\mathrm{lock}}}>1$, more bits to read a candidate frequency. It is supported when $\Pr(\theta_{\mathrm{lock}}>\log1.2\mid D)\ge0.95$, at least twenty per cent more code, and refuted when $\Pr(|\theta_{\mathrm{lock}}|<\log1.1\mid D)\ge0.95$. The stage and geometry offsets absorb level differences that run to several-fold and would otherwise be available to the lock indicator; the unadjusted form without them is fitted alongside and compared by leave-one-out, and the comparison is reported beside the verdict without deciding it. The seven hierarchical band tasks of \autoref{sec:appSweep} each summarise hundreds of frequencies in one codelength, so the lock indicator has nothing to attach to there; they remain a descriptive cross-check and are not fitted.
 
@@ -143,9 +83,9 @@ The terms $\beta_c$, $u_k$, $u_b$, $\sigma$ and the scales are those of \autoref
 \alpha_g + \theta_S \cdot \text{OnStrideGrid} + \theta_P \cdot \text{OnPatchGrid},\ \sigma
 \right),
 \end{equation*}
-with the terms of \autoref{tab:termsD}, which lists both site models. For Model~D1 the estimands are the dip depths $\theta_S$ and $\theta_P$ on the two grids, each measured against the off-grid level $\alpha_g$ of its geometry. A frequency is on a grid when it coincides with a member of that comb to within $10^{-6}$\,Hz, which the union grid makes possible; a one-hertz tolerance would also label the integer neighbours of a non-integer site, which lie on no comb, and it is fitted only as a robustness reading. The logarithm makes the labels multiplicative on the per-geometry off-grid level. On a pure sinusoid the collapse is exactly zero at a stride site, so that mode is floored at $0.01$ of the off-grid median before the logarithm. It is fitted and reported, but the verdict is read from the two generator modes: on the pure mode the response at a site depends on the floor, and a stratum of identical values has no dispersion for a predictive check to reproduce.
+with the terms of \autoref{tab:termsD}, which lists Models~D1 and~D2. For Model~D1 the estimands are the dip depths $\theta_S$ and $\theta_P$ on the two grids, each measured against the off-grid level $\alpha_g$ of its geometry. A frequency is on a grid when it coincides with a member of that comb to within $10^{-6}$\,Hz, which the union grid makes possible; a one-hertz tolerance would also label the integer neighbours of a non-integer site, which lie on no comb, and it is fitted only as a robustness reading. The logarithm makes the labels multiplicative on the per-geometry off-grid level. On a pure sinusoid the collapse is exactly zero at a stride site, so that mode is floored at $0.01$ of the off-grid median before the logarithm. It is fitted and reported, but the verdict is read from the two generator modes: on the pure mode the response at a site depends on the floor, and a stratum of identical values has no dispersion for a predictive check to reproduce.
 
-\paragraph{Estimand and rule.} Four labellings are fitted to the same profiles, both grids, stride only, patch only and neither, separately for each generator. $H3$ is supported when the two-label fit wins the leave-one-out comparison against the others and the joint posterior probability $\Pr(\theta_S<0\wedge\theta_P<0\mid D)$ reaches $0.95$, on both generators; the verdict takes the less favourable of the two. The joint event is used because the hypothesis is a conjunction, and two marginals above $0.95$ can accompany a joint probability below it. $H3$ is refuted when the joint probability falls to $0.05$, or by an equivalence rule in the form of the one for $H1$: on both generators, $\Pr(|\theta_S|<\log1.1\lor|\theta_P|<\log1.1\mid D)\ge0.95$, one of the two grids carrying a practically nil dip, which denies the conjunction. The two coefficients separate only where one label applies without the other, which for $\theta_S$ means the six geometries with $S\nmid P$: where $S$ divides $P$, in nine runs including the four with $P=S$, every stride site is also a patch site.
+\paragraph{Estimand and rule.} Four labellings are fitted to the same profiles, both grids, stride only, patch only and neither, separately for each generator. $H3$ is supported when the two-label fit wins the leave-one-out comparison against the others and the joint posterior probability $\Pr(\theta_S<0\wedge\theta_P<0\mid D)$ reaches $0.95$, on both generators; the verdict takes the less favourable of the two. The joint event is used because the hypothesis is a conjunction, and two marginals above $0.95$ can accompany a joint probability below it.\footnote{Deliverable~2 asked of $H3$ only two negative coefficients and a winning fit. The joint reading replaces that rule, and it is required on both generator modes so that no single background carries the verdict.} $H3$ is refuted when the joint probability falls to $0.05$, or by an equivalence rule in the form of the one for $H1$: on both generators, $\Pr(|\theta_S|<\log1.1\lor|\theta_P|<\log1.1\mid D)\ge0.95$, one of the two grids carrying a practically nil dip, which denies the conjunction. The two coefficients separate only where one label applies without the other, which for $\theta_S$ means the six geometries with $S\nmid P$: where $S$ divides $P$, in nine runs including the four with $P=S$, every stride site is also a patch site.
 
 \subsection{Model D2, the movement of the sites (H3a, H3b)}
 
@@ -161,43 +101,9 @@ with the terms of \autoref{tab:termsD}, which lists both site models. For Model~
 \end{equation*}
 with the terms of \autoref{tab:termsD}, where the lower block holds the terms of this model: the measured fundamental, the spacing its branch predicts, the estimand $\kappa_F$ and the scatter $\sigma_F$ beyond the resolution floor $\Delta f$. The slope $\kappa_F$ is measured spacing per unit of predicted spacing, and its prior is centred on zero, that is on no relationship, so the hypothesis has to be earned from the data. The floor $\Delta f=1$\,Hz, the sweep step, is part of the residual because a spacing read off a discrete grid is no more precise than one step; without it, sites landing exactly on the prediction drive $\sigma_F$ to zero and the posterior develops a funnel the sampler cannot traverse. The median gap between successive sites is fitted in the same form as a robustness reading.
 
-\begin{table}[!htbp]
-    \centering
-    \small
-    \setlength{\tabcolsep}{4pt}
-    \renewcommand{\arraystretch}{1.2}
-    \begin{tabular}{@{}lM{9.6cm}l@{}}
-        \toprule
-        \textbf{Term} & \textbf{Meaning} & \textbf{Levels} \\
-        \midrule
-        \multicolumn{3}{@{}l}{\textit{Model D1, one fit per signal mode and labelling}}\\
-        $\log z_g(f)$ & log token collapse of geometry $g$ at swept frequency $f$, one replicate & one per row \\
-        \rowsep
-        $\alpha_g$ & off-grid level of geometry $g$ & $15$ \\
-        \rowsep
-        $\theta_S$, $\theta_P$ & \textbf{estimands}: log depth of the dip on the stride and on the patch grid & $1$ each \\
-        \rowsep
-        OnStrideGrid, OnPatchGrid & $1$ when $f$ is a member of $\mathcal F_S$, of $\mathcal F_P$ & data \\
-        \rowsep
-        $\sigma$ & residual scale & $1$ \\
-        \midrule
-        \multicolumn{3}{@{}l}{\textit{Model D2, one fit per branch $F\in\{S,P\}$}}\\
-        $\hat f^{\,F}_{1,g}$ & lowest detected site of branch $F$ on one replicate of geometry $g$ & one per replicate \\
-        \rowsep
-        $\Delta^F_g$ & spacing branch $F$ predicts, $f_s/S_g$ or $f_s/P_g$ & data \\
-        \rowsep
-        $\kappa_F$ & \textbf{estimand}: measured over predicted spacing; $\kappa_S$ for $H3a$, $\kappa_P$ for $H3b$ & $1$ \\
-        \rowsep
-        $\sigma_F$ & scatter beyond the resolution floor & $1$ \\
-        \rowsep
-        $\Delta f$ & sweep step, $1$\,Hz, fixed & constant \\
-        \bottomrule
-    \end{tabular}
-    \caption{Terms of Models~D1 and~D2.}
-    \label{tab:termsD}
-\end{table}
+\input{tables/bayesTermsD.tex}
 
-\paragraph{Estimand and rule.} A branch is first required to supply at least ten unambiguous sites on the replicate-averaged curves of the two generator modes; below that it is reported as not identified, which is not a null result, and the stride branch reaches the bar only across the six geometries with $S\nmid P$ taken together. An identified branch is supported when $\Pr(|\kappa_F-1|<0.1\mid D)\ge0.95$ and refuted when that probability falls to $0.05$. Where the first dip of a comb is not detected, the lowest site is a higher harmonic and pulls $\kappa_F$ towards an integer above one, so the fit is repeated on the replicates whose lowest site is the fundamental. Both readings must be available and converged, and if they reach different decisions the verdict is inconclusive. Neither reading is an independent test of the movement law, because the branch assignment already used the predicted grid: a supported $H3a$ or $H3b$ says that, given that dips were detected and fell near a branch's comb, their spacing is the one that branch predicts.
+\paragraph{Estimand and rule.} A branch is first required to supply at least ten unambiguous sites on the replicate-averaged curves of the two generator modes, since a branch with fewer cannot fix its slope; below that it is reported as not identified, which is not a null result, and the stride branch reaches the bar only across the six geometries with $S\nmid P$ taken together. An identified branch is supported when $\Pr(|\kappa_F-1|<0.1\mid D)\ge0.95$ and refuted when that probability falls to $0.05$. Where the first dip of a comb is not detected, the lowest site is a higher harmonic and pulls $\kappa_F$ towards an integer above one, so the fit is repeated on the replicates whose lowest site is the fundamental. Both readings must be available and converged, and if they reach different decisions the verdict is inconclusive. Neither reading is an independent test of the movement law, because the branch assignment already used the predicted grid: a supported $H3a$ or $H3b$ says that, given that dips were detected and fell near a branch's comb, their spacing is the one that branch predicts.
 
 \input{tables/bayesPriors.tex}
 
@@ -205,17 +111,17 @@ with the terms of \autoref{tab:termsD}, where the lower block holds the terms of
 
 \subsubsection{Sampling}
 
-Every model, including the auxiliary fits, is sampled with PyMC\autocite{abrilplaPyMCModernComprehensive2023}, a Python library for probabilistic programming, by the No-U-Turn sampler\autocite{hoffmanNoUTurnSamplerAdaptively2014}, an adaptive form of Hamiltonian Monte Carlo that sets the trajectory length itself, with the same settings, so that none receives a more or less careful exploration than another. Each fit runs four chains, with $2000$ warm-up draws per chain to adapt the step size, $2000$ retained draws per chain and a target acceptance rate of $0.9$. Offsets that enter one linear predictor additively can trade a constant against each other without changing the likelihood, so every offset set, $u_k$, $u_b$, $u_p$, $s_{\text{st}}$ and $g_{\text{geo}}$, is constrained to sum to zero; the configuration level $\beta_c$ is not, because it carries $\bar\beta$ and the $M1$ regression through its mean. The offsets informed by many observations are written in centred form and the phase offsets of Model~C in non-centred form, since $H2$ predicts their scale near zero, where the centred form develops a funnel. Every prior is given in \autoref{tab:bayesPriors}: each effect is centred on no effect with a scale of $0.5$ on the log scale of its response, or $1$ for the site models, every group scale is half-Student or half-normal, and only the baseline of Model~B is centred on the data.\footnote{Deliverable~2 read a posterior that had not moved from its prior as itself a report of an absent effect. That reading is dropped because a posterior that stays at its prior shows only that the data did not update it, which an uninformative design produces as readily as a null effect. An absent or negligible effect is claimed only through the rules that state it, which the priors alone satisfy with a probability between $0.14$ and $0.30$ (\autoref{tab:bayesDecisions}), far from the $0.95$ they require.}
+Every model, including the auxiliary fits, is sampled with PyMC\autocite{abrilplaPyMCModernComprehensive2023}, a Python library for probabilistic programming, by the No-U-Turn sampler\autocite{hoffmanNoUTurnSamplerAdaptively2014}, an adaptive form of Hamiltonian Monte Carlo that sets the trajectory length itself, with the same settings, so that none receives a more or less careful exploration than another. Each fit runs four chains, with $2000$ warm-up draws per chain to adapt the step size, $2000$ retained draws per chain and a target acceptance rate of $0.9$. Offsets that enter one linear predictor additively can trade a constant against each other without changing the likelihood, so every offset set, $u_k$, $u_b$, $u_p$, $s_{\text{st}}$ and $g_{\text{geo}}$, is constrained to sum to zero; the configuration level $\beta_c$ is not, because it carries $\bar\beta$ and the $M1$ regression through its mean. The offsets informed by many observations are written in centred form and the phase offsets of Model~C in non-centred form, since $H2$ predicts their scale near zero, where the centred form develops a funnel. Every prior is given in \autoref{tab:bayesPriors}: each effect is centred on no effect with a scale of $0.5$ on the log scale of its response, or $1$ for Models~D1 and~D2, every group scale is half-Student or half-normal, and only the baseline of Model~B is centred on the data.\footnote{Deliverable~2 read a posterior that had not moved from its prior as itself a report of an absent effect. That reading is dropped because a posterior that stays at its prior shows only that the data did not update it, which an uninformative design produces as readily as a null effect. An absent or negligible effect is claimed only through the rules that state it, which the priors alone satisfy with a probability between $0.14$ and $0.30$ (\autoref{tab:bayesDecisions}), far from the $0.95$ they require.}
 
 \subsubsection{Validation gates}
 
-The validation checks are implemented as gates, and a claim is read only if every gate that applies to it holds. The numerical thresholds of every gate were fixed in the implementation before the final run.\footnote{Deliverable~2 gave numerical thresholds only for convergence, $\hat R<1.01$, effective sample sizes above $1000$ and no divergences, and listed parameter recovery, the posterior predictive check, prior sensitivity and the leave-one-out comparison without a criterion. Fixing a number for each before the final run makes every gate decidable and keeps it from being tuned to the results it decides.} Two implementation checks precede the fits and stop the run if they fail: the log likelihood rebuilt for leave-one-out must agree with the one PyMC computes, and the Pareto smoothing ported for the large fits must agree with that of ArviZ\autocite{kumarArviZUnifiedLibrary2019}, a Python library for the diagnostics of Bayesian models.
+The validation checks are implemented as gates, and a claim is read only if every gate that applies to it holds. The numerical thresholds of every gate were fixed in the implementation before the final run, which makes every gate decidable and keeps it from being tuned to the results it decides. Two implementation checks precede the fits and stop the run if they fail: the log likelihood rebuilt for leave-one-out must agree with the one PyMC computes, and the Pareto smoothing ported for the large fits must agree with that of ArviZ\autocite{kumarArviZUnifiedLibrary2019}, a Python library for the diagnostics of Bayesian models.
 
-Before any observation exists, each model is simulated on the real design axes in a prior predictive check, and the probability each decision rule already scores under the priors is recomputed and must reproduce the Prior column of \autoref{tab:bayesDecisions}. Parameter recovery then fits every model, twice per scenario, to data simulated with a known effect and to data simulated under the opposite state: no effect for Models~A, B and~D1, a near-nil phase scale $\sigma_\phi=0.02$ against $0.25$ for Model~C, and $\kappa_F=0.65$ against $1$ for D2. At least eighty per cent of the repeats must cover their own truth and exclude the other scenario's, so that a wide interval covering both cannot pass. Models~A and~C recover on a stratified subsample of twelve thousand triplets, the others on their whole tables, and Model~D1 on the Light TSMixup design only, whose verdict is then applied to both generators.
+Before any observation exists, each model is simulated on the real design axes in a prior predictive check, and the probability each decision rule already scores under the priors is recomputed and must reproduce the Prior column of \autoref{tab:bayesDecisions}. Parameter recovery then fits every model, twice per scenario, to data simulated with a known effect and to data simulated under the opposite state: no effect for Models~A, B and~D1, a near-nil phase scale $\sigma_\phi=0.02$ against $0.25$ for Model~C, and $\kappa_F=0.65$ against $1$ for D2. At least eighty per cent of the repeats must cover their own truth and exclude the other scenario's, so that a wide interval covering both cannot pass. Models~A and~C recover on a stratified subsample of twelve thousand triplets, Models~B and~D2 on their whole tables, and Model~D1 on the Light TSMixup design only, whose verdict is then applied to both generators.
 
-Once the data are fitted, the posterior predictive check draws $400$ replicated datasets. The observed mean and standard deviation must fall inside the $95\%$ replicated interval for at least ninety per cent of the levels of every stratum, the grouping factors of each model such as geometry, frequency, phase slice, generator or probe stage, and the $5\%$, $50\%$ and $95\%$ quantiles of the whole response must each fall inside theirs. Prior sensitivity multiplies every prior scale by $0.5$, $1$ and $2$,\footnote{Deliverable~2 stated the ladder as the absolute scales $\{0.25,0.5,1.0\}$, which match only the priors of scale $0.5$, and gave no criterion for when a conclusion counts as sensitive. It is stated here as a factor on every prior scale, so that the priors of scale $1$ of Models~D1 and~D2 and the phase scale of Model~C, of scale $0.25$, move in the same proportion. The group and residual scales, which can move a conclusion as much as the effect priors can, are varied with them. The tolerance of $0.10$ and the requirement of one decision class make the check decidable.} except the baseline $\alpha_0$ of Model~B, centred on the data, and its Gamma shape $r$, which are held fixed. For the effect priors of scale $0.5$ this gives the ladder $\{0.25,0.5,1.0\}$; every rung must converge, the rule probability may move by at most $0.10$, and the decision class must be the same at every rung.
+Once the data are fitted, the posterior predictive check draws $400$ replicated datasets. The observed mean and standard deviation must fall inside the $95\%$ replicated interval for at least ninety per cent of the levels of every stratum, the grouping factors of each model such as geometry, frequency, phase slice, generator or probe stage, and the $5\%$, $50\%$ and $95\%$ quantiles of the whole response must each fall inside theirs. Prior sensitivity multiplies every prior scale by $0.5$, $1$ and $2$,\footnote{Deliverable~2 stated the ladder as the absolute scales $\{0.25,0.5,1.0\}$, which match only the priors of scale $0.5$. It is stated here as a factor on every prior scale, so that the priors of scale $1$ of Models~D1 and~D2 and the phase scale of Model~C, of scale $0.25$, move in the same proportion. The group and residual scales, which can move a conclusion as much as the effect priors can, are varied with them.} except the baseline $\alpha_0$ of Model~B, centred on the data, and its Gamma shape $r$, which are held fixed. For the effect priors of scale $0.5$ this gives the ladder $\{0.25,0.5,1.0\}$; every rung must converge, the rule probability may move by at most $0.10$, and the decision class must be the same at every rung.
 
-Convergence requires $\hat R<1.01$, bulk and tail effective sample size above $1000$ and no divergences, over every parameter of every fit a claim reads, group scales included. The two diagnostics are the rank-normalised ones, which also expose differences of scale and heavy tails between chains\autocite{vehtariRankNormalizationFoldingLocalization2021}. Two readings must agree where the design offers two: those of Model~D2, and Model~A with its refit net of the background-only forecast for $H1$ behavioural and $M1$;\footnote{Deliverable~2 did not include eight of the readings used here, and each answers a weakness of that plan. The net reading of Model~A is added because the forecasts carry lines of their own on the candidate sites (\autoref{sec:appDecomp}), which enter the recovery whether or not a tone is injected. The rules for $H1$ on the representation are added because Deliverable~2 gave Model~B an estimand and a predicted direction but no rule to turn its posterior into a verdict. The identification bar of Model~D2 is added because a branch with few sites cannot fix its slope, and the agreement of its two readings, on all replicates and on those whose lowest site is the fundamental, because an undetected first dip makes a higher harmonic the lowest site and pulls $\kappa_F$ towards an integer above one. The median-gap response of Model~D2 checks the same slope on the gaps between successive sites rather than on the lowest one. The unadjusted form of Model~B checks whether the lock effect depends on the stage and geometry offsets, which absorb level differences of several-fold. The one-hertz labelling of Model~D1 shows what an integer grid would conclude, since that tolerance also labels the integer neighbours of non-integer sites. The joint-probability reading of $H3$ location, required on both generator modes, replaces a rule that asked only for two negative coefficients and a winning fit. The hypothesis is a conjunction, and two marginal probabilities above $0.95$ can accompany a joint one below it. Requiring both generators keeps one background from carrying the verdict.} a missing or unconverged reading fails the gate, and a disagreement makes the verdict inconclusive. Finally, leave-one-out cross-validation by Pareto-smoothed importance sampling\autocite{vehtariPracticalBayesianModel2017}, which approximates it from a single fit and flags unreliable weights by the Pareto shape $k$, runs over the whole design. A difference in expected log predictive density is read as inconclusive when it is within twice its paired standard error, or when any Pareto shape $k$ exceeds $0.7$; the comparison decides only the two rules that contain it, $M1$ and $H3$ location, and is reported beside the others.
+Convergence requires $\hat R<1.01$, bulk and tail effective sample size above $1000$ and no divergences, over every parameter of every fit a claim reads, group scales included. The two diagnostics are the rank-normalised ones, which also expose differences of scale and heavy tails between chains\autocite{vehtariRankNormalizationFoldingLocalization2021}. Two readings must agree where the design offers two: those of Model~D2, and Model~A with its refit net of the background-only forecast for $H1$ behavioural and $M1$; a missing or unconverged reading fails the gate, and a disagreement makes the verdict inconclusive. Finally, leave-one-out cross-validation by Pareto-smoothed importance sampling\autocite{vehtariPracticalBayesianModel2017}, which approximates it from a single fit and flags unreliable weights by the Pareto shape $k$, runs over the whole design. A difference in expected log predictive density is read as inconclusive when it is within twice its paired standard error, or when any Pareto shape $k$ exceeds $0.7$; the comparison decides only the two rules that contain it, $M1$ and $H3$ location, and is reported beside the others.
 
 \subsubsection{Verdicts}
 
@@ -235,7 +141,7 @@ Recovery of Model~A covers the truth in every repeat, and $\bar\beta$ and $\delt
 
 \autoref{fig:ppcDispersion} sets the two statistics side by side for every level of every stratum of the fits that decide a claim. On the left the observed stratum means sit on the replicated ones for every model, within a few tenths of a standard deviation at worst; on the right the replicated standard deviation departs from the observed one by factors of two to four in either direction for Models~A and~C, and less for B and~D1. The misfit that fails the gate is therefore one of spread rather than of location, and it is widest for the model that carries $H1$ behavioural and $M1$.
 
-\begin{figure}[!htbp]
+\begin{figure}[!tbp]
     \centering
     \includegraphics[width=\textwidth]{figures/bayes_ppc_dispersion.pdf}
 \caption{Posterior predictive check of every fit that decides a claim, one point per level of every stratum (geometry, candidate frequency, phase slice, $P$, $S$, generator or probe stage as they apply). Left: observed stratum mean minus the centre of its $95\%$ replicated interval, in units of the observed standard deviation of that stratum. Right: centre of the replicated interval of the standard deviation over the observed one, on a logarithmic axis; the Model~D2 levels with an observed standard deviation of zero are drawn at $20$. Filled points fall outside their replicated interval and fail the check. Model~C is fitted on the deficit $-d$, so its mean misses mirror those of Model~A.}

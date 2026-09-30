@@ -76,9 +76,9 @@ twoside, % Two side traditional mode where headers and footers change between od
 % trasformare la tabella in una griglia. \rowsep e' un filetto nero sottile ed e' quello in uso
 % nelle Tabelle 2 e 3; \rowtint tinge le righe alternate, tenuto qui se si vuole tornare indietro.
 \newcommand{\rowtint}{\rowcolor{black!6}}
-\newcommand{\rowsep}{\specialrule{0.2pt}{1.5pt}{1.5pt}}
+\newcommand{\rowsep}{\specialrule{0.1pt}{1.5pt}{1.6pt}} % 0.1 pt di filetto; il piu' 0.1 pt sotto lascia invariata l'altezza delle tabelle
 % Nelle tabelle a piu' blocchi le righe di un blocco sono separate da \rowsep e i blocchi fra loro
-% da \midrule (0.5 pt, piu' spessa); \cmidrule[0.2pt] e' lo stesso filetto sottile limitato a
+% da \midrule (0.5 pt, piu' spessa); \cmidrule[0.1pt] e' lo stesso filetto sottile limitato a
 % alcune colonne, per le celle che si estendono su piu' righe (\multirow).
 % \checkmark e \xmark: gate superato e non superato nella Tabella 7.
 \newcommand{\xmark}{\ding{55}}
@@ -180,6 +180,9 @@ twoside, % Two side traditional mode where headers and footers change between od
 \flushbottom
 \widowpenalty=10000
 \clubpenalty=10000
+% A footnote is never broken between two lines: it is set whole on the page that holds its marker,
+% and when it does not fit there the line that carries the marker moves to the next page with it.
+\interfootnotelinepenalty=10000
 
 \newpage
 \section*{Introduction}\label{sec:introduction}
