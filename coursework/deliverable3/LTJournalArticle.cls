@@ -41,7 +41,7 @@
 \graphicspath{{figures/}{./}} % Specifies where to look for included images (trailing slash required)
 
 \usepackage[bottom, hang]{footmisc} % Force footnotes to the bottom of the page and to the left margin
-\setlength{\footnotemargin}{6pt} % Horizontal space between the footnote marker and text
+\setlength{\footnotemargin}{12pt} % Reserve room for two-digit markers and a clear gap before the text
 \usepackage{indentfirst} % Indent the first paragraph of each section
 %----------------------------------------------------------------------------------------
 %	MARGINS
