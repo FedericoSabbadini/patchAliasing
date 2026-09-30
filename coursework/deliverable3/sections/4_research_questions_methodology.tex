@@ -18,7 +18,7 @@ Pure tones are swept across the band in one-hertz steps at several starting phas
 
 \subsection{Step two: decomposition of generated signals}
 
-A deployment never receives an isolated tone, so the second step uses multi-component draws from the two generators of \autoref{sec:signals}. Input and forecast are decomposed into their components, and the observable is a component returned at the wrong frequency or not at all. \autoref{sec:appDecomp} states the decomposition and the amplitude cut.
+A deployment never receives an isolated tone, so the second step uses multi-component draws from the two generators of \autoref{sec:signals}. Input and forecast are decomposed into their components by the same windowed discrete Fourier transform, and a component is counted as lost when the forecast returns it at the wrong frequency or not at all. \autoref{sec:appDecomp} states the decomposition and the amplitude cut.
 
 \subsection{Step three: forecasting the measured series}
 
