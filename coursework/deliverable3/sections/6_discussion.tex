@@ -1,0 +1,37 @@
+This section reads the Bayesian results claim by claim, evaluates the pre-registered mitigation and collects the limits of the evidence.
+
+\subsection{Reading the Claims}\label{sec:claims}
+All fits converged and no conclusion depends on its prior, so each posterior is a stable description of the data; what the gates withhold is the step from description to verdict. Two gates fail: the predictive check, when a model reproduces the average of a stratum but not its spread, and parameter recovery, when the design cannot find an effect of known size; one claim stops before them, because too few sites exist to identify its slope. Each claim below reports what its posterior shows before the gates and which gates then fail.
+
+\subsubsection*{Frequency-dependent blind spots (H1)}
+A tone at a candidate frequency is recovered $35\%$ better than beside it, and the probe needs only $6\%$ more code to read it from the internal state, so both readings would refute $H1$: no blind spot is visible, in line with the sites attracting the forecast in the sweep. Both models converged, yet neither is reportable. The predictive check fails on spread and not on location, since in Model~A one residual scale serves fifteen geometries whose spread differs threefold and the contrast is skewed beyond what a Student-$t$ likelihood reproduces; recovery fails through a patch-size slope that the design cannot tell from none in Model~A, and by $0.003$ on one interval in Model~B.
+
+\subsubsection*{Independence from temporal alignment (H2)}
+Whatever advantage a candidate carries is nearly the same at every starting phase, so $H2$ would be supported. Model~C converged but, sharing its triplets with Model~A, fails the same predictive check, and its recovery fails through a single divergent repeat.
+
+\subsubsection*{Parametric dependence of blind spot sites (H3)}
+The geometry leaves a visible footprint in the token sequences, though not a loss. Their dispersion dips on the stride grid and not on the patch grid, so $H3$ location, which needs both, would be refuted, while the stride sites move as $f_s/S$ predicts and $H3a$ would be supported. $H3b$ cannot be examined: no patch-only site is unambiguous on the averaged curves, against the ten required, and three single replicates show one, so it is not identified rather than refuted. The fits converged and the stride results fail only the predictive check, on dispersion within each geometry, which sites on the predicted spacing leave without scatter to reproduce; the patch branch also fails recovery, its simulated refits diverging on three observations. Dips that follow from repeating tokens locate structure the geometry imposes and do not by themselves evidence a learned loss.
+
+\subsubsection*{A candidate mitigation (M1)}
+More overlap goes with a smaller gain at the sites and not with a smaller loss, so the data show no benefit of the mitigation. The fits converged and the leave-one-out comparison is reliable, but the rule fails on both legs before the gates and the claim then fails the predictive and recovery gates of Model~A, from which it is read. \autoref{sec:mitigationDiscussion} gives the numbers, the confounds and further strategies.
+
+\subsection{Mitigation: Evaluation and Further Strategies}\label{sec:mitigationDiscussion}
+\begingroup
+\let\subsection\subsubsection
+\subsection*{Evaluation of $M1$}
+
+The overlap slope is $\delta_O=-0.13$, and $-0.12$ on the recovery net of the background-only forecast. Both legs of the rule fail: $\Pr(\delta_O>0\mid D)=0.053$ against $0.95$, and leave-one-out prefers the model without the overlap term by $0.7$ units of expected log predictive density against a paired standard error of $0.15$. The refutation probability, $0.947$, stops just short of its cut, so the reading is inconclusive before the gates and not reportable after them. Three confounds qualify any slope on this design. The token count moves with the stride, so overlap is not separated from sequence length; lowering $S$ changes the mix of stride and patch candidates; and the truncated context tail is non-zero on the six geometries that identify the stride branch.
+
+\subsection*{Further strategies}
+
+Because the candidate set follows from $(f_s,P,S)$ alone, the same arithmetic suggests two further strategies, neither tested here.
+
+The first moves the combs rather than thinning one. Changing $S$ or $P$ rescales the corresponding comb by a known amount, so a deployment that knows its spectral content can choose a geometry whose combs fall between the components that matter. It is a design-time control rather than a repair, and it protects only the content known in advance.
+
+The second is redundancy across geometries. Two models whose combs fall at different frequencies would be blind, if at all, in different places, and an ensemble switching per frequency on the observability assessment of \autoref{sec:ontology} would leave no frequency served only by a model known to be blind there. The cost is two forecasters to calibrate against each other and a switch that can itself be wrong.
+
+$M1$ thins one branch, geometry selection moves both, and only redundancy covers what a single tokeniser cannot represent.
+\endgroup
+
+\subsection{Limitations}\label{sec:limitations}
+The evidence has limits that no fit removes. Each geometry is one trained model from one seed, so a difference between two configurations is also a difference between two training runs, and the retrained models use half the published step budget (\autoref{sec:appRetraining}), which makes them comparable with one another but not with the released checkpoint. The mitigation slope carries the three confounds of \autoref{sec:mitigationDiscussion}, the truncated context among them (\autoref{tab:sweepContext}). The $64$-sample horizon resolves frequencies only to one bin, $f_s/64$, so a recovered line is located near a tone rather than resolved from its neighbours. The measured series carries no appreciable energy on $\mathcal F_{\mathrm{lock}}$, so the domain informs the risk reading but tests no hypothesis. Finally, Pagani et al. report frequency content recovered unevenly from Chronos representations. The pre-gate readings agree that the candidate sites are special, but not on the direction: the forecast recovers more there and the internal state loses under $10\%$, so, were the gates met, the unevenness would not be a loss concentrated on $\mathcal F_{\mathrm{lock}}$.
