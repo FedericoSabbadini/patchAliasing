@@ -8,11 +8,11 @@
         \textbf{Parameter} & \textbf{Adopted} & \textbf{Published} & \textbf{Constraint / note} \\
         \midrule
         Patch size $P$              & $8$, $16$, $24$, $32$              & $16$                & swept; the pairs are in \autoref{tab:hfModels} \\
-        \rowsep
+        \rowsep%
         Stride $S$                  & $8$, $12$, $16$, $20$, $24$, $32$  & $16$                & swept, subject to $S\le P$ \\
-        \rowsep
+        \rowsep%
         Geometries trained          & $15$                               & $1$                 & one checkpoint per $(P,S)$ \\
-        \rowsep
+        \rowsep%
         Training seed               & $42$                               & ---                 & one seed, shared by every run \\
         \addlinespace[12pt]
         \midrule[\heavyrulewidth]
@@ -21,13 +21,13 @@
         \textbf{Parameter} & \textbf{Adopted} & \textbf{Published} & \textbf{Constraint / note} \\
         \midrule
         Context length              & $2048$ samples                     & $2048$              & as released \\
-        \rowsep
+        \rowsep%
         Prediction length           & $64$ samples                       & $64$                & as released \\
-        \rowsep
+        \rowsep%
         Quantile levels             & $9$, from $0.1$ to $0.9$           & $9$                 & as released \\
-        \rowsep
+        \rowsep%
         Widths, heads, layers       & as released                        & as released         & only $(P,S)$ is overridden \\
-        \rowsep
+        \rowsep%
         Initial weights             & random                             & pretrained          & every geometry trained from scratch \\
         \addlinespace[12pt]
         \midrule[\heavyrulewidth]
@@ -36,17 +36,17 @@
         \textbf{Parameter} & \textbf{Adopted} & \textbf{Published} & \textbf{Constraint / note} \\
         \midrule
         Corpora (streamed)          & TSMixup $10$M, KernelSynth $1$M    & same                & public Chronos collection \\
-        \rowsep
+        \rowsep%
         Mixing ratio                & $9{:}1$                            & $9{:}1$             & TSMixup to KernelSynth \\
-        \rowsep
+        \rowsep%
         Shuffle buffer              & $10{,}000$                         & $100{,}000$         & departure: streaming throughput \\
-        \rowsep
+        \rowsep%
         Minimum observed past       & $60$ samples                       & $60$                & required before the horizon \\
-        \rowsep
+        \rowsep%
         Maximum missing per series  & $0.9$                              & $0.9$               & series above this are discarded \\
-        \rowsep
+        \rowsep%
         Injected missing rate       & $\mathcal U(0,0.2)$                & $\mathcal U(0,0.2)$ & masked, excluded from the loss \\
-        \rowsep
+        \rowsep%
         Windows per series          & $1$                                & $1$                 & one admissible split point \\
         \addlinespace[12pt]
         \midrule[\heavyrulewidth]
@@ -55,24 +55,24 @@
         \textbf{Parameter} & \textbf{Adopted} & \textbf{Published} & \textbf{Constraint / note} \\
         \midrule
         Gradient updates            & $100{,}000$                        & $200{,}000$         & departure: compute budget \\
-        \rowsep
+        \rowsep%
         Batch size                  & $32$ windows                       & $256$               & departure: one device, where the published $256$ is $8\times32$ \\
-        \rowsep
+        \rowsep%
         Windows seen                & $3.2$M                             & $51.2$M             & updates $\times$ batch size \\
-        \rowsep
+        \rowsep%
         Optimiser                   & AdamW                              & AdamW               & --- \\
-        \rowsep
+        \rowsep%
         Learning rate               & $10^{-3}$                          & $10^{-3}$           & --- \\
-        \rowsep
+        \rowsep%
         Scheduler / warmup          & linear to zero / none              & linear / none       & --- \\
-        \rowsep
+        \rowsep%
         Weight decay                & $0.0$                              & $0.01$              & as in the released script, which keeps the default $0.0$ \\
-        \rowsep
+        \rowsep%
         Gradient-norm clip          & $1.0$                              & $1.0$               & --- \\
-        \rowsep
+        \rowsep%
         Numerical precision         & single                             & TF32                & reduced-precision matrix products where available \\
         \bottomrule
     \end{tabular}
-\caption{Training parameters of every retrained geometry, beside the published Chronos recipe\autocite{ansariChronosLearningLanguage2024} by which the not fully published Chronos-Bolt recipe is approximated, with the constraint behind each. The architecture rows follow the released Chronos-Bolt-Tiny configuration. Besides the patch geometry, the object of the study, the step budget, the batch and the shuffle buffer are reduced to fit the compute, identically for all fifteen runs, and the weight decay is that of the released script rather than of the article.}
+\caption{Training parameters of every retrained geometry, beside the published Chronos recipe\autocite{ansariChronosLearningLanguage2024} by which the not fully published Chronos-Bolt recipe is approximated, with the constraint behind each. The architecture rows follow the released Chronos-Bolt-Tiny configuration. Besides the patch geometry, the object of the study, the step budget, the batch and the shuffle buffer are reduced to fit the compute, identically for all fifteen runs, and the weight decay is that of the released script rather than of the article.}%
     \label{tab:trainParams}
 \end{table}

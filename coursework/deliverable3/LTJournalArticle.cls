@@ -105,7 +105,7 @@
 	\setcounter{secnumdepth}{2} % Number sections down to subsections
 }
 
-\titleformat
+\titleformat%
 	{\section} % Section type being modified
 	[block] % Section layout type, can be: hang, block, display, runin, leftmargin, rightmargin, drop, wrap, frame
 	{\Large\bfseries\centering} % Text formatting of the whole section, i.e. label and title
@@ -116,7 +116,7 @@
 
 %------------------------------------------------
 
-\titleformat
+\titleformat%
 	{\subsection} % Section type being modified
 	[block] % Section layout type, can be: hang, block, display, runin, leftmargin, rightmargin, drop, wrap, frame
 	{\raggedright\large\bfseries} % Text formatting of the whole section, i.e. label and title
@@ -127,7 +127,7 @@
 
 %------------------------------------------------
 
-\titleformat
+\titleformat%
 	{\subsubsection} % Section type being modified
 	[runin] % Section layout type, can be: hang, block, display, runin, leftmargin, rightmargin, drop, wrap, frame
 	{\bfseries} % Text formatting of the whole section, i.e. label and title
@@ -161,7 +161,7 @@
 \usepackage{abstract} % Allows abstract customization
 
 \renewcommand{\abstractnamefont}{\normalfont\bfseries\vspace{0.5\baselineskip}} % Set the "Abstract" text to bold
-\renewcommand{\abstracttextfont}{\vspace{-0.5\baselineskip}\normalfont\small\itshape} % Set the abstract itself to small italic text
+\renewcommand{\abstracttextfont}{\vspace{-0.5\baselineskip}\normalfont\small\itshape} % Set the abstract itself to small italic text  % chktex 6: font-selection hook, not italic text.
 
 %----------------------------------------------------------------------------------------
 %	BIBLIOGRAPHY

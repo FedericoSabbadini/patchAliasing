@@ -9,27 +9,27 @@
         \midrule
         \multicolumn{3}{@{}l}{\textit{Model D1, one fit per signal mode and labelling}}\\
         $\log z_g(f)$ & log token collapse of geometry $g$ at swept frequency $f$, one replicate & one per row \\
-        \rowsep
+        \rowsep%
         $\alpha_g$ & off-grid level of geometry $g$ & $15$ \\
-        \rowsep
+        \rowsep%
         $\theta_S$, $\theta_P$ & \textbf{estimands}: log depth of the dip on the stride and on the patch grid & $1$ each \\
-        \rowsep
+        \rowsep%
         OnStrideGrid, OnPatchGrid & $1$ when $f$ is a member of $\mathcal F_S$, of $\mathcal F_P$ & data \\
-        \rowsep
+        \rowsep%
         $\sigma$ & residual scale & $1$ \\
         \midrule[\heavyrulewidth]
         \multicolumn{3}{@{}l}{\textit{Model D2, one fit per branch $F\in\{S,P\}$}}\\
         $\hat f^{\,F}_{1,g}$ & lowest detected site of branch $F$ on one replicate of geometry $g$ & one per replicate \\
-        \rowsep
+        \rowsep%
         $\Delta^F_g$ & spacing branch $F$ predicts, $f_s/S_g$ or $f_s/P_g$ & data \\
-        \rowsep
+        \rowsep%
         $\kappa_F$ & \textbf{estimand}: measured over predicted spacing; $\kappa_S$ for $H3a$, $\kappa_P$ for $H3b$ & $1$ \\
-        \rowsep
+        \rowsep%
         $\sigma_F$ & scatter beyond the resolution floor & $1$ \\
-        \rowsep
+        \rowsep%
         $\Delta f$ & sweep step, $1$\,Hz, fixed & constant \\
         \bottomrule
     \end{tabular}
-    \caption{Terms of Models~D1 and~D2.}
+    \caption{Terms of Models~D1 and~D2.}%
     \label{tab:termsD}
 \end{table}

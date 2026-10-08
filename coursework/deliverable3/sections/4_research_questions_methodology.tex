@@ -2,8 +2,8 @@ This section sets out the experimental framework, the four steps and what each c
 
 \subsection{Experimental Framework}\label{sec:framework}
 \begingroup
-\let\subsubsection\paragraph
-\let\subsection\subsubsection
+\let\subsubsection\paragraph%
+\let\subsection\subsubsection%
 Testing the claims of \autoref{sec:agent} requires a design in which the two branches of $\mathcal F_{\mathrm{lock}}$ can be told apart, signals whose frequency content is known by construction, and an order in which nothing that decides a claim is chosen after seeing the data. Two things are left outside it: variation between independently trained instances, since one model is trained per geometry; and the photovoltaic series, which supplies the application domain, so no claim is decided on measured telemetry.
 
 \input{tables/branchSites.tex}
@@ -14,11 +14,11 @@ One limit of the design is arithmetic rather than empirical. Where $S \mid P$ ev
 
 \subsection{Step one: the frequency sweep}
 
-Pure tones are swept across the band in one-hertz steps at several starting phases, once per geometry, and each is read both in the forecast and in the internal state. The behavioural reading rolls the forecast forward and asks at what frequency the model rebuilds the tone. The representational reading asks whether a linear probe on a captured internal state can still place it, on the seven hierarchical band tasks of Pagani et al.\autocite{paganiPreliminaryInsightsChronos2026} and on a local task separating $f-1$\,Hz from $f+1$\,Hz. The scan averages over phase and has no controls, so it decides no claim: it shows whether frequency content is represented at all and where that ability degrades. \autoref{sec:appSweep} states the contexts, the tasks and the resolution limit.
+Pure tones are swept across the band in one-hertz steps at several starting phases, once per geometry, and each is read both in the forecast and in the internal state. The behavioural reading rolls the forecast forward and asks at what frequency the model rebuilds the tone. The representational reading asks whether a linear probe on a captured internal state can still place it, on the seven hierarchical band tasks of Pagani et al.\autocite{paganiPreliminaryInsightsChronos2026} and on a local task separating $f-1$\,Hz from $f+1$\,Hz. The scan averages over phase and has no controls, so it decides no claim: it shows whether frequency content is represented at all and where that ability degrades\@. \autoref{sec:appSweep} states the contexts, the tasks and the resolution limit.
 
 \subsection{Step two: decomposition of generated signals}
 
-A deployment never receives an isolated tone, so the second step uses multi-component draws from the two generators of \autoref{sec:signals}. Input and forecast are decomposed into their components by the same windowed discrete Fourier transform, and a component is counted as lost when the forecast returns it at the wrong frequency or not at all. \autoref{sec:appDecomp} states the decomposition and the amplitude cut.
+A deployment never receives an isolated tone, so the second step uses multi-component draws from the two generators of \autoref{sec:signals}. Input and forecast are decomposed into their components by the same windowed discrete Fourier transform, and a component is counted as lost when the forecast returns it at the wrong frequency or not at all\@. \autoref{sec:appDecomp} states the decomposition and the amplitude cut.
 
 \subsection{Step three: forecasting the measured series}
 
@@ -26,7 +26,7 @@ The third step gives the photovoltaic telemetry to every geometry and to the pub
 
 \subsection{Step four: the Bayesian analysis}
 
-The three steps above cannot separate a loss at a candidate frequency from one the model would show anywhere. The inferential step therefore places every candidate beside two controls under one geometry, background and phase, so that only the frequency changes, and fits the models of \autoref{sec:models} to the resulting contrasts. The configurations, the frequency grid and the coverage of each geometry are declared before anything is measured, and no response filter is applied afterwards, so the arms where the forecast rebuilds nothing are kept. Interpretation is fail-closed: an estimate is read only when every check on its model passes, and is otherwise withheld rather than taken as evidence either way. The checks, called gates, are convergence, parameter recovery, posterior predictive adequacy, prior sensitivity, the reliability of the leave-one-out comparisons and the agreement of two readings where the design offers them. A claim whose estimate fails one is reported as not reportable, and a branch with fewer than ten unambiguous sites as not identified; neither is a null result. \autoref{sec:appBayes} states the gates, the sampler settings and how the context truncation enters each comparison.
+The three steps above cannot separate a loss at a candidate frequency from one the model would show anywhere. The inferential step therefore places every candidate beside two controls under one geometry, background and phase, so that only the frequency changes, and fits the models of \autoref{sec:models} to the resulting contrasts. The configurations, the frequency grid and the coverage of each geometry are declared before anything is measured, and no response filter is applied afterwards, so the arms where the forecast rebuilds nothing are kept. Interpretation is fail-closed: an estimate is read only when every check on its model passes, and is otherwise withheld rather than taken as evidence either way. The checks, called gates, are convergence, parameter recovery, posterior predictive adequacy, prior sensitivity, the reliability of the leave-one-out comparisons and the agreement of two readings where the design offers them. A claim whose estimate fails one is reported as not reportable, and a branch with fewer than ten unambiguous sites as not identified; neither is a null result\@. \autoref{sec:appBayes} states the gates, the sampler settings and how the context truncation enters each comparison.
 \endgroup
 
 \input{tables/bayesModels.tex}
@@ -37,7 +37,7 @@ Bayesian inference represents uncertainty about unknown quantities through proba
 \input{tables/bayesDecisions.tex}
 
 \begingroup
-\let\subsubsection\paragraph
+\let\subsubsection\paragraph%
 
 \subsection*{Model A, the behavioural reading (H1)}
 Amplitude recovery $R=A_{\mathrm{pred}}/A_{\mathrm{true}}$ is collected in matched triplets, a candidate $f_k$ with its controls $f_k\pm\delta$ sharing one background and one phase, and reduced to one contrast per triplet,

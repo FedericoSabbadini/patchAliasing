@@ -10,7 +10,7 @@ The same context is given to two checkpoints: a retrained geometry of \autoref{t
 
 Each of the three windows is decomposed in the same way. Its mean is removed, it is multiplied by a Hann window, and its one-sided magnitude spectrum is computed by a discrete Fourier transform and scaled so that a pure tone of amplitude $A$ peaks near $A$. The spectrum is evaluated on a one-hertz grid obtained by zero padding, which places a peak finely but does not separate two peaks: the native spacing remains $f_s/64=8$\,Hz, and two components closer than that appear as one line however fine the grid.
 
-Candidate lines are the local maxima of that spectrum inside the analysed band of $2$--$250$\,Hz, taken strongest first, no two closer than the native spacing, and none weaker than $5\%$ of the strongest. Up to six are kept on the real side and up to eight on each forecast. On the real side of a Light TSMixup draw the lines are not estimated at all, since the generator records the frequencies it used; a KernelSynth draw names no frequencies, so its real side is read off the spectrum like the forecasts. A forecast line is then retained only if its magnitude reaches $35\%$ of the strongest candidate of the same forecast. The cut is computed separately for each checkpoint, so a forecast that is weak overall is not emptied by a threshold set on another model's output.
+Candidate lines are the local maxima of that spectrum inside the analysed band of $2$\textendash{}$250$\,Hz, taken strongest first, no two closer than the native spacing, and none weaker than $5\%$ of the strongest. Up to six are kept on the real side and up to eight on each forecast. On the real side of a Light TSMixup draw the lines are not estimated at all, since the generator records the frequencies it used; a KernelSynth draw names no frequencies, so its real side is read off the spectrum like the forecasts. A forecast line is then retained only if its magnitude reaches $35\%$ of the strongest candidate of the same forecast. The cut is computed separately for each checkpoint, so a forecast that is weak overall is not emptied by a threshold set on another model's output.
 
 Retained lines are turned into components by one joint least-squares fit over the window: a sinusoid at every retained frequency plus a constant, fitted together so that energy shared by two nearby frequencies is split between them instead of being counted twice. The fit returns an amplitude and a phase per line; it never adds or removes a line, which is decided by the spectrum alone. A component whose frequency completes fewer than one and a half cycles in the window is flagged, since below that an amplitude cannot be separated from a phase, and a fit that is poorly conditioned is reported as such rather than returned as a clean number.
 
@@ -29,14 +29,14 @@ Frequencies below are in cycles per patch, equal to cycles per stride at this ge
 \begin{figure*}[p]
     \centering
     \includegraphics[width=\textwidth,height=0.86\textheight,keepaspectratio]{figures/FIG_G_kernelsynth_p16-s16_seed85_components.png}
-\caption{KernelSynth draw at the reference geometry $P=S=16$, components. Columns, left to right: the real continuation, the forecast of the retrained model and that of the published checkpoint, each headed by its $64$-sample window; each row below is one retained component, titled with its frequency in hertz, in cycles per patch and per stride, and its fitted amplitude, and marked when it lies within one hertz of a candidate site. Both sides are estimated, since the generator names no frequencies. Illustrative only.}
+\caption{KernelSynth draw at the reference geometry $P=S=16$, components. Columns, left to right: the real continuation, the forecast of the retrained model and that of the published checkpoint, each headed by its $64$-sample window; each row below is one retained component, titled with its frequency in hertz, in cycles per patch and per stride, and its fitted amplitude, and marked when it lies within one hertz of a candidate site. Both sides are estimated, since the generator names no frequencies. Illustrative only.}%
     \label{fig:decompKS}
 \end{figure*}
 
 \begin{figure*}[p]
     \centering
     \includegraphics[width=\textwidth,height=0.80\textheight,keepaspectratio]{figures/FIG_G_kernelsynth_p16-s16_seed85_spectra.png}
-\caption{Spectra of the draw of \autoref{fig:decompKS}: real continuation (top), retrained model (middle) and published checkpoint (bottom), in cycles per patch on the lower axis and per stride on the upper one. Dashed verticals are the candidate sites, the dotted horizontal is the $35\%$ cut and triangles mark the lines carried into the components page; grey margins lie outside the analysed band.}
+\caption{Spectra of the draw of \autoref{fig:decompKS}: real continuation (top), retrained model (middle) and published checkpoint (bottom), in cycles per patch on the lower axis and per stride on the upper one. Dashed verticals are the candidate sites, the dotted horizontal is the $35\%$ cut and triangles mark the lines carried into the components page; grey margins lie outside the analysed band.}%
     \label{fig:decompKSspec}
 \end{figure*}
 
@@ -45,34 +45,34 @@ The first Light TSMixup draw carries a single injected tone at $6.16$\,cpp with 
 \begin{figure*}[p]
     \centering
     \includegraphics[width=\textwidth,height=0.70\textheight,keepaspectratio]{figures/FIG_G_tsmixup_p16-s16_seed42_components.png}
-\caption{Light TSMixup draw with a single high-frequency injected tone at $6.16$\,cpp, reference geometry $P=S=16$, components, read as \autoref{fig:decompKS}. The real side lists the frequencies the generator drew rather than estimating them. Every component panel shares the vertical scale of the strongest real component, so the residual forecast lines, about a hundredth of the input, read as nearly flat. Illustrative only.}
+\caption{Light TSMixup draw with a single high-frequency injected tone at $6.16$\,cpp, reference geometry $P=S=16$, components, read as \autoref{fig:decompKS}. The real side lists the frequencies the generator drew rather than estimating them. Every component panel shares the vertical scale of the strongest real component, so the residual forecast lines, about a hundredth of the input, read as nearly flat. Illustrative only.}%
     \label{fig:decompTS}
 \end{figure*}
 
 \begin{figure*}[p]
     \centering
     \includegraphics[width=\textwidth,height=0.80\textheight,keepaspectratio]{figures/FIG_G_tsmixup_p16-s16_seed42_spectra.png}
-\caption{Spectra of the draw of \autoref{fig:decompTS}, read as \autoref{fig:decompKSspec}; the green vertical marks the frequency the generator drew. The two forecast panels have their own vertical scale, two orders of magnitude below that of the input.}
+\caption{Spectra of the draw of \autoref{fig:decompTS}, read as \autoref{fig:decompKSspec}; the green vertical marks the frequency the generator drew. The two forecast panels have their own vertical scale, two orders of magnitude below that of the input.}%
     \label{fig:decompTSspec}
 \end{figure*}
 
 \begin{figure*}[p]
     \centering
     \includegraphics[width=\textwidth,height=0.70\textheight,keepaspectratio]{figures/FIG_G_tsmixup_p16-s16_seed17_components.png}
-\caption{Light TSMixup draw with a low-frequency injected tone at $1.30$\,cpp in a background that also holds components at $0.88$ and $6.69$\,cpp, reference geometry $P=S=16$, components, read as \autoref{fig:decompKS}. Both checkpoints return the injected tone, at $1.34$\,cpp, and neither returns the $6.69$\,cpp component. Illustrative only.}
+\caption{Light TSMixup draw with a low-frequency injected tone at $1.30$\,cpp in a background that also holds components at $0.88$ and $6.69$\,cpp, reference geometry $P=S=16$, components, read as \autoref{fig:decompKS}. Both checkpoints return the injected tone, at $1.34$\,cpp, and neither returns the $6.69$\,cpp component. Illustrative only.}%
     \label{fig:decompTSlow}
 \end{figure*}
 
 \begin{figure*}[p]
     \centering
     \includegraphics[width=\textwidth,height=0.80\textheight,keepaspectratio]{figures/FIG_G_tsmixup_p16-s16_seed17_spectra.png}
-\caption{Spectra of the draw of \autoref{fig:decompTSlow}, read as \autoref{fig:decompKSspec}; green verticals mark the three frequencies the generator drew.}
+\caption{Spectra of the draw of \autoref{fig:decompTSlow}, read as \autoref{fig:decompKSspec}; green verticals mark the three frequencies the generator drew.}%
     \label{fig:decompTSlowspec}
 \end{figure*}
 
 Read together, the three draws illustrate the behaviour that the recovery count quantifies: slow content tends to survive into the forecast and fast content tends to be lost, the published checkpoint returns more components than the retrained one, and the lines the retrained model returns away from the input often sit on its own candidate sites. This describes how the models behave on these signals and does not confirm any hypothesis, which is decided only by the paired analysis of \autoref{sec:bayesResults}.
 
-\FloatBarrier
+\FloatBarrier%
 \subsection{The recovery count}
 
 The single draws show what happens to one realisation; the count behind \autoref{tab:decomposition} asks how often an added component survives. For each generator one hundred backgrounds are drawn with the recipe above and reused unchanged for every checkpoint. Each geometry then receives one hundred paired trials: in the lock trial a tone is added at one of that geometry's candidate sites, the sites being cycled so that each is used about equally often, and since no geometry has a hundred sites in band, sites recur. In the control trial the same background receives a tone at a nearby frequency, placed below or above the site in equal proportion and more than $2$\,Hz from every candidate of that geometry. These controls serve only this count and differ from those of Model~A, which sit at a matched offset $f_k\pm\delta$ from each candidate (\autoref{sec:appBayes}). The tone has an amplitude of one and a half times the background standard deviation and the same phase in both trials of a pair, and the sum is not renormalised afterwards. The published checkpoint and the retrained $P=S=16$ share the same candidate sites and receive exactly the same signals.

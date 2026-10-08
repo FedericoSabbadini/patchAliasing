@@ -4,19 +4,19 @@ This appendix describes how the photovoltaic series is prepared, forecast and sc
 
 The series is the module power of the SolarTech Lab plant\autocite{levaPhotovoltaicPowerWeather2020}, recorded once per minute over the whole of 2017 and timestamped in Central European Time, $525{,}601$ timestamps in total. Only $198{,}730$ of them, $37.8\%$, carry a valid reading. Power is absent outside daylight by construction, because the plant produces nothing and the logger records nothing; during the day readings are also lost whenever the logger misses a minute. Twenty readings above $1$\,kW, with a maximum near $60$\,kW, are physically impossible for this module and are treated as missing rather than as data.
 
-Each day is inspected by locating its longest run of consecutive valid readings, which is the longest stretch that could be handed to a model without any filling. The longest run in the whole year is $880$ minutes, on 5 July, and only $64$ of the $365$ days reach the $544$ consecutive readings used by the synthetic windows. \autoref{fig:solarDays} shows two of the longest runs: on the clear day the power traces a smooth arc that peaks near $200$\,W, whereas on the cloudy one the midday readings scatter well away from that arc. \autoref{fig:solarOverlay} superimposes four days of different character: clear summer days follow a smooth arc, a winter day produces less power over a shorter interval, and a cloudy day departs from the arc in rapid drops and peaks that last a few minutes each. Those departures come from the weather and not from the plant, so they are part of what a forecaster is asked to predict and cannot learn from the context.
+Each day is inspected by locating its longest run of consecutive valid readings, which is the longest stretch that could be handed to a model without any filling. The longest run in the whole year is $880$ minutes, on 5 July, and only $64$ of the $365$ days reach the $544$ consecutive readings used by the synthetic windows\@. \autoref{fig:solarDays} shows two of the longest runs: on the clear day the power traces a smooth arc that peaks near $200$\,W, whereas on the cloudy one the midday readings scatter well away from that arc\@. \autoref{fig:solarOverlay} superimposes four days of different character: clear summer days follow a smooth arc, a winter day produces less power over a shorter interval, and a cloudy day departs from the arc in rapid drops and peaks that last a few minutes each. Those departures come from the weather and not from the plant, so they are part of what a forecaster is asked to predict and cannot learn from the context.
 
 \begin{figure}[!bp]
     \centering
     \includegraphics[width=\textwidth]{figures/SOLAR_days_186_212.png}
-\caption{Module power over two recorded days, 5 July (left) and 31 July 2017 (right), one point per valid minute coloured by its value. The grey band marks the longest run of consecutive valid readings in each day. The first day is clear and follows the expected arc; on the second, the scattered readings between noon and mid-afternoon are drops and peaks caused by passing clouds and changing weather.}
+\caption{Module power over two recorded days, 5 July (left) and 31 July 2017 (right), one point per valid minute coloured by its value. The grey band marks the longest run of consecutive valid readings in each day. The first day is clear and follows the expected arc; on the second, the scattered readings between noon and mid-afternoon are drops and peaks caused by passing clouds and changing weather.}%
     \label{fig:solarDays}
 \end{figure}
 
 \begin{figure}[!tbp]
     \centering
     \includegraphics[width=0.9\textwidth]{figures/SOLAR_days_overlay.png}
-\caption{Module power on four recorded days, superimposed by time of day: two clear summer days (5 July and 7 June), a summer day with passing clouds (31 July) and a winter day (15 January). Gaps in a curve are minutes without a valid reading.}
+\caption{Module power on four recorded days, superimposed by time of day: two clear summer days (5 July and 7 June), a summer day with passing clouds (31 July) and a winter day (15 January). Gaps in a curve are minutes without a valid reading.}%
     \label{fig:solarOverlay}
 \end{figure}
 
@@ -37,7 +37,7 @@ A single forecast is first examined in detail, issued at 13:00 on 5 July 2017, t
 \begin{figure}[!tbp]
     \centering
     \includegraphics[width=\textwidth]{figures/SOLAR_day186_1300_p16-s16_both.png}
-\caption{Forecast issued at 13:00 on 5 July 2017 by the retrained $P=S=16$ geometry and by the published checkpoint. Left, the full context with its measured, zero-filled and interpolated minutes marked; right, the last $90$ minutes of context and the $64$ forecast minutes, with each model's median and $80\%$ interval against the measured values.}
+\caption{Forecast issued at 13:00 on 5 July 2017 by the retrained $P=S=16$ geometry and by the published checkpoint. Left, the full context with its measured, zero-filled and interpolated minutes marked; right, the last $90$ minutes of context and the $64$ forecast minutes, with each model's median and $80\%$ interval against the measured values.}%
     \label{fig:solar186both}
 \end{figure}
 
@@ -46,7 +46,7 @@ A single forecast is first examined in detail, issued at 13:00 on 5 July 2017, t
 \begin{figure}[!tbp]
     \centering
     \includegraphics[width=\textwidth]{figures/SOLAR_day186_1300_p16-s16_error.png}
-\caption{The same forecast as \autoref{fig:solar186both}, drawn as the difference between forecast and measurement minute by minute: bars for the medians, thin lines for the $10\%$ and $90\%$ quantiles, with the measured value printed beneath each labelled minute.}
+\caption{The same forecast as \autoref{fig:solar186both}, drawn as the difference between forecast and measurement minute by minute: bars for the medians, thin lines for the $10\%$ and $90\%$ quantiles, with the measured value printed beneath each labelled minute.}%
     \label{fig:solar186err}
 \end{figure}
 
@@ -55,7 +55,7 @@ Across the fifteen geometries the same cut gives errors between $5.3$ and $15.9$
 \begin{figure}[!tbp]
     \centering
     \includegraphics[width=0.8\textwidth]{figures/SOLAR_day186_1300_bypatch.png}
-\caption{Median forecasts of the retrained geometries for the cut of \autoref{fig:solar186both}, one panel per patch size and one colour per stride, against the measured values (dashed). Intervals are omitted so that the curves remain readable.}
+\caption{Median forecasts of the retrained geometries for the cut of \autoref{fig:solar186both}, one panel per patch size and one colour per stride, against the measured values (dashed). Intervals are omitted so that the curves remain readable.}%
     \label{fig:solar186patch}
 \end{figure}
 
@@ -72,7 +72,7 @@ The point forecast is the median of the nine quantiles each model returns. For e
 \begin{figure}[!tbp]
     \centering
     \includegraphics[width=\textwidth]{figures/SOLAR_day019_1300_p16-s16_both.png}
-\caption{Forecast issued at 13:00 on 19 January 2017 by the retrained $P=S=16$ geometry and by the published checkpoint. Left, the $2048$-minute context, which spans the previous day and night: $818$ minutes are measured, $1203$ missing night-time minutes are set to zero and $27$ minutes of short daylight gaps are interpolated. Right, the last $90$ minutes of context and the $64$ forecast minutes, with each model's median and $80\%$ interval against the measured values.}
+\caption{Forecast issued at 13:00 on 19 January 2017 by the retrained $P=S=16$ geometry and by the published checkpoint. Left, the $2048$-minute context, which spans the previous day and night: $818$ minutes are measured, $1203$ missing night-time minutes are set to zero and $27$ minutes of short daylight gaps are interpolated. Right, the last $90$ minutes of context and the $64$ forecast minutes, with each model's median and $80\%$ interval against the measured values.}%
     \label{fig:solarForecast19}
 \end{figure}
 
@@ -81,7 +81,7 @@ The forecast of \autoref{fig:solarForecast19}, issued on a winter afternoon at t
 \begin{figure}[!tbp]
     \centering
     \includegraphics[width=\textwidth]{figures/SOLAR_benchmark_summary.png}
-\caption{Mean absolute error, bias and error variance of the median forecast over the $150$ windows, for the published checkpoint (red) and the fifteen retrained geometries (blue).}
+\caption{Mean absolute error, bias and error variance of the median forecast over the $150$ windows, for the published checkpoint (red) and the fifteen retrained geometries (blue).}%
     \label{fig:solarSummary}
 \end{figure}
 
@@ -89,16 +89,16 @@ The forecast of \autoref{fig:solarForecast19}, issued on a winter afternoon at t
 
 \subsection{The dominant frequency of the context}
 
-To place each window in the units of \autoref{sec:tokenisation}, the strongest non-constant component of its context is located on the Hann-windowed spectrum of the $2048$ context minutes, after the mean is removed. Only the context is used, so nothing about the horizon enters this coordinate. Across the $150$ windows that component falls on one of the three lowest frequencies the context can resolve, which are periods of about $34$, $17$ and $11$ hours: $108$ windows on the first, $40$ on the second and $2$ on the third. In cycles per patch this is at most $0.05$ for any geometry, so the dominant content of every window is the daily envelope and none lies near a candidate site. \autoref{fig:solarFreq} reports the error of each model grouped by that component. The error tends to fall as the dominant period shortens, but the groups are of very unequal size and differ in season and weather, so the figure describes the sample rather than a property of the geometry.
+To place each window in the units of \autoref{sec:tokenisation}, the strongest non-constant component of its context is located on the Hann-windowed spectrum of the $2048$ context minutes, after the mean is removed. Only the context is used, so nothing about the horizon enters this coordinate. Across the $150$ windows that component falls on one of the three lowest frequencies the context can resolve, which are periods of about $34$, $17$ and $11$ hours: $108$ windows on the first, $40$ on the second and $2$ on the third. In cycles per patch this is at most $0.05$ for any geometry, so the dominant content of every window is the daily envelope and none lies near a candidate site\@. \autoref{fig:solarFreq} reports the error of each model grouped by that component. The error tends to fall as the dominant period shortens, but the groups are of very unequal size and differ in season and weather, so the figure describes the sample rather than a property of the geometry.
 
 \begin{figure}[!tbp]
     \centering
     \includegraphics[width=0.85\textwidth]{figures/SOLAR_benchmark_frequency_cps.png}
-\caption{Mean absolute error (solid, left axis) and error variance (dashed, right axis) of each model, grouped by the dominant frequency of the context, expressed in cycles per stride of that model's geometry. The three points of each panel hold $108$, $40$ and $2$ windows respectively.}
+\caption{Mean absolute error (solid, left axis) and error variance (dashed, right axis) of each model, grouped by the dominant frequency of the context, expressed in cycles per stride of that model's geometry. The three points of each panel hold $108$, $40$ and $2$ windows respectively.}%
     \label{fig:solarFreq}
 \end{figure}
 
-\FloatBarrier
+\FloatBarrier%
 
 \subsection{Limits}
 

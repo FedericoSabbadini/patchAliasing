@@ -10,32 +10,32 @@ Kernel & Formula & Hyperparameters \\
 Constant &
 $\kappa_{\mathrm{Const}}(x,x')=C$ &
 $C=1$ \\
-\rowsep
+\rowsep%
 White Noise &
 $\kappa_{\mathrm{White}}(x,x')=\sigma_n \cdot \mathbf{1}_{x=x'}$ &
 $\sigma_n \in \{0.1,1\}$ \\
-\rowsep
+\rowsep%
 Linear &
 $\kappa_{\mathrm{Lin}}(x,x')=\sigma_0^2+x\cdot x'$ &
 $\sigma_0 \in \{0,1,10\}$ \\
-\rowsep
+\rowsep%
 RBF &
 $\kappa_{\mathrm{RBF}}(x,x')=\exp\!\left(-\frac{\lVert x-x'\rVert^2}{2l^2}\right)$ &
 $l \in \{0.1,1,10\}$ \\
-\rowsep
+\rowsep%
 Rational Quadratic &
-$\kappa_{\mathrm{RQ}}(x,x')=\left(1+\frac{\lVert x-x'\rVert^2}{2\alpha}\right)^{-\alpha}$ &
+        $\kappa_{\mathrm{RQ}}(x,x')=\left\lparen1+\frac{\lVert x-x'\rVert^2}{2\alpha}\right\rparen^{-\alpha}$ &
 $\alpha \in \{0.1,1,10\}$, $l=1$ \\
-\rowsep
+\rowsep%
 Periodic &
 $\kappa_{\mathrm{Per}}(x,x')=\exp\!\left(-2\sin^2\!\left(\pi\frac{\lVert x-x'\rVert}{p/l_{\mathrm{syn}}}\right)\right)$ &
 \begin{tabular}[t]{@{}l@{}}
-$p \in \{24,48,96,168,336,672,$\\
-$7,14,30,60,365,730,$\\
+$p \in \{24,48,96,168,336,672\mathpunct{,}$\\
+$7,14,30,60,365,730\mathpunct{,}$\\
 $4,26,52,4,6,12,4,40,10\}$
 \end{tabular} \\
 \bottomrule
 \end{tabular}
-\caption{Kernel bank $\mathcal{K}$ used by KernelSynth.}
+\caption{Kernel bank $\mathcal{K}$ used by KernelSynth.}%
 \label{tab:kernelsynth_bank}
 \end{table}

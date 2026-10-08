@@ -163,9 +163,9 @@ Z_O=
 \end{cases}
 \qquad X=Z\wedge Y.
 \end{equation*}
-\valueof{Observable} therefore means that positive evidence shows the tested representation preserves the task-relevant information within tolerance $\epsilon_{\mathrm{loss}}$. It does not mean global observability of the physical system, nor does it merely mean that aliasing was not found. Candidate geometry may still be \valueof{Observable} when the experiment demonstrates preservation. \valueof{PartiallyObservable} is the epistemic fallback: preservation has not been certified, while structural aliasing has not been confirmed. It covers inconclusive, unfinished or conflicting evidence, and means partially trusted rather than partially visible.
+\valueof{Observable} therefore means that positive evidence shows the tested representation preserves the task-relevant information within tolerance $\epsilon_{\mathrm{loss}}$. It does not mean global observability of the physical system, nor does it merely mean that aliasing was not found. Candidate geometry may still be \valueof{Observable} when the experiment demonstrates preservation\@. \valueof{PartiallyObservable} is the epistemic fallback: preservation has not been certified, while structural aliasing has not been confirmed. It covers inconclusive, unfinished or conflicting evidence, and means partially trusted rather than partially visible.
 
-The hypotheses $H1$--$H3$ of \autoref{sec:agent} contribute controlled evidence to $D$ but remain falsifiable experimental factors rather than ontology subclasses or automatic action rules. Sensor validity is modelled separately as an anomaly and never relabels a model representation as structurally aliased.
+The hypotheses $H1$\textendash{}$H3$ of \autoref{sec:agent} contribute controlled evidence to $D$ but remain falsifiable experimental factors rather than ontology subclasses or automatic action rules. Sensor validity is modelled separately as an anomaly and never relabels a model representation as structurally aliased.
 
 When an experimental generator provides a phase $\phi$ in radians, the corresponding temporal offset is converted before storage:
 \begin{equation*}
@@ -187,7 +187,7 @@ The semantic propagation path is explicit:
 \end{aligned}
 \label{eq:semantic-path}
 \end{equation}
-Aliasing can therefore reduce confidence in forecast-derived production, ramp expectations, forecast-driven anomaly recognition, and routing. It does not alter the directly observed values of $G_{\mathrm{tilt}}$, $P_{\mathrm{pv}}$, load demand, or SoC; those values are governed by the separate validity path.
+Aliasing can therefore reduce confidence in forecast-derived production, ramp expectations, forecast-driven anomaly recognition, and routing. It does not alter the directly observed values of $G_{\mathrm{tilt}}$, $P_{\mathrm{pv}}$, load demand, or SoC;\@ those values are governed by the separate validity path.
 
 The second line of \autoref{eq:semantic-path} is where a signal-level candidate becomes a domain-level error, and one case makes it concrete. A ramp expected from the forecast, the forecast-driven counterpart of the \valueof{RampEvent} of \autoref{eq:ramp-event}, is read from a \pv{Forecast} rather than from history. At one sample per minute with $P=16$, the patch branch places candidates at periods of $16/k$ minutes. If structural aliasing were confirmed there, fluctuation on that scale would be under-represented in the very forecast the expectation consumes: the ramp would be anticipated late or not at all, and \autoref{eq:mode-selection} would select a mode for a plant that is not the one outside. While no claim of this report is reportable, the assessment stays \valueof{PartiallyObservable} and the mode \valueof{ConservativeMode}. The concept is never contradicted by the ontology, which is the point, since nothing in the knowledge base records that the evidence behind it was incomplete unless an \pv{ObservabilityAssessment} says so.
 
@@ -220,16 +220,16 @@ Within \valueof{NormalMode}, a ramp response takes precedence over ordinary rout
 The ordinary policy serves the internal load before charging the battery or exporting energy. Let
 \begin{equation}
 \label{eq:surplus-deficit}
-P_{\mathrm{sur}}=(P_{\mathrm{pv}}-P_{\mathrm{load}})^{+},
+P_{\mathrm{sur}}=\lparen{}P_{\mathrm{pv}}-P_{\mathrm{load}}\rparen^{+},
 \qquad
-P_{\mathrm{def}}=(P_{\mathrm{load}}-P_{\mathrm{pv}})^{+}.
+P_{\mathrm{def}}=\lparen{}P_{\mathrm{load}}-P_{\mathrm{pv}}\rparen^{+}.
 \end{equation}
-Here daylight abbreviates \{\valueof{ClearSky}, \valueof{PartialCloud}, \valueof{Overcast}\}. \autoref{fig:routing-policy} shows the priority scan as a single pass: the modes are tested in a fixed order and no later branch can override an earlier one, so the policy is deterministic, and degrading authority narrows the same policy instead of substituting a different one. \autoref{tab:routing} states the boundary cases the figure cannot show, each row pairing a triggering condition with the routes it admits and the guard that blocks it: a daylight deficit, a negative ramp whose reference is missing, stale or non-finite, which disables export catch-up, and the conservative and safe modes.
+Here daylight abbreviates \{\valueof{ClearSky}, \valueof{PartialCloud}, \valueof{Overcast}\}\@. \autoref{fig:routing-policy} shows the priority scan as a single pass: the modes are tested in a fixed order and no later branch can override an earlier one, so the policy is deterministic, and degrading authority narrows the same policy instead of substituting a different one\@. \autoref{tab:routing} states the boundary cases the figure cannot show, each row pairing a triggering condition with the routes it admits and the guard that blocks it: a daylight deficit, a negative ramp whose reference is missing, stale or non-finite, which disables export catch-up, and the conservative and safe modes.
 
 \begin{figure}[!tbp]
 \centering
 \includegraphics[width=\textwidth]{figures/routing.png}
-\caption{The routing policy as a priority scan. The control mode is read first, so a safe-mode cycle never reaches the ordinary branches; the ramp branch is available only in \valueof{NormalMode}, and the conservative branch rejoins the ordinary load-first router under its reduced cap. Below that the surplus and deficit decide which of the seven admissible routes a cycle issues, always serving the internal load before charging the battery or exporting. A cycle issues a route only for a strictly positive transfer and may issue several co-mode decisions, and every setpoint is clipped to the state of charge, the capacity and the charge and discharge limits.}
+\caption{The routing policy as a priority scan. The control mode is read first, so a safe-mode cycle never reaches the ordinary branches; the ramp branch is available only in \valueof{NormalMode}, and the conservative branch rejoins the ordinary load-first router under its reduced cap. Below that the surplus and deficit decide which of the seven admissible routes a cycle issues, always serving the internal load before charging the battery or exporting. A cycle issues a route only for a strictly positive transfer and may issue several co-mode decisions, and every setpoint is clipped to the state of charge, the capacity and the charge and discharge limits.}%
 \label{fig:routing-policy}
 \end{figure}
 

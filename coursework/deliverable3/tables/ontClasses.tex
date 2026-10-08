@@ -6,42 +6,42 @@
 \textbf{Class} & \textbf{Role} \\
 \midrule
 \pv{PVSystem} & Aggregate system and scope of each control cycle. \\
-\rowsep
+\rowsep%
 \pv{EnergyAsset} & Parent of the four passive physical assets. \\
-\rowsep
+\rowsep%
 \pv{PhotovoltaicArray} & Intermittent renewable source measured through PV telemetry. \\
-\rowsep
+\rowsep%
 \pv{BatteryStorage} & Bounded storage asset that can charge, discharge, or hold. \\
-\rowsep
+\rowsep%
 \pv{InternalLoad} & Aggregate passive demand of a factory or machine fleet. \\
-\rowsep
+\rowsep%
 \pv{ExternalGrid} & Reliable bidirectional boundary bus for residual balancing. \\
 \midrule
 \pv{ControlAgent} & The single decision-making entity. \\
-\rowsep
+\rowsep%
 \pv{SystemObservation} & Time-stamped snapshot of PV, environment, battery, load, and grid reference. \\
 \midrule
 \pv{TimeSeriesSignal} & Physical signal and its temporal descriptors. \\
-\rowsep
+\rowsep%
 \pv{PatchedRepresentation} & A model input representation defined by patch and stride. \\
-\rowsep
+\rowsep%
 \pv{Forecast} & Horizon of predicted values produced from a \pv{PatchedRepresentation} and consumed by the \pv{ControlAgent}. \\
-\rowsep
+\rowsep%
 \pv{ObservabilityAssessment} & Evidence linking a signal-representation pair to an observability state. \\
 \midrule
 \pv{GenerationContext} & Operational proxy for expected solar generation. \\
-\rowsep
+\rowsep%
 \pv{AnomalyState} & Detected physical or sensing abnormality. \\
-\rowsep
+\rowsep%
 \pv{ObservabilityState} & Semantic assessment of information retained after patching. \\
-\rowsep
+\rowsep%
 \pv{ControlMode} & Normal, conservative, or safe operating policy. \\
-\rowsep
-\pv{PowerRoute} & Closed vocabulary of the seven admissible source--destination pairs. \\
+\rowsep%
+\pv{PowerRoute} & Closed vocabulary of the seven admissible source\textendash{}destination pairs. \\
 \midrule
 \pv{PowerRoutingDecision} & One directional transfer or hold decision with an optional bounded setpoint. \\
 \bottomrule
 \end{tabular}
-\caption{Core classes in the simplified ontology.}
+\caption{Core classes in the simplified ontology.}%
 \label{tab:classes}
 \end{table}

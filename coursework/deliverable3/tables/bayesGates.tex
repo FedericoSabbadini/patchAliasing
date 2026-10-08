@@ -6,21 +6,21 @@
         \toprule
         \textbf{Claim} & \textbf{Model} & $\max\hat R$ & \textbf{min ESS} & \textbf{Div.} & \textbf{Conv.} & \textbf{Recov.} & \textbf{PPC} & \textbf{Sens.} & \textbf{LOO} & \textbf{D2} & \textbf{Net} & \textbf{Verdict} & \textbf{Decided by} \\
         \midrule
-        $H1$ behav. & A & 1.004 & 4637 & 0 & \checkmark & \xmark & \xmark & \checkmark & -- & -- & \checkmark & not reportable & PPC, Recov. \\
-        \rowsep
-        $M1$ & A$'$ & 1.004 & 4490 & 0 & \checkmark & \xmark & \xmark & \checkmark & \checkmark & -- & \checkmark & not reportable & PPC, Recov. \\
-        \rowsep
-        $H1$ repr. & B & 1.003 & 2724 & 0 & \checkmark & \xmark & \xmark & \checkmark & -- & -- & -- & not reportable & PPC, Recov. \\
+        $H1$ behav. & A & 1.004 & 4637 & 0 & \checkmark{} & \xmark{} & \xmark{} & \checkmark{} & \textendash{} & \textendash{} & \checkmark{} & not reportable & PPC, Recov. \\
+        \rowsep%
+        $M1$ & A$'$ & 1.004 & 4490 & 0 & \checkmark{} & \xmark{} & \xmark{} & \checkmark{} & \checkmark{} & \textendash{} & \checkmark{} & not reportable & PPC, Recov. \\
+        \rowsep%
+        $H1$ repr. & B & 1.003 & 2724 & 0 & \checkmark{} & \xmark{} & \xmark{} & \checkmark{} & \textendash{} & \textendash{} & \textendash{} & not reportable & PPC, Recov. \\
         \midrule
-        $H2$ & C & 1.004 & 2457 & 0 & \checkmark & \xmark & \xmark & \checkmark & -- & -- & -- & not reportable & PPC, Recov. \\
+        $H2$ & C & 1.004 & 2457 & 0 & \checkmark{} & \xmark{} & \xmark{} & \checkmark{} & \textendash{} & \textendash{} & \textendash{} & not reportable & PPC, Recov. \\
         \midrule
-        $H3$ location & D1 & 1.002 & 4935 & 0 & \checkmark & \checkmark & \xmark & \checkmark & \checkmark & -- & -- & not reportable & PPC \\
-        \rowsep
-        $H3a$ & D2 & 1.003 & 1751 & 0 & \checkmark & \checkmark & \xmark & \checkmark & -- & \checkmark & -- & not reportable & PPC \\
-        \rowsep
-        $H3b$ & D2 & 1.002 & 3214 & 0 & \checkmark & \xmark & \xmark & \checkmark & -- & \xmark & -- & not identified & 0 of 10 sites \\
+        $H3$ location & D1 & 1.002 & 4935 & 0 & \checkmark{} & \checkmark{} & \xmark{} & \checkmark{} & \checkmark{} & \textendash{} & \textendash{} & not reportable & PPC \\
+        \rowsep%
+        $H3a$ & D2 & 1.003 & 1751 & 0 & \checkmark{} & \checkmark{} & \xmark{} & \checkmark{} & \textendash{} & \checkmark{} & \textendash{} & not reportable & PPC \\
+        \rowsep%
+        $H3b$ & D2 & 1.002 & 3214 & 0 & \checkmark{} & \xmark{} & \xmark{} & \checkmark{} & \textendash{} & \xmark{} & \textendash{} & not identified & 0 of 10 sites \\
         \bottomrule
     \end{tabular}
-\caption{Convergence and gates of every claim, with the worst values over its fits; ESS is the effective sample size and Div.\ the divergences, and Conv.\ is convergence, judged by those three columns. Recov.\ is parameter recovery, PPC the posterior predictive check, Sens.\ prior sensitivity, LOO the reliability of the leave-one-out comparison, D2 the agreement of the two Model~D2 readings and Net that of Model~A with its net refit. A tick marks a gate passed, a cross a gate failed and a dash a gate that does not apply.}
+\caption{Convergence and gates of every claim, with the worst values over its fits; ESS is the effective sample size and Div.\ the divergences, and Conv.\ is convergence, judged by those three columns. Recov.\ is parameter recovery, PPC the posterior predictive check, Sens.\ prior sensitivity, LOO the reliability of the leave-one-out comparison, D2 the agreement of the two Model~D2 readings and Net that of Model~A with its net refit. A tick marks a gate passed, a cross a gate failed and a dash a gate that does not apply.}%
     \label{tab:bayesGates}
 \end{table*}

@@ -28,6 +28,6 @@
         $32$ & $32$ & $512$ & $16$ & $15$ & $0$ \\
         \bottomrule
     \end{tabular}
-\caption{How Chronos-Bolt tokenises the two contexts of this study. A context of $L$ samples is left-padded with masked values to a multiple of $P$ and cut every $S$ samples, so the $(L-P)\bmod S$ most recent samples enter no token (Left out). The sweep uses the longest $L\le512$ with $P\mid L$ and $S\mid(L-P)$; the inferential stage and the decomposition use $480$ samples, which is never padded.}
+\caption{How Chronos-Bolt tokenises the two contexts of this study. A context of $L$ samples is left-padded with masked values to a multiple of $P$ and cut every $S$ samples, so the $(L-P)\bmod S$ most recent samples enter no token (Left out). The sweep uses the longest $L\le512$ with $P\mid L$ and $S\mid(L-P)$; the inferential stage and the decomposition use $480$ samples, which is never padded.}%
     \label{tab:sweepContext}
 \end{table}

@@ -1,0 +1,12 @@
+# Hyperref and biblatex arguments are reference keys, not prose.
+# Keep warning rules enabled while teaching ChkTeX these command signatures.
+WipeArg
+{
+    \autoref:{} \autocite:[][]{}
+}
+
+# Algorithmic statement commands intentionally precede unbraced line content.
+Silent
+{
+    \State \Require \Ensure \Return
+}

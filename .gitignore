@@ -261,3 +261,7 @@ notebooks/_gen_tmp/
 notebooks/bayes_data/
 notebooks/results/
 .codex-remote-attachments
+
+# Local experimental runs
+/notebooks/experimental runs/
+/notebooks/support_scripts/experimental runs/

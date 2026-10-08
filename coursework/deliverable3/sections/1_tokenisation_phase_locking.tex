@@ -1,6 +1,6 @@
 Everything that follows rests on treating patch tokenisation as an operator rather than an implementation detail, because its degeneracies then become derivable instead of observed. This section fixes that operator and its notation, and derives the arithmetic condition under which the tokens repeat content that the sampler kept distinct, in its two forms, one governed by the stride and one by the patch.
 
-Let $\mathbf{x} = \{x[n]\}_{n \in \mathbb{N}}$, with $\mathbb{N}=\{0,1,\ldots\}$, be a discrete-time signal representing the input time series. Defining the patch-based tokenisation operator $\mathcal{T}_{P,S}$, with patch size $P \in \mathbb{N}^{+}$ and stride $S \in \mathbb{N}^{+}$, as a mapping that transforms the signal $\mathbf{x}$ into a sequence of vector-valued tokens $\mathbf{T}=\{\mathbf{t}_k\}_{k\in\mathbb{N}}$ with $\mathbf{t}_k\in\mathbb{R}^{P}$, the $k$-th token is
+Let $\mathbf{x} = \lbrace{}x[n]\rbrace_{n \in \mathbb{N}}$, with $\mathbb{N}=\lbrace{}0,1,\ldots\rbrace$, be a discrete-time signal representing the input time series. Defining the patch-based tokenisation operator $\mathcal{T}_{P,S}$, with patch size $P \in \mathbb{N}^{+}$ and stride $S \in \mathbb{N}^{+}$, as a mapping that transforms the signal $\mathbf{x}$ into a sequence of vector-valued tokens $\mathbf{T}=\lbrace{}\mathbf{t}_k\rbrace_{k\in\mathbb{N}}$ with $\mathbf{t}_k\in\mathbb{R}^{P}$, the $k$-th token is
 
 \begin{equation*}
 \mathbf{t}_k
@@ -23,7 +23,7 @@ Using element-wise indexing notation,
 =
 x[kS+m],
 \qquad
-m\in\{0,\ldots,P-1\}.
+m\in\lbrace{}0,\ldots,P-1\rbrace.
 \end{equation}
 
 \subsection{Phase-Locking and Token Degeneracies}
@@ -37,7 +37,7 @@ x[n]
 \right),
 \end{equation*}
 
-where $f$ denotes the signal frequency satisfying the Nyquist criterion $f < \frac{f_s}{2}$, and $\phi\in[0,2\pi)$ is an arbitrary phase offset.
+where $f$ denotes the signal frequency satisfying the Nyquist criterion $f < \frac{f_s}{2}$, and $\phi\in\lbrack0,2\pi\rparen$ is an arbitrary phase offset.
 
 
 
@@ -116,15 +116,15 @@ Solving \autoref{eq:phase_boundary} and \autoref{eq:phase_boundary_2} for $f$ yi
 \label{eq:branches}
 \mathcal{F}_{S}
 =
-\left\{
+\left\lbrace{}
 c\frac{f_s}{S}
-\right\}_{c\in\mathbb{N}^{+}},
+\right\rbrace_{c\in\mathbb{N}^{+}},
 \qquad
 \mathcal{F}_{P}
 =
-\left\{
+\left\lbrace{}
 k\frac{f_s}{P}
-\right\}_{k\in\mathbb{N}^{+}}.
+\right\rbrace_{k\in\mathbb{N}^{+}}.
 \end{equation}
 
 Each family is a comb, that is an evenly spaced set of frequencies, of spacing $f_s/S$ and $f_s/P$ respectively. Using the two families in \autoref{eq:branches}, the phase-locking frequency class $\mathcal{F}_{\mathrm{lock}}$ is defined as
@@ -133,13 +133,13 @@ Each family is a comb, that is an evenly spaced set of frequencies, of spacing $
 \label{eq:flock}
 \mathcal F_{\mathrm{lock}}
 =
-\left\{
+\left\lbrace{}
 f\in\mathbb{R}^{+}
 \;\middle|\;
 f\in\mathcal{F}_{S}\cup\mathcal{F}_{P},
 \;
 f<\frac{f_s}{2}
-\right\}.
+\right\rbrace.
 \end{equation}
 
 It is convenient to express both conditions in units that do not depend on the sampling rate. Introducing the cycles-per-stride and cycles-per-patch ratios
@@ -272,20 +272,20 @@ O
 =
 \frac{P-S}{P}
 \in
-[0,1),
+\lbrack0,1\rparen,
 \end{equation}
 
 which is $0$ for contiguous patches and approaches $1$ as the stride shortens.
 
 In this regime the two branches separate, and since $f_s/S>f_s/P$ the stride comb is the sparser of the two. The derivation of \autoref{eq:collapse_S} makes no use of the relation between $P$ and $S$, so at $f\in\mathcal{F}_{S}$ consecutive tokens are still exactly equal.
 
-\subsubsection*{Disjoint Windows ($S>P$)}
+\subsubsection*{Disjoint Windows ($S>P$)}%
 \label{sec:disjoint}
 When the stride exceeds the patch size the windows leave $S-P$ unobserved samples between consecutive patches, and \autoref{eq:reconstruction} fails: $\mathcal{T}_{P,S}$ is non-injective whatever the frequency content, since signals differing only on the gaps share a token sequence. The loss is one of discarded samples rather than of tokenisation geometry, so these configurations are excluded by construction from the experimental design.
 
 \subsection{Structural Aliasing as a Representation-Level Property}
 $\mathcal{F}_{S}$ collects the stride-lock candidates, at which consecutive raw tokens repeat. $\mathcal{F}_{P}$ collects the frequencies whose period fits a whole number of times into the patch, at which the sequence repeats every $P/\gcd(P,S)$ tokens. Consecutive patches coincide exactly on $\mathcal{F}_{S}$, which for $S \mid P$ lies wholly inside $\mathcal{F}_{P}$. Their union $\mathcal{F}_{\mathrm{lock}}$ is a statement about candidate geometry, not a proof of aliasing. For $S\le P$ the raw token sequence remains a lossless encoding of the input at every one of these frequencies, so none of the translations derived above is by itself evidence that two distinct signals become indistinguishable to the model.
 
-Structural aliasing is the separate, representation-level proposition that a model trained on such sequences nevertheless fails to make those frequencies readable from its internal state. It is treated here as an emergent and falsifiable property of the trained representations, diagnosed by readability rather than by a distance between raw tokens. The defining event is that two distinct signals become indistinguishable in the internal state; it is measured here through probe readings, as Pagani et al. did for the frequency content of Chronos representations\autocite{paganiPreliminaryInsightsChronos2026}. So structural aliasing is present when the frequency of the signal can no longer be recovered from the internal state at a locked frequency as well as at neighbouring, non-locked ones. It is accordingly a property of the learned representation rather than of the operator, and one that can only be established empirically, with $\mathcal{F}_{\mathrm{lock}}$ supplying the candidate frequencies at which to look, while the hypotheses that test it are formalised in \autoref{sec:agent}.
+Structural aliasing is the separate, representation-level proposition that a model trained on such sequences nevertheless fails to make those frequencies readable from its internal state. It is treated here as an emergent and falsifiable property of the trained representations, diagnosed by readability rather than by a distance between raw tokens. The defining event is that two distinct signals become indistinguishable in the internal state; it is measured here through probe readings, as Pagani et al\@. did for the frequency content of Chronos representations\autocite{paganiPreliminaryInsightsChronos2026}. So structural aliasing is present when the frequency of the signal can no longer be recovered from the internal state at a locked frequency as well as at neighbouring, non-locked ones. It is accordingly a property of the learned representation rather than of the operator, and one that can only be established empirically, with $\mathcal{F}_{\mathrm{lock}}$ supplying the candidate frequencies at which to look, while the hypotheses that test it are formalised in \autoref{sec:agent}.
 
 Observability is used in that sense throughout this report: not injectivity of $\mathcal{T}_{P,S}$, which \autoref{eq:reconstruction} settles, but readability of a frequency from the state the model builds.

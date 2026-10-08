@@ -53,6 +53,10 @@ twoside, % Two side traditional mode where headers and footers change between od
 % \autoref needs a printed name for the algorithm environment used in Appendices C and D
 \providecommand{\algorithmautorefname}{Algorithm}
 
+% Named delimiters preserve half-open intervals and indexed parentheses.
+\DeclareMathDelimiter{\lparen}{\mathopen}{operators}{40}{largesymbols}{0}
+\DeclareMathDelimiter{\rparen}{\mathclose}{operators}{41}{largesymbols}{1}
+
 % The class sets subsubsections as run-in headings, which makes the stages of a multi-part
 % procedure indistinguishable from emphasised text. They are given their own line instead.
 \titleformat{\subsubsection}
@@ -128,7 +132,7 @@ twoside, % Two side traditional mode where headers and footers change between od
 
 % Float-heavy pages were being justified to full height by stretching the glue between
 % a top float and the text under it, which opened gaps mid-page. Let short pages end short.
-\raggedbottom
+\raggedbottom%
 
 % At the end of a section block or appendix every deferred float is flushed onto float pages,
 % which are vertically centred, instead of being set as a lone top float on a text page.
@@ -215,44 +219,44 @@ twoside, % Two side traditional mode where headers and footers change between od
 \section{Conclusions}\label{sec:conclusions}
 \input{sections/8_conclusion.tex}
 
-\flushfloatpages
+\flushfloatpages%
 \printbibliography[]
 
 \setcounter{secnumdepth}{0} % appendices and their subdivisions stay unnumbered
 
-\flushfloatpages
+\flushfloatpages%
 \appendixsection{Ontology of the Photovoltaic Application Domain}{sec:appOntology}
-\begingroup \let\section\subsection \let\subsection\subsubsection
+\begingroup \let\section\subsection\let\subsection\subsubsection%
 \input{sections/A_ontology_appendix.tex}
 \endgroup
 
-\flushfloatpages
-\tablesbelowtext
+\flushfloatpages%
+\tablesbelowtext%
 \appendixsection{Chronos-Bolt-Tiny Retraining Procedure}{sec:appRetraining}
 \input{sections/B_retraining_appendix.tex}
 
-\flushfloatpages
+\flushfloatpages%
 \appendixsection{Light TSMixup}{sec:appTSMixup}
 \input{sections/C_lighttsmixup_appendix.tex}
 
-\flushfloatpages
+\flushfloatpages%
 \appendixsection{KernelSynth}{sec:appKernelSynth}
 \input{sections/D_kernelsynth_appendix.tex}
 
-\flushfloatpages
-\tablesbelowtext
+\flushfloatpages%
+\tablesbelowtext%
 \appendixsection{Bayesian Model Specifications}{sec:appBayes}
 \input{sections/E_bayesian_appendix.tex}
 
-\flushfloatpages
+\flushfloatpages%
 \appendixsection{The Exploratory Frequency Sweep}{sec:appSweep}
 \input{sections/F_sweep_appendix.tex}
 
-\flushfloatpages
+\flushfloatpages%
 \appendixsection{Decomposition of Generated Signals}{sec:appDecomp}
 \input{sections/G_decomposition_appendix.tex}
 
-\flushfloatpages
+\flushfloatpages%
 \appendixsection{The Photovoltaic Series}{sec:appSolar}
 \input{sections/H_solar_appendix.tex}
 
