@@ -1,43 +1,43 @@
-\begin{table}[!tbp]
+\begin{table}[!tb]
 \centering
 \small
 \begin{tabular}{@{}M{0.25\linewidth}M{0.29\linewidth}M{0.37\linewidth}@{}}
 \toprule
 \textbf{Property} & \textbf{Domain} & \textbf{Range or meaning} \\
 \midrule
-\pv{hasAsset} & \pv{PVSystem} & \pv{EnergyAsset} \\
-\rowsep%
-\pv{managedBy} & \pv{PVSystem} & exactly one \pv{ControlAgent} \\
-\rowsep%
-\pv{hasObservation} & \pv{PVSystem} & \pv{SystemObservation} \\
+\pv{hasAsset} & \multirow{3}{=}{\pv{PVSystem}} & \pv{EnergyAsset} \\
+\cmidrule[0.1pt]{1-1}\cmidrule[0.1pt]{3-3}
+\pv{managedBy} &  & exactly one \pv{ControlAgent} \\
+\cmidrule[0.1pt]{1-1}\cmidrule[0.1pt]{3-3}
+\pv{hasObservation} &  & \pv{SystemObservation} \\
 \rowsep%
 \pv{hasSignal} & \pv{PhotovoltaicArray} & \pv{TimeSeriesSignal} \\
 \midrule
+\pv{hasGenerationContext} & \multirow{2}{=}{\pv{SystemObservation}} & zero or one \pv{GenerationContext} value \\
+\cmidrule[0.1pt]{1-1}\cmidrule[0.1pt]{3-3}
+\pv{hasAnomaly} &  & zero or more \pv{AnomalyState} values \\
+\midrule
 \pv{hasRepresentation} & \pv{TimeSeriesSignal} & \pv{PatchedRepresentation} \\
 \rowsep%
-\pv{forecastFrom} & \pv{Forecast} & exactly one \pv{PatchedRepresentation} \\
+\pv{forecastFrom} & \multirow{2}{=}{\pv{Forecast}} & exactly one \pv{PatchedRepresentation} \\
+\cmidrule[0.1pt]{1-1}\cmidrule[0.1pt]{3-3}
+\pv{informsAnomaly} &  & \pv{AnomalyState} \\
 \rowsep%
-\pv{informsAnomaly} & \pv{Forecast} & \pv{AnomalyState} \\
-\rowsep%
-\pv{assessesRepresentation} & \pv{ObservabilityAssessment} & exactly one \pv{PatchedRepresentation} \\
-\rowsep%
-\pv{hasGenerationContext} & \pv{SystemObservation} & zero or one \pv{GenerationContext} value \\
-\rowsep%
-\pv{hasAnomaly} & \pv{SystemObservation} & zero or more \pv{AnomalyState} values \\
-\rowsep%
-\pv{hasObservabilityState} & \pv{ObservabilityAssessment} & one \pv{ObservabilityState} value \\
+\pv{assessesRepresentation} & \multirow{2}{=}{\pv{ObservabilityAssessment}} & exactly one \pv{PatchedRepresentation} \\
+\cmidrule[0.1pt]{1-1}\cmidrule[0.1pt]{3-3}
+\pv{hasObservabilityState} &  & one \pv{ObservabilityState} value \\
 \midrule
-\pv{selectsMode} & \pv{PowerRoutingDecision} & exactly one \pv{ControlMode} value \\
-\rowsep%
 \pv{makesDecision} & \pv{ControlAgent} & \pv{PowerRoutingDecision} \\
 \rowsep%
-\pv{basedOn} & \pv{PowerRoutingDecision} & observation, assessment, or inferred state \\
-\rowsep%
-\pv{hasRoute} & \pv{PowerRoutingDecision} & zero or one \pv{PowerRoute} value \\
-\rowsep%
-\pv{hasSourceAsset} & \pv{PowerRoutingDecision} & zero or one \pv{EnergyAsset} \\
-\rowsep%
-\pv{hasDestinationAsset} & \pv{PowerRoutingDecision} & zero or one \pv{EnergyAsset} \\
+\pv{selectsMode} & \multirow{5}{=}{\pv{PowerRoutingDecision}} & exactly one \pv{ControlMode} value \\
+\cmidrule[0.1pt]{1-1}\cmidrule[0.1pt]{3-3}
+\pv{basedOn} &  & observation, assessment, or inferred state \\
+\cmidrule[0.1pt]{1-1}\cmidrule[0.1pt]{3-3}
+\pv{hasRoute} &  & zero or one \pv{PowerRoute} value \\
+\cmidrule[0.1pt]{1-1}\cmidrule[0.1pt]{3-3}
+\pv{hasSourceAsset} &  & zero or one \pv{EnergyAsset} \\
+\cmidrule[0.1pt]{1-1}\cmidrule[0.1pt]{3-3}
+\pv{hasDestinationAsset} &  & zero or one \pv{EnergyAsset} \\
 \bottomrule
 \end{tabular}
 \caption{Object-property signatures.}%
