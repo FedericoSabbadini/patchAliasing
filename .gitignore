@@ -265,3 +265,6 @@ notebooks/results/
 # Local experimental runs
 /notebooks/experimental runs/
 /notebooks/support_scripts/experimental runs/
+/notebooks/bayesian/selectable_gate_repair/
+/notebooks/support_scripts/audit_selectable_saved_gates.py
+/notebooks/support_scripts/repair_selectable_gate_notebooks.py
