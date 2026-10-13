@@ -15,7 +15,7 @@ The right column is representational: at each swept frequency the internal state
 \begin{figure*}[!p]
     \centering
     \includegraphics[width=0.8\textwidth]{figures/FIG_E1_page1.png}
-    \caption{Reconstruction and probe sweep, first of three: geometries p8-s8, p16-s8, p16-s12,
+    \caption{Frequency reconstruction and probe sweep, first of three: geometries p8-s8, p16-s8, p16-s12,
     p16-s16 and p24-s8. Each row is one geometry. Left, the dominant frequency of the generated
     window against the frequency supplied as context, averaged over up to four starting phases, drawn as
     the solid red curve; both axes are in cycles per patch (bottom and left) and cycles per stride
@@ -24,9 +24,9 @@ The right column is representational: at each swept frequency the internal state
     frequency the model returns depends on where in its cycle the tone began, and a band that
     collapses to the curve means the reading is phase-independent there. The dotted diagonal marks
     a tone rebuilt correctly. Right, the accuracy of a linear probe on the internal state at each
-    swept frequency, one strip per task, with the local $f\pm1$\,Hz task last. Dashed verticals
-    are that geometry's patch-branch candidates ($\mathrm{cpp}\in\mathbb N^{+}$) and dash-dotted
-    verticals its stride-branch candidates ($\mathrm{cps}\in\mathbb N^{+}$). This figure carries
+    swept frequency, one strip per task, with the local $f\pm1$\,Hz task last. Dashed and dash-dotted
+    verticals are that geometry's patch- and stride-branch candidates
+    ($\mathrm{cpp},\mathrm{cps}\in\mathbb N^{+}$, respectively). This figure carries
     the two contiguous baselines p8-s8 and p16-s16, the geometries p16-s8 and p24-s8 that share
     $S=8$ with p8-s8, and p16-s12.}%
     \label{fig:sweepA}
@@ -35,7 +35,7 @@ The right column is representational: at each swept frequency the internal state
 \begin{figure*}[!p]
     \centering
     \includegraphics[width=0.85\textwidth]{figures/FIG_E1_page2.png}
-    \caption{Second of three: geometries p24-s12, p24-s16, p24-s20, p24-s24 and p32-s8, read as \autoref{fig:sweepA}. The first four hold the patch size at $P=24$ and shorten the stride
+    \caption{Frequency reconstruction and probe sweep, second of three: geometries p24-s12, p24-s16, p24-s20, p24-s24 and p32-s8, read as \autoref{fig:sweepA}. The first four hold the patch size at $P=24$ and shorten the stride
     from $24$ to $12$, so the stride comb $c f_s/S$ moves across the band while the patch comb
     $k f_s/P$ stays where it is: this is the series on which the two branches of
     $\mathcal F_{\mathrm{lock}}$ can be told apart by eye, and p24-s16 and p24-s20 are among the
@@ -46,7 +46,7 @@ The right column is representational: at each swept frequency the internal state
 \begin{figure*}[!p]
     \centering
     \includegraphics[width=0.85\textwidth]{figures/FIG_E1_page3.png}
-    \caption{Third of three: geometries p32-s12, p32-s16, p32-s20, p32-s24 and p32-s32, read as \autoref{fig:sweepA}. The patch size is held at $P=32$, the widest of the design, so the
+    \caption{Frequency reconstruction and probe sweep, third of three: geometries p32-s12, p32-s16, p32-s20, p32-s24 and p32-s32, read as \autoref{fig:sweepA}. The patch size is held at $P=32$, the widest of the design, so the
     patch comb is the densest and the overlap ratio runs from $0.63$ down to $0$ within this one figure.
     Read against \autoref{fig:sweepB} at equal stride, the difference between the two is a difference of
     patch size alone, which is the comparison the patch-size covariate of Model~A
