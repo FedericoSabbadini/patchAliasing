@@ -299,6 +299,9 @@ def plot_results(frames, out):
             ax.plot(p[coordinate], p.MAE, "o-", color="#1678ac", label="MAE")
             other.plot(p[coordinate], p.variance, "s--", color="#ba3b35", label="Variance")
             ax.set(title=model, xlabel=coordinate, ylabel=f"MAE [{table.MAE_unit.iloc[0]}]")
+            if coordinate == "cps":
+                ax.set_xticks(p[coordinate].unique())
+                ax.xaxis.set_major_formatter("{x:.3f}")
             other.set_ylabel(f"Variance [{table.variance_unit.iloc[0]}]", color="#ba3b35")
             ax.tick_params(axis="y", colors="#1678ac")
             ax.grid(alpha=.2)
