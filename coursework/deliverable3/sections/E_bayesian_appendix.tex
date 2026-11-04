@@ -22,9 +22,8 @@ d_i \sim \text{Student-}t_4(\mu_i,\ \sigma),
 \quad
 \beta_c \sim \mathcal{N}\!\left(\bar\beta + \delta_O \widetilde O_c + \delta_P \widetilde{\log P}_c,\ \tau\right).
 \end{equation}
-\autoref{tab:termsA} gives every term with its meaning and number of levels. It separates the two estimands the claims read, $\bar\beta$ for $H1$ and $\delta_O$ for $M1$, from the patch-size slope $\delta_P$ that keeps patch size apart from overlap, and from the offsets and scales that absorb what a triplet does not cancel: the candidate frequency, the background realisation and the residual. The response is a paired difference rather than a level, so no lock indicator is needed and the effect of interest is the population intercept $\bar\beta$. The Student-$t_4$ likelihood admits the very negative contrasts of the arms that rebuild nothing without letting a handful of them set the estimate, which a Gaussian would. The configuration effects are drawn around a population mean, which makes the fifteen geometries instances of one phenomenon and gives each of them equal weight, however many triplets it contributes.
+\autoref{tab:termsA} gives every term with its meaning and dimension. It separates the two estimands the claims read, $\bar\beta$ for $H1$ and $\delta_O$ for $M1$, from the patch-size slope $\delta_P$ that keeps patch size apart from overlap, and from the offsets and scales that absorb what a triplet does not cancel: the candidate frequency, the background realisation and the residual. The response is a paired difference rather than a level, so no lock indicator is needed and the effect of interest is the population intercept $\bar\beta$. The Student-$t_4$ likelihood admits the very negative contrasts of the arms that rebuild nothing without letting a handful of them set the estimate, which a Gaussian would. The configuration effects are drawn around a population mean, which makes the fifteen geometries instances of one phenomenon and gives each of them equal weight, however many triplets it contributes.
 
-% non mi piace troppo levels, non so quanto sia descrittivo ???
 \input{tables/bayesTermsA.tex}
 
 \paragraph{Estimand and rule} $H1$ predicts $e^{\bar\beta}<1$; it is supported when $\Pr(\bar\beta<\log 0.8\mid D)\ge0.95$, a recovery at a candidate of at most four fifths of its controls, and refuted when $\Pr(|\bar\beta|<\log1.1\mid D)\ge0.95$. Centring the covariates is what makes $\bar\beta$ the effect at the average geometry of the design rather than an extrapolation to $O=0$ and a patch of one sample.
@@ -54,7 +53,7 @@ L_i \sim \text{Gamma}\!\left(r,\ r/\mu_i\right),
 \qquad
 \log \mu_i = \alpha_0 + \theta_{\mathrm{lock}}\,\mathrm{IsLocked}_i + s_{\text{st}[i]} + g_{\text{geo}[i]}.
 \end{equation*}
-A codelength is strictly positive, right-skewed and has a variance that grows with its mean, which is what a Gamma likelihood in its shape\textendash{}rate form with a log link is for; its mean is $\mu_i$ and its coefficient of variation $1/\sqrt r$\@. \autoref{tab:termsB} gives the terms and their levels. The estimand is $\theta_{\mathrm{lock}}$, read on the lock indicator; the baseline $\alpha_0$, the stage offsets $s_{\text{st}}$ and the geometry offsets $g_{\text{geo}}$ absorb level differences unrelated to locking, and the shape $r$ carries the dispersion of the codelength.
+A codelength is strictly positive, right-skewed and has a variance that grows with its mean, which is what a Gamma likelihood in its shape\textendash{}rate form with a log link is for; its mean is $\mu_i$ and its coefficient of variation $1/\sqrt r$\@. \autoref{tab:termsB} gives the terms and their dimensions. The estimand is $\theta_{\mathrm{lock}}$, read on the lock indicator; the baseline $\alpha_0$, the stage offsets $s_{\text{st}}$ and the geometry offsets $g_{\text{geo}}$ absorb level differences unrelated to locking, and the shape $r$ carries the dispersion of the codelength.
 
 \input{tables/bayesTermsB.tex}
 

@@ -17,12 +17,13 @@ patchAliasing/
 │   ├── support_scripts/          # probe_lib, collect, comparison and model-loading modules
 │   └── data/
 │       ├── synthetic/            # Light TSMixup and KernelSynth generators
-│       └── Dataset-SolarTechLab.csv
+│       ├── Dataset-SolarTechLab.csv   # third-party dataset (CC BY), see notebooks/data/README.md
+│       └── README.md                  # source, licence and attribution of the dataset
 ├── coursework/
 │   ├── deliverable1_v0/, deliverable1_v1/, deliverable2_v0/   # submitted deliverables (frozen)
 │   └── deliverable3/             # current report: main.tex, sections/, tables/, figures/
 ├── pyproject.toml
-└── LICENSE                       # MIT
+└── LICENSE                       # MIT (code); other material: see Licensing
 ```
 
 Which notebook produces which part of the report:
@@ -80,7 +81,20 @@ candidate frequency is recovered better than at its controls, and the stride sit
 
 ## Licensing
 
-The written report is licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). All source code, probing scripts and software artifacts are released under the [MIT License](LICENSE).
+| Material | Licence |
+|---|---|
+| Written report (LaTeX source and PDF, `coursework/deliverable3/`) | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) |
+| Ontology (`coursework/deliverable3/ontology.ttl`) | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) |
+| Result tables (the LaTeX tables in `coursework/deliverable3/tables/` and the CSV result tables the notebooks write) | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) |
+| Source code, probing scripts, notebooks and software artefacts | [MIT License](LICENSE) |
+
+These licences apply only to material produced by the authors. Third-party material keeps its own licence or terms of use and is attributed below.
+
+### Third-party material
+
+- **Photovoltaic dataset.** `notebooks/data/Dataset-SolarTechLab.csv` is a copy of *Photovoltaic Power and Weather Parameters*, measured at the SolarTech Lab, Politecnico di Milano, by S. Leva, A. Nespoli, S. Pretto, M. Mussetta and E. Ogliari (IEEE DataPort, 23 September 2020, [doi:10.21227/42V0-JZ14](https://doi.org/10.21227/42V0-JZ14)). It is an open-access dataset released under a Creative Commons Attribution (CC BY) licence and is redistributed here only so that the experiments can be reproduced; any reuse must credit the original authors and cite the DOI. Details in [`notebooks/data/README.md`](notebooks/data/README.md).
+- **LaTeX template.** The report layout is the *Journal Article* template by Vel ([LaTeXTemplates.com](https://www.LaTeXTemplates.com)), licensed under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/); the licence header is kept in `main.tex` and `LTJournalArticle.cls`.
+- **Chronos models and training corpora.** The Chronos-Bolt-Tiny architecture and the Chronos training datasets are used under their own licences and terms of use, cited in the report.
 
 ## Authors
 

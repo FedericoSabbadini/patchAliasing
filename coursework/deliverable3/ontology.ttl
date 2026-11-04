@@ -7,6 +7,7 @@
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
 @base <http://www.semanticweb.org/solar/ontologies/2026/6/solar-aliasing> .
 
 <http://www.semanticweb.org/solar/ontologies/2026/6/solar-aliasing>
@@ -16,7 +17,9 @@
     owl:versionInfo "2.1" ;
     rdfs:label "Simplified PV Closed-Loop Control Ontology"@en ;
     rdfs:comment
-        "A compact OWL 2 DL ontology for PV observations, environmental context, anomaly and observability assessments, and bounded single-agent power routing. Load, battery and grid values not present in the PV dataset are asserted or simulated. Threshold evaluation, Bayesian evidence, rule priority and setpoint calculation remain responsibilities of the operational layer."@en .
+        "A compact OWL 2 DL ontology for PV observations, environmental context, anomaly and observability assessments, and bounded single-agent power routing. Load, battery and grid values not present in the PV dataset are asserted or simulated. Threshold evaluation, Bayesian evidence, rule priority and setpoint calculation remain responsibilities of the operational layer."@en ;
+    dcterms:license <https://creativecommons.org/licenses/by/4.0/> ;
+    dcterms:rights "Licensed under CC BY 4.0. Copyright (c) 2026 Matteo Boniotti, Gianluca Brignoli, Federico Sabbadini."@en .
 
 #################################################################
 #    Object Properties
