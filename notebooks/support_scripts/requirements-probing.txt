@@ -1,0 +1,6 @@
+# Notebook execution tools, in addition to the project's uv environment.
+ipykernel>=7.3.0
+nbclient>=0.11.0
+nbconvert>=7.17.1
+nbformat>=5.11.1
+threadpoolctl>=3.6.0

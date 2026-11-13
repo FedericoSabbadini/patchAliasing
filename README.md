@@ -37,6 +37,12 @@ Which notebook produces which part of the report:
 | Figure 4 (Appendix E) | `bayesian/figure_ppc_dispersion.py`, from the `tables/05_ppc.csv` the notebook writes |
 | Appendix B | `chronos_architecture/train_sweep.py` |
 
+The SV probing entry points are the [pure-tone sweep](notebooks/signal_analysis/probing_pure_tones.ipynb)
+and the [KS/TSM sweep](notebooks/signal_analysis/probing_complex_signals.ipynb).
+The pure-tone sweep produced the [retrained 16–16 SV figure](notebooks/signal_analysis/figures/fig_probing_sv_p16_s16.pdf).
+The KS/TSM sweep exports compression counts for each checkpoint, background family and task.
+The notebooks write run results under `notebooks/_run/probing/`.
+
 ## Hypotheses
 
 | ID | Claim | Test |
@@ -70,6 +76,48 @@ python support_scripts/collect.py --out ./results           # full design
 ```
 
 Then open `notebooks/bayesian/deliverable3_bayesian_models.ipynb` for the PyMC inference. See the [Bayesian guide](notebooks/bayesian/README.md) for its setup and execution modes.
+
+**SV probing** (run from the repository root):
+
+```bash
+uv pip install -r notebooks/support_scripts/requirements-probing.txt
+python notebooks/support_scripts/run_probing.py --kind both --mode smoke --device cpu --root notebooks/_run/probing
+python notebooks/support_scripts/run_probing.py --kind both --mode full --device cpu --root notebooks/_run/probing
+```
+
+To save executed notebook outputs as well, use
+`python notebooks/support_scripts/execute_probing_notebooks.py --mode full`.
+It uses the current Python environment, checkpoints completed cells, and saves
+the canonical notebooks after execution. With `--mode smoke`, it saves labelled
+validation copies and HTML previews under `notebooks/_run/probing/validation/`.
+The default executor captures rich outputs through IPython without local TCP
+sockets. Use `--engine nbclient` for a separate Jupyter kernel where available.
+
+The full run compares the published checkpoint and all fifteen retrained
+geometries at decoder blocks 0–3 and the output head. The pure-tone sweep uses
+2–250 Hz at 1-Hz steps and ten distinct phases. For KS and Light TSMixup,
+each of 100 fixed backgrounds per family receives the same labelled sweep,
+giving one SV per background, model, stage and task. The main table counts
+`SV > 0` at the output head for the seven hierarchical tasks, with an exact
+denominator of 100 in every cell.
+
+Five prequential blocks keep all phases of one frequency together. Scaler,
+PCA and logistic regression are fitted on preceding blocks only; the first
+block costs one bit per label. Thus `SV = 1 - L_bits/n`, negative SV values
+are retained, and the initial uniform block limits the attainable SV to about
+0.8. A shuffled-label control accompanies the true task. This is the
+repository's grouped prequential protocol, with a figure layout inspired by
+[Pagani et al., Figure 3](https://arxiv.org/html/2605.06361v1).
+
+Both notebooks default to the full design. To execute a notebook as a small
+pipeline check, set `PATCHALIASING_PROBING_MODE=smoke` in its kernel environment
+before running it from top to bottom. Smoke mode uses the retrained 16–16,
+two backgrounds per family, two phases and a 4-Hz step; its outputs are marked
+as smoke results and cannot supply the report's 100-background table. The CLI
+also accepts `--models` in smoke mode to select checkpoint tags for a bounded diagnostic.
+The CPU execution processes one checkpoint at a time; atomic, fingerprinted
+shards allow an interrupted run to resume with the same command. Configuration,
+input, code and checkpoint changes select a different run identity.
 
 ## Status
 
