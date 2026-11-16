@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import unittest
+import unittest.mock
 from unittest.mock import patch
 
 import numpy as np
@@ -158,7 +159,7 @@ class ProtocolTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             prequential_mdl(self.features, self.y, [self.chunks[0]] * 5)
 
-    def test_score_contract_has_35_results_and_metadata(self):
+    def test_score_contract_has_70_results_and_metadata(self):
         cfg = ProbeConfig.smoke()
         design = make_design(cfg)
         frequency = design.frequency.to_numpy()
@@ -167,14 +168,71 @@ class ProtocolTest(unittest.TestCase):
         metadata = {"model": "retrained-p16-s16", "P": 16, "S": 16,
                     "family": "pure", "background_id": 0}
         scores = score_features(features, design, cfg, metadata)
-        self.assertEqual(len(scores), 35)
+        self.assertEqual(len(scores), 70)
         self.assertEqual(set(scores.task), {task[0] for task in TASKS})
         self.assertEqual(set(scores.stage), set(STAGES))
         self.assertEqual(set(scores.family), {"pure"})
         self.assertFalse(scores.duplicated(["stage", "task"]).any())
         assert_allclose(scores.SV, 1-scores.L_bits/scores.n)
+        self.assertNotIn("SV_random_init", scores)
         with self.assertRaises(ValueError):
             score_features({"output_head": features["output_head"]}, design, cfg, metadata)
+
+    def test_random_init_control_is_scored_with_the_same_blocks(self):
+        cfg = ProbeConfig.smoke()
+        design = make_design(cfg)
+        frequency = design.frequency.to_numpy()
+        informative = np.column_stack([frequency, frequency ** 2])
+        noise = np.random.default_rng(0).normal(size=(len(design), 6))
+        metadata = {"model": "m", "family": "pure", "background_id": -1}
+        scores = score_features({stage: informative for stage in STAGES}, design, cfg, metadata,
+                                {stage: noise for stage in STAGES})
+        assert_allclose(scores.SV_random_init, 1 - scores.L_random_init_bits / scores.n)
+        self.assertTrue((scores.SV > scores.SV_random_init).all())
+        self.assertLess(scores.SV_random_init.median(), .05)
+        with self.assertRaises(ValueError):
+            score_features({stage: informative for stage in STAGES}, design, cfg, metadata,
+                           {"output_head": noise})
+
+    def test_task_path_places_a_tone_in_an_eighth_of_the_band(self):
+        import probing_protocol as protocol
+        self.assertEqual(protocol.task_path(20), [("Mid", 0), ("L", 0), ("LL", 0)])
+        self.assertEqual(protocol.task_path(64), [("Mid", 0), ("L", 0), ("LL", 1)])
+        self.assertEqual(protocol.task_path(64.5), [("Mid", 0), ("L", 1), ("LH", 0)])
+        self.assertEqual(protocol.task_path(128), [("Mid", 1), ("H", 0), ("HL", 0)])
+        self.assertEqual(protocol.task_path(230.4), [("Mid", 1), ("H", 1), ("HH", 1)])
+        self.assertEqual(protocol.boundary_distance(128), 2.0)
+        with self.assertRaises(ValueError):
+            protocol.task_path(251)
+
+    def test_trials_are_located_from_informative_states_only(self):
+        import probing_protocol as protocol
+        cfg = ProbeConfig()
+        design = make_design(cfg)
+        trials = protocol.pure_trials(16, 16, cfg)
+        self.assertEqual(set(trials.arm), {"lock", "control"})
+        self.assertEqual(trials.groupby("pair").frequency.nunique().unique().tolist(), [3])
+
+        def state(frame):
+            f = frame.frequency.to_numpy(float)
+            return np.column_stack([f, np.sin(frame.phase), np.cos(frame.phase)])
+        rng = np.random.default_rng(1)
+        stages = STAGES[:1]
+        with unittest.mock.patch.object(protocol, "STAGES", stages):
+            good = protocol.score_trials({s: state(design) for s in stages}, design,
+                                         {s: state(trials) for s in stages}, trials, cfg, {"model": "m"})
+            blind = protocol.score_trials(
+                {s: rng.normal(size=(len(design), 3)) for s in stages}, design,
+                {s: rng.normal(size=(len(trials), 3)) for s in stages}, trials, cfg, {"model": "m"},
+                network="random_init")
+        self.assertEqual(len(good), trials[["pair", "arm", "frequency"]].drop_duplicates().shape[0])
+        self.assertTrue((good.n_contexts == cfg.n_phases).all())
+        self.assertTrue((good.located <= good[["level1", "level2", "level3"]].min(axis=1)).all())
+        far = good.loc[good.boundary_distance >= 8]
+        self.assertGreater(far.located.sum() / far.n_contexts.sum(), .95)
+        self.assertLess(blind.located.sum() / blind.n_contexts.sum(), .4)
+        # six frequencies at most are withheld around the three tones of a pair
+        self.assertTrue(good.n_withheld.between(cfg.n_phases, 9 * cfg.n_phases).all())
 
 
 if __name__ == "__main__":

@@ -13,6 +13,8 @@ def main():
     parser.add_argument("--mode", choices=("smoke", "full"), default="full")
     parser.add_argument("--device", default="cpu")
     parser.add_argument("--root", type=Path, default=Path(__file__).parents[1] / "_run" / "probing")
+    parser.add_argument("--no-random-init", action="store_true",
+                        help="KS/TSM only: skip the untrained-network control (halves the cost)")
     parser.add_argument("--models", nargs="+", choices=[s.tag for s in MODELS])
     args = parser.parse_args()
     cfg = ProbeConfig.smoke() if args.mode == "smoke" else ProbeConfig()
@@ -20,7 +22,11 @@ def main():
         tuple(s for s in MODELS if s.tag == "retrained-p16-s16") if args.mode == "smoke" else MODELS)
     for kind, runner in (("pure", run_pure), ("complex", run_complex)):
         if args.kind in (kind, "both"):
-            _results, out = runner(args.root, cfg, models, args.device)
+            run_cfg = cfg
+            if kind == "complex" and args.no_random_init:
+                from dataclasses import replace
+                run_cfg = replace(cfg, random_init=False)
+            _results, out = runner(args.root, run_cfg, models, args.device)
             print(f"Completed {kind}: {out}", flush=True)
 
 

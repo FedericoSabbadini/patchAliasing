@@ -39,9 +39,13 @@ Which notebook produces which part of the report:
 
 The SV probing entry points are the [pure-tone sweep](notebooks/signal_analysis/probing_pure_tones.ipynb)
 and the [KS/TSM sweep](notebooks/signal_analysis/probing_complex_signals.ipynb).
-The pure-tone sweep produced the [retrained 16–16 SV figure](notebooks/signal_analysis/figures/fig_probing_sv_p16_s16.pdf).
-The KS/TSM sweep exports compression counts for each checkpoint, background family and task.
-The notebooks write run results under `notebooks/_run/probing/`.
+Both read ten stages (four encoder blocks, four decoder blocks, the input of the output projection and the
+output quantile head), with a shuffled-label and an untrained-network control, and add a lock/control reading
+at the candidate sites. The pure-tone sweep produces the retrained 16–16 SV figure and the tables of Appendix F;
+the KS/TSM sweep exports the median and quartiles of SV for each checkpoint, background family and task.
+The notebooks write run results under `notebooks/_run/probing/` and, in full mode, copy the values quoted in the
+report to `notebooks/signal_analysis/results/probing/`. The probing values of the report come from these files,
+not from `02_mdl_bandtasks.parquet` of Model B, whose blocks are not grouped by frequency.
 
 ## Hypotheses
 

@@ -32,7 +32,29 @@ def results(models=exports.MODELS, n_backgrounds=100):
                             background_id=background_id, stage=stage, task=task,
                             n=n, L_bits=n * (1 - sv), L_uniform=n, SV=sv,
                             L_shuffled_bits=n * 1.05, SV_shuffled=-.05,
-                            first_chunk_n=int(n / 5)))
+                            first_chunk_n=int(n / 5),
+                            L_random_init_bits=n * 1.01, SV_random_init=-.01))
+    return pd.DataFrame(rows)
+
+
+def trial_results(models=exports.MODELS, families=exports.FAMILIES, n_pairs=100):
+    rows = []
+    for model in models:
+        for family in families:
+            for pair in range(n_pairs):
+                near = pair % 4 == 0
+                for network in exports.NETWORKS:
+                    for stage in exports.STAGES:
+                        for arm, located in (("lock", 4 if near else 8), ("control", 10)):
+                            rows.append(dict(
+                                model=model.tag, P=model.P, S=model.S, official=model.official,
+                                family=family, background_id=pair if family != "pure" else -1,
+                                network=network, stage=stage, pair=pair, arm=arm,
+                                frequency=64. if arm == "lock" else 60.,
+                                lock_hz=64., branch="both",
+                                boundary_distance=0. if near and arm == "lock" else 9.,
+                                n_contexts=10, located=located, level1=10, level2=10,
+                                level3=located, bits_per_context=.4))
     return pd.DataFrame(rows)
 
 
@@ -49,7 +71,7 @@ class CompressionExportTests(unittest.TestCase):
         self.assertTrue((counts.compresses == "50/100").all())
         self.assertTrue((counts.shuffled_compressed == 0).all())
         self.assertTrue(np.allclose(distribution.SV_min, -.02))
-        self.assertEqual(len(distribution), 16 * 2 * 5 * 7)
+        self.assertEqual(len(distribution), 16 * 2 * 10 * 7)
 
     def test_missing_background_stops_full_publication(self):
         incomplete = self.frame.loc[self.frame.background_id != 99]
@@ -89,13 +111,50 @@ class CompressionExportTests(unittest.TestCase):
         models = exports.MODELS[:1]
         frame = results(models=models, n_backgrounds=2)
         with tempfile.TemporaryDirectory() as directory:
-            paths = exports.export_complex(frame, Path(directory), models, SimpleNamespace(mode="smoke", n_backgrounds=2))
+            paths = exports.export_complex(frame, Path(directory), models,
+                                           SimpleNamespace(mode="smoke", n_backgrounds=2),
+                                           trials=trial_results(models, n_pairs=2))
             self.assertNotIn("table_tex", paths)
             self.assertTrue(all(path.name.startswith("smoke_") for path in paths.values()))
             self.assertEqual(list(Path(directory).glob("*.tex")), [])
             self.assertIn("SMOKE TEST ONLY", paths["caption"].read_text(encoding="utf-8"))
             table = pd.read_csv(paths["counts_csv"])
             self.assertTrue((table.n_backgrounds == 2).all())
+
+
+class LockControlExportTests(unittest.TestCase):
+    def test_rates_net_and_off_boundary_reading(self):
+        summary = exports.lock_control_summary(trial_results(exports.MODELS[:2], ("pure",), 8))
+        self.assertEqual(len(summary), 2 * 2 * 10)
+        self.assertTrue(np.allclose(summary.lock_pct, 70) and np.allclose(summary.control_pct, 100))
+        self.assertTrue(np.allclose(summary.net_pct, -30))
+        # pairs with a tone at a task boundary leave the off-boundary reading whole
+        self.assertTrue(np.allclose(summary.lock_pct_off, 80) and (summary.pairs_off == 6).all())
+        self.assertTrue((summary.pairs == 8).all() and (summary.lock_n == 80).all())
+
+    def test_full_exports_write_the_report_tables(self):
+        frame = results()
+        with tempfile.TemporaryDirectory() as directory:
+            paths = exports.export_complex(frame, Path(directory), exports.MODELS,
+                                           SimpleNamespace(mode="full", n_backgrounds=100),
+                                           trials=trial_results())
+            table = paths["lock_control_tex"].read_text(encoding="utf-8")
+            self.assertIn("tab:probingLockControlBg", table)
+            self.assertEqual(table.count("$70/100$"), 16 * 2 * 10)
+            self.assertIn("_{", paths["table_tex"].read_text(encoding="utf-8"))
+        pure = frame.loc[(frame.family == "tsmixup") & (frame.background_id == 0)].assign(
+            family="pure", background_id=-1)
+        with tempfile.TemporaryDirectory() as directory:
+            with self.assertRaisesRegex(ValueError, "lock/control"):
+                exports.export_pure(pure, Path(directory))
+            with self.assertRaisesRegex(ValueError, "random-initialisation"):
+                exports.export_pure(pure.drop(columns="SV_random_init"), Path(directory))
+            paths = exports.export_pure(pure, Path(directory),
+                                        trials=trial_results(families=("pure",), n_pairs=8))
+            self.assertIn("tab:probingLockControl}", paths["lock_control_tex"].read_text(encoding="utf-8"))
+            self.assertIn("Untrained network", paths["stage_tex"].read_text(encoding="utf-8"))
+            self.assertTrue(paths["reference_pdf"].is_file())
+            self.assertNotIn("Final output", paths["caption"].read_text(encoding="utf-8"))
 
 
 if __name__ == "__main__":

@@ -89,7 +89,7 @@ def _prepare(root, kind, cfg, models, device):
     sources += sorted((Path(__file__).parents[1] / "data" / "synthetic").glob("*.py"))
     sources += [Path(__file__).with_name("probe_lib.py")]
     manifest = {
-        "protocol": "frequency-grouped-prequential-v1", "kind": kind,
+        "protocol": "frequency-grouped-prequential-v2", "kind": kind,
         "config": asdict(cfg), "device": device,
         "models": [{**asdict(s), "checkpoint": comparison.checkpoint_identity(s)} for s in models],
         "code": {p.name: cp.sha256_file(p) for p in sources},
@@ -110,13 +110,21 @@ def _prepare(root, kind, cfg, models, device):
     if path.exists() and json.loads(path.read_text(encoding="utf-8")) != manifest:
         raise ValueError("Manifest mismatch: refusing cache reuse")
     cp.atomic_json(path, manifest)
+    manifest_stages = {"stages": list(STAGES), "encoder_reg_position": "last",
+                       "decoder_reg_position": 0}
+    cp.atomic_json(out / "stages.json", manifest_stages)
     design = protocol.make_design(cfg)
     _csv(out / "design.csv", design)
     return models, out, key, design
 
 
 class StageExtractor(comparison.Forecaster):
-    """Capture only four decoder states and the projected quantile head in one pass."""
+    """Capture the ten probe points of Deliverable 1 v1 in one forward pass.
+
+    The [REG] vector is the last position after each encoder block and the single
+    query token (position 0) after each decoder block; `output_reg` is the input of
+    the output projection and `output_head` its output, the quantile head.
+    """
 
     def __init__(self, spec, device="cpu", batch_size=64):
         # Prefer an already cached immutable snapshot to avoid a network round trip
@@ -152,10 +160,34 @@ class StageExtractor(comparison.Forecaster):
                 raise ValueError("Expected the native 64-step horizon")
             self.qi = list(config["quantiles"]).index(.5)
             self.pipe.model.eval()
-        if len(self.pipe.model.decoder.block) != 4:
+        if len(self.pipe.model.encoder.block) != 4 or len(self.pipe.model.decoder.block) != 4:
             self.close()
-            raise ValueError("This protocol requires exactly four decoder blocks")
+            raise ValueError("This protocol requires exactly four encoder and four decoder blocks")
         self.pipe.model.requires_grad_(False)
+
+    def randomised(self, seed=42):
+        """An untrained copy of the same architecture (random-initialisation control).
+
+        Whatever a probe reads from this network is exposed by the architecture and
+        the tokenisation alone; only the gap to the trained network speaks of training.
+        The global torch generator is restored, so the draw leaves no trace elsewhere.
+        """
+        import copy
+        import torch
+        state = torch.random.get_rng_state()
+        try:
+            torch.manual_seed(int(seed))
+            model = type(self.pipe.model)(copy.deepcopy(self.pipe.model.config))
+        finally:
+            torch.random.set_rng_state(state)
+        model = model.eval().to(self.device)
+        model.requires_grad_(False)
+        clone = copy.copy(self)
+        clone.pipe = copy.copy(self.pipe)
+        clone.pipe.model = model
+        if hasattr(clone.pipe, "inner_model"):
+            clone.pipe.inner_model = model
+        return clone
 
     def capture(self, contexts):
         import torch
@@ -164,17 +196,23 @@ class StageExtractor(comparison.Forecaster):
             raise ValueError("Expected finite nonempty [N, context] inputs")
         captured, result, handles = {}, {s: [] for s in STAGES}, []
 
-        def hook(stage):
-            def save(_module, _inputs, output):
-                value = output[0] if isinstance(output, tuple) else output
+        def hook(stage, position=0, use_input=False):
+            def save(_module, inputs, output):
+                value = inputs[0] if use_input else output
+                value = value[0] if isinstance(value, tuple) else value
                 value = value.detach().float().cpu().numpy()
-                captured[stage] = value[:, 0, :] if value.ndim == 3 else value
+                captured[stage] = value[:, position, :] if value.ndim == 3 else value
             return save
 
         try:
-            for i, block in enumerate(self.pipe.model.decoder.block):
+            model = self.pipe.model
+            for i, block in enumerate(model.encoder.block):
+                handles.append(block.register_forward_hook(hook(f"enc_{i}", position=-1)))
+            for i, block in enumerate(model.decoder.block):
                 handles.append(block.register_forward_hook(hook(f"dec_{i}")))
-            handles.append(self.pipe.model.output_patch_embedding.register_forward_hook(hook("output_head")))
+            head = model.output_patch_embedding
+            handles.append(head.register_forward_hook(hook("output_reg", use_input=True)))
+            handles.append(head.register_forward_hook(hook("output_head")))
             with torch.inference_mode():
                 for start in range(0, len(x), self.batch_size):
                     captured.clear()
@@ -191,6 +229,14 @@ class StageExtractor(comparison.Forecaster):
         if any(a.ndim != 2 or len(a) != len(x) or not np.isfinite(a).all() for a in result.values()):
             raise ValueError("Incomplete or nonfinite representation capture")
         return result
+
+
+def _trial_design(spec, family, bg_id, cfg):
+    """Lock and control tones of one dataset (all sites for pure tones, one pair per background)."""
+    if family == "pure":
+        return protocol.pure_trials(spec.P, spec.S, cfg)
+    trials = protocol.background_trials(spec.P, spec.S, cfg.n_backgrounds, cfg)
+    return trials.loc[trials.pair.eq(bg_id)].reset_index(drop=True)
 
 
 def _contexts(design, length, background=None):
@@ -226,7 +272,7 @@ def _backgrounds(out, family, cfg):
     return signals, seeds
 
 
-def _validate_shard(frame, metadata, design):
+def _validate_shard(frame, metadata, design, random_init=False):
     expected = {(stage, task[0]) for stage in STAGES for task in protocol.TASKS}
     if (len(frame) != len(expected) or frame.duplicated(["stage", "task"]).any()
             or set(zip(frame.stage, frame.task)) != expected):
@@ -235,6 +281,13 @@ def _validate_shard(frame, metadata, design):
         if name not in frame or not frame[name].eq(value).all():
             raise ValueError(f"Shard identity mismatch: {name}")
     numeric = ["n", "L_bits", "L_uniform", "SV", "L_shuffled_bits", "SV_shuffled", "first_chunk_n"]
+    if random_init:
+        numeric += ["L_random_init_bits", "SV_random_init"]
+        if set(numeric) - set(frame.columns):
+            raise ValueError("Shard lacks the random-initialisation control")
+        if (not np.allclose(frame.SV_random_init, 1-frame.L_random_init_bits/frame.n, atol=1e-12)
+                or (frame.L_random_init_bits < frame.first_chunk_n - 1e-9).any()):
+            raise ValueError("Invalid random-initialisation codelength")
     if not np.isfinite(frame[numeric].to_numpy(float)).all():
         raise ValueError("Nonfinite probe result")
     for task, low, high, _boundary in protocol.TASKS:
@@ -249,9 +302,36 @@ def _validate_shard(frame, metadata, design):
         raise ValueError("Invalid prequential codelength")
 
 
+def _validate_trials(frame, metadata, trials, random_init=False):
+    networks = protocol.NETWORKS if random_init else protocol.NETWORKS[:1]
+    tones = trials[["pair", "arm", "frequency"]].drop_duplicates()
+    keys = ["network", "stage", "pair", "arm", "frequency"]
+    if (len(frame) != len(tones) * len(STAGES) * len(networks) or frame.duplicated(keys).any()
+            or set(frame.network) != set(networks) or set(frame.stage) != set(STAGES)):
+        raise ValueError("Incomplete or duplicated lock/control shard")
+    for name, value in metadata.items():
+        if name not in frame or not frame[name].eq(value).all():
+            raise ValueError(f"Trial shard identity mismatch: {name}")
+    expected = np.sort(np.round(tones.frequency.to_numpy(float), 6))
+    for _, part in frame.groupby(["network", "stage"]):
+        if not np.allclose(np.sort(part.frequency.to_numpy(float)), expected, atol=1e-5):
+            raise ValueError("Trial shard does not match the registered tones")
+    counts = frame[["located", "level1", "level2", "level3"]].to_numpy(float)
+    if (not np.isfinite(frame.bits_per_context.to_numpy(float)).all() or (counts < 0).any()
+            or (counts > frame.n_contexts.to_numpy(float)[:, None]).any()
+            or (frame.located > frame[["level1", "level2", "level3"]].min(axis=1)).any()
+            or not frame.n_contexts.eq(trials.phase_index.nunique()).all()):
+        raise ValueError("Invalid lock/control outcome")
+
+
 def _dataset(out, key, spec, family, bg_id, bg_seed, background, cfg, design, extractor, device):
+    """Score one dataset; returns (SV frame, lock/control frame, extractor, cached)."""
     length = protocol.context_length(spec.P, spec.S)
-    contexts = _contexts(design, length, background)
+    trials = _trial_design(spec, family, bg_id, cfg)
+    # Sweep and trial tones go through the network together and are split afterwards.
+    contexts = np.concatenate([_contexts(design, length, background),
+                               _contexts(trials, length, background)])
+    n_sweep = len(design)
     metadata = {
         "model": spec.tag, "P": spec.P, "S": spec.S, "official": spec.official,
         "family": family, "background_id": bg_id, "background_seed": bg_seed,
@@ -261,11 +341,13 @@ def _dataset(out, key, spec, family, bg_id, bg_seed, background, cfg, design, ex
     }
     folder = out / "shards" / spec.tag / family
     path = folder / f"background_{bg_id:03d}.csv"
+    trials_path = folder / f"background_{bg_id:03d}_trials.csv"
     features_path = folder / f"background_{bg_id:03d}_features.npz"
-    if path.exists():
-        frame = pd.read_csv(path)
-        _validate_shard(frame, metadata, design)
-        return frame, extractor, True
+    if path.exists() and trials_path.exists():
+        frame, trial_frame = pd.read_csv(path), pd.read_csv(trials_path)
+        _validate_shard(frame, metadata, design, cfg.random_init)
+        _validate_trials(trial_frame, metadata, trials, cfg.random_init)
+        return frame, trial_frame, extractor, True
     created = False
     try:
         if features_path.exists():
@@ -273,14 +355,33 @@ def _dataset(out, key, spec, family, bg_id, bg_seed, background, cfg, design, ex
                 if str(z["input_hash"]) != metadata["input_hash"] or str(z["run_key"]) != key:
                     raise ValueError("Feature cache mismatch")
                 features = {s: z[s] for s in STAGES}
+                control = {s: z[f"random_init__{s}"] for s in STAGES} if cfg.random_init else None
         else:
             if extractor is None:
                 extractor = StageExtractor(spec, device=device, batch_size=cfg.batch_size)
                 created = True
             features = extractor.capture(contexts)
-            _npz(features_path, **features, input_hash=np.array(metadata["input_hash"]), run_key=np.array(key))
-        frame = protocol.score_features(features, design, cfg, metadata)
-        _validate_shard(frame, metadata, design)
+            control = None
+            if cfg.random_init:
+                if getattr(extractor, "untrained", None) is None:
+                    extractor.untrained = extractor.randomised(cfg.seed)
+                control = extractor.untrained.capture(contexts)
+            _npz(features_path, **features,
+                 **({f"random_init__{s}": a for s, a in control.items()} if control else {}),
+                 input_hash=np.array(metadata["input_hash"]), run_key=np.array(key))
+        sweep = {s: a[:n_sweep] for s, a in features.items()}
+        probe = {s: a[n_sweep:] for s, a in features.items()}
+        sweep_control = {s: a[:n_sweep] for s, a in control.items()} if control else None
+        frame = protocol.score_features(sweep, design, cfg, metadata, sweep_control)
+        _validate_shard(frame, metadata, design, cfg.random_init)
+        parts = [protocol.score_trials(sweep, design, probe, trials, cfg, metadata, "trained")]
+        if control:
+            parts.append(protocol.score_trials(sweep_control, design,
+                                               {s: a[n_sweep:] for s, a in control.items()},
+                                               trials, cfg, metadata, "random_init"))
+        trial_frame = pd.concat(parts, ignore_index=True)
+        _validate_trials(trial_frame, metadata, trials, cfg.random_init)
+        _csv(trials_path, trial_frame)
         _csv(path, frame)
     except BaseException:
         if created:
@@ -289,7 +390,7 @@ def _dataset(out, key, spec, family, bg_id, bg_seed, background, cfg, design, ex
     # A committed result shard is the resume cache; retain feature blocks only until committed.
     # This bounds storage instead of retaining tens of GB of reproducible intermediate states.
     features_path.unlink(missing_ok=True)
-    return frame, extractor, False
+    return frame, trial_frame, extractor, False
 
 
 def _run(root, kind, cfg, models, device):
@@ -299,7 +400,7 @@ def _run(root, kind, cfg, models, device):
     else:
         import probing_exports as exports
     models, out, key, design = _prepare(root, kind, cfg, models, device)
-    started, frames, completed = time.monotonic(), [], 0
+    started, frames, trial_frames, completed = time.monotonic(), [], [], 0
     total = len(models) * (1 if kind == "pure" else 2*cfg.n_backgrounds)
     progress = {"kind": kind, "mode": cfg.mode, "run_key": key, "total_datasets": total,
                 "completed_datasets": 0, "status": "running"}
@@ -323,9 +424,11 @@ def _run(root, kind, cfg, models, device):
                                         elapsed_seconds=time.monotonic()-started)
                         cp.atomic_json(out / "progress.json", progress)
                         tick = time.monotonic()
-                        frame, extractor, cached = _dataset(out, key, spec, family, bg_id, bg_seed,
-                                                           background, cfg, design, extractor, device)
+                        frame, trial_frame, extractor, cached = _dataset(
+                            out, key, spec, family, bg_id, bg_seed, background, cfg, design,
+                            extractor, device)
                         frames.append(frame)
+                        trial_frames.append(trial_frame)
                         completed += 1
                         progress.update(completed_datasets=completed, current=current,
                                         elapsed_seconds=time.monotonic()-started)
@@ -336,12 +439,16 @@ def _run(root, kind, cfg, models, device):
                     if extractor is not None:
                         extractor.close()
             result = pd.concat(frames, ignore_index=True)
+            trial_result = pd.concat(trial_frames, ignore_index=True)
             _csv(out / "results.csv", result)
-            artifacts = (exports.export_pure(result, out, mode=cfg.mode) if kind == "pure" else
-                         exports.export_complex(result, out, models, cfg))
+            _csv(out / "lock_control.csv", trial_result)
+            artifacts = (exports.export_pure(result, out, mode=cfg.mode, trials=trial_result)
+                         if kind == "pure" else
+                         exports.export_complex(result, out, models, cfg, trials=trial_result))
             cp.atomic_json(out / "artifacts.json", {k: str(v) for k, v in artifacts.items()})
             progress.update(status="complete", elapsed_seconds=time.monotonic()-started)
             cp.atomic_json(out / "progress.json", progress)
+            result.attrs["lock_control"] = trial_result
             return result, out
         except BaseException as exc:
             progress.update(status="error", error=f"{type(exc).__name__}: {exc}",
@@ -353,7 +460,11 @@ def _run(root, kind, cfg, models, device):
 
 
 def run_pure(root, cfg=None, models=MODELS, device="cpu"):
-    """Run/resume the pure-tone dataset for each selected frozen checkpoint."""
+    """Run/resume the pure-tone dataset for each selected frozen checkpoint.
+
+    Returns the SV rows and the run directory; the lock/control rows are in
+    `result.attrs["lock_control"]` and in lock_control.csv.
+    """
     return _run(root, "pure", cfg or ProbeConfig(), models, device)
 
 
