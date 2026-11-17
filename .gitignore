@@ -268,3 +268,6 @@ notebooks/results/
 /notebooks/bayesian/selectable_gate_repair/
 /notebooks/support_scripts/audit_selectable_saved_gates.py
 /notebooks/support_scripts/repair_selectable_gate_notebooks.py
+
+# iCloud placeholders (files offloaded by macOS)
+*.icloud

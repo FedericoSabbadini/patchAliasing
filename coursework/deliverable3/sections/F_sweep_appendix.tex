@@ -67,3 +67,83 @@ The reconstruction follows the diagonal only up to roughly one cycle per patch, 
 The probe strips do not follow that pattern. The local task stays at or above $0.9$ over most of the band in every geometry, including at frequencies the reconstruction no longer places, with yellow cells that become denser towards the top of the band rather than at the sites. The band tasks are weaker, and their red cells gather at the low end of the band and beside the task boundaries of \autoref{tab:bandTasks}, most visibly in the Mid and L tasks. The boundaries of the first two levels lie next to $f_s/8$, $f_s/4$ and $3f_s/8$, sites of every geometry, and those of the third next to odd multiples of $f_s/16$, sites for $P=16$ and $P=32$. On this design, therefore, the difficulty a band task has at its own boundary cannot be told apart from an effect of the site.
 
 These readings are descriptive, since neither is paired against controls or carries an interval. They show that the two readings disagree in a specific direction, a frequency still separated in the internal state and misplaced in the output, and that on the output the sites act as attractors rather than as holes. That observation gives the study its direction, and the Bayesian hypotheses reported in \autoref{sec:bayesResults} test it.
+
+\subsection{Probing by stage}\label{sec:appSweepMDL}
+
+The probe strips above read the internal state at one point only, the output quantile head, and score it by accuracy. This subsection repeats the reading at every stage of the network and scores it by description length, then compares, stage by stage, a tone on a candidate site with a tone beside it, as the recovery count of \autoref{sec:appDecomp} does on the forecast.\footnote{The probing by stage is implemented in the notebooks \href{https://github.com/FedericoSabbadini/patchAliasing/blob/main/notebooks/signal_analysis/probing_pure_tones.ipynb}{\texttt{probing\_pure\_tones.ipynb}} and \href{https://github.com/FedericoSabbadini/patchAliasing/blob/main/notebooks/signal_analysis/probing_complex_signals.ipynb}{\texttt{probing\_complex\_signals.ipynb}}.} It covers the fifteen geometries of \autoref{tab:hfModels} and the published checkpoint. Like the sweep, it is descriptive and decides no claim.
+
+\paragraph{How the readings are produced.}
+
+The signals are those of the sweep: pure sinusoids from $2$ to $250$\,Hz in one-hertz steps at $f_s=512$\,Hz, each at ten phases spread evenly over one cycle, so that a geometry receives $249\times10=2{,}490$ contexts, cut with the context rule of this appendix (\autoref{tab:sweepContext}). Each context passes through the network once and the state is read at ten points: the \texttt{[REG]} vector after each of the four encoder blocks, the single decoder token after each of the four decoder blocks, the input of the output projection, and its output, the quantile head.
+
+The first reading scores the seven band tasks of \autoref{tab:bandTasks} by prequential description length\autocite{voitaInformationTheoreticProbingMinimum2020}. The contexts of a task are split into five class-stratified blocks that keep all phases of a frequency together, so that no frequency is seen in both fitting and coding. The first block is coded at one bit per label; each later block is coded by a probe, the same as in the sweep (standardisation, twenty principal components, logistic regression), fitted on the preceding blocks only. The result is the space saving $\mathrm{SV}=1-L/n$, with $L$ the code length in bits and $n$ the number of labels: positive when the state lets the labels be coded in fewer bits than one each, zero or negative when it does not. Because the first block is always paid in full, $\mathrm{SV}$ cannot exceed a ceiling between $0.77$ and $0.80$ according to the task. Two controls accompany every value. The first repeats the procedure on permuted labels. The second repeats it on a network of the same architecture with untrained weights, which reads the same contexts: what that network already exposes comes from the tokenisation and the architecture, and only the gap between the two can be attributed to training.
+
+The second reading follows the lock and control trials of the recovery count, taken inside the network instead of on the forecast. For every candidate site of a geometry, at its exact value, a tone is placed on the site and two more beside it, one below and one above at the same offset, each more than $2$\,Hz from every candidate of that geometry. Every tone is presented at the ten phases. A tone counts as located at a stage when the three band probes on its path, the Mid task, then L or H, then one of LL, LH, HL and HH, all return its label, which places it in an eighth of the band. Those probes are fitted on the sweep without the frequencies within $1$\,Hz of the site or of its controls, so a located tone was never seen in fitting. All trials remain in each denominator. Since the task boundaries lie beside several candidate sites, the count is repeated on the pairs whose tones all lie at least $4$\,Hz from the boundaries on their path.
+
+The same two readings are taken on complex backgrounds. The hundred Light TSMixup and the hundred KernelSynth backgrounds of \autoref{sec:appDecomp} each receive the full sweep, the tone having an amplitude of one and a half times the background standard deviation, so that each background yields its own space saving for every geometry, stage and task. Each background also keeps the site and the control it has in the recovery count, read here at ten phases by probes fitted on the sweep of that same background.
+
+\paragraph{What is shown for each geometry.}
+
+\autoref{fig:probingSV} draws the first reading for the reference geometry: one group of seven bars per stage, from the first encoder block at the top to the output quantile head at the bottom, one bar per band task. A bar to the right of zero is a task whose labels the stage compresses. The two values printed beside each bar are the controls, permuted labels first and untrained network second. \autoref{tab:probingStages} condenses the same reading for all geometries into the median space saving over the seven tasks at each stage, with the untrained network in its lower panel.
+
+\autoref{tab:probingLockControl} reports the second reading: for each geometry and stage, the percentage of contexts located with the tone on a candidate site and with the tone beside it. Equal values mean that the stage places a tone as well on a site as off it, and a lower first value that the band of a tone is harder to read on a site. \autoref{tab:probingLockControlBg} gives the same pair on the two families of backgrounds, and \autoref{tab:probingCompression} the space saving at the output head across backgrounds.
+
+% TODO(probing): replace the placeholder with the figure exported by probing_pure_tones.ipynb
+%   (notebooks/signal_analysis/results/probing/fig_probing_sv_p16_s16.pdf, copy to figures/).
+\begin{figure*}[!p]
+    \centering
+    % \includegraphics[width=0.75\textwidth]{figures/fig_probing_sv_p16_s16.pdf}
+    \fbox{\parbox{0.75\textwidth}{\centering\vspace{3em}\textbf{TODO: figure of the pure-tone probing run}\vspace{3em}}}
+    \caption{Space saving of the seven band tasks at the ten probe points, reference geometry $P=S=16$. Bars give $\mathrm{SV}=1-L/n$ under the five-block prequential code; values in parentheses are the shuffled-label and untrained-network controls. The first block is coded uniformly, which caps $\mathrm{SV}$ near $0.8$.}%
+    \label{fig:probingSV}
+\end{figure*}
+
+% TODO(probing): replace each placeholder table below with the generated file, which carries the
+%   same caption and label:
+%   \input{tables/probing_sv_stages.tex}                  (pure tones, tab:probingStages)
+%   \input{tables/probing_lock_control.tex}               (pure tones, tab:probingLockControl)
+%   \input{tables/probing_lock_control_backgrounds.tex}   (KS/TSM,     tab:probingLockControlBg)
+%   \input{tables/probing_compression.tex}                (KS/TSM,     tab:probingCompression)
+\begin{table*}[!tbp]
+    \centering
+    \fbox{\parbox{0.75\textwidth}{\centering\textbf{TODO: \texttt{probing\_sv\_stages.tex}}}}
+    \caption{Median space saving over the seven band tasks at each probe point, pure tones, with the same reading on the untrained network.}%
+    \label{tab:probingStages}
+\end{table*}
+
+\begin{table*}[!tbp]
+    \centering
+    \fbox{\parbox{0.75\textwidth}{\centering\textbf{TODO: \texttt{probing\_lock\_control.tex}}}}
+    \caption{Pure tones located at each probe point, in per cent of the contexts, at the candidate sites of each geometry and at the controls beside them.}%
+    \label{tab:probingLockControl}
+\end{table*}
+
+\begin{table*}[!tbp]
+    \centering
+    \fbox{\parbox{0.75\textwidth}{\centering\textbf{TODO: \texttt{probing\_lock\_control\_backgrounds.tex}}}}
+    \caption{Added tones located at each probe point, in per cent of the contexts, on a candidate site and beside it, over one hundred backgrounds per generator.}%
+    \label{tab:probingLockControlBg}
+\end{table*}
+
+\begin{table*}[!tbp]
+    \centering
+    \fbox{\parbox{0.75\textwidth}{\centering\textbf{TODO: \texttt{probing\_compression.tex}}}}
+    \caption{Space saving of the band labels of the added tone at the output quantile head, across one hundred backgrounds per generator: median and quartiles.}%
+    \label{tab:probingCompression}
+\end{table*}
+
+\paragraph{What the readings show.}
+
+% TODO(probing): every bracketed value comes from the full pure-tone run; rewrite the sentence if
+%   the data contradict its wording.
+In the reference geometry \textbf{[TODO: $n$ of the $70$]} values are positive, from \textbf{[TODO]} to \textbf{[TODO]}, and \textbf{[TODO: every/all but $n$]} shuffled-label control is negative. The median over the tasks is \textbf{[TODO]} across the four encoder blocks, \textbf{[TODO]} across the four decoder blocks, \textbf{[TODO]} at the input of the projection and \textbf{[TODO]} at the output head (\autoref{fig:probingSV}). \textbf{[TODO: one sentence on where along the stages the band is most and least readable, and whether the other fifteen checkpoints follow the same profile (\autoref{tab:probingStages}).]}
+
+The untrained network reaches a median of \textbf{[TODO]} in the encoder and \textbf{[TODO]} at the output head. \textbf{[TODO: state the gap. If the untrained encoder already compresses, the band is exposed by the tokenisation and the architecture and training adds only the gap; the text may call the information learned only where the gap is clear.]}
+
+On the candidate sites a pure tone is located in \textbf{[TODO]}\% of the contexts at the output head and beside them in \textbf{[TODO]}\%, on average over the retrained geometries, against \textbf{[TODO]}\% and \textbf{[TODO]}\% at the last encoder block (\autoref{tab:probingLockControl}). \textbf{[TODO: say whether the difference appears at a given stage or is absent throughout.]} Away from the task boundaries the two rates are \textbf{[TODO]}\% and \textbf{[TODO]}\%. That second count rests on few pairs in the geometries whose sites fall beside the boundaries: in the reference geometry six of the seven sites lie within $4$\,Hz of one, so there a difference between lock and control cannot be told from the difficulty of a band task at its own boundary, the limit already noted for the accuracy profile.
+
+% TODO(probing): this paragraph needs the KS/TSM run; delete it, with the last two placeholder
+%   tables and their mentions above, if that run is not carried out.
+On the backgrounds the median space saving at the output head is \textbf{[TODO]} on Light TSMixup and \textbf{[TODO]} on KernelSynth (\autoref{tab:probingCompression}), and the added tone is located in \textbf{[TODO]}\% of the contexts on a site and \textbf{[TODO]}\% beside it (\autoref{tab:probingLockControlBg}). \textbf{[TODO: compare with \autoref{tab:decomposition}, where the forecast returns a tone on a site in about a quarter of the trials and almost never beside one: say whether the internal state shows the same asymmetry or places the tone equally in the two cases.]}
+
+These readings are descriptive, as those of the sweep. The probes are linear readouts of twenty principal components, so they score a lower bound on what a stage holds, and the space saving reported here is not the band code length collected for Model~B, whose blocks are not grouped by frequency (\autoref{sec:appBayes}). \textbf{[TODO: closing sentence relating the stage profile to the direction of the sweep, a frequency retained in the representation and misplaced in the output.]}
