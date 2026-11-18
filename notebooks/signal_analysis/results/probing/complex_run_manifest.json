@@ -1,0 +1,361 @@
+{
+  "execution": {
+    "engine": "ipython",
+    "finished_utc": "2026-11-18T11:36:15.932078+00:00",
+    "started_utc": "2026-11-17T22:33:26.118239+00:00",
+    "status": "complete"
+  },
+  "export_sha256_uncompressed": {
+    "complex_lock_control.csv": "1cd117ae92b4044116c82c5e75568ccd4d53600de3da008fbe040f8beeaf40aa",
+    "complex_lock_control_trials.csv": "6af52e8fb743bd40bef90fe7fea688f7f7ee70a4e19a6b677a096ff7bdbc8383",
+    "complex_sv.csv": "986e4b0de211d828ba47d55be46df39bcde1e10e0e04749dc2a24bbd981e731e",
+    "compression_counts.csv": "0eb2e829319154ee78d347b0808b3bb520c024c82e11ee8a0203ae1463b457e2",
+    "compression_kernelsynth.csv": "8bd35c07b8415f3c8192fb048b575f4fbbaf19ad5d9b2948a4b31fc686a7db57",
+    "compression_tsmixup.csv": "113996b11b446def878cd4dc58a54acb6d520efe9d031a08f87a319c92d18676",
+    "probing_compression.tex": "054e90495da5e89eead37486928fe2687b35ff60cfb0a8fae2912a11da4d79ab",
+    "probing_compression_caption.txt": "c4781c1b85520e52f0545dc55fcdf382f00a0653e27c2aa6a070055a1bea9388",
+    "probing_lock_control_backgrounds.tex": "d39f9d68ef39390a5c136ed23a50daae40fb7f5d8de91e492f0c3b340d7a08c6",
+    "sv_distribution.csv": "010877be7037196847dacbfb59da2575de0cb4be2f9d2a424322316a9d0de6e5",
+    "sv_distribution_p16_s16.pdf": "231b42b21cbab6bc8bd265777c4db721ab89805543dd863e2fc13200b3a62525",
+    "sv_distribution_p16_s16.png": "773e126f7727c8692f567c584e479895ee28bf0dbdb8f0ade293f4dfa6d97b84"
+  },
+  "manifest": {
+    "background_recipe": {
+      "canonical_length": 544,
+      "first_seed": 42001,
+      "injected_amplitude_sd": 1.5,
+      "kernelsynth": {
+        "J": 5,
+        "jitter": 0.0001
+      },
+      "normalisation": "canonical realisation: zero mean and population SD one",
+      "tsmixup": {
+        "alpha": 1.5,
+        "components": [
+          1,
+          4
+        ],
+        "min_separation_hz": 10
+      }
+    },
+    "code": {
+      "checkpointing.py": "09eaf62606e18eed5a53861cc4162943109b39acb6623739c57e95796c789267",
+      "comparison_lib.py": "e87b10e7625d935c90f4616d1499085f0c9594f56c2c104ad22f13bd165f372e",
+      "model_loader.py": "2917d0967ab842113fc1465a15ecefbb331b77c238d23554463dfc343efb5068",
+      "probe_lib.py": "e9b064faa6075b3f28c42cfec9f248339094bc725ba3c32bb73a53c0d9bd50ae",
+      "probing_lib.py": "0155ef0d63d8c5e5d202f44c6f5f305a12ee80d73ce1156cc746ef65ca28ac1e",
+      "probing_protocol.py": "511811fc77b8e587ae2481a44a35596af9136d779ae6365473902b5341ca6c38",
+      "signalGenerator.py": "166ed2144b8f4c3cc734727fa372bc24e571a5ea19a19f5725c8b1e90edce7e9",
+      "tones.py": "1b165617828d7fc4243ccd78dc485e9e56bc508d3dbc8ddbf4a467d9484db611"
+    },
+    "config": {
+      "batch_size": 64,
+      "control_guard_hz": 2.000001,
+      "frequency_step": 1,
+      "max_iter": 2000,
+      "mode": "full",
+      "n_backgrounds": 100,
+      "n_chunks": 5,
+      "n_pca": 20,
+      "n_phases": 10,
+      "random_init": true,
+      "seed": 42,
+      "threads": 4,
+      "trial_exclusion_hz": 1.0
+    },
+    "device": "cpu",
+    "kind": "complex",
+    "models": [
+      {
+        "P": 16,
+        "S": 16,
+        "checkpoint": {
+          "geometry": [
+            16,
+            16
+          ],
+          "repo": "amazon/chronos-bolt-tiny",
+          "revision": "a0e552de83495b5c28c14c71c374f3e33280b340"
+        },
+        "official": true,
+        "tag": "official-p16-s16"
+      },
+      {
+        "P": 8,
+        "S": 8,
+        "checkpoint": {
+          "geometry": {
+            "P": 8,
+            "S": 8
+          },
+          "identity_sha256": "4ae55f9a706e8d2a0da5459d23f3bdb2f101a4cf6ebc9bd80d0e4558f0374a96",
+          "repo": "federicosabbadini/chronos-bolt-patch-sweep",
+          "revision": "230ea28278a3c60621964b920e9778c0ba73337e",
+          "source": "huggingface",
+          "subfolder": "p8-s8-seed42"
+        },
+        "official": false,
+        "tag": "retrained-p8-s8"
+      },
+      {
+        "P": 16,
+        "S": 8,
+        "checkpoint": {
+          "geometry": {
+            "P": 16,
+            "S": 8
+          },
+          "identity_sha256": "c512ebd47cabf9aa2726464124589df4bb47124d03f32060548d39caad63efe8",
+          "repo": "federicosabbadini/chronos-bolt-patch-sweep",
+          "revision": "230ea28278a3c60621964b920e9778c0ba73337e",
+          "source": "huggingface",
+          "subfolder": "p16-s8-seed42"
+        },
+        "official": false,
+        "tag": "retrained-p16-s8"
+      },
+      {
+        "P": 16,
+        "S": 12,
+        "checkpoint": {
+          "geometry": {
+            "P": 16,
+            "S": 12
+          },
+          "identity_sha256": "a6850a755a05afe1b2a7cf384634d61e1f1f11727ce905dad4d95fb021365c54",
+          "repo": "federicosabbadini/chronos-bolt-patch-sweep",
+          "revision": "230ea28278a3c60621964b920e9778c0ba73337e",
+          "source": "huggingface",
+          "subfolder": "p16-s12-seed42"
+        },
+        "official": false,
+        "tag": "retrained-p16-s12"
+      },
+      {
+        "P": 16,
+        "S": 16,
+        "checkpoint": {
+          "geometry": {
+            "P": 16,
+            "S": 16
+          },
+          "identity_sha256": "eb3006c11e560a5146b7a420415da1ad2632417a75d59b0eee7fdc7ea1d16237",
+          "repo": "federicosabbadini/chronos-bolt-patch-sweep",
+          "revision": "230ea28278a3c60621964b920e9778c0ba73337e",
+          "source": "huggingface",
+          "subfolder": "p16-s16-seed42"
+        },
+        "official": false,
+        "tag": "retrained-p16-s16"
+      },
+      {
+        "P": 24,
+        "S": 8,
+        "checkpoint": {
+          "geometry": {
+            "P": 24,
+            "S": 8
+          },
+          "identity_sha256": "f9944f63e3a2db3a2a62d317bbe009e21e404d0a7c328a08018afb4ca52357a2",
+          "repo": "federicosabbadini/chronos-bolt-patch-sweep",
+          "revision": "230ea28278a3c60621964b920e9778c0ba73337e",
+          "source": "huggingface",
+          "subfolder": "p24-s8-seed42"
+        },
+        "official": false,
+        "tag": "retrained-p24-s8"
+      },
+      {
+        "P": 24,
+        "S": 12,
+        "checkpoint": {
+          "geometry": {
+            "P": 24,
+            "S": 12
+          },
+          "identity_sha256": "7b90cd7fcdecbb4b9d4dc1d8ee2d01ca8c8a7dcc2696e7e2a6f4cc4c8d80ea51",
+          "repo": "federicosabbadini/chronos-bolt-patch-sweep",
+          "revision": "230ea28278a3c60621964b920e9778c0ba73337e",
+          "source": "huggingface",
+          "subfolder": "p24-s12-seed42"
+        },
+        "official": false,
+        "tag": "retrained-p24-s12"
+      },
+      {
+        "P": 24,
+        "S": 16,
+        "checkpoint": {
+          "geometry": {
+            "P": 24,
+            "S": 16
+          },
+          "identity_sha256": "a564791d45511c5939765cee3a5dcb1c416aec2b0b10bd2f135094b8deecbb46",
+          "repo": "federicosabbadini/chronos-bolt-patch-sweep",
+          "revision": "230ea28278a3c60621964b920e9778c0ba73337e",
+          "source": "huggingface",
+          "subfolder": "p24-s16-seed42"
+        },
+        "official": false,
+        "tag": "retrained-p24-s16"
+      },
+      {
+        "P": 24,
+        "S": 20,
+        "checkpoint": {
+          "geometry": {
+            "P": 24,
+            "S": 20
+          },
+          "identity_sha256": "a5101b5ede96855a7e0e8d8669750e131a700e2270b6cbb7218fedcb0d9ac890",
+          "repo": "federicosabbadini/chronos-bolt-patch-sweep",
+          "revision": "230ea28278a3c60621964b920e9778c0ba73337e",
+          "source": "huggingface",
+          "subfolder": "p24-s20-seed42"
+        },
+        "official": false,
+        "tag": "retrained-p24-s20"
+      },
+      {
+        "P": 24,
+        "S": 24,
+        "checkpoint": {
+          "geometry": {
+            "P": 24,
+            "S": 24
+          },
+          "identity_sha256": "b7a30a68413728e9d43aec4169bcdf72e1eba3e316665f5109c3321589bf6e1e",
+          "repo": "federicosabbadini/chronos-bolt-patch-sweep",
+          "revision": "230ea28278a3c60621964b920e9778c0ba73337e",
+          "source": "huggingface",
+          "subfolder": "p24-s24-seed42"
+        },
+        "official": false,
+        "tag": "retrained-p24-s24"
+      },
+      {
+        "P": 32,
+        "S": 8,
+        "checkpoint": {
+          "geometry": {
+            "P": 32,
+            "S": 8
+          },
+          "identity_sha256": "b67fc8d2bd91ec6a64d66493e20c8b12fc5cf169b83565b798f21da5abd9e437",
+          "repo": "federicosabbadini/chronos-bolt-patch-sweep",
+          "revision": "230ea28278a3c60621964b920e9778c0ba73337e",
+          "source": "huggingface",
+          "subfolder": "p32-s8-seed42"
+        },
+        "official": false,
+        "tag": "retrained-p32-s8"
+      },
+      {
+        "P": 32,
+        "S": 12,
+        "checkpoint": {
+          "geometry": {
+            "P": 32,
+            "S": 12
+          },
+          "identity_sha256": "679e56f2f038caf0dc862c835554fb790da9053ed3e2c371969b9866be43bb89",
+          "repo": "federicosabbadini/chronos-bolt-patch-sweep",
+          "revision": "230ea28278a3c60621964b920e9778c0ba73337e",
+          "source": "huggingface",
+          "subfolder": "p32-s12-seed42"
+        },
+        "official": false,
+        "tag": "retrained-p32-s12"
+      },
+      {
+        "P": 32,
+        "S": 16,
+        "checkpoint": {
+          "geometry": {
+            "P": 32,
+            "S": 16
+          },
+          "identity_sha256": "40384515c1d1ee03ec19420ec086b4fb1a3bc92e9b8570da0ce67888f4ba4280",
+          "repo": "federicosabbadini/chronos-bolt-patch-sweep",
+          "revision": "230ea28278a3c60621964b920e9778c0ba73337e",
+          "source": "huggingface",
+          "subfolder": "p32-s16-seed42"
+        },
+        "official": false,
+        "tag": "retrained-p32-s16"
+      },
+      {
+        "P": 32,
+        "S": 20,
+        "checkpoint": {
+          "geometry": {
+            "P": 32,
+            "S": 20
+          },
+          "identity_sha256": "33325a67c34c4691a5d66b4f83c6721f0977c4a76a823bb5d5c5cf5c66ba2be4",
+          "repo": "federicosabbadini/chronos-bolt-patch-sweep",
+          "revision": "230ea28278a3c60621964b920e9778c0ba73337e",
+          "source": "huggingface",
+          "subfolder": "p32-s20-seed42"
+        },
+        "official": false,
+        "tag": "retrained-p32-s20"
+      },
+      {
+        "P": 32,
+        "S": 24,
+        "checkpoint": {
+          "geometry": {
+            "P": 32,
+            "S": 24
+          },
+          "identity_sha256": "5c4bdbdc1b1db7cff8fe318f0883d4d5961afe337e7e044572559c165fd892bb",
+          "repo": "federicosabbadini/chronos-bolt-patch-sweep",
+          "revision": "230ea28278a3c60621964b920e9778c0ba73337e",
+          "source": "huggingface",
+          "subfolder": "p32-s24-seed42"
+        },
+        "official": false,
+        "tag": "retrained-p32-s24"
+      },
+      {
+        "P": 32,
+        "S": 32,
+        "checkpoint": {
+          "geometry": {
+            "P": 32,
+            "S": 32
+          },
+          "identity_sha256": "21a7dca436800d6d387bf1f59d11b5991092d0645b5fdf318a8b997b4b9578cc",
+          "repo": "federicosabbadini/chronos-bolt-patch-sweep",
+          "revision": "230ea28278a3c60621964b920e9778c0ba73337e",
+          "source": "huggingface",
+          "subfolder": "p32-s32-seed42"
+        },
+        "official": false,
+        "tag": "retrained-p32-s32"
+      }
+    ],
+    "packages": {
+      "chronos-forecasting": "2.2.2",
+      "numpy": "2.4.6",
+      "pandas": "3.0.3",
+      "scikit-learn": "1.8.0",
+      "threadpoolctl": "3.6.0",
+      "torch": "2.12.1+cpu",
+      "transformers": "4.57.6"
+    },
+    "protocol": "frequency-grouped-prequential-v2"
+  },
+  "run": {
+    "completed_datasets": 3200,
+    "current": "retrained-p32-s32/kernelsynth/99",
+    "elapsed_seconds": 46954.971863111015,
+    "kind": "complex",
+    "mode": "full",
+    "run_key": "58a38312e817a81d9cbc8cb6aee990b79eba424021f6296d192b571beb73829e",
+    "status": "complete",
+    "total_datasets": 3200
+  },
+  "source_commit": "1d71bc20e8f820f992c1c1c38eb5675c75c98871"
+}

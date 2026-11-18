@@ -1,0 +1,1 @@
+Space saving of the band labels of the added tone across 100 backgrounds per generator, reference geometry $P=S=16$, at the ten probe points. Boxes span the quartiles with the median marked; whiskers reach 1.5 times the interquartile range. Each background supplies its own frequency and phase sweep.
