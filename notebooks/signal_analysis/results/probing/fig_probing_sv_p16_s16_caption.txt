@@ -1,0 +1,1 @@
+Space saving of the seven band tasks at the ten probe points, reference geometry $P=S=16$. Bars give $\mathrm{SV}=1-L/n$ under the five-block prequential code; values in parentheses are the shuffled-label and untrained-network controls. The first block is coded uniformly, which caps $\mathrm{SV}$ near $0.8$.
