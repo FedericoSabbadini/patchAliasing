@@ -1,0 +1,25 @@
+\begin{table*}[!tbp]
+    \centering
+    \color{red}\captionsetup{font+=probingred} % probing added after the notebook run: drop this line for the final version
+    \small
+    \setlength{\tabcolsep}{4pt}
+    \begin{tabular}{@{}llrrrrrrrrrr@{}}
+        \toprule
+        \textbf{Signal} & \textbf{Reading} & \textbf{E1} & \textbf{E2} & \textbf{E3} & \textbf{E4} & \textbf{D1} & \textbf{D2} & \textbf{D3} & \textbf{D4} & \textbf{In} & \textbf{Head} \\
+        \midrule
+        Pure tones & Trained & $-29$ & $-33$ & $-32$ & $-30$ & $-43$ & $-43$ & $-41$ & $-41$ & $-41$ & $-33$ \\
+         & Trained, off boundary & $-30$ & $-34$ & $-32$ & $-30$ & $-40$ & $-37$ & $-37$ & $-38$ & $-39$ & $-33$ \\
+         & Untrained & $-22$ & $-22$ & $-23$ & $-22$ & $-23$ & $-22$ & $-23$ & $-23$ & $-23$ & $-22$ \\
+        \addlinespace[3pt]
+        Light TSMixup & Trained & $-23$ & $-24$ & $-25$ & $-24$ & $-35$ & $-34$ & $-33$ & $-32$ & $-32$ & $-24$ \\
+         & Trained, off boundary & $-24$ & $-24$ & $-26$ & $-24$ & $-29$ & $-29$ & $-29$ & $-28$ & $-27$ & $-25$ \\
+         & Untrained & $-21$ & $-21$ & $-21$ & $-21$ & $-20$ & $-20$ & $-20$ & $-21$ & $-21$ & $-21$ \\
+        \addlinespace[3pt]
+        KernelSynth & Trained & $-24$ & $-27$ & $-27$ & $-26$ & $-36$ & $-34$ & $-33$ & $-34$ & $-34$ & $-28$ \\
+         & Trained, off boundary & $-24$ & $-26$ & $-27$ & $-24$ & $-31$ & $-29$ & $-29$ & $-29$ & $-29$ & $-27$ \\
+         & Untrained & $-20$ & $-22$ & $-21$ & $-21$ & $-20$ & $-20$ & $-20$ & $-21$ & $-21$ & $-21$ \\
+        \bottomrule
+    \end{tabular}
+    \caption{Located rate on a candidate site minus the rate beside it, in percentage points, averaged over the fifteen retrained geometries; a negative value means that a tone on a site is located less often. Off boundary keeps the pairs at least $4$\,Hz from the task boundaries, Untrained uses untrained weights. E1--E4 and D1--D4 are the encoder and decoder blocks, In the projection input, Head the output quantile head.}
+    \label{tab:probingLockSummary}
+\end{table*}

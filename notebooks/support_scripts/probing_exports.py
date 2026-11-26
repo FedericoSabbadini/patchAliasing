@@ -352,9 +352,8 @@ def export_pure(frame: pd.DataFrame, out: Path, mode: str = "full",
                 r"Pure tones located at each probe point, in per cent of the contexts, at the candidate "
                 r"sites of each geometry and at the controls beside them (lock/control). A tone is "
                 r"located when the three band probes on its path all return its label; the probes are "
-                r"fitted without the frequencies within $1$\,Hz of the tone. E1--E4 and D1--D4 are the "
-                r"encoder and decoder blocks, In the input of the output projection and Head the output "
-                r"quantile head. $\dagger$ marks the published checkpoint.",
+                r"fitted without the frequencies within $1$\,Hz of the tone. Columns as in "
+                r"\autoref{tab:probingStages}. $\dagger$ marks the published checkpoint.",
                 "tab:probingLockControl"))
     return paths
 
@@ -520,10 +519,9 @@ def export_complex(frame: pd.DataFrame, out: Path, models: Iterable[Any], cfg: A
                 r"Added tones located at each probe point, in per cent of the contexts, when the tone "
                 r"sits on a candidate site and when it sits beside it (lock/control), over $"
                 + str(cfg.n_backgrounds) + r"$ backgrounds per generator. Sites and controls are those "
-                r"of the recovery count (\autoref{tab:decomposition}); each tone is read at ten phases "
-                r"by probes fitted on the sweep of its own background, without the frequencies within "
-                r"$1$\,Hz of it. Columns as in \autoref{tab:probingLockControl}. $\dagger$ marks the "
-                r"published checkpoint.", "tab:probingLockControlBg"))
+                r"of the recovery count (\autoref{tab:decomposition}), and the probes never saw the "
+                r"frequencies within $1$\,Hz of the tone. Columns as in \autoref{tab:probingLockControl}. "
+                r"$\dagger$ marks the published checkpoint.", "tab:probingLockControlBg"))
     ref = frame.loc[frame.model == REFERENCE]
     if not ref.empty:
         figure = _plot_distribution(ref, "SMOKE TEST" if cfg.mode == "smoke" else None)
@@ -538,3 +536,99 @@ def export_complex(frame: pd.DataFrame, out: Path, models: Iterable[Any], cfg: A
         "quartiles with the median marked; whiskers reach 1.5 times the interquartile range. "
         "Each background supplies its own frequency and phase sweep.\n"))
     return paths
+
+
+# --------------------------------------------------------------------------- #
+#  Lock/control summary across the pure and background runs
+# --------------------------------------------------------------------------- #
+SUMMARY_SIGNALS = (("pure", "Pure tones"),) + tuple(FAMILY_LABELS.items())
+SUMMARY_READINGS = (("Trained", "trained", ""), ("Trained, off boundary", "trained", "_off"),
+                    ("Untrained", "random_init", ""))
+
+
+def lock_summary(pure: pd.DataFrame, complex_: pd.DataFrame) -> pd.DataFrame:
+    """Mean lock-minus-control difference per signal, reading and stage, over the retrained geometries.
+
+    `pure` and `complex_` are the outputs of lock_control_summary for the two runs
+    (pure_lock_control.csv and complex_lock_control.csv).  The published checkpoint
+    is left out, so each mean rests on the fifteen retrained geometries; a mean is
+    unweighted across geometries, as quoted in the report.
+    """
+    frame = pd.concat([pure, complex_], ignore_index=True)
+    needed = {"model", "official", "family", "network", "stage", "net_pct", "net_pct_off"}
+    if missing := needed - set(frame.columns):
+        raise ValueError(f"Lock/control summaries miss {sorted(missing)}")
+    retrained = frame.loc[~frame.official.astype(bool)]
+    expected = {spec.tag for spec in MODELS if not spec.official}
+    rows = []
+    for signal, signal_label in SUMMARY_SIGNALS:
+        for reading, network, suffix in SUMMARY_READINGS:
+            part = retrained.loc[(retrained.family == signal) & (retrained.network == network)]
+            for stage in STAGES:
+                cell = part.loc[part.stage == stage, ["model", f"net_pct{suffix}"]]
+                if set(cell.model) != expected or cell.model.duplicated().any():
+                    raise ValueError(f"{signal}/{network}/{stage} needs each retrained geometry once")
+                values = cell[f"net_pct{suffix}"].to_numpy(float)
+                if not np.isfinite(values).all():
+                    raise ValueError(f"{signal}/{network}/{stage}{suffix}: a geometry has no pair")
+                rows.append(dict(signal=signal, signal_label=signal_label, reading=reading,
+                                 network=network, off_boundary=bool(suffix), stage=stage,
+                                 mean_net_pct=float(values.mean()), geometries=len(values)))
+    return pd.DataFrame(rows)
+
+
+def _latex_lock_summary(table: pd.DataFrame) -> str:
+    """Rows are signal and reading, columns the ten stages, cells the mean difference in points."""
+    lines = [r"\begin{table*}[!tbp]", r"    \centering", r"    \small",
+             r"    \setlength{\tabcolsep}{4pt}",
+             r"    \begin{tabular}{@{}ll" + "r" * len(STAGES) + r"@{}}", r"        \toprule",
+             r"        \textbf{Signal} & \textbf{Reading} & " + " & ".join(
+                 r"\textbf{" + STAGE_SHORT[stage] + "}" for stage in STAGES) + r" \\",
+             r"        \midrule"]
+    for index, (signal, signal_label) in enumerate(SUMMARY_SIGNALS):
+        if index:
+            lines.append(r"        \addlinespace[3pt]")
+        for row, (reading, _network, _suffix) in enumerate(SUMMARY_READINGS):
+            part = table.loc[(table.signal == signal) & (table.reading == reading)].set_index("stage")
+            cells = [f"${part.loc[stage, 'mean_net_pct']:.0f}$" for stage in STAGES]
+            lines.append(f"        {signal_label if row == 0 else ''} & {reading} & "
+                         + " & ".join(cells) + r" \\")
+    lines.extend([
+        r"        \bottomrule", r"    \end{tabular}",
+        r"    \caption{Difference between the located rates on a candidate site and beside it (lock "
+        r"minus control), in percentage points, averaged over the fifteen retrained geometries at "
+        r"each probe point. Negative values mean that a tone on a site is located less often. Off "
+        r"boundary keeps the pairs at least $4$\,Hz from the task boundaries on their path; untrained "
+        r"repeats the reading with untrained weights. Columns as in \autoref{tab:probingStages}.}",
+        r"    \label{tab:probingLockSummary}", r"\end{table*}", ""])
+    return "\n".join(lines)
+
+
+def export_lock_summary(directory: Path, out: Path | None = None) -> dict[str, Path]:
+    """Write probing_lock_summary.tex and lock_summary.csv from the two full-run summaries.
+
+    Reads pure_lock_control.csv and complex_lock_control.csv from `directory`, the
+    folder the two notebooks publish to, so it runs once both experiments are done.
+    """
+    directory = Path(directory)
+    out = Path(out) if out is not None else directory
+    sources = {name: directory / f"{name}_lock_control.csv" for name in ("pure", "complex")}
+    if absent := [str(path) for path in sources.values() if not path.is_file()]:
+        raise FileNotFoundError(f"Run both probing notebooks in full mode first; missing {absent}")
+    table = lock_summary(pd.read_csv(sources["pure"]), pd.read_csv(sources["complex"]))
+    paths = {"summary_csv": out / "lock_summary.csv", "summary_tex": out / "probing_lock_summary.tex"}
+    _csv(paths["summary_csv"], table)
+    _text(paths["summary_tex"], _latex_lock_summary(table))
+    return paths
+
+
+if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Build the lock/control summary table of Appendix F.")
+    parser.add_argument("--dir", type=Path,
+                        default=Path(__file__).parents[1] / "signal_analysis" / "results" / "probing",
+                        help="folder holding pure_lock_control.csv and complex_lock_control.csv")
+    args = parser.parse_args()
+    for path in export_lock_summary(args.dir).values():
+        print(path)

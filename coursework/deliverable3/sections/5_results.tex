@@ -2,20 +2,30 @@ This section separates what the signals show from what the inferential stage dec
 
 \subsection{The frequency sweep}
 
-Across the fifteen geometries, all drawn in \autoref{sec:appSweep}, the forecast rebuilds a pure tone at the right frequency only over the lower part of the band, and above it mostly returns slow content unrelated to the input. Only a small minority of the tones is rebuilt within two sweep steps of the input. The exceptions point at the candidate sites: inputs on a site often make the output jump, runs of neighbouring inputs are returned at one frequency, often a site, and the starting phases disagree most at the steps between runs. The linear probes behave differently. The local task stays at an accuracy of $0.9$ or above over most of the band in every geometry, including where the forecast fails, while the band tasks weaken beside their own boundaries. Those boundaries lie next to candidate sites, so a boundary effect cannot be told from a site effect\@. Read by description length at ten stages, from the first encoder block to the output quantile head, the band tasks compress at \textbf{[TODO: every]} stage, with a median space saving of \textbf{[TODO]} in the encoder, \textbf{[TODO]} in the decoder and \textbf{[TODO]} at the output head against a ceiling near $0.8$; shuffled labels never compress and an untrained network reaches \textbf{[TODO]} (\autoref{fig:probingSV}). A tone on a candidate site is located in \textbf{[TODO]}\% of the contexts and one beside it in \textbf{[TODO]}\% (\autoref{tab:probingLockControl}). % TODO(probing): numbers from the pure-tone run; procedure in \autoref{sec:appSweepMDL}.
+Across the fifteen geometries, all drawn in \autoref{sec:appSweep}, the forecast rebuilds a pure tone at the right frequency only over the lower part of the band, and above it mostly returns slow content unrelated to the input. Only a small minority of the tones is rebuilt within two sweep steps of the input. The exceptions point at the candidate sites: inputs on a site often make the output jump, runs of neighbouring inputs are returned at one frequency, often a site, and the starting phases disagree most at the steps between runs. The linear probes behave differently. The local task stays at an accuracy of $0.9$ or above over most of the band in every geometry, including where the forecast fails, while the band tasks weaken beside their own boundaries. Those boundaries lie next to candidate sites, so a boundary effect cannot be told from a site effect\@. {\color{red}Read by description length at ten stages, from the first encoder block to the output quantile head, the band tasks of the reference geometry compress at every stage, with a median space saving of $0.51$ in the encoder, $0.57$ in the decoder and $0.31$ at the output head against a ceiling near $0.8$. Shuffled labels never compress, while an untrained network already reaches $0.48$ in the encoder and $0.49$ at the head, so training adds little before the head and lowers the readability there in all checkpoints but one (\autoref{fig:probingSV}; procedure in \autoref{sec:appSweep}). A tone on a candidate site is located at the head in $35\%$ of the contexts and one beside it in $68\%$, a gap present at every stage, kept away from the task boundaries and wider than on the untrained network (\autoref{tab:probingLockSummary}; per geometry in \autoref{tab:probingLockControl}).} % red: probing added after the notebook run
 \autoref{fig:rec16-16} shows both readings at the reference geometry. The common case is thus a frequency that the representation retains and the output misplaces, with the sites acting on the output as attractors rather than holes; this gives the study its direction, but confirms none of the claims of \autoref{sec:agent}.
 
-\begin{figure}[H]
+\begin{figure}[!tbp]
     \centering
     \includegraphics[width=\textwidth]{figures/fig_rec_16_16.png}
 \caption{Behavioural reconstruction (left) and representational recovery (right) for pure tones under the retrained reference geometry $P=S=16$ and seed~42, with every frequency in cycles per patch (bottom and left) and cycles per stride (top and right). The left panel compares input and dominant generated frequencies, averaged over up to four starting phases with $\pm1$ standard deviation shaded; the right reports the accuracy of the local and hierarchical band probes. Dashed verticals mark the patch-branch sites ($\mathrm{cpp}\in\mathbb N^{+}$), which coincide with the stride-branch sites at $P=S$, and grey cells denote frequencies outside a task's coverage.}%
     \label{fig:rec16-16}
 \end{figure}
 
+\begin{figure*}[!p]
+    \centering
+    \color{red}\captionsetup{font+=probingred} % probing added after the notebook run: drop this line for the final version
+    \includegraphics[width=0.75\textwidth]{figures/fig_probing_sv_p16_s16.pdf}
+    \caption{Space saving of the seven band tasks at the ten probe points, retrained reference geometry $P=S=16$. Bars give $\mathrm{SV}=1-L/n$ under the five-block prequential code; values in parentheses are the shuffled-label and untrained-network controls. The first block is coded uniformly, which caps $\mathrm{SV}$ near $0.8$.}%
+    \label{fig:probingSV}
+\end{figure*}
+
+\input{tables/probing_lock_summary.tex}
+
 \subsection{Recovering a component from a complex background}
 
 Tones added to a Light TSMixup or KernelSynth background are seldom returned by the retrained models. The injected tone is much harder to recover at the control frequencies than at the candidate sites. It reappears in about a quarter of the trials on a site and almost never beside one, and still in a sixth to a fifth once the lines a forecast draws there with no tone are discounted (\autoref{tab:decomposition}; procedure and single draws in \autoref{sec:appDecomp}). The pattern is the same for both generators, the smallest patch retaining the most and the widest the least, which points to the geometry rather than the signal family; the published checkpoint returns more components, on and off the sites. The result runs against the loss that $H1$ predicts and agrees with the attraction seen in the sweep. Two mechanisms may contribute. A tone on a candidate site produces a repeating token sequence (\autoref{sec:tokenisation}) that a forecaster can prolong without representing the frequency. The forecasts also carry lines of their own on the sites, which a count of presence credits as recovered and which account for a quarter to two fifths of the lock recoveries. 
-% TODO(probing, only if the KS/TSM run is carried out): Inside the network the added tone is located in [TODO]\% of the contexts on a site and [TODO]\% beside it at the output head (\autoref{tab:probingLockControlBg}), so the representation [TODO: places / does not place] the tone equally in the two cases.
+{\color{red}Inside the network the asymmetry is reversed: at the output head the added tone is located in $37$ to $38\%$ of the contexts on a site and in $61$ to $66\%$ beside it (\autoref{tab:probingLockSummary}; per geometry in \autoref{tab:probingLockControlBg}), so the recovery at the sites does not come from a sharper representation of their frequency, which favours the first mechanism.} % red: probing added after the notebook run
 Whether a loss concentrates at the sites once background and phase are matched is what the Bayesian analysis was designed to decide.
 
 \input{tables/decomposition.tex}
@@ -26,7 +36,7 @@ On the photovoltaic series every checkpoint forecasts the same windows across th
 
 \input{tables/solarPrediction.tex}
 
-The series informs the application rather than testing the design: the dominant content of every window is the daily cycle, far below the first candidate site at one cycle per patch, so no window carries appreciable energy on $\mathcal F_{\mathrm{lock}}$. Content at the sites reaches this plant only through weather transients lasting a few minutes, the events a confirmed loss at the sites would leave the forecaster least able to represent.
+The series informs the application rather than testing the design: the dominant content of every window is the daily cycle, far below the first candidate site at one cycle per patch; weaker content at the sites is not measured. Content at the sites reaches this plant only through weather transients lasting a few minutes, the events a confirmed loss at the sites would leave the forecaster least able to represent.
 
 
 

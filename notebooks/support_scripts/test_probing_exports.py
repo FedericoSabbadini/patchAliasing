@@ -157,5 +157,46 @@ class LockControlExportTests(unittest.TestCase):
             self.assertNotIn("Final output", paths["caption"].read_text(encoding="utf-8"))
 
 
+
+class LockSummaryExportTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.pure = exports.lock_control_summary(trial_results(families=("pure",), n_pairs=8))
+        cls.complex = exports.lock_control_summary(trial_results(n_pairs=8))
+
+    def test_means_cover_the_retrained_geometries_only(self):
+        table = exports.lock_summary(self.pure, self.complex)
+        self.assertEqual(len(table), 3 * 3 * 10)
+        self.assertTrue((table.geometries == 15).all())
+        self.assertTrue(np.allclose(table.loc[~table.off_boundary, "mean_net_pct"], -30))
+        self.assertTrue(np.allclose(table.loc[table.off_boundary, "mean_net_pct"], -20))
+        # the published checkpoint may differ without moving the retrained means
+        moved = self.pure.copy()
+        moved.loc[moved.official, "net_pct"] = 50.
+        self.assertTrue(np.allclose(exports.lock_summary(moved, self.complex).mean_net_pct,
+                                    table.mean_net_pct))
+
+    def test_a_missing_geometry_or_stage_stops_the_table(self):
+        partial = self.pure.loc[self.pure.model != "retrained-p8-s8"]
+        with self.assertRaisesRegex(ValueError, "each retrained geometry"):
+            exports.lock_summary(partial, self.complex)
+        untrained_missing = self.complex.loc[self.complex.network != "random_init"]
+        with self.assertRaisesRegex(ValueError, "each retrained geometry"):
+            exports.lock_summary(self.pure, untrained_missing)
+
+    def test_export_reads_the_published_summaries(self):
+        with tempfile.TemporaryDirectory() as directory:
+            directory = Path(directory)
+            with self.assertRaises(FileNotFoundError):
+                exports.export_lock_summary(directory)
+            self.pure.to_csv(directory / "pure_lock_control.csv", index=False)
+            self.complex.to_csv(directory / "complex_lock_control.csv", index=False)
+            paths = exports.export_lock_summary(directory)
+            table = paths["summary_tex"].read_text(encoding="utf-8")
+            self.assertIn("tab:probingLockSummary", table)
+            self.assertEqual(table.count("$-30$"), 3 * 2 * 10)
+            self.assertEqual(table.count("$-20$"), 3 * 10)
+            self.assertEqual(len(pd.read_csv(paths["summary_csv"])), 90)
+
 if __name__ == "__main__":
     unittest.main()
