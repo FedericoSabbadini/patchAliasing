@@ -1,91 +1,91 @@
-signal,signal_label,reading,network,off_boundary,stage,mean_net_pct,geometries
-pure,Pure tones,Trained,trained,False,enc_0,-29.473389666524678,15
-pure,Pure tones,Trained,trained,False,enc_1,-33.315527289898,15
-pure,Pure tones,Trained,trained,False,enc_2,-32.35806248163228,15
-pure,Pure tones,Trained,trained,False,enc_3,-29.902976149200402,15
-pure,Pure tones,Trained,trained,False,dec_0,-42.857844875693836,15
-pure,Pure tones,Trained,trained,False,dec_1,-42.82258214706727,15
-pure,Pure tones,Trained,trained,False,dec_2,-40.839610224507254,15
-pure,Pure tones,Trained,trained,False,dec_3,-41.01432302759534,15
-pure,Pure tones,Trained,trained,False,output_reg,-41.43020925171956,15
-pure,Pure tones,Trained,trained,False,output_head,-32.69113627282963,15
-pure,Pure tones,"Trained, off boundary",trained,True,enc_0,-29.949999999999996,15
-pure,Pure tones,"Trained, off boundary",trained,True,enc_1,-33.830555555555556,15
-pure,Pure tones,"Trained, off boundary",trained,True,enc_2,-32.34722222222222,15
-pure,Pure tones,"Trained, off boundary",trained,True,enc_3,-29.824999999999996,15
-pure,Pure tones,"Trained, off boundary",trained,True,dec_0,-40.46944444444445,15
-pure,Pure tones,"Trained, off boundary",trained,True,dec_1,-36.90833333333333,15
-pure,Pure tones,"Trained, off boundary",trained,True,dec_2,-37.147222222222226,15
-pure,Pure tones,"Trained, off boundary",trained,True,dec_3,-38.15833333333333,15
-pure,Pure tones,"Trained, off boundary",trained,True,output_reg,-39.169444444444444,15
-pure,Pure tones,"Trained, off boundary",trained,True,output_head,-33.17777777777778,15
-pure,Pure tones,Untrained,random_init,False,enc_0,-22.020422597996973,15
-pure,Pure tones,Untrained,random_init,False,enc_1,-22.326775436615257,15
-pure,Pure tones,Untrained,random_init,False,enc_2,-22.51817686508762,15
-pure,Pure tones,Untrained,random_init,False,enc_3,-22.213319860917114,15
-pure,Pure tones,Untrained,random_init,False,dec_0,-23.299375579924774,15
-pure,Pure tones,Untrained,random_init,False,dec_1,-22.459540154734665,15
-pure,Pure tones,Untrained,random_init,False,dec_2,-22.730726024547536,15
-pure,Pure tones,Untrained,random_init,False,dec_3,-23.037393879956813,15
-pure,Pure tones,Untrained,random_init,False,output_reg,-22.539559042533867,15
-pure,Pure tones,Untrained,random_init,False,output_head,-22.490944092774757,15
-tsmixup,Light TSMixup,Trained,trained,False,enc_0,-22.813333333333336,15
-tsmixup,Light TSMixup,Trained,trained,False,enc_1,-24.366666666666667,15
-tsmixup,Light TSMixup,Trained,trained,False,enc_2,-25.220000000000006,15
-tsmixup,Light TSMixup,Trained,trained,False,enc_3,-24.08666666666667,15
-tsmixup,Light TSMixup,Trained,trained,False,dec_0,-34.76,15
-tsmixup,Light TSMixup,Trained,trained,False,dec_1,-33.626666666666665,15
-tsmixup,Light TSMixup,Trained,trained,False,dec_2,-33.03333333333334,15
-tsmixup,Light TSMixup,Trained,trained,False,dec_3,-32.00000000000001,15
-tsmixup,Light TSMixup,Trained,trained,False,output_reg,-31.69333333333333,15
-tsmixup,Light TSMixup,Trained,trained,False,output_head,-24.366666666666664,15
-tsmixup,Light TSMixup,"Trained, off boundary",trained,True,enc_0,-23.543794997407243,15
-tsmixup,Light TSMixup,"Trained, off boundary",trained,True,enc_1,-24.407761972914834,15
-tsmixup,Light TSMixup,"Trained, off boundary",trained,True,enc_2,-25.65939783897443,15
-tsmixup,Light TSMixup,"Trained, off boundary",trained,True,enc_3,-23.72470909147784,15
-tsmixup,Light TSMixup,"Trained, off boundary",trained,True,dec_0,-29.307200456456417,15
-tsmixup,Light TSMixup,"Trained, off boundary",trained,True,dec_1,-29.02293692990126,15
-tsmixup,Light TSMixup,"Trained, off boundary",trained,True,dec_2,-28.826980449710042,15
-tsmixup,Light TSMixup,"Trained, off boundary",trained,True,dec_3,-28.272745977860268,15
-tsmixup,Light TSMixup,"Trained, off boundary",trained,True,output_reg,-27.49773021052256,15
-tsmixup,Light TSMixup,"Trained, off boundary",trained,True,output_head,-24.663684826366264,15
-tsmixup,Light TSMixup,Untrained,random_init,False,enc_0,-20.84666666666667,15
-tsmixup,Light TSMixup,Untrained,random_init,False,enc_1,-21.046666666666663,15
-tsmixup,Light TSMixup,Untrained,random_init,False,enc_2,-21.073333333333334,15
-tsmixup,Light TSMixup,Untrained,random_init,False,enc_3,-21.493333333333336,15
-tsmixup,Light TSMixup,Untrained,random_init,False,dec_0,-20.293333333333333,15
-tsmixup,Light TSMixup,Untrained,random_init,False,dec_1,-19.759999999999998,15
-tsmixup,Light TSMixup,Untrained,random_init,False,dec_2,-19.520000000000003,15
-tsmixup,Light TSMixup,Untrained,random_init,False,dec_3,-20.85333333333333,15
-tsmixup,Light TSMixup,Untrained,random_init,False,output_reg,-20.539999999999996,15
-tsmixup,Light TSMixup,Untrained,random_init,False,output_head,-21.060000000000002,15
-kernelsynth,KernelSynth,Trained,trained,False,enc_0,-24.413333333333334,15
-kernelsynth,KernelSynth,Trained,trained,False,enc_1,-26.60666666666667,15
-kernelsynth,KernelSynth,Trained,trained,False,enc_2,-26.8,15
-kernelsynth,KernelSynth,Trained,trained,False,enc_3,-26.33333333333334,15
-kernelsynth,KernelSynth,Trained,trained,False,dec_0,-36.05999999999999,15
-kernelsynth,KernelSynth,Trained,trained,False,dec_1,-33.733333333333334,15
-kernelsynth,KernelSynth,Trained,trained,False,dec_2,-32.946666666666665,15
-kernelsynth,KernelSynth,Trained,trained,False,dec_3,-33.52,15
-kernelsynth,KernelSynth,Trained,trained,False,output_reg,-34.28666666666666,15
-kernelsynth,KernelSynth,Trained,trained,False,output_head,-28.086666666666662,15
-kernelsynth,KernelSynth,"Trained, off boundary",trained,True,enc_0,-24.318247441248708,15
-kernelsynth,KernelSynth,"Trained, off boundary",trained,True,enc_1,-26.16955486629138,15
-kernelsynth,KernelSynth,"Trained, off boundary",trained,True,enc_2,-27.111883823973802,15
-kernelsynth,KernelSynth,"Trained, off boundary",trained,True,enc_3,-24.00407378749667,15
-kernelsynth,KernelSynth,"Trained, off boundary",trained,True,dec_0,-31.203535070987307,15
-kernelsynth,KernelSynth,"Trained, off boundary",trained,True,dec_1,-28.778755107866914,15
-kernelsynth,KernelSynth,"Trained, off boundary",trained,True,dec_2,-28.53629478312642,15
-kernelsynth,KernelSynth,"Trained, off boundary",trained,True,dec_3,-28.563969181713027,15
-kernelsynth,KernelSynth,"Trained, off boundary",trained,True,output_reg,-29.422487856738865,15
-kernelsynth,KernelSynth,"Trained, off boundary",trained,True,output_head,-26.66510401668531,15
-kernelsynth,KernelSynth,Untrained,random_init,False,enc_0,-20.320000000000004,15
-kernelsynth,KernelSynth,Untrained,random_init,False,enc_1,-22.493333333333332,15
-kernelsynth,KernelSynth,Untrained,random_init,False,enc_2,-21.26666666666667,15
-kernelsynth,KernelSynth,Untrained,random_init,False,enc_3,-21.479999999999997,15
-kernelsynth,KernelSynth,Untrained,random_init,False,dec_0,-19.986666666666668,15
-kernelsynth,KernelSynth,Untrained,random_init,False,dec_1,-19.89333333333333,15
-kernelsynth,KernelSynth,Untrained,random_init,False,dec_2,-20.233333333333338,15
-kernelsynth,KernelSynth,Untrained,random_init,False,dec_3,-20.70666666666666,15
-kernelsynth,KernelSynth,Untrained,random_init,False,output_reg,-20.51333333333333,15
-kernelsynth,KernelSynth,Untrained,random_init,False,output_head,-20.83333333333333,15
+signal,signal_label,reading,network,off_boundary,stage,mean_net_pct,mean_lock_pct,mean_control_pct,geometries
+pure,Pure tones,Trained,trained,False,enc_0,-29.473389666524678,45.626265928325424,75.09965559485009,15
+pure,Pure tones,Trained,trained,False,enc_1,-33.315527289898,44.589795965539665,77.90532325543766,15
+pure,Pure tones,Trained,trained,False,enc_2,-32.35806248163228,45.75391839281998,78.11198087445227,15
+pure,Pure tones,Trained,trained,False,enc_3,-29.902976149200402,47.37879217146952,77.28176832066994,15
+pure,Pure tones,Trained,trained,False,dec_0,-42.857844875693836,46.64007581536185,89.4979206910557,15
+pure,Pure tones,Trained,trained,False,dec_1,-42.82258214706727,46.84430575780689,89.66688790487416,15
+pure,Pure tones,Trained,trained,False,dec_2,-40.839610224507254,47.307410819538966,88.14702104404621,15
+pure,Pure tones,Trained,trained,False,dec_3,-41.01432302759534,48.032036613272304,89.04635964086765,15
+pure,Pure tones,Trained,trained,False,output_reg,-41.43020925171956,45.87644341420085,87.30665266592037,15
+pure,Pure tones,Trained,trained,False,output_head,-32.69113627282963,34.76443017953316,67.45556645236279,15
+pure,Pure tones,"Trained, off boundary",trained,True,enc_0,-29.949999999999996,50.80555555555555,80.75555555555555,15
+pure,Pure tones,"Trained, off boundary",trained,True,enc_1,-33.830555555555556,46.21666666666667,80.0472222222222,15
+pure,Pure tones,"Trained, off boundary",trained,True,enc_2,-32.34722222222222,49.783333333333324,82.13055555555555,15
+pure,Pure tones,"Trained, off boundary",trained,True,enc_3,-29.824999999999996,52.58888888888888,82.41388888888888,15
+pure,Pure tones,"Trained, off boundary",trained,True,dec_0,-40.46944444444445,52.45,92.91944444444445,15
+pure,Pure tones,"Trained, off boundary",trained,True,dec_1,-36.90833333333333,54.94444444444444,91.85277777777777,15
+pure,Pure tones,"Trained, off boundary",trained,True,dec_2,-37.147222222222226,53.21666666666667,90.3638888888889,15
+pure,Pure tones,"Trained, off boundary",trained,True,dec_3,-38.15833333333333,54.21111111111111,92.36944444444447,15
+pure,Pure tones,"Trained, off boundary",trained,True,output_reg,-39.169444444444444,52.933333333333344,92.10277777777779,15
+pure,Pure tones,"Trained, off boundary",trained,True,output_head,-33.17777777777778,44.12777777777777,77.30555555555556,15
+pure,Pure tones,Untrained,random_init,False,enc_0,-22.020422597996973,38.79991810884259,60.82034070683958,15
+pure,Pure tones,Untrained,random_init,False,enc_1,-22.326775436615257,41.01587301587301,63.34264845248827,15
+pure,Pure tones,Untrained,random_init,False,enc_2,-22.51817686508762,39.68375087917422,62.201927744261845,15
+pure,Pure tones,Untrained,random_init,False,enc_3,-22.213319860917114,39.37620467506051,61.58952453597763,15
+pure,Pure tones,Untrained,random_init,False,dec_0,-23.299375579924774,39.07748818687035,62.376863766795125,15
+pure,Pure tones,Untrained,random_init,False,dec_1,-22.459540154734665,39.290528032862134,61.750068187596796,15
+pure,Pure tones,Untrained,random_init,False,dec_2,-22.730726024547536,38.338598802672024,61.069324827219575,15
+pure,Pure tones,Untrained,random_init,False,dec_3,-23.037393879956813,38.17057135592604,61.20796523588285,15
+pure,Pure tones,Untrained,random_init,False,output_reg,-22.539559042533867,38.555396396128664,61.09495543866253,15
+pure,Pure tones,Untrained,random_init,False,output_head,-22.490944092774757,38.1846170102463,60.67556110302107,15
+tsmixup,Light TSMixup,Trained,trained,False,enc_0,-22.813333333333336,42.16666666666667,64.98,15
+tsmixup,Light TSMixup,Trained,trained,False,enc_1,-24.366666666666667,42.70666666666667,67.07333333333332,15
+tsmixup,Light TSMixup,Trained,trained,False,enc_2,-25.220000000000006,42.04,67.26,15
+tsmixup,Light TSMixup,Trained,trained,False,enc_3,-24.08666666666667,43.14,67.22666666666667,15
+tsmixup,Light TSMixup,Trained,trained,False,dec_0,-34.76,46.76666666666667,81.52666666666666,15
+tsmixup,Light TSMixup,Trained,trained,False,dec_1,-33.626666666666665,48.10666666666667,81.73333333333333,15
+tsmixup,Light TSMixup,Trained,trained,False,dec_2,-33.03333333333334,48.35333333333333,81.38666666666667,15
+tsmixup,Light TSMixup,Trained,trained,False,dec_3,-32.00000000000001,48.28000000000001,80.27999999999999,15
+tsmixup,Light TSMixup,Trained,trained,False,output_reg,-31.69333333333333,47.18666666666666,78.88000000000002,15
+tsmixup,Light TSMixup,Trained,trained,False,output_head,-24.366666666666664,36.77333333333333,61.14,15
+tsmixup,Light TSMixup,"Trained, off boundary",trained,True,enc_0,-23.543794997407243,45.171209850957254,68.71500484836449,15
+tsmixup,Light TSMixup,"Trained, off boundary",trained,True,enc_1,-24.407761972914834,45.864693330705954,70.2724553036208,15
+tsmixup,Light TSMixup,"Trained, off boundary",trained,True,enc_2,-25.65939783897443,45.50953131109807,71.1689291500725,15
+tsmixup,Light TSMixup,"Trained, off boundary",trained,True,enc_3,-23.72470909147784,47.91599400351121,71.64070309498905,15
+tsmixup,Light TSMixup,"Trained, off boundary",trained,True,dec_0,-29.307200456456417,55.34141941803589,84.64861987449231,15
+tsmixup,Light TSMixup,"Trained, off boundary",trained,True,dec_1,-29.02293692990126,55.94672238859423,84.96965931849552,15
+tsmixup,Light TSMixup,"Trained, off boundary",trained,True,dec_2,-28.826980449710042,55.80817858692442,84.63515903663446,15
+tsmixup,Light TSMixup,"Trained, off boundary",trained,True,dec_3,-28.272745977860268,55.360786571544416,83.63353254940469,15
+tsmixup,Light TSMixup,"Trained, off boundary",trained,True,output_reg,-27.49773021052256,55.44790905904525,82.94563926956782,15
+tsmixup,Light TSMixup,"Trained, off boundary",trained,True,output_head,-24.663684826366264,44.312652753223325,68.97633757958961,15
+tsmixup,Light TSMixup,Untrained,random_init,False,enc_0,-20.84666666666667,37.559999999999995,58.40666666666667,15
+tsmixup,Light TSMixup,Untrained,random_init,False,enc_1,-21.046666666666663,38.873333333333335,59.919999999999995,15
+tsmixup,Light TSMixup,Untrained,random_init,False,enc_2,-21.073333333333334,39.65333333333333,60.72666666666667,15
+tsmixup,Light TSMixup,Untrained,random_init,False,enc_3,-21.493333333333336,38.55333333333333,60.04666666666667,15
+tsmixup,Light TSMixup,Untrained,random_init,False,dec_0,-20.293333333333333,38.43333333333333,58.72666666666665,15
+tsmixup,Light TSMixup,Untrained,random_init,False,dec_1,-19.759999999999998,38.63999999999999,58.39999999999999,15
+tsmixup,Light TSMixup,Untrained,random_init,False,dec_2,-19.520000000000003,38.00666666666666,57.52666666666665,15
+tsmixup,Light TSMixup,Untrained,random_init,False,dec_3,-20.85333333333333,37.413333333333334,58.26666666666667,15
+tsmixup,Light TSMixup,Untrained,random_init,False,output_reg,-20.539999999999996,37.480000000000004,58.01999999999999,15
+tsmixup,Light TSMixup,Untrained,random_init,False,output_head,-21.060000000000002,37.34666666666667,58.40666666666666,15
+kernelsynth,KernelSynth,Trained,trained,False,enc_0,-24.413333333333334,43.0,67.41333333333333,15
+kernelsynth,KernelSynth,Trained,trained,False,enc_1,-26.60666666666667,43.519999999999996,70.12666666666668,15
+kernelsynth,KernelSynth,Trained,trained,False,enc_2,-26.8,43.45333333333333,70.25333333333333,15
+kernelsynth,KernelSynth,Trained,trained,False,enc_3,-26.33333333333334,43.89999999999999,70.23333333333333,15
+kernelsynth,KernelSynth,Trained,trained,False,dec_0,-36.05999999999999,44.36666666666667,80.42666666666666,15
+kernelsynth,KernelSynth,Trained,trained,False,dec_1,-33.733333333333334,46.78666666666666,80.52000000000001,15
+kernelsynth,KernelSynth,Trained,trained,False,dec_2,-32.946666666666665,46.85333333333334,79.8,15
+kernelsynth,KernelSynth,Trained,trained,False,dec_3,-33.52,45.96,79.48,15
+kernelsynth,KernelSynth,Trained,trained,False,output_reg,-34.28666666666666,44.98666666666667,79.27333333333333,15
+kernelsynth,KernelSynth,Trained,trained,False,output_head,-28.086666666666662,38.02,66.10666666666667,15
+kernelsynth,KernelSynth,"Trained, off boundary",trained,True,enc_0,-24.318247441248708,46.86426260677386,71.18251004802255,15
+kernelsynth,KernelSynth,"Trained, off boundary",trained,True,enc_1,-26.16955486629138,46.6260992517025,72.79565411799386,15
+kernelsynth,KernelSynth,"Trained, off boundary",trained,True,enc_2,-27.111883823973802,46.67635916842587,73.78824299239965,15
+kernelsynth,KernelSynth,"Trained, off boundary",trained,True,enc_3,-24.00407378749667,48.98046246771394,72.98453625521061,15
+kernelsynth,KernelSynth,"Trained, off boundary",trained,True,dec_0,-31.203535070987307,53.30055897435215,84.50409404533947,15
+kernelsynth,KernelSynth,"Trained, off boundary",trained,True,dec_1,-28.778755107866914,55.33671830247463,84.11547341034155,15
+kernelsynth,KernelSynth,"Trained, off boundary",trained,True,dec_2,-28.53629478312642,54.48579867010573,83.02209345323215,15
+kernelsynth,KernelSynth,"Trained, off boundary",trained,True,dec_3,-28.563969181713027,53.799292053167875,82.3632612348809,15
+kernelsynth,KernelSynth,"Trained, off boundary",trained,True,output_reg,-29.422487856738865,53.26148830705906,82.68397616379795,15
+kernelsynth,KernelSynth,"Trained, off boundary",trained,True,output_head,-26.66510401668531,45.4026049450761,72.06770896176141,15
+kernelsynth,KernelSynth,Untrained,random_init,False,enc_0,-20.320000000000004,36.5,56.819999999999986,15
+kernelsynth,KernelSynth,Untrained,random_init,False,enc_1,-22.493333333333332,36.97333333333334,59.466666666666676,15
+kernelsynth,KernelSynth,Untrained,random_init,False,enc_2,-21.26666666666667,38.2,59.46666666666666,15
+kernelsynth,KernelSynth,Untrained,random_init,False,enc_3,-21.479999999999997,38.23333333333333,59.713333333333345,15
+kernelsynth,KernelSynth,Untrained,random_init,False,dec_0,-19.986666666666668,37.50666666666667,57.49333333333333,15
+kernelsynth,KernelSynth,Untrained,random_init,False,dec_1,-19.89333333333333,37.233333333333334,57.126666666666665,15
+kernelsynth,KernelSynth,Untrained,random_init,False,dec_2,-20.233333333333338,36.88666666666666,57.12,15
+kernelsynth,KernelSynth,Untrained,random_init,False,dec_3,-20.70666666666666,36.8,57.50666666666667,15
+kernelsynth,KernelSynth,Untrained,random_init,False,output_reg,-20.51333333333333,36.86666666666667,57.38000000000001,15
+kernelsynth,KernelSynth,Untrained,random_init,False,output_head,-20.83333333333333,37.22666666666666,58.059999999999995,15
