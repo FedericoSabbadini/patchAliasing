@@ -1,25 +1,40 @@
-\begin{table*}[!tbp]
+\begin{sidewaystable}[!p]
     \centering
     \color{red}\captionsetup{font+=probingred} % probing added after the notebook run: drop this line for the final version
     \small
-    \setlength{\tabcolsep}{4pt}
-    \begin{tabular}{@{}llrrrrrrrrrr@{}}
+    \renewcommand{\arraystretch}{1.15}
+    \setlength{\tabcolsep}{7pt}
+    \begin{tabular}{@{}lrrrrr@{\hspace{22pt}}rrrrr@{\hspace{22pt}}rrrrr@{}}
         \toprule
-        \textbf{Signal} & \textbf{Reading} & \textbf{E1} & \textbf{E2} & \textbf{E3} & \textbf{E4} & \textbf{D1} & \textbf{D2} & \textbf{D3} & \textbf{D4} & \textbf{In} & \textbf{Head} \\
+        & \multicolumn{5}{c}{\textbf{Pure tones}} & \multicolumn{5}{c}{\textbf{Light TSMixup}} & \multicolumn{5}{c}{\textbf{KernelSynth}} \\
+        \cmidrule(lr){2-6} \cmidrule(lr){7-11} \cmidrule(lr){12-16}
+        \textbf{Stage} & \textbf{Lock} & \textbf{Control} & \textbf{Diff} & \textbf{Untr.} & \textbf{Net} & \textbf{Lock} & \textbf{Control} & \textbf{Diff} & \textbf{Untr.} & \textbf{Net} & \textbf{Lock} & \textbf{Control} & \textbf{Diff} & \textbf{Untr.} & \textbf{Net} \\
         \midrule
-        Pure tones & Trained & $-29$ & $-33$ & $-32$ & $-30$ & $-43$ & $-43$ & $-41$ & $-41$ & $-41$ & $-33$ \\
-         & Trained, off boundary & $-30$ & $-34$ & $-32$ & $-30$ & $-40$ & $-37$ & $-37$ & $-38$ & $-39$ & $-33$ \\
-         & Untrained & $-22$ & $-22$ & $-23$ & $-22$ & $-23$ & $-22$ & $-23$ & $-23$ & $-23$ & $-22$ \\
-        \addlinespace[3pt]
-        Light TSMixup & Trained & $-23$ & $-24$ & $-25$ & $-24$ & $-35$ & $-34$ & $-33$ & $-32$ & $-32$ & $-24$ \\
-         & Trained, off boundary & $-24$ & $-24$ & $-26$ & $-24$ & $-29$ & $-29$ & $-29$ & $-28$ & $-27$ & $-25$ \\
-         & Untrained & $-21$ & $-21$ & $-21$ & $-21$ & $-20$ & $-20$ & $-20$ & $-21$ & $-21$ & $-21$ \\
-        \addlinespace[3pt]
-        KernelSynth & Trained & $-24$ & $-27$ & $-27$ & $-26$ & $-36$ & $-34$ & $-33$ & $-34$ & $-34$ & $-28$ \\
-         & Trained, off boundary & $-24$ & $-26$ & $-27$ & $-24$ & $-31$ & $-29$ & $-29$ & $-29$ & $-29$ & $-27$ \\
-         & Untrained & $-20$ & $-22$ & $-21$ & $-21$ & $-20$ & $-20$ & $-20$ & $-21$ & $-21$ & $-21$ \\
+        \multicolumn{16}{@{}l}{\textit{All pairs}} \\
+        E1 & $46$ & $75$ & $-29$ & $-22$ & $-7$ & $42$ & $65$ & $-23$ & $-21$ & $-2$ & $43$ & $67$ & $-24$ & $-20$ & $-4$ \\
+        E2 & $45$ & $78$ & $-33$ & $-22$ & $-11$ & $43$ & $67$ & $-24$ & $-21$ & $-3$ & $44$ & $70$ & $-27$ & $-22$ & $-4$ \\
+        E3 & $46$ & $78$ & $-32$ & $-23$ & $-10$ & $42$ & $67$ & $-25$ & $-21$ & $-4$ & $43$ & $70$ & $-27$ & $-21$ & $-6$ \\
+        E4 & $47$ & $77$ & $-30$ & $-22$ & $-8$ & $43$ & $67$ & $-24$ & $-21$ & $-3$ & $44$ & $70$ & $-26$ & $-21$ & $-5$ \\
+        D1 & $47$ & $89$ & $-43$ & $-23$ & $-20$ & $47$ & $82$ & $-35$ & $-20$ & $-14$ & $44$ & $80$ & $-36$ & $-20$ & $-16$ \\
+        D2 & $47$ & $90$ & $-43$ & $-22$ & $-20$ & $48$ & $82$ & $-34$ & $-20$ & $-14$ & $47$ & $81$ & $-34$ & $-20$ & $-14$ \\
+        D3 & $47$ & $88$ & $-41$ & $-23$ & $-18$ & $48$ & $81$ & $-33$ & $-20$ & $-14$ & $47$ & $80$ & $-33$ & $-20$ & $-13$ \\
+        D4 & $48$ & $89$ & $-41$ & $-23$ & $-18$ & $48$ & $80$ & $-32$ & $-21$ & $-11$ & $46$ & $79$ & $-34$ & $-21$ & $-13$ \\
+        In & $46$ & $87$ & $-41$ & $-23$ & $-19$ & $47$ & $79$ & $-32$ & $-21$ & $-11$ & $45$ & $79$ & $-34$ & $-21$ & $-14$ \\
+        Head & $35$ & $67$ & $-33$ & $-22$ & $-10$ & $37$ & $61$ & $-24$ & $-21$ & $-3$ & $38$ & $66$ & $-28$ & $-21$ & $-7$ \\
+        \midrule
+        \multicolumn{16}{@{}l}{\textit{Off boundary}} \\
+        E1 & $51$ & $81$ & $-30$ & $-22$ & $-8$ & $45$ & $69$ & $-24$ & $-21$ & $-3$ & $47$ & $71$ & $-24$ & $-20$ & $-4$ \\
+        E2 & $46$ & $80$ & $-34$ & $-22$ & $-12$ & $46$ & $70$ & $-24$ & $-21$ & $-3$ & $47$ & $73$ & $-26$ & $-22$ & $-4$ \\
+        E3 & $50$ & $82$ & $-32$ & $-23$ & $-10$ & $46$ & $71$ & $-26$ & $-21$ & $-5$ & $47$ & $74$ & $-27$ & $-21$ & $-6$ \\
+        E4 & $53$ & $82$ & $-30$ & $-22$ & $-8$ & $48$ & $72$ & $-24$ & $-21$ & $-2$ & $49$ & $73$ & $-24$ & $-21$ & $-3$ \\
+        D1 & $52$ & $93$ & $-40$ & $-23$ & $-17$ & $55$ & $85$ & $-29$ & $-20$ & $-9$ & $53$ & $85$ & $-31$ & $-20$ & $-11$ \\
+        D2 & $55$ & $92$ & $-37$ & $-22$ & $-14$ & $56$ & $85$ & $-29$ & $-20$ & $-9$ & $55$ & $84$ & $-29$ & $-20$ & $-9$ \\
+        D3 & $53$ & $90$ & $-37$ & $-23$ & $-14$ & $56$ & $85$ & $-29$ & $-20$ & $-9$ & $54$ & $83$ & $-29$ & $-20$ & $-8$ \\
+        D4 & $54$ & $92$ & $-38$ & $-23$ & $-15$ & $55$ & $84$ & $-28$ & $-21$ & $-7$ & $54$ & $82$ & $-29$ & $-21$ & $-8$ \\
+        In & $53$ & $92$ & $-39$ & $-23$ & $-17$ & $55$ & $83$ & $-27$ & $-21$ & $-7$ & $53$ & $83$ & $-29$ & $-21$ & $-9$ \\
+        Head & $44$ & $77$ & $-33$ & $-22$ & $-11$ & $44$ & $69$ & $-25$ & $-21$ & $-4$ & $45$ & $72$ & $-27$ & $-21$ & $-6$ \\
         \bottomrule
     \end{tabular}
-    \caption{Located rate on a candidate site minus the rate beside it, in percentage points, averaged over the fifteen retrained geometries; a negative value means that a tone on a site is located less often. Off boundary keeps the pairs at least $4$\,Hz from the task boundaries, Untrained uses untrained weights. E1--E4 and D1--D4 are the encoder and decoder blocks, In the projection input, Head the output quantile head.}
+    \caption{Located rate in per cent, averaged over the retrained geometries, for a tone on a candidate site (Lock) and beside it (Control); Diff is Lock minus Control in points, negative when a site is located less often. Untr. is Diff on the untrained network, on all pairs; Net is Diff minus Untr. Off boundary keeps pairs at least $4$\,Hz from the task boundaries. E1--E4, D1--D4: encoder and decoder blocks; In: projection input; Head: output head.}
     \label{tab:probingLockSummary}
-\end{table*}
+\end{sidewaystable}

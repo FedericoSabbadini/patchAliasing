@@ -170,6 +170,8 @@ class LockSummaryExportTests(unittest.TestCase):
         self.assertTrue((table.geometries == 15).all())
         self.assertTrue(np.allclose(table.loc[~table.off_boundary, "mean_net_pct"], -30))
         self.assertTrue(np.allclose(table.loc[table.off_boundary, "mean_net_pct"], -20))
+        self.assertTrue(np.allclose(table.loc[~table.off_boundary, "mean_lock_pct"], 70))
+        self.assertTrue(np.allclose(table.loc[~table.off_boundary, "mean_control_pct"], 100))
         # the published checkpoint may differ without moving the retrained means
         moved = self.pure.copy()
         moved.loc[moved.official, "net_pct"] = 50.
@@ -194,8 +196,12 @@ class LockSummaryExportTests(unittest.TestCase):
             paths = exports.export_lock_summary(directory)
             table = paths["summary_tex"].read_text(encoding="utf-8")
             self.assertIn("tab:probingLockSummary", table)
-            self.assertEqual(table.count("$-30$"), 3 * 2 * 10)
-            self.assertEqual(table.count("$-20$"), 3 * 10)
+            # per signal and stage, Lock, Control, Diff, Untr. and Net, in the all-pairs and off-boundary blocks
+            for cell, count in (("$70$", 30), ("$80$", 30), ("$100$", 60), ("$-30$", 90), ("$-20$", 30),
+                                ("$10$", 30), ("$0$", 30)):
+                self.assertEqual(table.count(cell), count, cell)
+            self.assertNotIn("$-0$", table)
+            self.assertIn("Off boundary", table)
             self.assertEqual(len(pd.read_csv(paths["summary_csv"])), 90)
 
 if __name__ == "__main__":

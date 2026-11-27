@@ -547,7 +547,7 @@ SUMMARY_READINGS = (("Trained", "trained", ""), ("Trained, off boundary", "train
 
 
 def lock_summary(pure: pd.DataFrame, complex_: pd.DataFrame) -> pd.DataFrame:
-    """Mean lock-minus-control difference per signal, reading and stage, over the retrained geometries.
+    """Mean lock, control and lock-minus-control per signal, reading and stage, over the retrained geometries.
 
     `pure` and `complex_` are the outputs of lock_control_summary for the two runs
     (pure_lock_control.csv and complex_lock_control.csv).  The published checkpoint
@@ -555,7 +555,8 @@ def lock_summary(pure: pd.DataFrame, complex_: pd.DataFrame) -> pd.DataFrame:
     unweighted across geometries, as quoted in the report.
     """
     frame = pd.concat([pure, complex_], ignore_index=True)
-    needed = {"model", "official", "family", "network", "stage", "net_pct", "net_pct_off"}
+    needed = {"model", "official", "family", "network", "stage", "net_pct", "net_pct_off",
+              "lock_pct", "control_pct", "lock_pct_off", "control_pct_off"}
     if missing := needed - set(frame.columns):
         raise ValueError(f"Lock/control summaries miss {sorted(missing)}")
     retrained = frame.loc[~frame.official.astype(bool)]
@@ -565,42 +566,69 @@ def lock_summary(pure: pd.DataFrame, complex_: pd.DataFrame) -> pd.DataFrame:
         for reading, network, suffix in SUMMARY_READINGS:
             part = retrained.loc[(retrained.family == signal) & (retrained.network == network)]
             for stage in STAGES:
-                cell = part.loc[part.stage == stage, ["model", f"net_pct{suffix}"]]
+                cell = part.loc[part.stage == stage, ["model", f"net_pct{suffix}", f"lock_pct{suffix}",
+                                                       f"control_pct{suffix}"]]
                 if set(cell.model) != expected or cell.model.duplicated().any():
                     raise ValueError(f"{signal}/{network}/{stage} needs each retrained geometry once")
                 values = cell[f"net_pct{suffix}"].to_numpy(float)
-                if not np.isfinite(values).all():
+                if not np.isfinite(cell.drop(columns="model").to_numpy(float)).all():
                     raise ValueError(f"{signal}/{network}/{stage}{suffix}: a geometry has no pair")
                 rows.append(dict(signal=signal, signal_label=signal_label, reading=reading,
                                  network=network, off_boundary=bool(suffix), stage=stage,
-                                 mean_net_pct=float(values.mean()), geometries=len(values)))
+                                 mean_net_pct=float(values.mean()),
+                                 mean_lock_pct=float(cell[f"lock_pct{suffix}"].mean()),
+                                 mean_control_pct=float(cell[f"control_pct{suffix}"].mean()),
+                                 geometries=len(values)))
     return pd.DataFrame(rows)
 
 
 def _latex_lock_summary(table: pd.DataFrame) -> str:
-    """Rows are signal and reading, columns the ten stages, cells the mean difference in points."""
-    lines = [r"\begin{table*}[!tbp]", r"    \centering", r"    \small",
-             r"    \setlength{\tabcolsep}{4pt}",
-             r"    \begin{tabular}{@{}ll" + "r" * len(STAGES) + r"@{}}", r"        \toprule",
-             r"        \textbf{Signal} & \textbf{Reading} & " + " & ".join(
-                 r"\textbf{" + STAGE_SHORT[stage] + "}" for stage in STAGES) + r" \\",
-             r"        \midrule"]
-    for index, (signal, signal_label) in enumerate(SUMMARY_SIGNALS):
-        if index:
-            lines.append(r"        \addlinespace[3pt]")
-        for row, (reading, _network, _suffix) in enumerate(SUMMARY_READINGS):
-            part = table.loc[(table.signal == signal) & (table.reading == reading)].set_index("stage")
-            cells = [f"${part.loc[stage, 'mean_net_pct']:.0f}$" for stage in STAGES]
-            lines.append(f"        {signal_label if row == 0 else ''} & {reading} & "
-                         + " & ".join(cells) + r" \\")
+    """Two blocks of rows, all pairs and off boundary, one row per probe point in each.
+
+    For each signal, Lock and Control are the per cent of tones located on a candidate site and
+    beside it, averaged over the retrained geometries; Diff is their difference in points, Untr.
+    the same difference on the untrained network and Net the first minus the second.  Differences
+    are taken on the unrounded means.  The untrained network is read on all pairs, so Untr. is the
+    same in both blocks.  The table is set sideways on a page of its own and needs the rotating
+    package; the direction of the rotation follows the parity of the page.
+    """
+    columns = ("Lock", "Control", "Diff", "Untr.", "Net")
+    blocks = (("Trained", "All pairs"), ("Trained, off boundary", "Off boundary"))
+    width = 1 + len(columns) * len(SUMMARY_SIGNALS)
+    lines = [r"\begin{sidewaystable}[!p]", r"    \centering", r"    \small",
+             r"    \renewcommand{\arraystretch}{1.15}", r"    \setlength{\tabcolsep}{7pt}",
+             r"    \begin{tabular}{@{}l" + "rrrrr@{\\hspace{22pt}}" * (len(SUMMARY_SIGNALS) - 1) + "rrrrr@{}}",
+             r"        \toprule"]
+    lines.append("        & " + " & ".join(
+        rf"\multicolumn{{{len(columns)}}}{{c}}{{\textbf{{{label}}}}}" for _signal, label in SUMMARY_SIGNALS) + r" \\")
+    lines.append("        " + " ".join(
+        rf"\cmidrule(lr){{{2 + i * len(columns)}-{1 + (i + 1) * len(columns)}}}" for i in range(len(SUMMARY_SIGNALS))))
+    lines.append(r"        \textbf{Stage} & " + " & ".join(
+        " & ".join(rf"\textbf{{{name}}}" for name in columns) for _ in SUMMARY_SIGNALS) + r" \\")
+    frames = {}
+    for signal, _label in SUMMARY_SIGNALS:
+        part = table.loc[table.signal == signal]
+        frames[signal] = {reading: part.loc[part.reading == reading].set_index("stage")
+                          for reading in ("Trained", "Trained, off boundary", "Untrained")}
+    for reading, block in blocks:
+        lines.append(r"        \midrule")
+        lines.append(rf"        \multicolumn{{{width}}}{{@{{}}l}}{{\textit{{{block}}}}} \\")
+        for stage in STAGES:
+            cells = []
+            for signal, _label in SUMMARY_SIGNALS:
+                trained, untrained = frames[signal][reading], frames[signal]["Untrained"]
+                diff, base = trained.mean_net_pct[stage], untrained.mean_net_pct[stage]
+                cells += [f"${trained.mean_lock_pct[stage]:.0f}$", f"${trained.mean_control_pct[stage]:.0f}$",
+                          f"${diff:.0f}$", f"${base:.0f}$", f"${diff - base:.0f}$".replace("$-0$", "$0$")]
+            lines.append(f"        {STAGE_SHORT[stage]} & " + " & ".join(cells) + r" \\")
     lines.extend([
         r"        \bottomrule", r"    \end{tabular}",
-        r"    \caption{Difference between the located rates on a candidate site and beside it (lock "
-        r"minus control), in percentage points, averaged over the fifteen retrained geometries at "
-        r"each probe point. Negative values mean that a tone on a site is located less often. Off "
-        r"boundary keeps the pairs at least $4$\,Hz from the task boundaries on their path; untrained "
-        r"repeats the reading with untrained weights. Columns as in \autoref{tab:probingStages}.}",
-        r"    \label{tab:probingLockSummary}", r"\end{table*}", ""])
+        r"    \caption{Located rate in per cent, averaged over the retrained geometries, for a tone on a "
+        r"candidate site (Lock) and beside it (Control); Diff is Lock minus Control in points, negative when a "
+        r"site is located less often. Untr. is Diff on the untrained network, on all pairs; Net is Diff minus "
+        r"Untr. Off boundary keeps pairs at least $4$\,Hz from the task boundaries. E1--E4, D1--D4: encoder and "
+        r"decoder blocks; In: projection input; Head: output head.}",
+        r"    \label{tab:probingLockSummary}", r"\end{sidewaystable}", ""])
     return "\n".join(lines)
 
 
